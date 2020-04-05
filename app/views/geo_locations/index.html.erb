@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Geo Locations</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Lat</th>
+      <th>Long</th>
+      <th>Smartphone</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @geo_locations.each do |geo_location| %>
+      <tr>
+        <td><%= geo_location.date %></td>
+        <td><%= geo_location.lat %></td>
+        <td><%= geo_location.long %></td>
+        <td><%= geo_location.smartphone_id %></td>
+        <td><%= link_to 'Show', geo_location %></td>
+        <td><%= link_to 'Edit', edit_geo_location_path(geo_location) %></td>
+        <td><%= link_to 'Destroy', geo_location, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Geo Location', new_geo_location_path %>

@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  taget_ip: MyString
+  status: MyString
+  apk_payload: one
+
+two:
+  taget_ip: MyString
+  status: MyString
+  apk_payload: two

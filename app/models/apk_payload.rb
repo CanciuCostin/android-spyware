@@ -1,0 +1,2 @@
+class ApkPayload < ApplicationRecord
+end

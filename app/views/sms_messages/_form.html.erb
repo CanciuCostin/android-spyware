@@ -1,0 +1,42 @@
+<%= form_with(model: sms_message, local: true) do |form| %>
+  <% if sms_message.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(sms_message.errors.count, "error") %> prohibited this sms_message from being saved:</h2>
+
+      <ul>
+        <% sms_message.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :date %>
+    <%= form.date_select :date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :source %>
+    <%= form.text_field :source %>
+  </div>
+
+  <div class="field">
+    <%= form.label :destination %>
+    <%= form.text_field :destination %>
+  </div>
+
+  <div class="field">
+    <%= form.label :content %>
+    <%= form.text_area :content %>
+  </div>
+
+  <div class="field">
+    <%= form.label :smartphone_id %>
+    <%= form.text_field :smartphone_id %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

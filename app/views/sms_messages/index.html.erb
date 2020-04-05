@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Sms Messages</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Source</th>
+      <th>Destination</th>
+      <th>Content</th>
+      <th>Smartphone</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @sms_messages.each do |sms_message| %>
+      <tr>
+        <td><%= sms_message.date %></td>
+        <td><%= sms_message.source %></td>
+        <td><%= sms_message.destination %></td>
+        <td><%= sms_message.content %></td>
+        <td><%= sms_message.smartphone_id %></td>
+        <td><%= link_to 'Show', sms_message %></td>
+        <td><%= link_to 'Edit', edit_sms_message_path(sms_message) %></td>
+        <td><%= link_to 'Destroy', sms_message, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Sms Message', new_sms_message_path %>

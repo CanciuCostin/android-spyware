@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  operating_system: MyString
+  name: MyString
+  pictures: MyString
+  screenshots: MyString
+  videos: MyString
+  recordings: MyString
+  is_rooted: MyString
+  call_logs: MyString
+  contacts: MyString
+  sms_messages: MyString
+  geo_locations: MyString
+  is_app_hidden: MyString
+
+two:
+  operating_system: MyString
+  name: MyString
+  pictures: MyString
+  screenshots: MyString
+  videos: MyString
+  recordings: MyString
+  is_rooted: MyString
+  call_logs: MyString
+  contacts: MyString
+  sms_messages: MyString
+  geo_locations: MyString
+  is_app_hidden: MyString

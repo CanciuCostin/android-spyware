@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Date:</strong>
+  <%= @sms_message.date %>
+</p>
+
+<p>
+  <strong>Source:</strong>
+  <%= @sms_message.source %>
+</p>
+
+<p>
+  <strong>Destination:</strong>
+  <%= @sms_message.destination %>
+</p>
+
+<p>
+  <strong>Content:</strong>
+  <%= @sms_message.content %>
+</p>
+
+<p>
+  <strong>Smartphone:</strong>
+  <%= @sms_message.smartphone_id %>
+</p>
+
+<%= link_to 'Edit', edit_sms_message_path(@sms_message) %> |
+<%= link_to 'Back', sms_messages_path %>

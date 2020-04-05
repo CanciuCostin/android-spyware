@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Apk Installations</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Taget ip</th>
+      <th>Status</th>
+      <th>Apk payload</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @apk_installations.each do |apk_installation| %>
+      <tr>
+        <td><%= apk_installation.taget_ip %></td>
+        <td><%= apk_installation.status %></td>
+        <td><%= apk_installation.apk_payload_id %></td>
+        <td><%= link_to 'Show', apk_installation %></td>
+        <td><%= link_to 'Edit', edit_apk_installation_path(apk_installation) %></td>
+        <td><%= link_to 'Destroy', apk_installation, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Apk Installation', new_apk_installation_path %>

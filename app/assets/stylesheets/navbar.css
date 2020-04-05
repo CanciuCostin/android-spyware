@@ -1,0 +1,99 @@
+
+#black-nav-bar *,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+ 
+#black-nav-bar html,
+body {
+  width: 100%;
+  height: 100%;
+}
+ 
+#black-nav-bar .clearfix {
+  zoom: 1;
+}
+#black-nav-bar .clearfix:before, .clearfix:after {
+  content: "\0020";
+  display: block;
+  height: 0;
+  overflow: hidden;
+}
+#black-nav-bar .clearfix:after {
+  clear: both;
+}
+ 
+
+ 
+#black-nav-bar  ul {
+  position: relative;
+  -webkit-transform: rotate(-35deg) skew(20deg, 5deg);
+          transform: rotate(-35deg) skew(20deg, 5deg);
+}
+ 
+#black-nav-bar .list-item {
+  background: #000;
+  color: #575757;
+  text-align: center;
+  height: 2.5em;
+  width: 4em;
+  vertical-align: middle;
+  line-height: 2.5em;
+  border-bottom: 1px solid #060606;
+  position: relative;
+  display: block;
+  text-decoration: none;
+  box-shadow: -2em 1.5em 0 #e1e1e1;
+  -webkit-transition: all .25s linear;
+  transition: all .25s linear;
+}
+#black-nav-bar .list-item:hover {
+  background: #ff6e42;
+  color: #fffcfb;
+  -webkit-transform: translate(0.9em, -0.9em);
+          transform: translate(0.9em, -0.9em);
+  -webkit-transition: all .25s linear;
+  transition: all .25s linear;
+  box-shadow: -2em 2em 0 #e1e1e1;
+}
+#black-nav-bar .list-item:hover:before, .list-item:hover:after {
+  -webkit-transition: all .25s linear;
+  transition: all .25s linear;
+}
+#black-nav-bar .list-item:hover:before {
+  background: #b65234;
+  width: 1em;
+  top: .5em;
+  left: -1em;
+}
+#black-nav-bar .list-item:hover:after {
+  background: #b65234;
+  width: 1em;
+  bottom: -2.5em;
+  left: 1em;
+  height: 4em;
+}
+#black-nav-bar .list-item:before, .list-item:after {
+  content: '';
+  position: absolute;
+  -webkit-transition: all .25s linear;
+  transition: all .25s linear;
+  width: .5em;
+}
+#black-nav-bar .list-item:after {
+  height: 4em;
+  background: #181818;
+  bottom: -2.25em;
+  left: 1.5em;
+  -webkit-transform: rotate(90deg) skew(0, 45deg);
+          transform: rotate(90deg) skew(0, 45deg);
+}
+#black-nav-bar .list-item:before {
+  height: 2.5em;
+  background: #121212;
+  top: .25em;
+  left: -.5em;
+  -webkit-transform: skewY(-45deg);
+          transform: skewY(-45deg);
+}

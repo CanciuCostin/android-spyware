@@ -1,0 +1,29 @@
+// Place all the styles related to the smartphones controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: https://sass-lang.com/
+
+  #infoi {
+    position: relative  ;
+    bottom: 300px;
+    z-index: 10;
+  }
+  #navi {
+    position: relative  ;
+    top: 0;
+    left: 0;
+  }
+
+
+
+  #acustom {
+    color: #ffffff;
+    text-decoration: none;
+  }
+
+  .dashboardContainer{
+    position: absolute;
+}
+
+
+
+

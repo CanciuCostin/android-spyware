@@ -1,0 +1,37 @@
+<%= form_with(model: apk_payload, local: true) do |form| %>
+  <% if apk_payload.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(apk_payload.errors.count, "error") %> prohibited this apk_payload from being saved:</h2>
+
+      <ul>
+        <% apk_payload.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :destination_ip %>
+    <%= form.text_field :destination_ip %>
+  </div>
+
+  <div class="field">
+    <%= form.label :destination_port %>
+    <%= form.text_field :destination_port %>
+  </div>
+
+  <div class="field">
+    <%= form.label :forwarding_ip %>
+    <%= form.text_field :forwarding_ip %>
+  </div>
+
+  <div class="field">
+    <%= form.label :forwarding_port %>
+    <%= form.text_field :forwarding_port %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

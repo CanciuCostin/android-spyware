@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  destination_ip: MyString
+  destination_port: MyString
+  forwarding_ip: MyString
+  forwarding_port: MyString
+
+two:
+  destination_ip: MyString
+  destination_port: MyString
+  forwarding_ip: MyString
+  forwarding_port: MyString

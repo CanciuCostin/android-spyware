@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Screenshots</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Duration</th>
+      <th>Filename</th>
+      <th>Smartphone</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @screenshots.each do |screenshot| %>
+      <tr>
+        <td><%= screenshot.date %></td>
+        <td><%= screenshot.duration %></td>
+        <td><%= screenshot.filename %></td>
+        <td><%= screenshot.smartphone_id %></td>
+        <td><%= link_to 'Show', screenshot %></td>
+        <td><%= link_to 'Edit', edit_screenshot_path(screenshot) %></td>
+        <td><%= link_to 'Destroy', screenshot, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Screenshot', new_screenshot_path %>

@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Date:</strong>
+  <%= @screenshot.date %>
+</p>
+
+<p>
+  <strong>Duration:</strong>
+  <%= @screenshot.duration %>
+</p>
+
+<p>
+  <strong>Filename:</strong>
+  <%= @screenshot.filename %>
+</p>
+
+<p>
+  <strong>Smartphone:</strong>
+  <%= @screenshot.smartphone_id %>
+</p>
+
+<%= link_to 'Edit', edit_screenshot_path(@screenshot) %> |
+<%= link_to 'Back', screenshots_path %>
