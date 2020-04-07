@@ -22,53 +22,28 @@
   </div>
 
   <div class="field">
-    <%= form.label :pictures %>
-    <%= form.text_field :pictures %>
-  </div>
-
-  <div class="field">
-    <%= form.label :screenshots %>
-    <%= form.text_field :screenshots %>
-  </div>
-
-  <div class="field">
-    <%= form.label :videos %>
-    <%= form.text_field :videos %>
-  </div>
-
-  <div class="field">
-    <%= form.label :recordings %>
-    <%= form.text_field :recordings %>
-  </div>
-
-  <div class="field">
     <%= form.label :is_rooted %>
     <%= form.text_field :is_rooted %>
   </div>
 
   <div class="field">
-    <%= form.label :call_logs %>
-    <%= form.text_field :call_logs %>
-  </div>
-
-  <div class="field">
-    <%= form.label :contacts %>
-    <%= form.text_field :contacts %>
-  </div>
-
-  <div class="field">
-    <%= form.label :sms_messages %>
-    <%= form.text_field :sms_messages %>
-  </div>
-
-  <div class="field">
-    <%= form.label :geo_locations %>
-    <%= form.text_field :geo_locations %>
-  </div>
-
-  <div class="field">
     <%= form.label :is_app_hidden %>
     <%= form.text_field :is_app_hidden %>
+  </div>
+
+  <div class="field">
+    <%= form.label :created_at %>
+    <%= form.datetime_select :created_at %>
+  </div>
+
+  <div class="field">
+    <%= form.label :updated_at %>
+    <%= form.datetime_select :updated_at %>
+  </div>
+
+  <div class="field">
+    <%= form.label :apk_installation_id %>
+    <%= form.text_field :apk_installation_id %>
   </div>
 
   <div class="actions">

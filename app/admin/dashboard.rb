@@ -4,7 +4,7 @@ ActiveAdmin.register_page "Dashboard" do
   content title: proc { I18n.t("active_admin.dashboard") } do
 
 
-    render partial: "switch"
+    #render partial: "switch"
 
 
     if params[:selected_smartphone_id].present?
@@ -23,7 +23,7 @@ ActiveAdmin.register_page "Dashboard" do
     #   end
     # end
 
-    render partial: "carousel"
+    #render partial: "carousel"
 
 
 

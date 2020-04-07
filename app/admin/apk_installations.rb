@@ -19,7 +19,7 @@ ActiveAdmin.register ApkInstallation do
         system("tools\\platform-tools\\adb install payloads\\#{@apk_payload.name}.apk")
         puts "Done"
 
-        newSmartphone=Smartphone.new(:operating_system => 'Unknown',:name => 'Smartphone',:is_rooted => 'False',:is_app_hidden => 'False',:created_at => '2003-05-03 00:00:00',:updated_at => '2003-05-03 00:00:00')
+        newSmartphone=Smartphone.new(:operating_system => 'Unknown',:name => 'Smartphone',:is_rooted => 'False',:is_app_hidden => 'False',:apk_installation_id => apk_installation.id,:created_at => '2003-05-03 00:00:00',:updated_at => '2003-05-03 00:00:00')
         newSmartphone.save!
 
         

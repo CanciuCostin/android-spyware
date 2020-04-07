@@ -2,7 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: https://sass-lang.com/
 
-  #infoi {
+#infoi {
     position: relative  ;
     bottom: 300px;
     z-index: 10;
@@ -24,6 +24,48 @@
     position: absolute;
 }
 
+.smartphone {
+    position: relative !important;
+    width: 360px !important;
+    height: 640px !important;
+    margin: auto !important;
+    border: 16px black solid !important;
+    border-top-width: 60px !important;
+    border-bottom-width: 60px !important;
+    border-radius: 36px !important;
+  }
+  
+  /* The horizontal line on the top of the device */
+  .smartphone:before {
+    content: '' !important;
+    display: block !important;
+    width: 60px !important;
+    height: 5px !important;
+    position: absolute !important;
+    top: -30px !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: #333 !important;
+    border-radius: 10px !important;
+  }
+  
+  /* The circle on the bottom of the device */
+  .smartphone:after {
+    content: '' !important;
+    display: block !important;
+    width: 35px !important;
+    height: 35px !important;
+    position: absolute !important;
+    left: 50% !important;
+    bottom: -65px !important;
+    transform: translate(-50%, -50%) !important;
+    background: #333 !important;
+    border-radius: 50% !important;
+  }
 
-
-
+  .smartphone .content {
+    width: 330px;
+    height: 540px;
+    background: white;
+  }
+  

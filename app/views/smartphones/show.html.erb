@@ -11,53 +11,28 @@
 </p>
 
 <p>
-  <strong>Pictures:</strong>
-  <%= @smartphone.pictures %>
-</p>
-
-<p>
-  <strong>Screenshots:</strong>
-  <%= @smartphone.screenshots %>
-</p>
-
-<p>
-  <strong>Videos:</strong>
-  <%= @smartphone.videos %>
-</p>
-
-<p>
-  <strong>Recordings:</strong>
-  <%= @smartphone.recordings %>
-</p>
-
-<p>
   <strong>Is rooted:</strong>
   <%= @smartphone.is_rooted %>
 </p>
 
 <p>
-  <strong>Call logs:</strong>
-  <%= @smartphone.call_logs %>
-</p>
-
-<p>
-  <strong>Contacts:</strong>
-  <%= @smartphone.contacts %>
-</p>
-
-<p>
-  <strong>Sms messages:</strong>
-  <%= @smartphone.sms_messages %>
-</p>
-
-<p>
-  <strong>Geo locations:</strong>
-  <%= @smartphone.geo_locations %>
-</p>
-
-<p>
   <strong>Is app hidden:</strong>
   <%= @smartphone.is_app_hidden %>
+</p>
+
+<p>
+  <strong>Created at:</strong>
+  <%= @smartphone.created_at %>
+</p>
+
+<p>
+  <strong>Updated at:</strong>
+  <%= @smartphone.updated_at %>
+</p>
+
+<p>
+  <strong>Apk installation:</strong>
+  <%= @smartphone.apk_installation_id %>
 </p>
 
 <%= link_to 'Edit', edit_smartphone_path(@smartphone) %> |

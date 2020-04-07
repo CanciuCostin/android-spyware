@@ -3,27 +3,17 @@
 one:
   operating_system: MyString
   name: MyString
-  pictures: MyString
-  screenshots: MyString
-  videos: MyString
-  recordings: MyString
   is_rooted: MyString
-  call_logs: MyString
-  contacts: MyString
-  sms_messages: MyString
-  geo_locations: MyString
   is_app_hidden: MyString
+  created_at: 2020-04-05 17:41:31
+  updated_at: 2020-04-05 17:41:31
+  apk_installation: one
 
 two:
   operating_system: MyString
   name: MyString
-  pictures: MyString
-  screenshots: MyString
-  videos: MyString
-  recordings: MyString
   is_rooted: MyString
-  call_logs: MyString
-  contacts: MyString
-  sms_messages: MyString
-  geo_locations: MyString
   is_app_hidden: MyString
+  created_at: 2020-04-05 17:41:31
+  updated_at: 2020-04-05 17:41:31
+  apk_installation: two

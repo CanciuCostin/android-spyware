@@ -1,6 +1,6 @@
 <div id="dashboardContainer">
 
-<% @selected_smartphone = smartphone.id.to_s + " - " + smartphone.name  %>
+<% @selected_smartphone = smartphone.nil? ? "No Smartphones Yet" : smartphone.id.to_s + " - " + smartphone.name  %>
 
 <div id ="drop" class="dropdown">
   <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -17,7 +17,7 @@ class SmartphonesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create smartphone" do
     assert_difference('Smartphone.count') do
-      post smartphones_url, params: { smartphone: { call_logs: @smartphone.call_logs, contacts: @smartphone.contacts, geo_locations: @smartphone.geo_locations, is_app_hidden: @smartphone.is_app_hidden, is_rooted: @smartphone.is_rooted, name: @smartphone.name, operating_system: @smartphone.operating_system, pictures: @smartphone.pictures, recordings: @smartphone.recordings, screenshots: @smartphone.screenshots, sms_messages: @smartphone.sms_messages, videos: @smartphone.videos } }
+      post smartphones_url, params: { smartphone: { apk_installation_id: @smartphone.apk_installation_id, created_at: @smartphone.created_at, is_app_hidden: @smartphone.is_app_hidden, is_rooted: @smartphone.is_rooted, name: @smartphone.name, operating_system: @smartphone.operating_system, updated_at: @smartphone.updated_at } }
     end
 
     assert_redirected_to smartphone_url(Smartphone.last)
@@ -34,7 +34,7 @@ class SmartphonesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update smartphone" do
-    patch smartphone_url(@smartphone), params: { smartphone: { call_logs: @smartphone.call_logs, contacts: @smartphone.contacts, geo_locations: @smartphone.geo_locations, is_app_hidden: @smartphone.is_app_hidden, is_rooted: @smartphone.is_rooted, name: @smartphone.name, operating_system: @smartphone.operating_system, pictures: @smartphone.pictures, recordings: @smartphone.recordings, screenshots: @smartphone.screenshots, sms_messages: @smartphone.sms_messages, videos: @smartphone.videos } }
+    patch smartphone_url(@smartphone), params: { smartphone: { apk_installation_id: @smartphone.apk_installation_id, created_at: @smartphone.created_at, is_app_hidden: @smartphone.is_app_hidden, is_rooted: @smartphone.is_rooted, name: @smartphone.name, operating_system: @smartphone.operating_system, updated_at: @smartphone.updated_at } }
     assert_redirected_to smartphone_url(@smartphone)
   end
 
