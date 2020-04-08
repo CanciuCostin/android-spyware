@@ -1,5 +1,6 @@
-//= require active_admin/base
+//= require arctic_admin/base
 //= require_tree .
+
 $(document).ready(function(){
     $(".alerttt" ).fadeOut(3000);
     $("#carouselContainer").hide();

@@ -57,3 +57,5 @@ gem 'devise'
 gem 'bootstrap', '~> 4.0.0'
 
 gem 'jquery-rails'
+
+gem 'arctic_admin'

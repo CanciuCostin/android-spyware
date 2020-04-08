@@ -65,7 +65,25 @@
 
   .smartphone .content {
     width: 330px;
-    height: 540px;
-    background: white;
+    height: 525px;
+    background-image: url("1.jfif");
+    position:relative;
+  }
+
+  .smartphone-icon {
+      width: 70px;
+      height: 70px;
+  }
+
+  .top-icons {
+    position: absolute;
+    top:15px;
+    left:15px;
+  }
+
+  .bottom-icons {
+    position: absolute;
+    bottom:10px;
+    left:15px;
   }
   

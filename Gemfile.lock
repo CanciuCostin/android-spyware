@@ -71,6 +71,10 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     arbre (1.2.1)
       activesupport (>= 3.0.0)
+    arctic_admin (3.1.1)
+      activeadmin (>= 1.1.0, < 3.0)
+      font-awesome-sass (~> 5.0)
+      jquery-rails
     autoprefixer-rails (9.7.4)
       execjs
     bcrypt (3.1.13)
@@ -103,6 +107,8 @@ GEM
     erubi (1.9.0)
     execjs (2.7.0)
     ffi (1.12.2-x64-mingw32)
+    font-awesome-sass (5.12.0)
+      sassc (>= 1.11)
     formtastic (3.1.5)
       actionpack (>= 3.2.13)
     formtastic_i18n (0.6.0)
@@ -267,6 +273,7 @@ PLATFORMS
 
 DEPENDENCIES
   activeadmin
+  arctic_admin
   bootsnap (>= 1.4.2)
   bootstrap (~> 4.0.0)
   byebug
