@@ -9,58 +9,34 @@
 
 // Active Admin's got SASS!
 // BASIC COLOR
-$red: #B02B2C;
-$green: #00897B;
-$blue: #4bacfe;
-$black: #36393D;
-$grey: #76838f;
+$skinActiveColor: #eea501 !default;
 
-// flash
-$error: #dc4747 !default;
-$warning: #f2a654 !default;
-$success: #46be8a !default;
-$info: #57c7d4 !default;
-$flash-text-color: #fff !default;
-$flash-background-color: $grey !default;
+.header#header {
+    height: calc(100% - 52px);
+  }
 
-// status_tag
-$status-tag-text-color: #fff !default;
-$status-tag-background-color: #cacaca !default;
-$status-tag-background-valid-color: $success !default;
-$status-tag-background-error-color: $error !default;
+  .right_row {
+    position: relative;
+    bottom:1450px;
+    left: 750px;
+    
+}
 
-$border-color: #e4eaec;
-
-
-// body
-$body-background: #eee !default;
-
-// header
-$header-border-color: #e6e6e6 !default;
-$header-background: #fff !default;
-
-// nav action
-$header-nav-action-hover-background: #f5f5f5 !default;
-$header-nav-action-active-background: #f0f0f0 !default;
-
-//sidebar
-$sidebar-border-color: $header-border-color !default;
-$sidebar-background: #f5f5f5 !default;
-
-$sidebar-item-hover-background: #f0f0f0 !default;
-$sidebar-nested-item-hover-background: #e7e7e7 !default;
-
-// text
-$text-color: #5a5a5a !default;
-$text-color-important: #526069 !default;
-
-$box-shadow: 0 0 4px 0 rgba(0,0,0,0.1) !default;
-
-$primary-color: $blue !default;
 @import "active_admin/mixins";
-@import "arctic_admin/base";
+@import "active_admin/base";
+
+@import "active_admin_flat_skin";
+@import 'font-awesome-sprockets';
+@import 'font-awesome';
+@import 'timeline'
+
+
 
 // Overriding any non-variable SASS must be done after the fact.
 // For example, to change the default status-tag color:
 //
 //   .status_tag { background: #6090DB; }
+
+
+
+

@@ -13,7 +13,7 @@ ActiveAdmin.register ApkInstallation do
         sleep(1)
 
         puts "Connecting to device.."
-        system("tools\\platform-tools\\adb connect #{apk_installation.taget_ip}")
+        system("tools\\platform-tools\\adb connect #{apk_installation.target_ip}")
         sleep(5)
         puts "Installing apk.."
         system("tools\\platform-tools\\adb install payloads\\#{@apk_payload.name}.apk")

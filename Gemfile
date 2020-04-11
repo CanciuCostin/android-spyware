@@ -59,3 +59,5 @@ gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails'
 
 gem 'arctic_admin'
+
+gem 'active_admin_flat_skin'

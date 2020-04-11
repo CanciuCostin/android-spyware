@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_05_144131) do
+ActiveRecord::Schema.define(version: 2020_04_09_074431) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,11 +42,9 @@ ActiveRecord::Schema.define(version: 2020_04_05_144131) do
   end
 
   create_table "apk_installations", force: :cascade do |t|
-    t.string "taget_ip"
+    t.string "target_ip"
     t.string "status"
     t.bigint "apk_payload_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["apk_payload_id"], name: "index_apk_installations_on_apk_payload_id"
   end
 
@@ -67,8 +65,6 @@ ActiveRecord::Schema.define(version: 2020_04_05_144131) do
     t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["smartphone_id"], name: "index_call_logs_on_smartphone_id"
   end
 
@@ -77,8 +73,6 @@ ActiveRecord::Schema.define(version: 2020_04_05_144131) do
     t.string "last_name"
     t.string "phone_number"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["smartphone_id"], name: "index_contacts_on_smartphone_id"
   end
 
@@ -87,18 +81,13 @@ ActiveRecord::Schema.define(version: 2020_04_05_144131) do
     t.string "lat"
     t.string "long"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["smartphone_id"], name: "index_geo_locations_on_smartphone_id"
   end
 
   create_table "pictures", force: :cascade do |t|
     t.date "date"
-    t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["smartphone_id"], name: "index_pictures_on_smartphone_id"
   end
 
@@ -107,8 +96,6 @@ ActiveRecord::Schema.define(version: 2020_04_05_144131) do
     t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["smartphone_id"], name: "index_recordings_on_smartphone_id"
   end
 
@@ -117,8 +104,6 @@ ActiveRecord::Schema.define(version: 2020_04_05_144131) do
     t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["smartphone_id"], name: "index_screenshots_on_smartphone_id"
   end
 
@@ -139,8 +124,6 @@ ActiveRecord::Schema.define(version: 2020_04_05_144131) do
     t.string "destination"
     t.text "content"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["smartphone_id"], name: "index_sms_messages_on_smartphone_id"
   end
 
@@ -149,8 +132,6 @@ ActiveRecord::Schema.define(version: 2020_04_05_144131) do
     t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["smartphone_id"], name: "index_videos_on_smartphone_id"
   end
 

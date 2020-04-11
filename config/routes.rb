@@ -9,13 +9,19 @@ Rails.application.routes.draw do
   resources :recordings
   resources :videos
   resources :screenshots
-  resources :pictures
+  resources :pictures do
+    collection do
+        post :take_picture
+    end
+end
+
   resources :smartphones do
     collection do
         get :load
         post :install 
         post :front_camera_snap
         post :select_smartphone
+        post :take_picture
     end
   end
   

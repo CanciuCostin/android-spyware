@@ -1,4 +1,6 @@
-//= require arctic_admin/base
+//= require active_admin/base
+//= require active_admin_flat_skin
+
 //= require_tree .
 
 $(document).ready(function(){
@@ -25,6 +27,7 @@ $(document).ready(function(){
             $("#dashboardContainer").fadeIn(1000);
         }
     });
+
 
 
 

@@ -1,0 +1,78 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700|Oswald:400,300,700);
+
+
+/* Base */
+
+
+#content {
+    text-align: center !important ;
+}
+
+/* Timeline */
+
+.timeline {
+border-left: 6px solid rgb(238, 165, 1) !important ;
+  border-bottom-right-radius: 4px !important ;
+  border-top-right-radius: 4px !important ;    
+  background: fade(grey, 3%) !important ;
+  color: fade(grey, 80%) !important ;
+  font-family: 'Source Sans Pro', sans-serif !important ;  
+  margin: 20px auto !important ;  
+  letter-spacing: 0.5px !important ;   
+  position: relative !important ;
+  line-height: 1.4em !important ;
+  font-size: 1.03em !important ;   
+  padding: 50px !important ;   
+  list-style: none !important ;
+  text-align: left !important ;  
+  font-weight: 100 !important ;  
+  max-width: 30% !important ; 
+  
+  h1, h2, h3 {
+   font-family: 'Oswald', sans-serif !important ;
+   letter-spacing: 1.5px !important ;
+   font-weight: 100 !important ;
+   font-size: 1.8em !important ;
+    
+  }
+  
+  .event {
+    border-bottom: 1px dashed fade(grey, 10%) !important ;
+    padding-bottom: (50px * 0.5) !important ;
+    margin-bottom: 50px !important ;  
+    position: relative !important ;
+
+    &:last-of-type { 
+      padding-bottom: 0 !important ;
+      margin-bottom: 0 !important ; 
+      border: none !important ;      
+    }
+
+    &:before, &:after {
+      position: absolute !important ;
+      display: block !important ;
+      top: 0 !important ;
+    }
+
+    &:before {
+      left: (((120px * 0.6) + 50px + 4px + 11px + (4px * 2)) * 1.5) * -1 !important ;    
+      color: fade(grey, 40%) !important ;    
+      content: attr(data-date) !important ;
+      text-align: right !important ;
+      font-weight: 100 !important ;    
+      font-size: 1.1em !important ;
+      min-width: 120px !important ;
+    }
+
+    &:after {
+      box-shadow: 0 0 0 4px fade(#4298C3,100%) !important ;    
+      left: (50px + 4px + (11px * 0.35)) * -1 !important ;        
+      background: lighten(#252827,5%) !important ;    
+      border-radius: 50% !important ;  
+      height: 11px !important ;
+      width: 11px !important ;
+      content: "" !important ;
+      top: 5px !important ;
+    }
+  }
+}

@@ -1,0 +1,13 @@
+
+<div>
+<div id="content">
+  <ul class="timeline">
+  <% activities.each do |activity| %>
+    <li class="event" data-date="<%= activity.date %>">
+      <h3><%= activity.type %></h3>
+      <p><%= activity.name %></p>
+    </li>
+  <% end %>
+  </ul>
+</div>
+</div>

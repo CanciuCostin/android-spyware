@@ -37,6 +37,7 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
+    active_admin_flat_skin (0.1.2)
     activeadmin (2.6.1)
       arbre (~> 1.2, >= 1.2.1)
       formtastic (~> 3.1)
@@ -272,6 +273,7 @@ PLATFORMS
   x64-mingw32
 
 DEPENDENCIES
+  active_admin_flat_skin
   activeadmin
   arctic_admin
   bootsnap (>= 1.4.2)
