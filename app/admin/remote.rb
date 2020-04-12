@@ -7,13 +7,21 @@ ActiveAdmin.register_page "Remote" do
   
   
       #render partial: "switch"
-      #render partial : "smartphones/dropdown_smartphones", smartphones: Smartphone.all, smartphone: Smartphone.first
+      #render partial: "smartphones/dropdown_smartphones", smartphones: Smartphone.all, smartphone: Smartphone.first
   
       if params[:selected_smartphone_id].present?
-          #render template: "smartphones/dropdown_list_smartphones", locals: {smartphones: Smartphone.all, smartphone: Smartphone.find(params[:selected_smartphone_id])}
+          columns do
+            column do
+          render template: "smartphones/dropdown_list_smartphones", locals: {smartphones: Smartphone.all, smartphone: Smartphone.find(params[:selected_smartphone_id])}
+            end
+        end
           puts 'true'
       else
-          #render template: "smartphones/dropdown_list_smartphones", locals: {smartphones: Smartphone.all, smartphone: Smartphone.first}
+        columns do
+            column do
+          render template: "smartphones/dropdown_list_smartphones", locals: {smartphones: Smartphone.all, smartphone: Smartphone.first}
+            end
+        end
           puts 'false'
       end
       

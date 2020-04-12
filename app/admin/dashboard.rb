@@ -1,6 +1,7 @@
 ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: proc { I18n.t("active_admin.dashboard") }, parent: "Actions"
 
+
   content title: proc { I18n.t("active_admin.dashboard") } do
 
     class Activity
@@ -21,6 +22,13 @@ ActiveAdmin.register_page "Dashboard" do
         activities << Activity.new("Picture", picture.date, picture.filename)
     end
 
+
+
+
+
+
+
+    
 
 
     columns do
