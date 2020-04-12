@@ -35,7 +35,7 @@ ActiveAdmin.register ApkInstallation do
   # or
   #
   # permit_params do
-  #   permitted = [:taget_ip, :status, :apk_payload_id]
+  #   permitted = [:target_ip, :status, :apk_payload_id]
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
