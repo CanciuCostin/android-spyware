@@ -51,7 +51,7 @@
      type: "button", :"data-toggle" => "tooltip", "data-placement": "top",title: "Start Recording"%>
     <%= link_to image_tag("message_icon.png", :alt => "Get Messages", :class => "smartphone-icon"), '../smartphones/install', method: :post,
      type: "button", :"data-toggle" => "tooltip", "data-placement": "top",title: "Get Messages"%>
-        <%= link_to image_tag("camera_icon.png", :alt => "Take Picture", :class => "smartphone-icon"), '../smartphones/install', method: :post,
+        <%= link_to image_tag("camera_icon.png", :alt => "Take Picture", :class => "smartphone-icon"), '../smartphones/install', method: :post, :id => "phoneBtna",
      type: "button", :"data-toggle" => "tooltip", "data-placement": "top",title: "Take Picture"%>
     </div>
     </div>
@@ -69,3 +69,6 @@
     </div>
   </div>
 </div>
+
+
+

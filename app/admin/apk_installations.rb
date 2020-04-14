@@ -30,7 +30,7 @@ ActiveAdmin.register ApkInstallation do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-  permit_params :taget_ip, :status, :apk_payload_id
+  permit_params :target_ip, :status, :apk_payload_id
   #
   # or
   #

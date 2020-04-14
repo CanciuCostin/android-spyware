@@ -296,6 +296,7 @@ DEPENDENCIES
   pg (>= 0.18, < 2.0)
   puma (~> 4.1)
   rails (~> 6.0.2, >= 6.0.2.1)
+  responders
   sass-rails (>= 6)
   selenium-webdriver
   turbolinks (~> 5)

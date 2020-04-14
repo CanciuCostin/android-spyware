@@ -63,3 +63,5 @@ gem 'active_admin_flat_skin'
 
 gem 'webpacker', '>= 4.x'
 
+gem 'responders'
+

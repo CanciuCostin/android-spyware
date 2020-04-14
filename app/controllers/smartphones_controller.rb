@@ -1,7 +1,5 @@
 
 class SmartphonesController < InheritedResources::Base
-
-
     
 
 
