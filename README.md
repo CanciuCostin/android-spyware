@@ -114,6 +114,8 @@ tbd
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[rails-shield]: https://img.shields.io/badge/rails-v5-green
+[rails-url]: https://github.com/CanciuCostin/android-spyware/graphs/contributors
 [contributors-shield]: https://img.shields.io/github/contributors/CanciuCostin/android-spyware.svg?style=flat-square
 [contributors-url]: https://github.com/CanciuCostin/android-spyware/graphs/contributors
 [issues-shield]: https://img.shields.io/github/issues/CanciuCostin/android-spyware.svg?style=flat-square
