@@ -1,3 +1,4 @@
+[![Rails][rails-shield]][rails-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
@@ -8,7 +9,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="https://github.com/CanciuCostin/android-spyware">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -43,14 +44,14 @@
 * [Contributing](#contributing)
 * [License](#license)
 * [Contact](#contact)
-* [Acknowledgements](#acknowledgements)
+
 
 
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Dashboard Screen Shot][product-screenshot]](https://github.com/CanciuCostin/android-spyware)
 
 The project is a web console based Android spyware, which allows accessing remotely the functionalities of a smartphone: contacts, SMS, camera, microphone, filesystem etc.
 
@@ -85,6 +86,9 @@ tbd
 
 ## Usage
 
+[![Login Screen Shot][login-screenshot]](https://github.com/CanciuCostin/android-spyware)
+[![Remote Screen Shot][remote-screenshot]](https://github.com/CanciuCostin/android-spyware)
+
 tbd
 
 ## Roadmap
@@ -110,12 +114,16 @@ tbd
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=flat-square
+[rails-shield]: https://img.shields.io/badge/rails-v6.0.2.2-green
+[rails-url]: https://github.com/CanciuCostin/android-spyware/graphs/contributors
+[contributors-shield]: https://img.shields.io/github/contributors/CanciuCostin/android-spyware.svg?style=flat-square
 [contributors-url]: https://github.com/CanciuCostin/android-spyware/graphs/contributors
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=flat-square
+[issues-shield]: https://img.shields.io/github/issues/CanciuCostin/android-spyware.svg?style=flat-square
 [issues-url]: https://github.com/CanciuCostin/android-spyware/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=flat-square
 [license-url]: https://github.com/CanciuCostin/android-spyware/blob/master/LICENSE.md
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
 [linkedin-url]: https://ro.linkedin.com/in/costin-canciu-b3572a105
 [product-screenshot]: images/dashboard.png
+[remote-screenshot]: images/remote.png
+[login-screenshot]: images/login.png
