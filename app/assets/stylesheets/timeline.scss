@@ -11,7 +11,7 @@
 /* Timeline */
 
 .timeline {
-border-left: 6px solid rgb(238, 165, 1) !important ;
+border-left: 6px solid #333333 !important ;
   border-bottom-right-radius: 4px !important ;
   border-top-right-radius: 4px !important ;    
   background: fade(grey, 3%) !important ;
@@ -67,12 +67,14 @@ border-left: 6px solid rgb(238, 165, 1) !important ;
     &:after {
       box-shadow: 0 0 0 4px fade(#4298C3,100%) !important ;    
       left: (50px + 4px + (11px * 0.35)) * -1 !important ;        
-      background: lighten(#252827,5%) !important ;    
+      background: #FF3366 !important ;    
       border-radius: 50% !important ;  
       height: 11px !important ;
       width: 11px !important ;
       content: "" !important ;
       top: 5px !important ;
     }
+
+
   }
 }

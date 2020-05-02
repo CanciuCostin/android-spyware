@@ -32,57 +32,72 @@ ActiveAdmin.register_page "Dashboard" do
 
 
     columns do
-        column do
-          panel "Activities Timeline" do
-                render partial: "timeline",    locals: {activities: activities}
-          end
-        end
-  
-        column do
-                  panel "Stats" do
-                    columns do
-                        column do
-                            render partial: "statistics_image", locals: {image_path: "users.png"}
-                        end
-                      
-                        column do
-                            render partial: "statistics_text", locals: {name: "Images", count: "132"}
-                        end
-                        column do
-                            render partial: "statistics_image", locals: {image_path: "devices.png"}
-                        end
-                      
-                        column do
-                            render partial: "statistics_text", locals: {name: "Images", count: "132"}
-                        end
-                      end
-                      columns do
-                        column do
-                            render partial: "statistics_image", locals: {image_path: "actions.png"}
-                        end
-                      
-                        column do
-                            render partial: "statistics_text", locals: {name: "Images", count: "132"}
-                        end
-                        column do
-                            render partial: "statistics_image", locals: {image_path: "something.png"}
-                        end
-                      
-                        column do
-                            render partial: "statistics_text", locals: {name: "Images", count: "132"}
-                        end
-                      end
-                      
-                    end
+        column span: 3 do
+            panel "Stats" do
+              columns do
+                  column do
+                      render partial: "statistics_image", locals: {image_path: "users.png"}
+                  end
+                
+                  column do
+                      render partial: "statistics_text", locals: {name: "Images", count: "132"}
+                  end
+                  column do
+                      render partial: "statistics_image", locals: {image_path: "devices.png"}
+                  end
+                
+                  column do
+                      render partial: "statistics_text", locals: {name: "Images", count: "132"}
+                  end
+
+                  column do
+                      render partial: "statistics_image", locals: {image_path: "actions.png"}
+                  end
+                
+                  column do
+                      render partial: "statistics_text", locals: {name: "Images", count: "132"}
+                  end
+                  column do
+                      render partial: "statistics_image", locals: {image_path: "something.png"}
+                  end
+                
+                  column do
+                      render partial: "statistics_text", locals: {name: "Images", count: "132"}
                   end
                 end
+                
+              end
+    end
+    column do
+        panel "Activities Timeline" do
+              render partial: "timeline",    locals: {activities: activities}
+        end
+      end
+end
+
+
+
+
+  
+        
+                
 
 
         columns do
-            column do
-                span "a"
+            column span: 3 do
+                panel "Locations" do
+                    render partial: "map"
+                end
             end
-                    column class: "right_row" do
+            column do
+            end
+
+        end
+
+
+        columns do
+ 
+                    column do
                     panel "Recent Pictures" do
                         table_for Picture.order("id desc").limit(10) do
                           column("id") { |picture| status_tag(picture.id) }
@@ -90,6 +105,8 @@ ActiveAdmin.register_page "Dashboard" do
                           column("filename")   { |picture| picture.filename }
                         end
                       end
+                  end
+                  column do
                   end
                 end
 

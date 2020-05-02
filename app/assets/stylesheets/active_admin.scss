@@ -9,7 +9,20 @@
 
 // Active Admin's got SASS!
 // BASIC COLOR
-$skinActiveColor: #eea501 !default;
+//$skinActiveColor: #eea501 !default;
+//242f3e
+//d59563
+$panelBorder: yellow !important;
+$skinActiveColor: #FF3366 !default;
+$bodyColor: #222222 !default;
+$skinTextColor: white !important;
+$skinTextActiveColor: black !default;
+$skinTextTable: blue !important;
+$skinHeaderBck: #222222 !important;
+$skinBlack: pink !important;
+$panelHeaderBck: purple !important;
+$skinBlackLight: red !important;
+$textGray: brown !important;
 
 .header#header {
     height: calc(100% - 52px);
@@ -22,14 +35,254 @@ $skinActiveColor: #eea501 !default;
     
 }
 
+
+.openbtn {
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+  }
+  
+  .openbtn:hover {
+    background-color: #444;
+  }
+  
+  
+  .center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+
 @import "active_admin/mixins";
 @import "active_admin/base";
 
 @import "active_admin_flat_skin";
 @import 'font-awesome-sprockets';
 @import 'font-awesome';
-@import 'timeline'
+@import 'timeline';
 
+#site_title{
+    background-color: #37474f !important;
+}
+
+.header#header {
+    width: 50% !important;
+    height: 100% !important;
+    overflow-x: hidden;
+    transition: 2s;
+  }
+
+  .lEoFR {
+
+    width: 3vw;
+    height: 4px;
+    border-radius: 1px;
+    margin: 4px;
+    background: white none repeat scroll 0% 0%;
+
+}
+
+.WQebA {
+    height: 100% !important;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    width: 5vw;
+    border-right: 1px solid #333333;
+    background: #222222 none repeat scroll 0% 0%;
+    box-shadow: none;
+    transition: all 0.3s ease 0s;
+    -moz-box-align: center;
+    align-items: center;
+    -moz-box-pack: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: translateX(0px);
+
+}
+
+.jYpagw {
+    transition: 2s;
+
+    height: 100%;
+    margin-right: 1rem;
+    cursor: pointer;
+    color: black;
+    transition: all 0.3s ease 0s;
+
+}
+
+svg:not(:root) {
+
+    overflow: hidden;
+
+}
+
+.eBLDUv {
+    transition: 2s;
+
+    position: absolute;
+    height: 2rem;
+
+}
+
+#active_admin_content {
+    width: 89% !important;
+}
+
+#footer {
+    z-index: 1000;
+}
+
+#title_bar{
+    width: 95% !important;
+}
+
+#map {
+    height: 100%;
+  }
+div.columns:nth-child(2) > div.column > div.panel > div.panel_contents {
+    height: 600px ;
+    width: 1261.77px;
+    padding: 0 !important;
+
+}
+div.columns:nth-child(2) > div.column > div.panel {
+    bottom: 1700px;
+}
+
+
+#site_title {
+    background-color: #222222 !important;
+}
+
+.header#header {
+    background-color: #222222;
+  }
+
+  html .panel > h3, html .sidebar_section.panel > h3 {
+    background: #222222;
+}
+
+.header#header .header-item.tabs#tabs li a {
+
+    color: #FF3366 !important;
+
+}
+
+#title_bar{
+    border-bottom: 1px solid #333333 !important;
+}
+
+html #footer{
+    border-left: 1px solid #333333 !important;
+    background: #222222;
+}
+
+.panel_contents{
+    background-color: #222222 !important;
+}
+
+.panel_contents table tr.even td {
+
+    background: #444444 !important;
+
+}
+.panel_contents table tr.odd td {
+
+    background: #666666 !important;
+
+}
+
+html .panel > h3, html .sidebar_section.panel > h3 {
+    border-bottom: 1px solid #FF3366;
+    border-bottom-style: solid;
+
+}
+
+.panel {
+
+}
+
+.section, .panel, .sidebar_section.panel{
+    background: #222222 !important;
+}
+
+.panel h3, .sidebar_section.panel h3 {
+    color: white !important;
+}
+
+.title_bar#title_bar h2 {
+    color: white;
+}
+
+.breadcrumb a, .breadcrumb a:link, .breadcrumb a:visited, .breadcrumb a:active {
+    color: white;
+}
+
+body {
+    color: white !important;
+}
+
+.phoneSvg {
+    top: 1rem;
+    position: absolute;
+    left: 25%;
+}
+
+li#current_user {
+    top: 1rem;
+    position: absolute;
+    left: 25%;
+}
+
+li#logout {
+    bottom: 1rem;
+    position: absolute;
+    left: 25%;
+}
+
+#footer #utility_nav li{
+    padding: 0 !important;
+}
+
+svg {
+    fill: #FFFFFF !important;
+  }
+
+svg:hover {
+    fill: #FF3366 !important;
+  }
+
+a.button:not(.disabled):hover, a:link.button:not(.disabled):hover, a:visited.button:not(.disabled):hover, input[type=submit]:not(.disabled):hover, input[type=button]:not(.disabled):hover, button:not(.disabled):hover {
+    background-color: #333333;
+    background-image: linear-gradient(180deg, #333333, #444444);
+}
+
+html #footer:hover{
+    background-color: #333333 !important;
+    background-image: linear-gradient(180deg, #333333, #444444) !important;
+}
+html #title_bar:hover{
+    background-color: #333333 !important;
+    background-image: linear-gradient(180deg, #333333, #444444) !important;
+}
+
+html #header ul.tabs > li:hover > a, html #header ul.tabs > li.current > a {
+    color: black;
+    background: #333333 !important;
+    border-radius: 0 !important;
+    margin: -10px 0;
+    display: block;
+    margin-top: 0 !important;
+}
 
 
 // Overriding any non-variable SASS must be done after the fact.
