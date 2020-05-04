@@ -29,3 +29,4 @@
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+/app/views/admin/dashboard/_map.html.erb
