@@ -61,30 +61,21 @@
 </ul>
 </div> %>
 
+<div id="terminalContainer">
+<%= render "smartphones/terminal"%>
+</div>
 
-
-
-
+<div id="navi">
 <%= render "smartphones/dropdown_smartphones", smartphones: smartphones, smartphone: smartphone %>
-
-
-
-
-<div align="center">
-
-
-
-
-<div id ="navi">
 <%= render "smartphones/smartphone", smartphones: smartphones, smartphone: smartphone %>
 </div>
 
-<div id="infoi" class="spinner-border alerttt load" role="status">
+
+
+<%# <div id="infoi" class="spinner-border alerttt load" role="status">
   <span class="sr-only">Loading...</span>
-</div>
+</div> %>
 
 
 
-</div>
-<%= render "smartphones/modal"%>
 

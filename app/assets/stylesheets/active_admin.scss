@@ -13,7 +13,7 @@
 //242f3e
 //d59563
 $panelBorder: yellow !important;
-$skinActiveColor: #FF3366 !default;
+$skinActiveColor: #D59563 !default;
 $bodyColor: #222222 !default;
 $skinTextColor: white !important;
 $skinTextActiveColor: black !default;
@@ -173,7 +173,7 @@ div.columns:nth-child(2) > div.column > div.panel {
 
 .header#header .header-item.tabs#tabs li a {
 
-    color: #FF3366 !important;
+    color: #D59563 !important;
 
 }
 
@@ -202,7 +202,7 @@ html #footer{
 }
 
 html .panel > h3, html .sidebar_section.panel > h3 {
-    border-bottom: 1px solid #FF3366;
+    border-bottom: 1px solid #D59563;
     border-bottom-style: solid;
 
 }
@@ -258,7 +258,7 @@ svg {
   }
 
 svg:hover {
-    fill: #FF3366 !important;
+    fill: #D59563 !important;
   }
 
 a.button:not(.disabled):hover, a:link.button:not(.disabled):hover, a:visited.button:not(.disabled):hover, input[type=submit]:not(.disabled):hover, input[type=button]:not(.disabled):hover, button:not(.disabled):hover {
@@ -284,6 +284,16 @@ html #header ul.tabs > li:hover > a, html #header ul.tabs > li.current > a {
     margin-top: 0 !important;
 }
 
+.breadcrumb {
+    background-color: #222222 !important;
+}
+
+
+.btn-secondary {
+    color: #fff;
+    background-color: #222222 !important;
+    border-color: #D59563 !important;
+}
 
 // Overriding any non-variable SASS must be done after the fact.
 // For example, to change the default status-tag color:

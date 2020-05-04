@@ -2,7 +2,7 @@
 
 .window {
   width : 100% ; 
-  background : #eea501; 
+  background : #D59563; 
   height : 100% ; 
   border-radius : 5px ;
   display : relative ; 
@@ -25,7 +25,7 @@
 
 .bash {
   width : 100% ; 
-  background-image: linear-gradient(180deg, #000000 25%, #012808 25%, #012808 50%, #000000 50%, #000000 75%, #012808 75%, #012808 100%);
+  background-image: linear-gradient(180deg, #000000 25%, #011a05 25%, #011605 50%, #000000 50%, #000000 75%, #011404 75%, #011604 100%);
 background-size: 8.00px 8.00px;
   height : 100% ; 
   border-radius : 5px ;

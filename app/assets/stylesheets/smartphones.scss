@@ -2,6 +2,31 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: https://sass-lang.com/
 
+.terminal{
+    transform: translatey(0px);
+	animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+	0% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+	50% {
+		box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
+		transform: translatey(-20px);
+	}
+	100% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+}
+#terminalContainer{
+    width: 75%;
+    position: relative;
+    float: right;
+    height: 660px;
+}
+
 #infoi {
     position: relative  ;
     bottom: 300px;
@@ -11,6 +36,9 @@
     position: relative  ;
     top: 0;
     left: 0;
+    width: 25%;
+    height: 660px;
+    float: left;
   }
 
 
