@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  resources :smartphones
   resources :apk_installations
   resources :apk_payloads
   resources :contacts

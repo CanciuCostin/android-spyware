@@ -9,21 +9,48 @@ ActiveAdmin.register_page "Remote" do
       #render partial: "switch"
       #render partial: "smartphones/dropdown_smartphones", smartphones: Smartphone.all, smartphone: Smartphone.first
   
-      if params[:selected_smartphone_id].present?
-          columns do
+      columns do
+        if params[:selected_smartphone_id].present?
             column do
-          render template: "smartphones/dropdown_list_smartphones", locals: {smartphones: Smartphone.all, smartphone: Smartphone.find(params[:selected_smartphone_id])}
+                render template: "smartphones/smartphone", locals: {smartphones: Smartphone.all, smartphone: Smartphone.find(params[:selected_smartphone_id])}
+            end
+        else
+            column do
+                render template: "smartphones/smartphone", locals: {smartphones: Smartphone.all, smartphone: Smartphone.first}
             end
         end
-          puts 'true'
-      else
-        columns do
-            column do
-          render template: "smartphones/dropdown_list_smartphones", locals: {smartphones: Smartphone.all, smartphone: Smartphone.first}
-            end
+        column do
+            render partial: "switcher"
         end
-          puts 'false'
-      end
+        column do
+            render template: "smartphones/terminal"
+        end
+
+    end
+
+
+    columns do
+        column do
+            render partial: "sliders"
+        end
+        column do
+            render partial: "dropdown"
+        end
+        column do
+            render partial: "input_counter"
+        end
+    end
+
+    columns do
+        column do
+            render partial: "input_box"
+        end
+        column do
+            render partial: "counter"
+        end
+        column do
+        end
+    end
       
   
     #    div class: "blank_slate_container", id: "dashboard_default_message" do

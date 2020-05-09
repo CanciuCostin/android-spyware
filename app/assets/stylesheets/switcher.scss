@@ -1,0 +1,138 @@
+html,
+body {
+  font-family: 'Muli', sans-serif;
+  background-color: #272936;
+  color: #A6A8B6;
+}
+
+.switcher_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+[type="radio"] {
+  z-index: -1;
+  position: absolute;
+  opacity: 0;
+  
+  &:checked ~ label {
+    border-color: #4062F6;
+    background-color: rgba(#619AEA, 0.16);
+    color: #FFF;
+		
+		&:before {
+			will-change: transform, border-width, border-color;
+      animation: bubble 1s ease-in;
+		}
+    
+    &:after {
+			will-change: opacity, box-shadow;
+			animation: sparkles 700ms ease-in-out;
+		}
+    
+    > span {
+      will-change: transform;
+      border: 0;
+      background-image: linear-gradient(to top right, #6E89FF, #4363EE);
+      animation: radio 400ms cubic-bezier(.17, .89, .32, 1.49);
+      
+      &:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 10px;
+        background-color: #fff;
+      }
+    }
+    
+    .card {
+      will-change: box-shadow;
+      animation: card 500ms ease-in-out forwards;
+      
+      &:after {
+        will-change: transform;
+        animation: shine 500ms ease-in forwards;
+        animation-delay: 100ms;
+      }
+    }
+  }
+}
+
+label {
+  position: relative;
+  display: grid;
+  align-items: center;
+  grid-template-columns: 20px auto 100px;
+  grid-gap: 20px;
+  width: 320px;
+  height: 62px;
+  padding: 0 20px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-color: transparent;
+  transition: all 300ms ease-in;
+  
+  &:hover {
+    border-color: #4062F6;
+    background-color: rgba(#619AEA, 0.16);
+  }
+  
+  &:before,
+  &:after {
+		position: absolute;
+    left: 29px;
+		border-radius: 50%;
+		content: '';
+	}
+  
+  &:before {
+		transform: scale(0);
+	}
+  
+
+  
+  > span {
+    position: relative;
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    border: 2px solid #454861;
+    background-image: linear-gradient(to bottom, #3B4059, #1C1E2D);
+  }
+}
+
+.text {
+  &__row {
+    display: grid;
+    grid-template-columns: 54px 64px;
+    grid-gap: 6px;
+    
+    &:last-of-type {
+      grid-template-columns: 45px 54px;
+      margin-top: 7px;
+    }
+  }
+  
+  &__loader {
+    height: 13px;
+    border-radius: 2px;
+    background-color: rgba(#000, 0.4);
+  }
+}
+
+.option:not(:last-child) {
+  margin-bottom: 4px;
+}
+
+@keyframes radio {
+	0%, 17.5% { transform: scale(0); }
+}

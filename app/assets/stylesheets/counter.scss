@@ -1,0 +1,41 @@
+@import url(https://fonts.googleapis.com/css?family=Dosis:700) ;
+
+.value {
+  border-bottom: 4px dashed #bdc3c7 !important ;
+  text-align: center !important ;
+  font-weight: bold !important ;
+  font-size: 10em !important ;
+  width: 300px !important ; 
+  height: 100px !important ;
+  line-height: 60px !important ;
+  margin: 40px auto !important ;
+  letter-spacing: -.07em !important ;
+  text-shadow: white 2px 2px 2px !important ;
+}
+#slide_count {
+  display: block !important ;
+  -webkit-appearance: none !important ;
+  background-color: #bdc3c7 !important ;
+  width: 300px !important ;
+  height: 5px !important ;
+  border-radius: 5px !important ;
+  margin: 0 auto !important ;
+  outline: 0 !important ;
+}
+#slide_count::-webkit-slider-thumb {
+  -webkit-appearance: none !important ;
+  background-color: #e74c3c !important ;
+  width: 30px !important ;
+  height: 30px !important ;
+  border-radius: 50% !important ;
+  border: 2px solid white !important ;
+  cursor: pointer !important ;
+  transition: .3s ease-in-out !important ;
+}​
+  #slide_count::-webkit-slider-thumb:hover {
+    background-color: white !important ;
+    border: 2px solid #e74c3c !important ;
+  }
+  #slide_count::-webkit-slider-thumb:active {
+    transform: scale(1.6) !important ;
+  }

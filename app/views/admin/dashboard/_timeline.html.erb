@@ -1,13 +1,16 @@
-
-<div>
 <div id="content">
   <ul class="timeline">
+  <% i=0 %>
   <% activities.each do |activity| %>
-    <li class="event" data-date="<%= activity.date %>">
-      <h3><%= activity.type %></h3>
-      <p><%= activity.name %></p>
-    </li>
+    <li>
+		<div class="direction-<%= if i%2 == 0 then 'r' else 'l' end %>">
+			<div class="flag-wrapper">
+				<span class="flag"><%= activity.type + activity.date.to_s %></span>
+			</div>
+			<div class="desc"><%= activity.name %></div>
+		</div>
+	</li>
+  <% i+=1 %>
   <% end %>
   </ul>
-</div>
 </div>

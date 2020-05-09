@@ -1,0 +1,190 @@
+// Fonts
+$body-font: "Roboto";
+
+// Font Weights
+$thin: 100;
+$light: 300;
+$regular: 400;
+$semibold: 600;
+$bold: 700;
+$ultra: 800;
+
+// Colors
+$black: #000000;
+$white: #FFFFFF;
+
+// Material Colors
+$dark-theme: (primary: rgba($black, .87), secondary: rgba($black, .54), disabled: rgba($black, .26));
+$light-theme: (primary: rgba($white, 1), secondary: rgba($white, .7), disabled: rgba($white, .3));
+
+// Pen Colors
+$accent: #5380F7;
+
+// Base Setting
+$base-color: map-get($dark-theme, primary);
+$base-font-family: $body-font, sans-serif;
+$base-font-size: 14px;
+$base-font-weight: $regular;
+$base-line-height: 1.5em;
+
+
+// Layout Settings
+$max-width: null;
+$columns: null;
+$gutters: null;
+
+// Elevation
+@mixin elevation($level) {
+  @if $level == 1 {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  }
+
+  @else if $level == 2 {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  }
+
+  @else if $level == 3 {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  }
+
+  @else if $level == 4 {
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  }
+
+  @else if $level == 5 {
+    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
+  }
+}
+
+/* Body */
+body {
+  background: #F5F5F5;
+  height: 100%;
+  color: $base-color;
+  font-family: $base-font-family;
+  font-size: $base-font-size;
+  font-weight: $base-font-weight;
+  line-height: $base-line-height;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.btn {
+  outline: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $accent;
+  min-width: 260px;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba($black, .1);
+  box-sizing: border-box;
+  padding: 16px 20px;
+  color: $white;
+  font-size: 12px;
+  font-weight: $semibold;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  overflow: hidden;
+  cursor: pointer;
+  
+  &:focus,
+  &:active {
+    .dropdown {
+      transform: translate(0, 20px);
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+  
+  .material-icons {
+    border-radius: 100%;
+    animation: ripple 0.6s linear infinite;
+  }
+  
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: $white;
+    width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba($black, .1);
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s ease;
+    
+    &:before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 20px;
+      width: 0;
+      height: 0;
+      box-shadow: 2px -2px 6px rgba($black, .05);
+      border-top: 6px solid $white;
+      border-right: 6px solid $white;
+      border-bottom: 6px solid transparent;
+      border-left: 6px solid transparent; 
+      transform: rotate(-45deg);   
+      mix-blend-mode: multiple;
+    }
+    
+    li {
+      z-index: 1;
+      position: relative;
+      background: $white;
+      padding: 0 20px;
+      color: #666;
+      
+      &.active {
+        color: $accent;
+      }
+      
+      &:first-child {
+        border-radius: 4px 4px 0 0;
+      }
+      
+      &:last-child {
+        border-radius: 0 0 4px 4px;
+
+        a {
+          border-bottom: 0;
+        }
+      }
+    }
+    
+    a {
+      display: block;
+      border-bottom: 1px solid rgba($black, .05);
+      padding: 16px 0;
+      color: inherit;
+      font-size: 10px;
+      text-decoration: none;
+    }
+  }
+}
+
+@keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 0 rgba($white, 0.1),
+                0 0 0 20px rgba($white, 0.1),
+                0 0 0 40px rgba($white, 0.1),
+                0 0 0 60px rgba($white, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba($white, 0.1),
+                0 0 0 40px rgba($white, 0.1),
+                0 0 0 60px rgba($white, 0.1),
+                0 0 0 80px rgba($white, 0);
+  }
+}

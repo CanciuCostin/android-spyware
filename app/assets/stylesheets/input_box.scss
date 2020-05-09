@@ -1,0 +1,116 @@
+* { box-sizing:border-box !important ; }
+
+/* basic stylings ------------------------------------------ */
+body 				 { background:url(https://scotch.io/wp-content/uploads/2014/07/61.jpg) ; }
+.container 		{ 
+  font-family:'Roboto' !important ;
+  width:600px !important ; 
+  margin:30px auto 0 !important ; 
+  display:block !important ; 
+  background:#FFF !important ;
+  padding:10px 50px 50px !important ;
+}
+h2 		 { 
+  text-align:center !important ; 
+  margin-bottom:50px !important ; 
+}
+h2 small { 
+  font-weight:normal !important ; 
+  color:#888 !important ; 
+  display:block !important ; 
+}
+.footer 	{ text-align:center !important ; }
+.footer a  { color:#53B2C8 !important ; }
+
+/* form starting stylings ------------------------------- */
+.group 			  { 
+  position:relative !important ; 
+  margin-bottom:45px !important ; 
+}
+input 				{
+  font-size:18px !important ;
+  padding:10px 10px 10px 5px !important ;
+  display:block !important ;
+  width:300px !important ;
+  border:none !important ;
+  border-bottom:1px solid #757575 !important ;
+}
+input:focus 		{ outline:none !important ; }
+
+/* LABEL ======================================= */
+label 				 {
+  color:#999 !important ; 
+  font-size:18px !important ;
+  font-weight:normal !important ;
+  position:absolute !important ;
+  pointer-events:none !important ;
+  left:5px !important ;
+  top:10px !important ;
+  transition:0.2s ease all !important ; 
+  -moz-transition:0.2s ease all !important ; 
+  -webkit-transition:0.2s ease all !important ;
+}
+
+/* active state */
+input:focus ~ label, input:valid ~ label 		{
+  top:-20px !important ;
+  font-size:14px !important ;
+  color:#5264AE !important ;
+}
+
+/* BOTTOM BARS ================================= */
+.bar 	{ position:relative !important ; display:block !important ; width:300px !important ; }
+.bar:before, .bar:after 	{
+  content:'' !important ;
+  height:2px !important ; 
+  width:0 !important ;
+  bottom:1px !important ; 
+  position:absolute !important ;
+  background:#5264AE !important ; 
+  transition:0.2s ease all !important ; 
+  -moz-transition:0.2s ease all !important ; 
+  -webkit-transition:0.2s ease all !important ;
+}
+.bar:before {
+  left:50% !important ;
+}
+.bar:after {
+  right:50% !important ; 
+}
+
+/* active state */
+input:focus ~ .bar:before, input:focus ~ .bar:after {
+  width:50% !important ;
+}
+
+/* HIGHLIGHTER ================================== */
+.highlight {
+  position:absolute !important ;
+  height:60% !important ; 
+  width:100px !important ; 
+  top:25% !important ; 
+  left:0 !important ;
+  pointer-events:none !important ;
+  opacity:0.5 !important ;
+}
+
+/* active state */
+input:focus ~ .highlight {
+  -webkit-animation:inputHighlighter 0.3s ease !important ;
+  -moz-animation:inputHighlighter 0.3s ease !important ;
+  animation:inputHighlighter 0.3s ease !important ;
+}
+
+/* ANIMATIONS ================ */
+@-webkit-keyframes inputHighlighter {
+	from { background:#5264AE !important ; }
+  to 	{ width:0 !important ; background:transparent !important ; }
+}
+@-moz-keyframes inputHighlighter {
+	from { background:#5264AE !important ; }
+  to 	{ width:0 !important ; background:transparent !important ; }
+}
+@keyframes inputHighlighter {
+	from { background:#5264AE !important ; }
+  to 	{ width:0 !important ; background:transparent !important ; }
+}

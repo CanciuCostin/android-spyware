@@ -13,12 +13,12 @@
 //242f3e
 //d59563
 $panelBorder: yellow !important;
-$skinActiveColor: #D59563 !default;
-$bodyColor: #222222 !default;
+$skinActiveColor: #AE4C50 !default;
+$bodyColor: #292B2C !default;
 $skinTextColor: white !important;
 $skinTextActiveColor: black !default;
 $skinTextTable: blue !important;
-$skinHeaderBck: #222222 !important;
+$skinHeaderBck: #343A43 !important;
 $skinBlack: pink !important;
 $panelHeaderBck: purple !important;
 $skinBlackLight: red !important;
@@ -66,6 +66,10 @@ $textGray: brown !important;
 @import 'font-awesome-sprockets';
 @import 'font-awesome';
 @import 'timeline';
+@import 'switcher';
+@import 'sliders';
+
+
 
 #site_title{
     background-color: #37474f !important;
@@ -76,6 +80,7 @@ $textGray: brown !important;
     height: 100% !important;
     overflow-x: hidden;
     transition: 2s;
+    z-index: 100000;
   }
 
   .lEoFR {
@@ -96,7 +101,7 @@ $textGray: brown !important;
     bottom: 0px;
     width: 5vw;
     border-right: 1px solid #333333;
-    background: #222222 none repeat scroll 0% 0%;
+    background: #343A43 none repeat scroll 0% 0%;
     box-shadow: none;
     transition: all 0.3s ease 0s;
     -moz-box-align: center;
@@ -134,7 +139,10 @@ svg:not(:root) {
 }
 
 #active_admin_content {
-    width: 89% !important;
+    width: 88% !important;
+    float: none !important;
+    padding-left: 6%;
+    padding-right: 6%;
 }
 
 #footer {
@@ -148,14 +156,13 @@ svg:not(:root) {
 #map {
     height: 100%;
   }
-div.columns:nth-child(2) > div.column > div.panel > div.panel_contents {
-    height: 600px ;
-    width: 1261.77px;
+div.columns:nth-child(3) > div.column > div.panel > div.panel_contents {
+    height: 450px ;
+    width: 820.567px;
     padding: 0 !important;
 
 }
 div.columns:nth-child(2) > div.column > div.panel {
-    bottom: 1700px;
 }
 
 
@@ -168,12 +175,12 @@ div.columns:nth-child(2) > div.column > div.panel {
   }
 
   html .panel > h3, html .sidebar_section.panel > h3 {
-    background: #222222;
+    background: #343A43;
 }
 
 .header#header .header-item.tabs#tabs li a {
 
-    color: #D59563 !important;
+    color: #AE4C50 !important;
 
 }
 
@@ -183,26 +190,26 @@ div.columns:nth-child(2) > div.column > div.panel {
 
 html #footer{
     border-left: 1px solid #333333 !important;
-    background: #222222;
+    background: #343A43;
 }
 
 .panel_contents{
-    background-color: #222222 !important;
+    background-color: #343A43 !important;
 }
 
 .panel_contents table tr.even td {
 
-    background: #444444 !important;
+    background: #AE4C50 !important;
 
 }
 .panel_contents table tr.odd td {
 
-    background: #666666 !important;
+    background: #000000 !important;
 
 }
 
 html .panel > h3, html .sidebar_section.panel > h3 {
-    border-bottom: 1px solid #D59563;
+    border-bottom: 1px solid #AE4C50;
     border-bottom-style: solid;
 
 }
@@ -212,7 +219,7 @@ html .panel > h3, html .sidebar_section.panel > h3 {
 }
 
 .section, .panel, .sidebar_section.panel{
-    background: #222222 !important;
+    background: #343A43 !important;
 }
 
 .panel h3, .sidebar_section.panel h3 {
@@ -253,12 +260,10 @@ li#logout {
     padding: 0 !important;
 }
 
-svg {
-    fill: #FFFFFF !important;
-  }
+
 
 svg:hover {
-    fill: #D59563 !important;
+    fill: #2DFFF3 !important;
   }
 
 a.button:not(.disabled):hover, a:link.button:not(.disabled):hover, a:visited.button:not(.disabled):hover, input[type=submit]:not(.disabled):hover, input[type=button]:not(.disabled):hover, button:not(.disabled):hover {
@@ -285,21 +290,161 @@ html #header ul.tabs > li:hover > a, html #header ul.tabs > li.current > a {
 }
 
 .breadcrumb {
-    background-color: #222222 !important;
+    background-color: #343A43 !important;
 }
 
 
 .btn-secondary {
     color: #fff;
-    background-color: #222222 !important;
-    border-color: #D59563 !important;
+    background-color: red !important;
+    border-color: #AE4C50 !important;
 }
 
+.count_icon {
+    fill: #2DFFF3 !important;
+  }
+
+
+svg.count_icon{
+    transform-box: fill-box;
+    animation-timing-function: cubic-bezier(.73,1.46,.95,.85);	
+    transform-origin:55% 50%;
+	-moz-transform-origin:55% 50%;
+    animation: flip_left 3.6s forwards;    
+}
+
+svg.count_icon:hover{
+	animation: flip_right 3.6s infinite forwards;
+
+}
+
+
+
+#left_arrow,#right_arrow{
+	animation-timing-function: cubic-bezier(.73,1.46,.95,.85);	
+}
+#left_arrow{
+	transform-origin:55% 50%;
+	-moz-transform-origin:55% 50%;
+	animation: flip_left 3.6s infinite forwards;
+}
+#right_arrow{
+	transform-origin:43% 50%;
+	-moz-transform-origin:43% 50%;
+	animation: flip_right 1.8s infinite forwards;
+	animation-delay: 0.3s;
+}
+
+@keyframes flip_left {
+  0% {transform: perspective(2000px) rotateY(90deg) skewY(-1deg)}
+  30% {transform:perspective(2000px) rotateY(-25deg) skewY(-0.8deg)}
+  50% {transform:perspective(2000px) rotateY(20deg) skewY(0.8deg)}
+  70% {transform:perspective(2000px) rotateY(-10deg) skewY(-0.8deg)}
+  100% {transform:perspective(2000px) rotateY(0deg)}
+}
+
+@keyframes flip_right {
+  0% {transform: perspective(2000px) rotateY(90deg) skewY(-3.5deg)}
+  30% {transform:perspective(2000px) rotateY(-25deg) skewY(-0.8deg)}
+  50% {transform:perspective(2000px) rotateY(20deg) skewY(0.8deg)}
+  70% {transform:perspective(2000px) rotateY(-10deg) skewY(-0.8deg)}
+  100% {transform:perspective(2000px) rotateY(0deg)}
+}
+
+.menu_icon {
+    fill: #FFFFFF;
+}
+
+#menu_modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    padding-top: 100px;
+    left: 100px;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+  }
+  
+  .tab-content{
+      border:none;
+  }
 // Overriding any non-variable SASS must be done after the fact.
 // For example, to change the default status-tag color:
 //
 //   .status_tag { background: #6090DB; }
 
 
+.column {
+    background: #343A43;
+}
+
+#main_content_wrapper{
+    padding-top: 10px;
+}
+
+#main_content > .columns:first-child > .column{
+    background: #292B2C !important;
+
+}
+
+#main_content > .columns:nth-child(2) > .column{
+    background: #292B2C !important;
+
+}
+
+#main_content > .columns:first-child > .column {
+    height: 164px;
+}
+
+#main_content > .columns:first-child > .column > .columns {
+    height: 164px;
+}
+
+#main_content > .columns:first-child > .column > .columns > .column {
+    height: 164px;
+}
+
+#main_content > .columns:nth-child(2) > .column > .columns > .column {
+    height: 164px;
+}
+
+h1.count, h4.category{
+    text-align: center;
+    transition: all 0.6s ease 0s;
+    position: relative !important;
+    font-size: initial;
+
+}
+
+.dashboard_counts_container{
+    float:  right;
+    height: 100%;
+    width: 50%;
+}
+
+.count_icon{
+    float: left;
+    padding-top: 25%;
+    padding-left: 15%;
+    transition: all 0.6s ease 0s;
+}
+
+.dashboard_icon{
+    height: 100%;
+    width: 50%;
+    float: left;
+}
 
 
+.dashboard_icon_container{
+    width: 100%;
+    height: 100%;
+}
+
+div.columns:nth-child(3) > div.column > div.panel > div.panel_contents {
+    width: auto;
+}

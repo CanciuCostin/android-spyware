@@ -1,0 +1,20 @@
+<%= stylesheet_link_tag 'radar_chart', media: 'all', 'data-turbolinks-track': 'reload' %>
+<div class="thewholething">
+  <div class="labelcontainer">
+  <ul>
+  <% i=1 %>
+  <% persons.each do |person| %>
+    <li class="label<%= i.to_s %>"><span><%= person %></span></li>
+  <% i+=1 %>
+  <% end %>
+    </ul>
+  </div>
+  <div class="graph-bg">
+    <div class="graphcontainer">
+      <div class="statform out">
+      </div>
+      <div class="statform in">
+      </div>
+    </div>
+  </div>
+  <div>

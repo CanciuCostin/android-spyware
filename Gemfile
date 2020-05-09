@@ -65,3 +65,7 @@ gem 'webpacker', '>= 4.x'
 
 gem 'responders'
 
+gem 'msfrpc-client'
+
+
+
