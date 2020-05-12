@@ -2,7 +2,7 @@
 
 <br />
 
-<h3 align="center">User Classifier</h3>
+<h3 align="center">Linux user classification module written in Python</h3>
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
@@ -14,7 +14,13 @@
 ## Description
 
 ## Usage
-
+```
+import user_classifier as uc
+```
+* Check if user is system user:
+```
+uc.isSystemUser("sshd") --> True
+```
 ## Contact
  costin.canciu@ibm.com
 
