@@ -1,13 +1,7 @@
-$( ".bash" ).on( "write", function(event, ps1, input, output) {
-    $(".bash").append("<span class=\"ps1\">" + ps1 + "</span>");
-    $(".bash").append("<span class=\"input\">" + input + "</span>");
-    $('.input').last().typeIt().stop();
-    $( ".bash")[0].scrollBy(0,180);
-    var index;
-    for (index = 0; index < output.length; ++index) {
-        $(".bash").append("<div class=\"output\"><span>" + output[index] + "</span></div>");
-}
-});
-$( ".bash" ).trigger("write",["msf > ", "webcam_snap", ["Starting...", "Got frame", "Stopped", "Webcam shot saved to: /lol2.jpeg"] ]);
-alert("done");
- 
+console.log("<%= commandOutput %>")
+console.log("<%= fileName %>")
+var commandOutput = <%=raw commandOutput%>;
+console.log(commandOutput)
+$( ".Terminal__body" ).trigger("write",[" msf > ", ". . .", commandOutput ]);
+
+window.open("/assets/files/pictures/<%= fileName %>") 

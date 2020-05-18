@@ -1,5 +1,5 @@
 ActiveAdmin.register ApkInstallation do
-    menu priority: 1, label: "Install APK", parent: "Actions"
+  menu priority: 4, label: "Install APK"
 
     after_create do |apk_installation|
         @apk_payload = ApkPayload.find(apk_installation.apk_payload_id)

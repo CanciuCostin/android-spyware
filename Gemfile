@@ -57,9 +57,7 @@ gem 'bootstrap', '~> 4.0.0'
 
 gem 'jquery-rails'
 
-gem 'arctic_admin'
-
-gem 'active_admin_flat_skin'
+gem 'active_admin_flat_skin', github: 'ayann/active_admin_flat_skin'
 
 gem 'webpacker', '>= 4.x'
 

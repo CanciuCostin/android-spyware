@@ -2,15 +2,13 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
 <%= stylesheet_link_tag 'dropdown', media: 'all', 'data-turbolinks-track': 'reload' %>
-<div class="container">
+<div class="dropdown_input_container">
   <!-- Btn-->
-  <button class="btn"><span>Account Settings</span><i class="material-icons">volume_up</i>
-    <ul class="dropdown">
-      <li class="active"><a href="#">Profile Information</a></li>
-      <li><a href="#">Change Password</a></li>
-      <li><a href="https://codepen.io/pro">Become <b>PRO</b></a></li>
-      <li><a href="#">Help</a></li>
-      <li><a href="#">Log Out</a></li>
+  <button class="dropdown_input_btn"><span>Sound Mode</span><i class="material-icons">volume_up</i>
+    <ul class="dropdown_input">
+      <li class="dropdown_input_active"><a href="#">Silent</a></li>
+      <li><a href="#">Vibration</a></li>
+      <li><a href="#">Sound</a></li>
     </ul>
   </button>
 </div>

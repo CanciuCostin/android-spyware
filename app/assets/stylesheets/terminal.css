@@ -9,7 +9,7 @@
 }
 
 .Terminal__Toolbar {
-  background: linear-gradient(#504b45 0%,#3c3b37 100%);
+  background: linear-gradient(#343A43 0%,#343A23 100%);
   width: 100%;
   padding: 0 8px;
   box-sizing: border-box;
@@ -62,11 +62,16 @@
   margin-bottom: 1px;
 }
 .Terminal__body {
-  background: rgba(56, 4, 40, .9);
+  /* background: rgba(56, 4, 40, .9); */
+  background: #303238;
   height: calc(100% - 25px);
   margin-top: -1px;
   padding-top: 2px;
   font-family: 'Ubuntu mono';
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  white-space: pre-wrap;
 }
 .Terminal__text {
   color: #ddd;
@@ -90,7 +95,7 @@
   height: 17px;
   width: 8px;
   background: white;
-  display: block;
+  display: inline-block;
   margin-left: 8px;
   animation: 2000ms ease infinite alternate blink;
 }
@@ -109,4 +114,9 @@
     max-height: 90%;
     width: 95%;
   }
+}
+
+
+.ps1{
+  color: #87d441;    
 }

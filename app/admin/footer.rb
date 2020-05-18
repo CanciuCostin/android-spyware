@@ -4,7 +4,7 @@ module ActiveAdmin
   
         def build (namespace)
           super :id => "footer"                                                    
-          super :style => "text-align: right; height: 100%; left: auto; right:0; padding:0; width: 5.203%;"                                     
+          super :style => "text-align: right; height: 100%; left: auto; right:0; padding:0; width: 3.7%;"                                     
   
 
         end

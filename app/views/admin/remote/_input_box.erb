@@ -1,17 +1,15 @@
 <%= stylesheet_link_tag 'input_box', media: 'all', 'data-turbolinks-track': 'reload' %>
-<div class="container">
   
   <form>
     
-    <div class="group">      
-      <input type="text" required>
-      <span class="highlight"></span>
-      <span class="bar"></span>
-      <label>Name</label>
+    <div class="input_box_group">      
+      <input class="input_box" type="text" required>
+      <span class="input_box_highlight"></span>
+      <span class="input_box_bar"></span>
+      <label class="input_name" ><%= input_name %></label>
     </div>
       
     
   </form>
     
   
-</div>

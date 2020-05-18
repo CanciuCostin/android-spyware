@@ -23,8 +23,7 @@
 #terminalContainer{
     width: 75%;
     position: relative;
-    float: right;
-    height: 660px;
+    height: 397px;
 }
 
 #infoi {
@@ -55,9 +54,9 @@
 .smartphone {
     position: relative !important;
     width: 360px !important;
-    height: 640px !important;
+    height: 615px !important;
     margin: auto !important;
-    border: 16px black solid !important;
+    border: 8px black solid !important;
     border-top-width: 60px !important;
     border-bottom-width: 60px !important;
     border-radius: 36px !important;
@@ -92,26 +91,50 @@
   }
 
   .smartphone .content {
-    width: 330px;
-    height: 525px;
-    background-image: url("1.jfif");
+    width: 342px;
+    height: 500px;
+    background-image: url("hack.png ");
     position:relative;
   }
 
   .smartphone-icon {
-      width: 70px;
-      height: 70px;
+      width: 45px;
+      height: 45px;
+      margin-right: 9%;
+      border-radius: 14px;
   }
 
   .top-icons {
-    position: absolute;
-    top:15px;
-    left:15px;
+    position: relative;
+    top: 6%;
+    left: 5%;
   }
 
   .bottom-icons {
-    position: absolute;
-    bottom:10px;
-    left:15px;
+    position: relative;
+    top: 25px;
+  }
+
+  .app_name{
+    margin-bottom: 5%;
+    width: 15%;
+    margin-right: 9%;
+    position: relative;
+    display: inline-block;
+    top: 0px;
+    font-size: x-small;
+    text-align: center;
+    line-height: initial;
+    font-weight: bold;
+  }
+
+  .app_names{
+      position: relative;
+      bottom: 4%;
+  }
+
+
+  .app_row{
+      margin-bottom: 4%;
   }
   

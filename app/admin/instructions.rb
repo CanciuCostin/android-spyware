@@ -1,5 +1,6 @@
 ActiveAdmin.register_page "Instructions" do
-    menu priority: 1, label: proc { "Instructions" }, parent: "Actions"
+  menu priority: 5, label: "Instructions"
+
   
     content title: proc { "Instructions" } do
   

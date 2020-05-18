@@ -1,17 +1,11 @@
-html,
-body {
-  font-family: 'Muli', sans-serif;
-  background-color: #272936;
-  color: #A6A8B6;
-}
 
 .switcher_container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: left;
   justify-content: center;
   width: 100%;
-  height: 100%;
+  padding-top: 60px;
 }
 
 [type="radio"] {
@@ -66,19 +60,20 @@ body {
   }
 }
 
-label {
+label.switcher_label {
   position: relative;
   display: grid;
   align-items: center;
   grid-template-columns: 20px auto 100px;
   grid-gap: 20px;
-  width: 320px;
+  width: 97%;
   height: 62px;
-  padding: 0 20px;
+  padding: 0 3%;
   border-radius: 6px;
   border: 2px solid transparent;
   background-color: transparent;
   transition: all 300ms ease-in;
+  border-color: rgb(90, 101, 151);
   
   &:hover {
     border-color: #4062F6;

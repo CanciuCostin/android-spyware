@@ -3,8 +3,10 @@
   /* General Rules For Range Slider */
   .custom-rangeslider { 
     position:relative ;
-    margin-top:40px ;
+    margin-top:60px ;
     padding:0 ;
+    width: 100%;
+    height: 50px;
   }
   
   
@@ -23,10 +25,10 @@
   
   // Track
   $track-height : 5px ;
-  $track-background-color : #33ccff ;
+  $track-background-color : #0a35c2 ;
   
   // Tool Tip
-  $tool-tip-border : 1px #33ccff solid ;
+  $tool-tip-border : 1px #0a35c2 solid ;
   $tool-tip-border-arrow : $tool-tip-border ;
   
   
@@ -68,11 +70,12 @@
       box-sizing: border-box ; // Border need to be inset
       background-color: $thumb-background-color ;
       //border: $thumb-border ;
-      outline : $thumb-border ;
+      //outline : $thumb-border ;
       width: $thumb-width ;
       height: $thumb-height ;
       border: none ;
       border-radius: $thumb-border-radius ;
+      box-shadow: 0 0 3px #ddd;
       @include cursorGrab ; // Optional
   }
   
@@ -145,7 +148,7 @@
       position : absolute ;
       height : 20px ;
       width : 40px ;
-      background-color : #FFF ;
+      background-color : #272936 ;
       padding : 3px 3px ;
       border : $tool-tip-border ;
       top : -40px ;
@@ -160,7 +163,7 @@
       &:after {
         display: block ;
         content : ' ' ;
-        background : #FFF ;
+        background : #272936 ;
         position : absolute ;
         border: $tool-tip-border-arrow ;
         border-top : 0 ; 
@@ -168,7 +171,7 @@
         width: 10px ;
         height: 10px ;
         left: calc(50% - 6px) ;
-        bottom : -6px ;
+        bottom : -10px ;
         transform:rotate(45deg) ;
       }
     }
@@ -194,5 +197,14 @@
   }
 
   #range-slider2::-moz-range-track {
-    background: linear-gradient(to right, #33ccff 0%, #33ccff 70%, #9c9e9f 70%, #9c9e9f 100%);
+    background: linear-gradient(to right, #0a35c2 0%, #0a35c2 70%, #9c9e9f 70%, #9c9e9f 100%);
+}
+
+#slider_content{
+    float: right;
+    width: 90%;
+}
+
+#slider_label{
+    float: left;
 }

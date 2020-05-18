@@ -41,13 +41,13 @@ li[class^='label'] {
     margin: 3px
 }
 .label1 {
-    color: red
+    color: #2196f3
 }
 .label2 {
-    color: #0ff
+    color: #009688
 }
 .label3 {
-    color: #ff0
+    color: #9c27b0
 }
 .label4 {
     color: #c9c
@@ -58,10 +58,10 @@ li span {
 }
 .graph-bg {
     width: 300px;
-    height: 300px;
+    height: 260px;
     background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/522641/jnehXBI.png);
     position: relative;
-    left: 10%;
+    left: 13%;
 }
 .graphcontainer {
     top: 16.5%;
@@ -120,15 +120,15 @@ li.label4 {
 }
 @keyframes out-anim {
     0%, 100%, 8% {
-        background-color: red;
+        background-color: #2196f3;
         clip-path: polygon(50% 61%, 23% 86%, 100% 100%)
     }
     25% {
-        background-color: #0ff;
+        background-color: #009688;
         clip-path: polygon(51% 1%, 0 100%, 69% 84%)
     }
     50% {
-        background-color: #ff0;
+        background-color: #9c27b0;
         clip-path: polygon(50% 45%, 0 100%, 100% 100%)
     }
     90% {
@@ -138,7 +138,7 @@ li.label4 {
 }
 @keyframes label1-anim {
     0%, 10%, 100% {
-        background-color: #DD2941
+        background-color: #2196f3
     }
     20%,
     90% {
@@ -150,7 +150,7 @@ li.label4 {
         background-color: #292B2C
     }
     30% {
-        background-color: #0CBCCC
+        background-color: #009688
     }
 }
 @keyframes label3-anim {
@@ -158,7 +158,7 @@ li.label4 {
         background-color: #292B2C
     }
     50% {
-        background-color: #C9C815
+        background-color: #9c27b0
     }
 }
 @keyframes label4-anim {
@@ -170,3 +170,35 @@ li.label4 {
         background-color: #c9c
     }
 }
+
+
+
+#calls_title{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    text-align: center;
+    position: relative;
+    right: 4%;
+    top: 4%;
+}
+
+#messages_title{
+
+    position: relative;
+    float: left;
+}
+
+#social_media{
+
+    position: relative;
+    float: right;
+}
+
+#social_media > h3, #messages_title >h3 {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+} 

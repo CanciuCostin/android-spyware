@@ -1,6 +1,5 @@
 ActiveAdmin.register_page "Dashboard" do
-  menu priority: 1, label: proc { I18n.t("active_admin.dashboard") }, parent: "Actions"
-
+    menu priority: 1, label: "Dashboard"
 
   content title: proc { I18n.t("active_admin.dashboard") } do
 
@@ -36,26 +35,26 @@ ActiveAdmin.register_page "Dashboard" do
                     columns do
                   column  do 
 
-                      render partial: "calls_count", locals: {name: "CALL DUMPS", count: "132"}
+                      render partial: "calls_count", locals: {name: "CALL DUMPS", count: "2"}
                   end
                 
 
                   column do
 
-                      render partial: "messages_count", locals: {name: "SMS DUMPS ", count: "132"}
+                      render partial: "messages_count", locals: {name: "SMS DUMPS ", count: "3"}
                   end
                 
 
 
                   column do
 
-                      render partial: "screenshots_count", locals: {name: "SCREEN SNAPS", count: "132"}
+                      render partial: "screenshots_count", locals: {name: "SCREEN SNAPS", count: "0"}
                 end
                 
 
                 column do
             
-                    render partial: "contacts_count", locals: {name: "CONTACTS DUMPS", count: "132"}
+                    render partial: "contacts_count", locals: {name: "CONTACTS DUMPS", count: "4"}
             end
         end
     end
@@ -97,25 +96,25 @@ ActiveAdmin.register_page "Dashboard" do
 
                     column do
                 
-                        render partial: "recordings_count", locals: {name: "MICROPHONE RECS", count: "132"}
+                        render partial: "recordings_count", locals: {name: "MICROPHONE RECS", count: "11"}
                 end
                     
     
                 column do
                 
-                    render partial: "pictures_count", locals: {name: "CAMERA SNAPS", count: "132"}
+                    render partial: "pictures_count", locals: {name: "CAMERA SNAPS", count: "13"}
             end
                     
     
             column do
                 
-                render partial: "videos_count", locals: {name: "VIDEO RECS", count: "132"}
+                render partial: "videos_count", locals: {name: "VIDEO RECS", count: "2"}
         end
                     
     
         column do
             
-            render partial: "locations_count", locals: {name: "LOCATION DUMPS", count: "132"}
+            render partial: "locations_count", locals: {name: "LOCATION DUMPS", count: "0"}
       end
     end
 end

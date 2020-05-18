@@ -1,8 +1,8 @@
-* { box-sizing:border-box !important ; }
+
 
 /* basic stylings ------------------------------------------ */
-body 				 { background:url(https://scotch.io/wp-content/uploads/2014/07/61.jpg) ; }
-.container 		{ 
+
+.form_field_container 		{ 
   font-family:'Roboto' !important ;
   width:600px !important ; 
   margin:30px auto 0 !important ; 
@@ -10,35 +10,26 @@ body 				 { background:url(https://scotch.io/wp-content/uploads/2014/07/61.jpg) 
   background:#FFF !important ;
   padding:10px 50px 50px !important ;
 }
-h2 		 { 
-  text-align:center !important ; 
-  margin-bottom:50px !important ; 
-}
-h2 small { 
-  font-weight:normal !important ; 
-  color:#888 !important ; 
-  display:block !important ; 
-}
-.footer 	{ text-align:center !important ; }
-.footer a  { color:#53B2C8 !important ; }
 
 /* form starting stylings ------------------------------- */
-.group 			  { 
+.input_box_group 			  { 
   position:relative !important ; 
   margin-bottom:45px !important ; 
 }
-input 				{
+.input_box				{
+  background: #343A43 !important;
   font-size:18px !important ;
   padding:10px 10px 10px 5px !important ;
   display:block !important ;
-  width:300px !important ;
+  width: 100% !important ;
   border:none !important ;
-  border-bottom:1px solid #757575 !important ;
+  border-bottom:1px solid #0a35c2 !important ;
+  box-sizing: initial;
 }
-input:focus 		{ outline:none !important ; }
+.input_box:focus 		{ outline:none !important ; }
 
 /* LABEL ======================================= */
-label 				 {
+label.input_name 				 {
   color:#999 !important ; 
   font-size:18px !important ;
   font-weight:normal !important ;
@@ -52,15 +43,15 @@ label 				 {
 }
 
 /* active state */
-input:focus ~ label, input:valid ~ label 		{
+.input_box:focus ~ label, input:valid ~ label 		{
   top:-20px !important ;
   font-size:14px !important ;
   color:#5264AE !important ;
 }
 
-/* BOTTOM BARS ================================= */
-.bar 	{ position:relative !important ; display:block !important ; width:300px !important ; }
-.bar:before, .bar:after 	{
+/* BOTTOM input_box_barS ================================= */
+.input_box_bar 	{ position:relative !important ; display:block !important ; width:300px !important ; }
+.input_box_bar:before, .input_box_bar:after 	{
   content:'' !important ;
   height:2px !important ; 
   width:0 !important ;
@@ -71,20 +62,20 @@ input:focus ~ label, input:valid ~ label 		{
   -moz-transition:0.2s ease all !important ; 
   -webkit-transition:0.2s ease all !important ;
 }
-.bar:before {
+.input_box_bar:before {
   left:50% !important ;
 }
-.bar:after {
+.input_box_bar:after {
   right:50% !important ; 
 }
 
 /* active state */
-input:focus ~ .bar:before, input:focus ~ .bar:after {
+.input_box:focus ~ .input_box_bar:before, input:focus ~ .input_box_bar:after {
   width:50% !important ;
 }
 
-/* HIGHLIGHTER ================================== */
-.highlight {
+/* input_box_highlightER ================================== */
+.input_box_highlight {
   position:absolute !important ;
   height:60% !important ; 
   width:100px !important ; 
@@ -95,22 +86,22 @@ input:focus ~ .bar:before, input:focus ~ .bar:after {
 }
 
 /* active state */
-input:focus ~ .highlight {
-  -webkit-animation:inputHighlighter 0.3s ease !important ;
-  -moz-animation:inputHighlighter 0.3s ease !important ;
-  animation:inputHighlighter 0.3s ease !important ;
+.input_box:focus ~ .input_box_highlight {
+  -webkit-animation:inputinput_box_highlighter 0.3s ease !important ;
+  -moz-animation:inputinput_box_highlighter 0.3s ease !important ;
+  animation:inputinput_box_highlighter 0.3s ease !important ;
 }
 
 /* ANIMATIONS ================ */
-@-webkit-keyframes inputHighlighter {
+@-webkit-keyframes inputinput_box_highlighter {
 	from { background:#5264AE !important ; }
   to 	{ width:0 !important ; background:transparent !important ; }
 }
-@-moz-keyframes inputHighlighter {
+@-moz-keyframes inputinput_box_highlighter {
 	from { background:#5264AE !important ; }
   to 	{ width:0 !important ; background:transparent !important ; }
 }
-@keyframes inputHighlighter {
+@keyframes inputinput_box_highlighter {
 	from { background:#5264AE !important ; }
   to 	{ width:0 !important ; background:transparent !important ; }
 }

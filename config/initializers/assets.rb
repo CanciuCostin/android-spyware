@@ -9,6 +9,9 @@ Rails.application.config.assets.version = '1.0'
 Rails.application.config.assets.paths << Rails.root.join('node_modules')
 
 #Rails.application.config.assets.paths << Rails.root.join('vendor', 'assets', 'javascripts') 
+#Rails.application.config.assets.precompile += %w( .js .es6 )
+
+Rails.application.config.assets.paths << Rails.root.join('vendor', 'assets', 'javascripts') 
 #\sRails.application.config.assets.precompile += %w( .js .es6 )
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in the app/assets
