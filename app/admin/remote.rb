@@ -13,13 +13,16 @@ ActiveAdmin.register_page "Remote" do
         column do
             columns do 
                 if params[:selected_smartphone_id].present?
-                    column  do
+                    column  span: 4 do
                         render template: "smartphones/smartphone2", locals: {smartphones: Smartphone.all, smartphone: Smartphone.find(params[:selected_smartphone_id])}
                     end
                 else
-                    column  do
+                    column span: 4  do
                         render template: "smartphones/smartphone2", locals: {smartphones: Smartphone.all, smartphone: Smartphone.first}
                     end
+                end
+                column do
+                    render partial: "smartphone_helper_bar"
                 end
             end
             columns do

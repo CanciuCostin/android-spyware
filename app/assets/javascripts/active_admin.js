@@ -340,9 +340,3 @@ elem.addEventListener("input", rangeValue);
 
 });
 
-
-
-
-
-
-
