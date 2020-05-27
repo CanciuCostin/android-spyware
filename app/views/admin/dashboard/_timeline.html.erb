@@ -6,7 +6,7 @@
     <li>
 		<div class="direction-<%= if i%2 == 0 then 'r' else 'l' end %>">
 			<div class="flag-wrapper">
-				<span class="flag"><%= activity.type + activity.date.to_s %></span>
+				<span class="flag color-<%= (i%4) + 1 %>"><%= activity.type + activity.date.to_s %></span>
 			</div>
 			<div class="desc"><%= activity.name %></div>
 		</div>

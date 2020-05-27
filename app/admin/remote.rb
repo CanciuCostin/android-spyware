@@ -12,18 +12,17 @@ ActiveAdmin.register_page "Remote" do
       columns do
         column do
             columns do 
+
                 if params[:selected_smartphone_id].present?
-                    column  span: 4 do
+                    column do
                         render template: "smartphones/smartphone2", locals: {smartphones: Smartphone.all, smartphone: Smartphone.find(params[:selected_smartphone_id])}
                     end
                 else
-                    column span: 4  do
+                    column do
                         render template: "smartphones/smartphone2", locals: {smartphones: Smartphone.all, smartphone: Smartphone.first}
                     end
                 end
-                column do
-                    render partial: "smartphone_helper_bar"
-                end
+
             end
             columns do
                 column do
@@ -39,31 +38,75 @@ ActiveAdmin.register_page "Remote" do
 
 
         column do
-            columns do
-                column do
-                    panel "Record Setings "do
-                        render partial: "input_box", locals: {input_name: "File Name"}
-                        render partial: "sliders"
-                        #render partial: "sliders"
-                        render partial: "switcher"
+            columns  do
+                column class: "a" do
+                    panel "Common Settings "do
+                        columns do
+                            column do
+                            render partial: "toggle", locals: {label: "Auto Open Tab"}
+                            end
+                            column do
+                            render partial: "toggle", locals: {label: "Auto Download"}
+                            end
+                        end
+                        columns do
+                            column do
+                                render partial: "sliders", locals: {label: "Timeout", min: "0s", max: "100s"}
+
+                            end
+                            column do
+                                render partial: "sliders", locals: {label: "Timeout", min: "0s", max: "100s"}
+                            end
+                        end
                     end
                 end
             end
-        columns  do
-            column class: "a" do
-                panel "SMS Setings "do
-                render partial: "input_box", locals: {input_name: "Destination Number"}
-                render partial: "input_box", locals: {input_name: "Content"}
+
+            columns do
+                column do
+                    panel "Specific Setings "do
+                        tabs do
+                            tab "Camera" do
+                                columns do
+                                    column do
+                                        render partial: "input_box", locals: {input_name: "File Name"}
+                                        render partial: "input_box", locals: {input_name: "File Path"}
+                                    end
+                                    column do
+                                        render partial: "switcher"
+
+                                    end
+                                end
+                                columns do
+                                    column do
+                                        render partial: "sliders", locals: {label: "Quality", min: "0%", max: "100%"}
+                                    end
+                                    column do
+                                        render partial: "sliders", locals: {label: "Time", min: "0s", max: "100s"}
+
+                                    end
+                                end
+                                #render partial: "sliders"
+                            end
+                            tab "SMS" do
+                                render partial: "input_box", locals: {input_name: "Destination Number"}
+                                render partial: "input_box", locals: {input_name: "Content"}
+                            end
+                            tab "Microphone" do
+                                render partial: "dropdown"
+                            end
+                            tab "File System" do
+                            end
+                            tab "System" do
+                            end
+                            tab "System" do
+                            end
+                            tab "System" do
+                            end
+                        end
+                    end
                 end
             end
-        end
-        columns  do
-            column class: "a" do
-                panel "System Setings "do
-                render partial: "dropdown"
-                end
-            end
-        end
         
     end
 

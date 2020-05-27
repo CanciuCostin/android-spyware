@@ -1,6 +1,6 @@
 
 .smartphonee{
-  margin: 50px !important;
+  margin: 10px 0px 10px 0px !important;
   display: -webkit-box !important;
   display: -ms-flexbox !important;
   display: flex !important;
@@ -10,7 +10,9 @@
   box-sizing: border-box !important;
   width: 58.5%;
   position: relative;
-  left: 11.5%;
+  //left: 11.5%;
+  float: left;
+  left:0.8%;
 }
 
 .volume-btnn{
@@ -92,7 +94,7 @@
 .screenn{
     width: 300px !important;
     height: 450px !important;
-    background-image: url("2.jfif");
+    background-image: url("wallpaper3.png");
 
     //background: #222326;
   background-repeat: no-repeat !important;

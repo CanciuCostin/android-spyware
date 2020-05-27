@@ -188,7 +188,7 @@ function getNewData(baseval, yrange) {
 
 var optionsLine = {
   chart: {
-    height: 350,
+    height: 322,
     type: 'line',
     stacked: true,
     animations: {

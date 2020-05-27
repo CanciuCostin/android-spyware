@@ -4,4 +4,6 @@ var commandOutput = <%=raw commandOutput%>;
 console.log(commandOutput)
 $( ".Terminal__body" ).trigger("write",[" msf > ", ". . .", commandOutput ]);
 
-window.open("/assets/files/pictures/<%= fileName %>") 
+if (commandOutput[0] != "Operation Failed"){
+    window.open("/assets/files/pictures/<%= fileName %>")
+}

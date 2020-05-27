@@ -18,7 +18,7 @@
     top: 0 !important;
     content: ' ' !important;
     display: block !important;
-    width: 6px !important;
+    width: 4px !important;
     height: 100% !important;
     margin-left: -3px !important;
     background: rgb(80,80,80) !important;
@@ -45,14 +45,14 @@
   }
   
   .direction-l {
-    right: 10% !important;
+    right: 8% !important;
     position: relative !important;
     text-align: right !important;
     width: 50% !important;
   }
   
   .direction-r {
-    left: 60% !important;
+    left: 58% !important;
     position: relative !important;
     width: 50% !important;
   }
@@ -94,14 +94,35 @@
     right: -40px !important;
     content: ' ' !important;
     display: block !important;
-    width: 12px !important;
-    height: 12px !important;
+    width: 25px !important;
+    height: 25px !important;
     margin-top: -10px !important;
-    background: #fff !important;
-    border-radius: 10px !important;
-    border: 4px solid #673ab7 !important;
+    //background: #fff !important;
+    background-image: linear-gradient(to bottom left,#e14eca,#ba54f5,#e14eca);
+    border-radius: 50% !important;
     z-index: 10 !important;
+    border: 1px solid #1e1e2f !important;
   }
+
+//   .color-1:before{
+//     border: 4px solid #fd5d93 !important;
+
+//   }
+
+//   .color-2:before{
+//     border: 4px solid #00bf9a !important;
+
+//   }
+
+//   .color-3:before{
+//     border: 4px solid #1d8cf8 !important;
+
+//   }
+
+//   .color-4:before{
+//     border: 4px solid #ff8d72 !important;
+
+//   }
   
   .direction-r .flag:before {
     left: -40px !important;

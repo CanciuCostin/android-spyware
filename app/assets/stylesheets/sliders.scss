@@ -3,10 +3,10 @@
   /* General Rules For Range Slider */
   .custom-rangeslider { 
     position:relative ;
-    margin-top:60px ;
+    //margin-top:60px ;
     padding:0 ;
     width: 100%;
-    height: 50px;
+    height: 150px;
   }
   
   
@@ -17,18 +17,18 @@
   $range-background-color : transparent ; // Test
   
   // Thumb
-  $thumb-background-color : #21324f ; // Test
+  $thumb-background-color : #00796b ; // Test
   $thumb-border : 2px solid #ffffff ;
   $thumb-height : 20px ;
   $thumb-width : 20px ;
   $thumb-border-radius : 50% ; // Circle
   
   // Track
-  $track-height : 5px ;
-  $track-background-color : #0a35c2 ;
-  
+  $track-height : 3px ;
+  $track-background-color : #00796b ;
+
   // Tool Tip
-  $tool-tip-border : 1px #0a35c2 solid ;
+  $tool-tip-border : 1px #e14eca solid ;
   $tool-tip-border-arrow : $tool-tip-border ;
   
   
@@ -68,14 +68,15 @@
   @mixin rangeThumb {
       appearance: none ; // Reset Appearance
       box-sizing: border-box ; // Border need to be inset
-      background-color: $thumb-background-color ;
+      //background-color: $thumb-background-color ;
+      background-image: linear-gradient(to bottom left,#e14eca,#ba54f5,#e14eca);
       //border: $thumb-border ;
       //outline : $thumb-border ;
       width: $thumb-width ;
       height: $thumb-height ;
       border: none ;
       border-radius: $thumb-border-radius ;
-      box-shadow: 0 0 3px #ddd;
+      //box-shadow: 0 0 3px #ddd;
       @include cursorGrab ; // Optional
   }
   
@@ -148,7 +149,7 @@
       position : absolute ;
       height : 20px ;
       width : 40px ;
-      background-color : #272936 ;
+      background-color : #27293d ;
       padding : 3px 3px ;
       border : $tool-tip-border ;
       top : -40px ;
@@ -156,6 +157,7 @@
       text-align : center ;
       transform: translate(-26%, 0) ;
       border-radius : 3px ;
+      visibility: hidden;
       
       @include unSelectable ;
       @include avoidClicks ;
@@ -163,7 +165,7 @@
       &:after {
         display: block ;
         content : ' ' ;
-        background : #272936 ;
+        background : #27293d ;
         position : absolute ;
         border: $tool-tip-border-arrow ;
         border-top : 0 ; 
@@ -197,14 +199,21 @@
   }
 
   #range-slider2::-moz-range-track {
-    background: linear-gradient(to right, #0a35c2 0%, #0a35c2 70%, #9c9e9f 70%, #9c9e9f 100%);
+      
+    //background: linear-gradient(to right, #e945c5 0%, #e945c5 70%, #9c9e9f 70%, #9c9e9f 100%) !important;
 }
 
 #slider_content{
     float: right;
-    width: 90%;
+    width: 60%;
+    padding-right: 10%;
+    top:42%;
+    position: relative;
 }
 
 #slider_label{
     float: left;
+    top:42%;
+    position: relative;
+    padding-left: 10%;
 }

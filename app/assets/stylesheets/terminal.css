@@ -3,13 +3,13 @@
 
 
 .Terminal {
-  width: 600px;
-  height: 400px;
+  width: 565px;
+  height: 365px;
   box-shadow: 2px 4px 10px rgba(0,0,0,.5);
 }
 
 .Terminal__Toolbar {
-  background: linear-gradient(#343A43 0%,#343A23 100%);
+  background: linear-gradient(#27293d 0%,#27293d 100%);
   width: 100%;
   padding: 0 8px;
   box-sizing: border-box;
@@ -62,8 +62,7 @@
   margin-bottom: 1px;
 }
 .Terminal__body {
-  /* background: rgba(56, 4, 40, .9); */
-  background: #303238;
+  background: rgba(39, 41, 61, .8);
   height: calc(100% - 25px);
   margin-top: -1px;
   padding-top: 2px;
@@ -72,6 +71,7 @@
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
   white-space: pre-wrap;
+  border-top: 1px solid grey;
 }
 .Terminal__text {
   color: #ddd;

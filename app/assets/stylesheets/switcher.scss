@@ -5,7 +5,8 @@
   align-items: left;
   justify-content: center;
   width: 100%;
-  padding-top: 60px;
+  height: 150px;
+  //padding-top: 60px;
 }
 
 [type="radio"] {
@@ -14,7 +15,7 @@
   opacity: 0;
   
   &:checked ~ label {
-    border-color: #4062F6;
+    border-color: #e14eca;
     background-color: rgba(#619AEA, 0.16);
     color: #FFF;
 		
@@ -31,7 +32,7 @@
     > span {
       will-change: transform;
       border: 0;
-      background-image: linear-gradient(to top right, #6E89FF, #4363EE);
+      background-image: linear-gradient(to bottom left,#e14eca,#ba54f5,#e14eca);
       animation: radio 400ms cubic-bezier(.17, .89, .32, 1.49);
       
       &:after {
@@ -66,17 +67,17 @@ label.switcher_label {
   align-items: center;
   grid-template-columns: 20px auto 100px;
   grid-gap: 20px;
-  width: 97%;
-  height: 62px;
-  padding: 0 3%;
+  width: 80%;
+  height: 41px;
+  margin-left: 10%;
   border-radius: 6px;
   border: 2px solid transparent;
   background-color: transparent;
   transition: all 300ms ease-in;
-  border-color: rgb(90, 101, 151);
+  border-color: rgba(225,78,202,0.2)
   
   &:hover {
-    border-color: #4062F6;
+    border-color: #e14eca;
     background-color: rgba(#619AEA, 0.16);
   }
   
@@ -130,4 +131,8 @@ label.switcher_label {
 
 @keyframes radio {
 	0%, 17.5% { transform: scale(0); }
+}
+
+.switcher_container .option{
+    padding-top: 7%;
 }
