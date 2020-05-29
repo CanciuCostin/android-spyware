@@ -17,6 +17,7 @@ ActiveAdmin.register_page "Dashboard" do
 
     pictures=Picture.all.limit(10)
     activities=[]
+	#what to do when no pictures
     pictures.each do |picture|
         activities << Activity.new("Picture", picture.date, picture.filename)
     end

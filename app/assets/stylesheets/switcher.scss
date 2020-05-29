@@ -5,8 +5,10 @@
   align-items: left;
   justify-content: center;
   width: 100%;
-  height: 150px;
+  height: 120px;
   //padding-top: 60px;
+  position: relative;
+  top:20px;
 }
 
 [type="radio"] {
@@ -134,5 +136,5 @@ label.switcher_label {
 }
 
 .switcher_container .option{
-    padding-top: 7%;
+    //padding-top: 7%;
 }

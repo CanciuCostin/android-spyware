@@ -100,14 +100,18 @@
   .smartphone-icon {
       width: 45px;
       height: 45px;
-      margin-right: 9%;
+      margin-right: 8%;
       border-radius: 14px;
   }
 
   .top-icons {
     position: relative;
     top: 6%;
-    left: 5%;
+    left: 7%;
+    height: 450px;
+    padding-right: 15%;
+    overflow: auto;
+    width: 100%;
   }
 
   .bottom-icons {
@@ -125,7 +129,7 @@
     font-size: x-small;
     text-align: center;
     line-height: initial;
-    font-weight: bold;
+    //font-weight: bold;
   }
 
   .app_names{

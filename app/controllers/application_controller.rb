@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
         session=rpc.call('session.list').keys[0]
 
         puts rpc.call('session.meterpreter_write', session, command)
-        sleep 2
+        sleep 4
         commandOutput = rpc.call('session.meterpreter_read', session).values()[0].split('\n')
         return commandOutput
     end

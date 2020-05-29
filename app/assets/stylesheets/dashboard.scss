@@ -3,7 +3,7 @@ div.columns:nth-child(3) > div.column > div.panel > div.panel_contents {
 }
 //map
 div.columns:nth-child(3) > div.column:first-child > div.panel > div.panel_contents {
-    height: 450px ;
+    height: 350px ;
     //width: 820.567px;
     padding: 0 !important;
 
@@ -11,7 +11,7 @@ div.columns:nth-child(3) > div.column:first-child > div.panel > div.panel_conten
 
 //radar
 div.columns:nth-child(3) > div.column:nth-child(2) > div.panel > div.panel_contents {
-    height: 425px ;
+    height: 325px ;
     //width: 820.567px;
     padding: 0 !important;
 
@@ -19,7 +19,7 @@ div.columns:nth-child(3) > div.column:nth-child(2) > div.panel > div.panel_conte
 
 //timeline
 body.admin_dashboard #main_content div.columns:first-child div.column:nth-child(2) > div.panel > div.panel_contents{
-    height: 743px;
+    height: 633px;
 }
 
 div.columns:nth-child(3) > div.column > div.panel > div.panel_contents {
@@ -124,4 +124,9 @@ li.ui-tabs-tab.ui-corner-top.ui-state-default.ui-tab a{
     line-height: 16px;
     font-weight: 600;
     font-family: Poppins,sans-serif !important;
+}
+
+//panel titles
+.panel h3{
+    padding: 8px !important;
 }

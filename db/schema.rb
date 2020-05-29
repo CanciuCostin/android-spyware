@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_09_074431) do
+ActiveRecord::Schema.define(version: 2020_05_28_173949) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,19 +60,15 @@ ActiveRecord::Schema.define(version: 2020_04_09_074431) do
 
   create_table "call_logs", force: :cascade do |t|
     t.date "date"
-    t.string "source"
-    t.string "destination"
-    t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
     t.index ["smartphone_id"], name: "index_call_logs_on_smartphone_id"
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.string "first_name"
-    t.string "last_name"
-    t.string "phone_number"
     t.bigint "smartphone_id", null: false
+    t.string "filename"
+    t.string "date"
     t.index ["smartphone_id"], name: "index_contacts_on_smartphone_id"
   end
 
@@ -120,10 +116,8 @@ ActiveRecord::Schema.define(version: 2020_04_09_074431) do
 
   create_table "sms_messages", force: :cascade do |t|
     t.date "date"
-    t.string "source"
-    t.string "destination"
-    t.text "content"
     t.bigint "smartphone_id", null: false
+    t.string "filename"
     t.index ["smartphone_id"], name: "index_sms_messages_on_smartphone_id"
   end
 

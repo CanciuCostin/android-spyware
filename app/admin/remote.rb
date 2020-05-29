@@ -51,11 +51,11 @@ ActiveAdmin.register_page "Remote" do
                         end
                         columns do
                             column do
-                                render partial: "sliders", locals: {label: "Timeout", min: "0s", max: "100s"}
+                                render partial: "sliders", locals: {label: "Exec Timeout", min: "0s", max: "100s"}
 
                             end
                             column do
-                                render partial: "sliders", locals: {label: "Timeout", min: "0s", max: "100s"}
+                                render partial: "sliders", locals: {label: "Cp Timeout", min: "0s", max: "100s"}
                             end
                         end
                     end
@@ -66,7 +66,7 @@ ActiveAdmin.register_page "Remote" do
                 column do
                     panel "Specific Setings "do
                         tabs do
-                            tab "Camera" do
+                            tab "Capture" do
                                 columns do
                                     column do
                                         render partial: "input_box", locals: {input_name: "File Name"}
@@ -97,12 +97,11 @@ ActiveAdmin.register_page "Remote" do
                             end
                             tab "File System" do
                             end
-                            tab "System" do
+                            tab "System Info" do
                             end
-                            tab "System" do
+                            tab "Apps" do
                             end
-                            tab "System" do
-                            end
+
                         end
                     end
                 end

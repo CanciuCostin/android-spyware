@@ -99,18 +99,20 @@
     //background: #222326;
   background-repeat: no-repeat !important;
   background-size: cover !important;
-    display: -webkit-box !important;
-    display: -ms-flexbox !important;
-    display: flex !important;
-    -webkit-box-align: center !important;
-        -ms-flex-align: center !important;
-            align-items: center !important;
-    -webkit-box-orient: vertical !important;
-    -webkit-box-direction: normal !important;
-        -ms-flex-direction: column !important;
-            flex-direction: column !important;
-            -webkit-box-sizing: border-box !important;
-            box-sizing: border-box !important;
+    // display: -webkit-box !important;
+    // display: -ms-flexbox !important;
+    // display: flex !important;
+    // -webkit-box-align: center !important;
+    //     -ms-flex-align: center !important;
+    //         align-items: center !important;
+    // -webkit-box-orient: vertical !important;
+    // -webkit-box-direction: normal !important;
+    //     -ms-flex-direction: column !important;
+    //         flex-direction: column !important;
+    //         -webkit-box-sizing: border-box !important;
+    display: inline-grid;
+    box-sizing: border-box !important;
+    overflow: hidden;
 }
 
 .speakerr{

@@ -3,9 +3,10 @@
 
 
 .Terminal {
-  width: 565px;
-  height: 365px;
+  width: 470px;
+  height: 325px;
   box-shadow: 2px 4px 10px rgba(0,0,0,.5);
+  font-size: 11.8px;
 }
 
 .Terminal__Toolbar {

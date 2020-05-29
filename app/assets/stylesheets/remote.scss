@@ -54,34 +54,37 @@ div.column:first-child, div.column:nth-child(2){
     background: none;
 }
 
-
+//terminal
 #main_content .columns .column:nth-child(3) .columns {
-    height: 367px;
+    height: 327px;
 }
 
 .panel {
     margin-bottom: 0 !important;
 }
 
+//common settings
 #main_content .columns:first-child .column:nth-child(2) .columns:first-child .panel .panel_contents{
-    height: 301px;
+    height: 261px;
 }
-
+//specific settings
 #main_content .columns:first-child .column:nth-child(2) .columns:nth-child(2) .panel .panel_contents{
-    height: 375px;
+    height: 365px;
 }
-
+//gauges
 #main_content .columns:first-child .column:first-child .columns:nth-child(2) .panel .panel_contents{
-    height: 140px;
+    height: 100px;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 // common settings
 #main_content .columns:first-child .column:nth-child(2) .columns:first-child .panel .panel_contents .columns .column .custom-rangeslider{
-    height: 150px;
+    height: 120px;
 }
 
 #main_content .columns:first-child .column:nth-child(2) .columns:first-child .panel .panel_contents .columns .column .toggle_container{
-    height: 150px;
+    height: 120px;
 }
 
 #main_content .columns:first-child .column:nth-child(2) .columns:first-child .panel .panel_contents .columns .column{
@@ -101,15 +104,27 @@ div.column:first-child, div.column:nth-child(2){
 
 
 #main_content .columns:first-child .column:nth-child(2) .columns:first-child .panel .panel_contents .columns:first-child{
-    border-bottom: 1px solid #6B6C75;
+    border-bottom: 1px solid #2b3553;
 }
 
 #main_content .columns:first-child .column:nth-child(2) .columns:first-child .panel .panel_contents .columns:first-child .column:first-child{
-    border-right: 1px solid #6B6C75;
+    border-right: 1px solid #2b3553;
 }
 
 #main_content .columns:first-child .column:nth-child(2) .columns:first-child .panel .panel_contents .columns:nth-child(2) .column:first-child{
-    border-right: 1px solid #6B6C75;
+    border-right: 1px solid #2b3553;
+}
+
+#main_content .columns:first-child .column:nth-child(2) .columns:nth-child(2) .panel .panel_contents .columns:first-child{
+    border-bottom: 1px solid #2b3553;
+}
+
+#main_content .columns:first-child .column:nth-child(2) .columns:nth-child(2) .panel .panel_contents .columns:first-child .column:first-child{
+    border-right: 1px solid #2b3553;
+}
+
+#main_content .columns:first-child .column:nth-child(2) .columns:nth-child(2) .panel .panel_contents .columns:nth-child(2) .column:first-child{
+    border-right: 1px solid #2b3553;
 }
 
 //specific settings - camera
@@ -167,15 +182,19 @@ body.admin_remote #active_admin_content .columns{
 
 
 #main_content .columns:first-child .column:nth-child(2) .columns:nth-child(2) .column .panel .panel_contents .tabs .tab-content #camera .columns:first-child{
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid #2b3553;
 }
 
 #main_content .columns:first-child .column:nth-child(2) .columns:nth-child(2) .column .panel .panel_contents .tabs .tab-content #camera .columns .column:first-child{
-    border-right: 1px solid gray;
+    border-right: 1px solid #2b3553;
 }
 
 body.admin_remote #active_admin_content .tab-content .columns{
     margin-bottom: 0 !important;
+}
+
+body.admin_remote .tabs.ui-tabs.ui-corner-all.ui-widget.ui-widget-content{
+    padding-top: 5%;
 }
 
 li.ui-tabs-tab.ui-corner-top.ui-state-default.ui-tab.ui-tabs-active.ui-state-active a{
@@ -206,3 +225,11 @@ li.ui-tabs-tab.ui-corner-top.ui-state-default.ui-tab a{
     font-weight: 600;
     font-family: Poppins,sans-serif !important;
 }
+
+
+//tabs
+.panel .panel_contents ul{
+    margin-left: 2.5%;
+}
+
+
