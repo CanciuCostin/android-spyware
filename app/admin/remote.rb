@@ -52,6 +52,7 @@ ActiveAdmin.register_page "Remote" do
                         columns do
                             column do
                                 render partial: "sliders", locals: {label: "Exec Timeout", min: "0s", max: "100s"}
+                                render partial: "triangle_info", locals: {color: "orange"}
 
                             end
                             column do
