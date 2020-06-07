@@ -1,0 +1,108 @@
+.demos{
+    position: absolute;
+    width: 60px;
+    left: 31%;
+}
+
+.service_status{
+    float: right;
+    top: 20%;
+    position: relative;
+}
+.demos div span:nth-child(2) {
+    margin-left: 30px;
+    line-height: 35px;
+  }
+  .demo-up {
+    display: block;
+    height: 35px;
+    position: relative;
+    color: #2ECC71;
+  }
+  .demo-slow {
+    display: block;
+    height: 35px;
+    position: relative;
+    color: #F1C40F;
+  }
+  .demo-down {
+    display: block;
+    height: 35px;
+    position: relative;
+    color: #E74C3C;
+  }
+  
+  /** Server status css **/
+  .server-status {
+    left: 10px;
+    top: 50%;
+    margin-left: 0px;
+    margin-top: -5px;
+    position: absolute;
+    vertical-align: middle;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .server-status::before,
+  .server-status::after {
+    left: 0;
+    top: 50%;
+    margin-left: -1px;
+    margin-top: -6px;
+    position: absolute;
+    vertical-align: middle;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .server-status[type="up"],
+  .server-status[type="up"]::before,
+  .server-status[type="up"]::after {
+    background: #2ECC71;
+  }
+  .server-status[type="down"],
+  .server-status[type="down"]::before,
+  .server-status[type="down"]::after {
+    background: #E74C3C;
+  }
+  .server-status[type="slow"],
+  .server-status[type="slow"]::before,
+  .server-status[type="slow"]::after {
+    background: #F1C40F;
+  }
+  
+  .server-status::before {
+    content: "";
+    animation: bounce 1.5s infinite;
+  }
+  .server-status::after {
+    content: "";
+    animation: bounce 1.5s -0.4s infinite;
+  }
+  
+  @keyframes bounce {
+    0% {
+      transform: scale(1);
+      -webkit-transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2);
+      -webkit-transform: scale(2);
+      opacity: 0;
+    }
+  }
+  
+  @-webkit-keyframes bounce {
+    0% {
+      transform: scale(1);
+      -webkit-transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2);
+      -webkit-transform: scale(2);
+      opacity: 0;
+    }
+  }

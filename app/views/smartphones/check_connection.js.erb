@@ -1,0 +1,19 @@
+console.log("<%= adbConnected %>")
+var adbConnected = <%=raw adbConnected %>;
+console.log(adbConnected)
+console.log("<%= msfConnected %>")
+var msfConnected = <%=raw msfConnected %>;
+console.log(msfConnected)
+if (adbConnected){
+    $(".adb_status.server-status").attr("type","up");
+}
+else{
+    $(".adb_status.server-status").attr("type","down");
+}
+if (msfConnected){
+    $(".msf_status.server-status").attr("type","up");
+    
+}
+else{
+    $(".msf_status.server-status").attr("type","down");
+}
