@@ -1,0 +1,103 @@
+https://android.googlesource.com/platform/frameworks/base/+/4a627c71ff53a4fca1f961f4b1dcc0461df18a06
+
+This is the basic infrastructure for pulling a full(*) backup of the
+device's data over an adb(**) connection to the local device.  The
+basic process consists of these interacting pieces:
+
+1. The framework's BackupManagerService, which coordinates the
+   collection of app data and routing to the destination.
+
+2. A new framework-provided BackupAgent implementation called
+   FullBackupAgent, which is instantiated in the target applications'
+   processes in turn, and knows how to emit a datastream that contains
+   all of the app's saved data files.
+
+3. A new shell-level program called "bu" that is used to bridge from
+   adb to the framework's Backup Manager.
+
+4. adb itself, which now knows how to use 'bu' to kick off a backup
+   operation and pull the resulting data stream to the desktop host.
+
+5. A system-provided application that verifies with the user that
+   an attempted backup/restore operation is in fact expected and to
+   be allowed.
+
+The full agent implementation is not used during normal operation of
+the delta-based app-customized remote backup process.  Instead it's
+used during user-confirmed *full* backup of applications and all their
+data to a local destination, e.g. via the adb connection.
+
+The output format is 'tar'.  This makes it very easy for the end
+user to examine the resulting dataset, e.g. for purpose of extracting
+files for debug purposes; as well as making it easy to contemplate
+adding things like a direct gzip stage to the data pipeline during
+backup/restore.  It also makes it convenient to construct and maintain
+synthetic backup datasets for testing purposes.
+
+Within the tar format, certain artificial conventions are used.
+All files are stored within top-level directories according to
+their semantic origin:
+
+apps/pkgname/a/  : Application .apk file itself
+apps/pkgname/obb/: The application's associated .obb containers
+apps/pkgname/f/  : The subtree rooted at the getFilesDir() location
+apps/pkgname/db/ : The subtree rooted at the getDatabasePath() parent
+apps/pkgname/sp/ : The subtree rooted at the getSharedPrefsFile() parent
+apps/pkgname/r/  : Files stored relative to the root of the app's file tree
+apps/pkgname/c/  : Reserved for the app's getCacheDir() tree; not stored.
+
+For each package, the first entry in the tar stream is a file called
+"_manifest", nominally rooted at apps/pkgname.  This file contains some
+metadata about the package whose data is stored in the archive.
+
+The contents of shared storage can optionally be included in the tar
+stream. It is placed in the synthetic location:
+
+shared/...
+
+uid/gid are ignored; app uids are assigned at install time, and the
+app's data is handled from within its own execution environment, so
+will automatically have the app's correct uid.
+
+Forward-locked .apk files are never backed up.  System-partition
+.apk files are not backed up unless they have been overridden by a
+post-factory upgrade, in which case the current .apk *is* backed up --
+i.e. the .apk that matches the on-disk data.  The manifest preceding
+each application's portion of the tar stream provides version numbers
+and signature blocks for version checking, as well as an indication
+of whether the restore logic should expect to install the .apk before
+extracting the data.
+
+System packages can designate their own full backup agents.  This is
+to manage things like the settings provider which (a) cannot be shut
+down on the fly in order to do a clean snapshot of their file trees,
+and (b) manage data that is not only irrelevant but actively hostile
+to non-identical devices -- CDMA telephony settings would seriously
+mess up a GSM device if emplaced there blind, for example.
+
+When a full backup or restore is initiated from adb, the system will
+present a confirmation UI that the user must explicitly respond to
+within a short [~ 30 seconds] timeout.  This is to avoid the
+possibility of malicious desktop-side software secretly grabbing a copy
+of all the user's data for nefarious purposes.
+
+(*) The backup is not strictly a full mirror.  In particular, the
+    settings database is not cloned; it is handled the same way that
+    it is in cloud backup/restore.  This is because some settings
+    are actively destructive if cloned onto a different (or
+    especially a different-model) device: telephony settings and
+    AndroidID are good examples of this.
+
+(**) On the framework side it doesn't care that it's adb; it just
+    sends the tar stream to a file descriptor.  This can easily be
+    retargeted around whatever transport we might decide to use
+    in the future.
+
+KNOWN ISSUES:
+
+* the security UI is desperately ugly; no proper designs have yet
+  been done for it
+* restore is not yet implemented
+* shared storage backup is not yet implemented
+* symlinks aren't yet handled, though some infrastructure for
+  dealing with them has been put in place.

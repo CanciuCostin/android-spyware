@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <int name="/ntp/succeeded" value="1" />
+    <int name="/ntp/started" value="1" />
+</map>

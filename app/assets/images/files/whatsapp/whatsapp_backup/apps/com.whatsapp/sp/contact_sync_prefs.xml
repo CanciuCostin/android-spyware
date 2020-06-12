@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <long name="sidelist_sync_backoff" value="-1" />
+    <long name="picture_sync_backoff" value="-1" />
+    <long name="devices_sync_backoff" value="-1" />
+    <long name="contact_full_sync_wait" value="494790000" />
+    <int name="contact_version" value="1" />
+    <long name="payment_sync_backoff" value="-1" />
+    <long name="last_contact_full_sync" value="1591622824246" />
+    <long name="last_sidelist_full_sync" value="1591622824246" />
+    <long name="last_business_full_sync" value="1591622824246" />
+    <long name="business_full_sync_wait" value="277093000" />
+    <long name="status_full_sync_wait" value="600923000" />
+    <long name="last_status_full_sync" value="1591622824246" />
+    <long name="status_sync_backoff" value="-1" />
+    <long name="business_sync_backoff" value="-1" />
+    <long name="contact_sync_backoff" value="-1" />
+</map>

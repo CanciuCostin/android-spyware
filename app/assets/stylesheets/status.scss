@@ -1,7 +1,17 @@
 .demos{
     position: absolute;
     width: 60px;
-    left: 31%;
+    left: 0;
+    bottom: 270%;
+}
+
+.device_info{
+  position: absolute;
+width: 60px;
+left: 12%;
+bottom: 280%;
+font-size: 8px;
+font-weight: 300;
 }
 
 .service_status{

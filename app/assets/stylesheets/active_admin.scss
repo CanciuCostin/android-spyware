@@ -716,35 +716,3 @@ a.button:not(.disabled):hover, a:link.button:not(.disabled):hover, a:visited.but
 }
 
 
-.triangle.orange {
-    border-color: transparent transparent transparent #ff8d72;
-}
-
-.triangle.green {
-    border-color: transparent transparent transparent #389466;
-}
-
-.triangle.blue {
-    border-color: transparent transparent transparent #3358f4;
-}
-
-.triangle.red {
-    border-color: transparent transparent transparent #ec250d;
-}
-
-.triangle {
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 38px 0 0 38px;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-}
-
-.info_icon{
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    fill: rgb(39, 41, 61);
-}

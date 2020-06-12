@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_28_173949) do
+ActiveRecord::Schema.define(version: 2020_06_09_123744) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -80,6 +80,15 @@ ActiveRecord::Schema.define(version: 2020_05_28_173949) do
     t.index ["smartphone_id"], name: "index_geo_locations_on_smartphone_id"
   end
 
+  create_table "messaging_apps_dumps", force: :cascade do |t|
+    t.date "date"
+    t.string "duration"
+    t.string "filename"
+    t.bigint "smartphone_id", null: false
+    t.string "app_name"
+    t.index ["smartphone_id"], name: "index_messaging_apps_dumps_on_smartphone_id"
+  end
+
   create_table "pictures", force: :cascade do |t|
     t.date "date"
     t.string "filename"
@@ -119,14 +128,6 @@ ActiveRecord::Schema.define(version: 2020_05_28_173949) do
     t.bigint "smartphone_id", null: false
     t.string "filename"
     t.index ["smartphone_id"], name: "index_sms_messages_on_smartphone_id"
-  end
-
-  create_table "videos", force: :cascade do |t|
-    t.date "date"
-    t.string "duration"
-    t.string "filename"
-    t.bigint "smartphone_id", null: false
-    t.index ["smartphone_id"], name: "index_videos_on_smartphone_id"
   end
 
   add_foreign_key "apk_installations", "apk_payloads"

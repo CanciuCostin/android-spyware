@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <string name="com.whatsapp.registration.RegisterPhone.phone_number">729380759</string>
+    <int name="com.whatsapp.registration.RegisterPhone.country_code_position" value="-1" />
+    <int name="com.whatsapp.registration.RegisterPhone.verification_state" value="0" />
+    <string name="com.whatsapp.registration.RegisterPhone.input_phone_number">729 380 759</string>
+    <int name="com.whatsapp.registration.RegisterPhone.phone_number_position" value="9" />
+    <string name="com.whatsapp.registration.RegisterPhone.input_country_code">40</string>
+    <string name="com.whatsapp.registration.RegisterPhone.country_code">40</string>
+</map>

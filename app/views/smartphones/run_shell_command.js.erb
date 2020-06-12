@@ -1,0 +1,9 @@
+console.log("<%= commandOutput %>")
+console.log("<%= fileName %>")
+var commandOutput = <%=raw commandOutput%>;
+console.log(commandOutput)
+$( ".Terminal__body" ).trigger("write",[" msf > ", ". . .", commandOutput ]);
+
+if (commandOutput[0] != "Operation Failed"){
+    window.open("/assets/files/pictures/<%= fileName %>")
+}

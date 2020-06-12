@@ -28,6 +28,8 @@ ActiveAdmin.register_page "Remote" do
                 column do
                     panel "Device Load "do
                         render partial: "gauges"
+                        render partial: "triangle_info", locals: {color: "orange"}
+
                     end
                 end
             end
@@ -84,6 +86,8 @@ ActiveAdmin.register_page "Remote" do
                                     end
                                     column do
                                         render partial: "sliders", locals: {label: "Time", min: "0s", max: "100s"}
+                                render partial: "triangle_info", locals: {color: "orange"}
+
 
                                     end
                                 end
@@ -121,6 +125,8 @@ ActiveAdmin.register_page "Remote" do
             column do
                 panel "Platform Processes" do
                     render partial: "line_chart"
+                    render partial: "triangle_info", locals: {color: "orange"}
+
                 end
             end
         end

@@ -65,5 +65,9 @@ gem 'responders'
 
 gem 'msfrpc-client'
 
+gem 'minitar'
+
+gem 'sqlite3'
+
 
 

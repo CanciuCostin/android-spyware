@@ -66,6 +66,9 @@ ActiveAdmin.register_page "Dashboard" do
             tabs do
                 tab :Timeline do
                     render partial: "timeline",    locals: {activities: activities}
+                    render partial: "triangle_info", locals: {color: "orange"}
+
+                    
                 end
                 tab :Charts do
                 end
@@ -128,12 +131,16 @@ end
         column span: 2 do
             panel "Locations" do
                         render partial: "map"
+                        render partial: "triangle_info", locals: {color: "orange"}
+
                 end
 
         end
         column do
             panel "Contacts of Interest" do
                 render partial: "radar_chart", locals: {persons: ["Andrei","Alin","Mihai"]}
+                render partial: "triangle_info", locals: {color: "orange"}
+
             end
         end
 
