@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <boolean name="biz_block_reasons_migration_pending" value="false" />
+    <int name="biz_block_reasons_api_back_off_days" value="0" />
+</map>

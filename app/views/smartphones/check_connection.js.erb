@@ -1,5 +1,8 @@
+
 console.log("<%= adbConnected %>")
 var adbConnected = <%=raw adbConnected %>;
+var nrFinishedProcesses = <%=raw nrFinishedProcesses %>;
+var nrRunningProcesses = <%=raw nrRunningProcesses %>;
 var cpuUsage = <%=raw cpuUsage %>;
 var memoryUsage = <%=raw memoryUsage %>;
 console.log(adbConnected)
@@ -55,3 +58,20 @@ if (!adbConnected && !msfConnected)
         
         }
     }
+
+
+    chartLine.updateSeries([{
+        data: [...chartLine.w.config.series[0].data,
+          [
+            chartLine.w.globals.maxX + 300000,
+            nrRunningProcesses
+          ]
+        ]
+      }, {
+        data: [...chartLine.w.config.series[1].data,
+          [
+            chartLine.w.globals.maxX + 300000,
+            nrFinishedProcesses
+          ]
+        ]
+      }])

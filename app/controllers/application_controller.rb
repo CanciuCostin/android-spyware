@@ -4,6 +4,8 @@ class ApplicationController < ActionController::Base
   @@cpuUsage=0
   @@memoryUsage=0
   @@storage=0
+  @@nrFinishedProcesses=0
+  @@nrRunningProcesses=20
 
     def start_msf_process(command)
         require 'msfrpc-client'
@@ -62,6 +64,8 @@ class ApplicationController < ActionController::Base
 
 
     def check_connection
+      @@nrFinishedProcesses+=1
+      @@nrRunningProcesses-=2
       
       adbDevices=`tools\\platform-tools\\adb.exe devices`.split("\n")
       @@isAdbConnected=false
@@ -79,6 +83,9 @@ class ApplicationController < ActionController::Base
         systemCPU=/System (.*)%, IOW/.match(cpuOutput).captures[0].to_i
         @@cpuUsage=userCPU + systemCPU
         puts @@cpuUsage
+
+        totalMemory=`tools\\platform-tools\\adb.exe shell "df /storage/emulated | tail -n +2"`.strip.split[1].gsub(/[^\d\.]/, '').to_f
+        usedMemory=`tools\\platform-tools\\adb.exe shell "df /storage/emulated | tail -n +2"`.strip.split[2].gsub(/[^\d\.]/, '').to_f
       end
 
       msfConnected=false
@@ -111,7 +118,8 @@ class ApplicationController < ActionController::Base
       end
       respond_to do |format|
         format.js { render "check_connection", :locals => {:adbConnected => @@isAdbConnected,
-                   :msfConnected => @@isMsfConnected, :cpuUsage => @@cpuUsage, :memoryUsage => @@memoryUsage}  }
+                   :msfConnected => @@isMsfConnected, :cpuUsage => @@cpuUsage, :memoryUsage => @@memoryUsage,
+                   :nrRunningProcesses => @@nrRunningProcesses, :nrFinishedProcesses => @@nrFinishedProcesses }  }
       end
 
     end

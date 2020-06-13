@@ -5,81 +5,85 @@
     <string name="interface_gdrive_backup_frequency">1</string>
     <int name="prefs_migration_version" value="8" />
     <string name="last_notification_hash">b219f1b14047bcd942693163d89de75d</string>
-    <long name="phoneid_timestamp" value="1591622771677" />
     <string name="ph">729380759</string>
     <string name="perf_device_id">19a803cb-f005-4110-b72d-4372982a41a0</string>
-    <int name="registration_sms_code_length" value="6" />
     <long name="live_location_reporting_session_total_time" value="0" />
-    <string name="sticker_hash_salt">Od4SNaGPvuua4F8HVPmsV8bM9iizK4x+5ntHUyixvA8=</string>
-    <string name="phoneid_id">bce3c931-2438-42dc-9a55-11a053850bcd</string>
     <string name="last_datacenter">frc</string>
     <int name="privacy_status" value="0" />
     <boolean name="wam_is_current_buffer_real_time" value="true" />
-    <string name="version">2.20.172</string>
-    <long name="software_forced_expiration" value="0" />
+    <string name="version">2.20.189</string>
     <int name="reg_attempts_verify_code" value="1" />
-    <int name="c2dm_app_vers" value="453671" />
-    <long name="sticker_store_backoff_time" value="0" />
+    <int name="c2dm_app_vers" value="453756" />
     <long name="live_location_sharing_session_start_time" value="0" />
-    <boolean name="bad_signed_pre_key_check_done" value="true" />
-    <long name="live_location_sharing_session_total_time" value="0" />
     <string name="registration_jid">40729380759</string>
     <int name="gdrive_activity_state" value="26" />
     <int name="logins_with_messages" value="0" />
-    <boolean name="is_eula_loaded_once" value="true" />
-    <string name="web_contact_checksum">E_SRsfgI4kx-uGnL&#10;    </string>
-    <long name="app_background_time" value="303787" />
+    <long name="app_background_time" value="-1800000" />
     <long name="client_server_time_diff" value="0" />
     <long name="block_list_receive_time" value="1591622816678" />
     <long name="gdrive_last_successful_backup_timestamp:canciucostin15@stud.ase.ro" value="0" />
-    <string name="gdrive_account_name">canciucostin15@stud.ase.ro</string>
     <boolean name="refresh_broadcast_lists" value="false" />
     <int name="phonebook_null_cursor_count" value="0" />
     <boolean name="saved_gcm_token_server_unreg" value="true" />
+    <long name="backup_token_file_timestamp" value="1591622822617" />
+    <boolean name="input_enter_send" value="false" />
+    <string name="notification_hash">b219f1b14047bcd942693163d89de75d</string>
+    <int name="privacy_profile_photo" value="0" />
+    <boolean name="registration_biz_registered_on_device" value="false" />
+    <string name="registration_failure_reason"></string>
+    <int name="registration_voice_code_length" value="6" />
+    <int name="reg_attempts_generate_code" value="1" />
+    <string name="c2dm_reg_id">f3keNKv7AN4:APA91bHYtv5nmmOR4RGSJyQ5IJRWO_cxzLjYjgyJzEQR6DKLOawPZelN_tMFc2q0op7vBmSYM4igDmhCjYeoA4ZsPktOkWMbniWtCAgPfgRNIOzmpQTFDo6ANwyboCdIf1XyGy-KyCit</string>
+    <long name="live_location_sharing_session_end_time" value="0" />
+    <boolean name="need_to_get_pre_key_digest" value="false" />
+    <int name="sticker_store_backoff_attempt" value="0" />
+    <boolean name="force_db_check" value="false" />
+    <int name="gdrive_activity_msgstore_init_key" value="1" />
+    <boolean name="signal_protocol_store_is_new" value="false" />
+    <long name="spam_banned_expiry_timestamp" value="0" />
+    <long name="last_heartbeat_login" value="1591973256768" />
+    <long name="last_daily_cron" value="1591995603463" />
+    <long name="sticker_store_last_fetch_time" value="1591622774413" />
+    <boolean name="client_version_upgraded" value="true" />
+    <long name="phoneid_timestamp" value="1591622771677" />
+    <int name="registration_sms_code_length" value="6" />
+    <string name="sticker_hash_salt">Od4SNaGPvuua4F8HVPmsV8bM9iizK4x+5ntHUyixvA8=</string>
+    <string name="phoneid_id">bce3c931-2438-42dc-9a55-11a053850bcd</string>
+    <long name="software_forced_expiration" value="0" />
+    <long name="sticker_store_backoff_time" value="0" />
+    <boolean name="bad_signed_pre_key_check_done" value="true" />
+    <long name="live_location_sharing_session_total_time" value="0" />
+    <boolean name="is_eula_loaded_once" value="true" />
+    <string name="web_contact_checksum">E_SRsfgI4kx-uGnL&#10;    </string>
+    <string name="gdrive_account_name">canciucostin15@stud.ase.ro</string>
     <int name="registration_state" value="3" />
     <boolean name="verification_level_consolidation_notification" value="true" />
     <boolean name="new_jid" value="false" />
-    <long name="backup_token_file_timestamp" value="1591622822617" />
     <int name="connection_sequence_attempts" value="0" />
     <long name="wa_last_reminder_timestamp" value="1591622822399" />
     <boolean name="spam_banned" value="false" />
     <long name="gdrive_next_prompt_for_setup_timestamp" value="1591622831440" />
     <int name="reg_attempts_check_exist" value="2" />
     <string name="routing_info">CAIIBQ</string>
-    <boolean name="input_enter_send" value="false" />
-    <string name="notification_hash">b219f1b14047bcd942693163d89de75d</string>
     <string name="cc">40</string>
-    <int name="privacy_profile_photo" value="0" />
     <int name="profile_photo_thumb_id" value="1575356981" />
-    <boolean name="registration_biz_registered_on_device" value="false" />
-    <string name="registration_failure_reason"></string>
-    <int name="registration_voice_code_length" value="6" />
-    <int name="reg_attempts_generate_code" value="1" />
-    <string name="c2dm_reg_id">f3keNKv7AN4:APA91bHWILxYtjwRZl7GMCcSMHbdYJlWg1WzmhvaoZCX3eCGvq92HTewpV4LwCBINR8aInXYv1fUK1LwppjuQgS38TAdGfQi0y0SB0HNjTVMG1O3sYyCBl2e3rfzo_j24YRIEdrXsIMY</string>
+    <long name="phoneid_last_sync_timestamp" value="1591887781922" />
     <boolean name="read_receipts_enabled" value="true" />
-    <long name="next_daily_cron_catchup" value="1591623673763" />
-    <long name="live_location_sharing_session_end_time" value="0" />
-    <boolean name="need_to_get_pre_key_digest" value="false" />
-    <int name="sticker_store_backoff_attempt" value="0" />
-    <boolean name="force_db_check" value="false" />
-    <int name="gdrive_activity_msgstore_init_key" value="1" />
+    <long name="next_daily_cron_catchup" value="1591950318661" />
     <boolean name="underage_account_banned" value="false" />
     <int name="gdrive_state" value="0" />
     <long name="dithered_last_signed_prekey_rotation" value="1590433831835" />
     <string name="registration_code">979186</string>
-    <long name="last_daily_event" value="1591622827592" />
+    <long name="last_daily_event" value="1591995603193" />
     <string name="com.whatsapp.registration.RegisterPhone.mistyped_state">6</string>
-    <long name="client_version_upgrade_timestamp" value="1591622771597" />
+    <long name="client_version_upgrade_timestamp" value="1591886854672" />
     <long name="last_read_conversation_time" value="1591622834192" />
     <string name="push_name">canciucostin15</string>
-    <boolean name="signal_protocol_store_is_new" value="false" />
-    <long name="spam_banned_expiry_timestamp" value="0" />
     <boolean name="report_unhealthy_module" value="true" />
     <string name="upload_token_random_bytes">Z+wmWgnrnReZmIHfBFv/FelWNECJ0Xk8vCcuqxYNb/w</string>
     <int name="privacy_groupadd" value="0" />
     <long name="last_login_time" value="1591622816" />
-    <long name="last_heartbeat_login" value="1591599885842" />
+    <string name="direct_migration_session_id">5e8fa7d8f0791358</string>
     <string name="sticker_store_etag">05e169a2e20e9e23f96d868aa5360c9c</string>
-    <long name="sticker_store_last_fetch_time" value="1591622774413" />
     <int name="profile_photo_full_id" value="1575356981" />
 </map>

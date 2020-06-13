@@ -1,26 +1,28 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <boolean name="ab_props:watls_enabled" value="true" />
-    <string name="ab_props:status_ads_params_json_validated">{&quot;min_media&quot;: 10, &quot;min_total&quot;: 10, &quot;view_slot&quot;: 10, &quot;time_gap&quot;: 10}</string>
     <string name="ab_props:status_ads_params_json">{&quot;min_media&quot;: 10, &quot;min_total&quot;: 10, &quot;view_slot&quot;: 10, &quot;time_gap&quot;: 10}</string>
+    <string name="ab_props:status_ads_params_json_validated">{&quot;min_media&quot;: 10, &quot;min_total&quot;: 10, &quot;view_slot&quot;: 10, &quot;time_gap&quot;: 10}</string>
+    <boolean name="ab_props:watls_enabled" value="true" />
     <int name="ab_props:sys:fetch_attemp_count" value="0" />
     <string name="ab_props:work_manager_ntp_sync_expo_key">564</string>
-    <boolean name="ab_props:watls_prefer_ip6" value="true" />
-    <long name="ab_props:sys:refresh" value="86400000" />
     <boolean name="ab_props:watls_no_dns" value="true" />
-    <set name="ab_props:sys:last_exposure_keys" />
+    <long name="ab_props:sys:refresh" value="86400000" />
+    <boolean name="ab_props:watls_prefer_ip6" value="true" />
+    <set name="ab_props:sys:last_exposure_keys">
+        <string>564</string>
+    </set>
     <int name="ab_props:sys:last_error_code" value="0" />
     <boolean name="ab_props:disable_prewarm" value="true" />
-    <long name="ab_props:sys:last_refresh_time" value="1591622816320" />
     <string name="ab_props:sys:config_key">xu,96</string>
-    <boolean name="ab_props:work_manager_ntp_sync" value="false" />
-    <boolean name="ab_props:stream_progressive_jpeg_enabled" value="true" />
     <boolean name="ab_props:watls_early_data" value="true" />
+    <boolean name="ab_props:stream_progressive_jpeg_enabled" value="true" />
+    <boolean name="ab_props:work_manager_ntp_sync" value="false" />
     <set name="ab_props:sys:last_config_names">
         <string>smb_banner_max_dismiss_count</string>
         <string>status_image_max_edge_test</string>
         <string>download_full_pjpeg_max_edge</string>
         <string>video_max_bitrate</string>
+        <string>camelot</string>
         <string>status_image_compression_quality_test</string>
         <string>new_wam_runtime_beaconing</string>
         <string>smb_banner_display_days_consec</string>
@@ -52,6 +54,7 @@
         <string>camera_core_integration_enabled</string>
         <string>status_fast_streaming_enable_test</string>
         <string>watls_enabled</string>
+        <string>roundtable</string>
         <string>mms_chatd_resume_check_override</string>
         <string>buffer_for_playback</string>
         <string>higher_image_max_edge</string>
@@ -89,6 +92,7 @@
         <string>media_max_autodownload</string>
         <string>work_manager_ntp_sync</string>
         <string>disable_status_autodownload_inactive_users</string>
+        <string>room_messenger_upgrade</string>
         <string>status_fast_streaming_unstall_second_test</string>
         <string>higher_image_max_edge_status</string>
         <string>wamsys_registration_v5_enabled</string>
@@ -108,11 +112,11 @@
         <string>wamsys_mms_enabled</string>
         <string>progressive_jpeg_thumbnail_enabled</string>
         <string>kill_ads</string>
+        <string>enable_non_wake_up_alarm_ping</string>
         <string>higher_image_quality</string>
         <string>media_max_autodownload_wifi_mb</string>
         <string>auto_expo_int_field</string>
         <string>mms_media_conn_foreground_only_enabled</string>
         <string>lazy_camera_view_inflation</string>
     </set>
-    <string name="ab_props:sys:config_hash">4bQfz</string>
 </map>

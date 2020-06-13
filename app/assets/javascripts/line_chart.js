@@ -1,3 +1,4 @@
+var chartLine;
 $(document).ready(function(){
 
 window.Apex = {
@@ -40,7 +41,7 @@ window.Apex = {
     }
   },
   yaxis: {
-    decimalsInFloat: 2,
+    decimalsInFloat: 0,
     opposite: true,
     labels: {
       offsetX: -10
@@ -107,7 +108,7 @@ var optionsLine = {
               data: newData2
             }],
             subtitle: {
-              text: parseInt(getRandom() * Math.random()).toString(),
+              text: ( chartCtx.w.config.series[0].data[12][1]  + chartCtx.w.config.series[1].data[12][1]).toString(),
             }
           }, false, false)
         }, 300)
@@ -141,13 +142,13 @@ var optionsLine = {
   },
   series: [{
     name: 'Running',
-    data: generateMinuteWiseTimeSeries(new Date("12/12/2016 00:20:00").getTime(), 12, {
+    data: generateMinuteWiseTimeSeries(new Date().getTime(), 12, {
       min: 30,
       max: 110
     })
   }, {
     name: 'Waiting',
-    data: generateMinuteWiseTimeSeries(new Date("12/12/2016 00:20:00").getTime(), 12, {
+    data: generateMinuteWiseTimeSeries(new Date().getTime(), 12, {
       min: 30,
       max: 110
     })
@@ -185,7 +186,7 @@ var optionsLine = {
   },
 }
 
-var chartLine = new ApexCharts(
+chartLine = new ApexCharts(
   document.querySelector("#linechart"),
   optionsLine
 );
@@ -193,28 +194,6 @@ chartLine.render()
 
 
 
-window.setInterval(function () {
 
-  iteration++;
-
-  chartLine.updateSeries([{
-    data: [...chartLine.w.config.series[0].data,
-      [
-        chartLine.w.globals.maxX + 300000,
-        getRandom()
-      ]
-    ]
-  }, {
-    data: [...chartLine.w.config.series[1].data,
-      [
-        chartLine.w.globals.maxX + 300000,
-        getRandom()
-      ]
-    ]
-  }])
-
-
-
-}, 3000)
 
 });
