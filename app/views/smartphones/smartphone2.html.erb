@@ -5,16 +5,11 @@
 <%= stylesheet_link_tag 'status', media: 'all', 'data-turbolinks-track': 'reload' %>
 <%= stylesheet_link_tag 'tooltip', media: 'all', 'data-turbolinks-track': 'reload' %>
 
-
-
-
-  <span class="arrow_container_left">
-  
-
+<span class="arrow_container_left">
     <a class="arrow_button" href="#">
-      <span class="left"></span>
+        <span class="left"></span>
     </a>
-  </span>
+</span>
 
 <div class="smartphonee">
     <div class="volume-btnn"></div>
@@ -22,38 +17,14 @@
         <div class="topp-0">
             <div class="cameraa"></div><div class="speakerr"></div><div class="cameraa hidee"></div>
         </div>
-        <div class="topp">
-        </div>
+        <div class="topp"></div>
         <div class="screenn">
             <div class="top-icons">
                 <div class="app_row">
-                <span tooltip="Support&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Android < 8.0&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ADB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                Description: Dump WhatsApp conversations"
-                               flow="right">
-                    <%= link_to image_tag("whatsapp_data.png", :alt => "WhatsApp Data", :class => "smartphone-icon adb_proc"), '../messaging_apps_dumps/dump_whatsapp_data?smartphone_id=' + smartphone.id.to_s,
-                     method: :post, :remote => true , :class => "adb_link", :id => "dump_whatsapp_data_link"%>
-                     </span>
-                <span tooltip="a" flow="down">
-                    <%= link_to '../smartphones/set_audio_mode?sound_mode=2&smartphone_id=' + smartphone.id.to_s,
-                    method: :post, :remote => true , :class => "msf_link", :id => "set_audio_mode_link" do %>
-                      <%= image_tag "sound_level.png", :alt => "Audio Mode", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                </span>
-                <span tooltip="a" flow="down">
-                    <%= link_to '../smartphones/dump_wifi_info?smartphone_id=' + smartphone.id.to_s,
-                     method: :post, :remote => true , :class => "adb_link", :id => "dump_wifi_info_link" do %>
-                      <%= image_tag "wifi_info.png", :alt => "Wi-Fi Information", :class => "smartphone-icon adb_proc" %>
-                    <% end %>
-                </span>
-                <span tooltip="a" flow="left">
-                    <%= link_to  '../call_logs/dump_calllogs?smartphone_id=' + smartphone.id.to_s,
-                    method: :post, :remote => true , :class => "msf_link", :id => "dump_callogs_link" do %>
-                      <%= image_tag "dump_call_logs.png", :alt => "Call Logs", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                </span>
+                    <%= render "whatsapp_app_icon", :smartphone => smartphone %>
+                    <%= render "audio_mode_app_icon", :smartphone => smartphone %>
+                    <%= render "dump_wifi_app_icon", :smartphone => smartphone %>
+                    <%= render "call_logs_app_icon", :smartphone => smartphone %>
                 </div>
                 <div class="app_names">
                     <span class="app_name">WhatsApp Data</span>
@@ -62,30 +33,10 @@
                     <span class="app_name">Dump Call Log</span>
                 </div>
                 <div class="app_row">
-                <span tooltip="a" flow="right">
-                    <%= link_to '../smartphones/dump_sysinfo?smartphone_id=' + smartphone.id.to_s,
-                    method: :post, :remote => true , :class => "msf_link", :id => "dump_sysinfo_link" do %>
-                      <%= image_tag "system_info.png", :alt => "System Info", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                </span>
-                    <span tooltip="I'm up above it!" flow="down">
-                    <%= link_to '../smartphones/dump_location?smartphone_id=' + smartphone.id.to_s,
-                     method: :get, :remote => true , :class => "msf_link", :id => "dump_location_link" do %>
-                      <%= image_tag "dump_location.png", :alt => "Dump Location", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                    </span>
-                    <span tooltip="I'm up above it!" flow="down">
-                    <%= link_to '../smartphones/webcam_record?smartphone_id=',
-                     method: :get, :remote => true , :class => "msf_link", :id => "webcam_record_link" do %>
-                      <%= image_tag "video_rec.png", :alt => "Video REC", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                  </span>
-                  <span tooltip="I'm up above it!" flow="left">
-                    <%= link_to '../sms_messages/dump_messages?smartphone_id=' + smartphone.id.to_s,
-                    method: :post, :remote => true , :class => "msf_link", :id => "dump_messages_link" do %>
-                      <%= image_tag "dump_messages.png", :alt => "Dump SMS", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                  </span>
+                    <%= render "dump_sysinfo_app_icon", :smartphone => smartphone %>
+                    <%= render "dump_location_app_icon", :smartphone => smartphone %>
+                    <%= render "video_rec_app_icon", :smartphone => smartphone %>
+                    <%= render "dump_messages_app_icon", :smartphone => smartphone %>
                 </div>
                 <div class="app_names">
                     <span class="app_name">System Info</span>
@@ -94,30 +45,10 @@
                     <span class="app_name">Dump Messages</span>
                 </div>
                 <div class="app_row">
-                <span tooltip="I'm up above it!" flow="right">
-                    <%= link_to '../smartphones/dump_localtime?smartphone_id=' + smartphone.id.to_s,
-                     method: :post, :remote => true, :class => "msf_link", :id => "dump_localtime_link" do %>
-                      <%= image_tag "dump_localtime.png", :alt => "Dump Localtime", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                </span>
-                <span tooltip="I'm up above it!" flow="up">
-                    <%= link_to '../recordings/microphone_rec?smartphone_id=' + smartphone.id.to_s,
-                     method: :post, :remote => true, :class => "msf_link", :id => "microphone_rec_link" do %>
-                     <%= image_tag "microphone_rec.png", :alt => "Microphone REC", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                  </span>
-                <span tooltip="I'm up above it!" flow="up">
-                    <%= link_to '../smartphones/uninstall_app?app_name=com.whatsapp&smartphone_id=' + smartphone.id.to_s,
-                     method: :post, :remote => true, :class => "adb_msf_link", :id => "uninstall_app_link" do %>
-                      <%= image_tag "uninstall_app.png", :alt => "Uninstall App", :class => "smartphone-icon adb_proc" %>
-                    <% end %>
-                </span>
-                <span tooltip="I'm up above it!" flow="left">
-                    <%= link_to '../smartphones/list_apps?apps_type=u&smartphone_id=' + smartphone.id.to_s,
-                        method: :post, :remote => true, :class => "adb_msf_link",:id => "list_apps_link" do %>
-                          <%= image_tag "list_installed_apps.png", :alt => "Installed Apps", :class => "smartphone-icon adb_msf_proc" %>
-                    <% end %>
-                </span>
+                    <%= render "dump_localtime_app_icon", :smartphone => smartphone %>
+                    <%= render "microphone_rec_app_icon", :smartphone => smartphone %>
+                    <%= render "uninstall_app_app_icon", :smartphone => smartphone %>
+                    <%= render "list_apps_app_icon", :smartphone => smartphone %>
                 </div>
                 <div class="app_names">
                     <span class="app_name">Dump Localtime</span>
@@ -126,28 +57,10 @@
                     <span class="app_name">Installed Apps</span>
                 </div>
                 <div class="app_row">
-                <span tooltip="I'm up above it!" flow="right">
-                    <%= link_to '../screenshots/dump_screen_snap?smartphone_id=' + smartphone.id.to_s,
-                     method: :get,:remote => true , :class => "adb_link", :id => "dump_screen_snap_link" do %>
-                    <%= image_tag "screen_snap.png", :alt => "Screen Snap", :class => "smartphone-icon adb_proc" %>
-                    <% end %>
-                </span>
-                <span tooltip="I'm up above it!" flow="up">
-                    <%= link_to '../smartphones/install', method: :post do %>
-                      <%= image_tag "send_message.png", :alt => "Send Message", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                </span>
-                <span tooltip="I'm up above it!" flow="up">
-                    <%= link_to '../smartphones/install', method: :post do %>
-                      <%= image_tag "upload_file.png", :alt => "Upload File", :class => "smartphone-icon adb_msf_proc" %>
-                    <% end %>
-                </span>
-                <span tooltip="I'm up above it!" flow="left">
-                    <%= link_to '../contacts/dump_contacts?smartphone_id=' + smartphone.id.to_s,
-                        method: :post, :remote => true ,:class => "msf_link", :id => "dump_contacts_link" do %>
-                          <%= image_tag "dump_contacts.png", :alt => "Dump Contacts", :class => "smartphone-icon msf_proc" %>
-                    <% end %>
-                </span>
+                    <%= render "screen_snap_app_icon", :smartphone => smartphone %>
+                    <%= render "send_message_app_icon", :smartphone => smartphone %>
+                    <%= render "upload_file_app_icon", :smartphone => smartphone %>
+                    <%= render "dump_contacts_app_icon", :smartphone => smartphone %>
                 </div>
                 <div class="app_names">
                     <span class="app_name">Screen Snap</span>
@@ -156,27 +69,10 @@
                     <span class="app_name">Dump Contacts</span>
                 </div>
                 <div class="app_row">
-                <span tooltip="I'm up above it!" flow="right">
-                <%= link_to '../smartphones/install', method: :post do %>
-                  <%= image_tag "lock_screen.png", :alt => "Lock Screen", :class => "smartphone-icon msf_proc" %>
-                <% end %>
-                </span>
-                <span tooltip="I'm up above it!" flow="up">
-                <%= link_to '../smartphones/install', method: :post do %>
-                <%= image_tag "wlan_geolocate.png", :alt => "WLAN Geolocate", :class => "smartphone-icon msf_proc" %>
-                <% end %>
-                </span>
-                <span tooltip="I'm up above it!" flow="up">
-                <%= link_to '../smartphones/install', method: :post do %>
-                  <%= image_tag "shell_command.png", :alt => "Shell Command", :class => "smartphone-icon adb_msf_proc" %>
-                <% end %>
-                </span>
-                <span tooltip="I'm up above it!" flow="left">
-                <%= link_to '../pictures/take_picture?smartphone_id=' + smartphone.id.to_s,
-                    method: :post, :remote => true , :class => "msf_link", :id => "webcam_snap_link" do %>
-                    <%= image_tag "webcam_snap.png", :alt => "Webcam Snap", :class => "smartphone-icon msf_proc" %>
-                <% end %>
-                </span>
+                    <%= render "lock_screen_app_icon", :smartphone => smartphone %>
+                    <%= render "screen_record_app_icon", :smartphone => smartphone %>
+                    <%= render "shell_command_app_icon", :smartphone => smartphone %>
+                    <%= render "webcam_snap_app_icon", :smartphone => smartphone %>                
                 </div>
                 <div class="app_names">
                     <span class="app_name">Lock Screen</span>
@@ -184,62 +80,50 @@
                     <span class="app_name">Shell Command</span>
                     <span class="app_name">Webcam Snap</span>
                 </div>
-
-    </div>
-    
-          <div class="timee">
-            <div id="ctt"></div>
-            <div id="cdd"></div>
-          </div>
-
+            </div>
+            <div class="timee">
+                <div id="ctt"></div>
+                <div id="cdd"></div>
+            </div>
         </div>
         <div class="bottomm">
             <div class="touch-buttonn"></div>
         </div>
     </div>
-  </div>
-
-  <span class="arrow_container_right">
-  <span class="demos">
-  <span class="demo-up">
-    <span class="msf_status server-status" type="up"></span>
-    <span class="service_status service_status_msf">MSF</span>
-  </span>
-
-  <span class="demo-down">
-    <span class="adb_status server-status" type="down"></span>
-    <span class="service_status service_status_adb">ADB</span>
-  </span>
-  </span>
-
-  <span class="device_info">
-    192.168.100.33
-    Android  6.0
-    IsRooted: No
+</div>
+<span class="arrow_container_right">
+    <span class="demos">
+        <span class="demo-up">
+            <span class="msf_status server-status" type="up"></span>
+            <span class="service_status service_status_msf">MSF</span>
+        </span>
+        <span class="demo-down">
+            <span class="adb_status server-status" type="down"></span>
+            <span class="service_status service_status_adb">ADB</span>
+        </span>
     </span>
-
-
+    <span class="device_info">
+        192.168.100.33
+        Android  6.0
+        IsRooted: No
+    </span>
     <a class="arrow_button" href="#">
-      <span class="right"></span>
+        <span class="right"></span>
     </a>
-  </span>
+</span>
 
   
 
-  <script>
-  $(function() {
-    $(document).ready(function() {
-      setInterval(function() {
-        jQuery.ajax({
-          url: "../smartphones/check_connection",
-          type: "GET",
-          dataType: "script"
+<script>
+    $(function() {
+        $(document).ready(function() {
+            setInterval(function() {
+                jQuery.ajax({
+                    url: "../smartphones/check_connection",
+                    type: "GET",
+                    dataType: "script"
+                });
+            }, 2000); // In every 30 seconds
         });
-      }, 2000); // In every 30 seconds
     });
-  });
 </script>
-
-
-
-

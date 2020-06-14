@@ -1,0 +1,6 @@
+<span tooltip="I'm up above it!" flow="left">
+<%= link_to '../smartphones/list_apps?apps_type=u&smartphone_id=' + smartphone.id.to_s,
+    method: :post, :remote => true, :class => "adb_msf_link",:id => "list_apps_link" do %>
+      <%= image_tag "list_installed_apps.png", :alt => "Installed Apps", :class => "smartphone-icon adb_msf_proc" %>
+<% end %>
+</span>

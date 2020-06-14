@@ -1,0 +1,6 @@
+<span tooltip="a" flow="right">
+<%= link_to '../smartphones/dump_sysinfo?smartphone_id=' + smartphone.id.to_s,
+method: :post, :remote => true , :class => "msf_link", :id => "dump_sysinfo_link" do %>
+  <%= image_tag "system_info.png", :alt => "System Info", :class => "smartphone-icon msf_proc" %>
+<% end %>
+</span>

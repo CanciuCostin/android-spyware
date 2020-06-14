@@ -1,0 +1,9 @@
+<span tooltip="Support&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Android < 8.0&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ADB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                Description: Dump WhatsApp conversations"
+                               flow="right">
+                    <%= link_to image_tag("whatsapp_data.png", :alt => "WhatsApp Data", :class => "smartphone-icon adb_proc"), '../messaging_apps_dumps/dump_whatsapp_data?smartphone_id=' + smartphone.id.to_s,
+                     method: :post, :remote => true , :class => "adb_link", :id => "dump_whatsapp_data_link"%>
+                     </span>

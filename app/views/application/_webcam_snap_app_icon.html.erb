@@ -1,0 +1,14 @@
+
+                <span tooltip="I'm up above it!" flow="left">
+                <%= link_to '../pictures/take_picture?smartphone_id=' + smartphone.id.to_s,
+                    method: :post, :remote => true , :class => "msf_link", :id => "webcam_snap_link" do %>
+                    <%= image_tag "webcam_snap.png", :alt => "Webcam Snap", :class => "smartphone-icon msf_proc" %>
+                <% end %>
+                </span>
+<script>
+$("#webcam_snap_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&filename=" + $('#input_box_filename').val();
+    });
+  });
+</script>

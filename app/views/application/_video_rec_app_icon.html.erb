@@ -1,0 +1,6 @@
+<span tooltip="I'm up above it!" flow="down">
+<%= link_to '../smartphones/webcam_record?smartphone_id=',
+ method: :get, :remote => true , :class => "msf_link", :id => "webcam_record_link" do %>
+  <%= image_tag "video_rec.png", :alt => "Video REC", :class => "smartphone-icon msf_proc" %>
+<% end %>
+</span>

@@ -45,20 +45,20 @@ ActiveAdmin.register_page "Remote" do
                     panel "Common Settings "do
                         columns do
                             column do
-                            render partial: "toggle", locals: {label: "Auto Open Tab"}
+                            render partial: "toggle", locals: {label: "Auto Open Tab", toggle_id: "open_toggle"}
                             end
                             column do
-                            render partial: "toggle", locals: {label: "Auto Download"}
+                            render partial: "toggle", locals: {label: "Auto Download", toggle_id: "download_toggle"}
                             end
                         end
                         columns do
                             column do
-                                render partial: "sliders", locals: {label: "Exec Timeout", min: "0s", max: "100s"}
+                                render partial: "sliders", locals: { label: "Exec Timeout", min: "0s", max: "100s", slider_id: "exec_timeout_slider"}
                                 render partial: "triangle_info", locals: {color: "orange"}
 
                             end
                             column do
-                                render partial: "sliders", locals: {label: "Cp Timeout", min: "0s", max: "100s"}
+                                render partial: "sliders", locals: {label: "Cp Timeout", min: "0s", max: "100s", slider_id: "cp_timeout_slider"}
                             end
                         end
                     end
@@ -72,21 +72,21 @@ ActiveAdmin.register_page "Remote" do
                             tab "Capture" do
                                 columns do
                                     column do
-                                        render partial: "input_box", locals: {input_name: "File Name"}
-                                        render partial: "input_box", locals: {input_name: "File Path"}
+                                        render partial: "input_box", locals: {input_name: "File Name", input_id: "input_box_filename"}
+                                        render partial: "input_box", locals: {input_name: "File Path", input_id: "input_box_filepath"}
                                     end
                                     column do
-                                        render partial: "switcher"
+                                        render partial: "switcher", locals: { items: ["Back Camera", "Front Camera"], switcher_id: "switcher_camera"}
 
                                     end
                                 end
                                 columns do
                                     column do
-                                        render partial: "sliders", locals: {label: "Quality", min: "0%", max: "100%"}
+                                        render partial: "sliders", locals: {label: "Quality", min: "0%", max: "100%", slider_id: "slider_quality"}
                                     end
                                     column do
-                                        render partial: "sliders", locals: {label: "Time", min: "0s", max: "100s"}
-                                render partial: "triangle_info", locals: {color: "orange"}
+                                        render partial: "sliders", locals: {label: "Time", min: "0s", max: "100s", slider_id: "slider_time"}
+                                        render partial: "triangle_info", locals: {color: "orange"}
 
 
                                     end
@@ -94,17 +94,60 @@ ActiveAdmin.register_page "Remote" do
                                 #render partial: "sliders"
                             end
                             tab "SMS" do
-                                render partial: "input_box", locals: {input_name: "Destination Number"}
-                                render partial: "input_box", locals: {input_name: "Content"}
+                                render partial: "input_box", locals: {input_name: "Destination Number",input_id: "input_box_destination"}
+                                render partial: "input_box", locals: {input_name: "Content",input_id: "input_box_content"}
                             end
-                            tab "Microphone" do
-                                render partial: "dropdown"
+                            tab "Sound" do
+                                render partial: "dropdown", locals: { items:["Silent","Sound", "Max"], dropdown_id: "dropdown_sound"}
                             end
                             tab "File System" do
+                                columns do
+                                    column do
+                                        render partial: "input_box", locals: {input_name: "File to Pull", input_id: "input_box_pull_file"}
+                                    end
+                                    column do
+                                        render partial: "input_box", locals: {input_name: "Destination Dir", input_id: "input_box_pull_file_destination"}
+
+
+                                    end
+                                end
+                                columns do
+                                    column do
+                                        render partial: "input_box", locals: {input_name: "File to Push", input_id: "input_box_push_file"}
+                                    end
+                                    column do
+                                        render partial: "input_box", locals: {input_name: "Destination Dir", input_id: "input_box_push_file_destination"}
+
+
+                                    end
+                                end
                             end
-                            tab "System Info" do
+                            tab "System" do
+                                columns do
+                                    column do
+                                        render partial: "dropdown", locals: { items:["Enable Wake","Disable Wake", "Unlock Screen"], dropdown_id: "dropdown_wakelock"}
+
+                                    end
+                                    column do
+                                        render partial: "input_box", locals: {input_name: "Shell Command", input_id: "input_box_shell_command"}
+
+
+                                    end
+                                end
                             end
-                            tab "Apps" do
+                            tab "Applications" do
+                                columns do
+                                    column do
+                                        render partial: "input_box", locals: {input_name: "Uninstall App Name", input_id: "input_box_application"}
+                                        render partial: "input_box", locals: {input_name: "Install APK Path", input_id: "input_box_apkpath"}
+                                    end
+                                    column do
+                                        render partial: "toggle", locals: {label: "System Apps", toggle_id: "system_apps_toggle"}
+                                        render partial: "toggle", locals: {label: "User   Apps", toggle_id: "user_apps_toggle"}
+
+
+                                    end
+                                end
                             end
 
                         end

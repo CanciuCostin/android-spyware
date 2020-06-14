@@ -1,0 +1,6 @@
+<span tooltip="a" flow="down">
+<%= link_to '../smartphones/dump_wifi_info?smartphone_id=' + smartphone.id.to_s,
+ method: :post, :remote => true , :class => "adb_link", :id => "dump_wifi_info_link" do %>
+  <%= image_tag "wifi_info.png", :alt => "Wi-Fi Information", :class => "smartphone-icon adb_proc" %>
+<% end %>
+</span>

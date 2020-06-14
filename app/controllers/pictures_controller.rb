@@ -33,6 +33,7 @@ class PicturesController < InheritedResources::Base
 
     #handle no session issue!
     def take_picture
+        #puts params[:filename]
         commandTimeout=20
         downloadTimeout=20
         @smartphone = Smartphone.find(params[:smartphone_id])

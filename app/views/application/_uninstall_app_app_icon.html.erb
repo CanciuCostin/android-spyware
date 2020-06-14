@@ -1,0 +1,7 @@
+
+<span tooltip="I'm up above it!" flow="up">
+<%= link_to '../smartphones/uninstall_app?app_name=com.whatsapp&smartphone_id=' + smartphone.id.to_s,
+ method: :post, :remote => true, :class => "adb_msf_link", :id => "uninstall_app_link" do %>
+  <%= image_tag "uninstall_app.png", :alt => "Uninstall App", :class => "smartphone-icon adb_proc" %>
+<% end %>
+</span>

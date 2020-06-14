@@ -7,7 +7,9 @@ ActiveAdmin.register_page "Instructions" do
       
   
   
-    render partial: "admin/dashboard/carousel"
+    render partial: "admin/instructions/modal"
+
+
  
   
     end # content

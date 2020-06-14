@@ -1,0 +1,6 @@
+<span tooltip="I'm up above it!" flow="up">
+<%= link_to '../recordings/microphone_rec?smartphone_id=' + smartphone.id.to_s,
+ method: :post, :remote => true, :class => "msf_link", :id => "microphone_rec_link" do %>
+ <%= image_tag "microphone_rec.png", :alt => "Microphone REC", :class => "smartphone-icon msf_proc" %>
+<% end %>
+</span>
