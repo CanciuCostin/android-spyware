@@ -48,7 +48,7 @@ $(document).ready(function(){
             $(".Terminal__body").append("<div><span class=\"ps1\">" + ps1 + "</span>" + "<span class=\"Prompt__cursor\"></span>")
             $( ".Terminal__body")[0].scrollBy(0,1000);
 
-        }, 3000);
+        }, 1000);
     
     });
     
@@ -57,60 +57,12 @@ $(document).ready(function(){
     $( ".Terminal__body" ).trigger("write",["msf > ", "msfconsole", lines ]);
 
 
-    $("#webcam_snap_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "webcam_snap", ["Starting . . ."] ]);
-    });
 
-    $("#dump_whatsapp_data_link").on('click',function(event){
-      $( ".Terminal__body" ).trigger("write",[" > ", "adb.exe shell pm uninstall -k com.whatsapp", ["Uninstalling  Whatsapp . . ."] ]);
-      setTimeout(function () {
-        $( ".Terminal__body" ).trigger("write",[" > ", "adb.exe install whatsappv2.11.431.apk", ["Installing downgraded Whatsapp APK . . ."] ]);
 
-    }, 5000);
-      setTimeout(function () {
-        $( ".Terminal__body" ).trigger("write",[" > ", "adb.exe backup -apk com.whatsapp", ["Performing ADB Backup for Whatsapp . . ."] ]);
 
-      }, 10000);
-      setTimeout(function () {
-        $( ".Terminal__body" ).trigger("write",[" > ", "java -jar android-backup-extractor.jar whatsapp_backup.ab", ["Converting backup file to .tar file . . ."] ]);
 
-      }, 15000);
-      setTimeout(function () {
-        $( ".Terminal__body" ).trigger("write",[" > ", "Minitar.unpack whatsapp_backup.tar", ["Extracting encryption key from .tar file . . ."] ]);
 
-      }, 20000);
-      setTimeout(function () {
-        $( ".Terminal__body" ).trigger("write",[" > ", "adb.exe pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12", ["Pulling whatsapp database from device . . ."] ]);
 
-      }, 25000);
-      setTimeout(function () {
-        $( ".Terminal__body" ).trigger("write",[" > ", "java -jar crypt12decrypt msgstore.db.crypt12", ["Decrypting database . . ."] ]);
-
-      }, 30000);
-      setTimeout(function () {
-        $( ".Terminal__body" ).trigger("write",[" > ", "SQLite3::Database.open msgstore.db && SELECT * FROM chat;", ["Exporting database . . ."] ]);
-      }, 35000);
-  });
-
-  $("#set_audio_mode_link").on('click',function(event){
-    $( ".Terminal__body" ).trigger("write",[" > ", "set_audio_mode", ["Starting . . ."] ]);
-});
-
-$("#dump_wifi_info_link").on('click',function(event){
-  $( ".Terminal__body" ).trigger("write",[" > ", "adb.exe shell dumpsys wifi | grep SSID: | grep -v rt=", ["Starting . . ."] ]);
-});
-
-$("#dump_callogs_link").on('click',function(event){
-  $( ".Terminal__body" ).trigger("write",[" > ", "dump_callogs", ["Starting . . ."] ]);
-});
-
-$("#dump_sysinfo_link").on('click',function(event){
-  $( ".Terminal__body" ).trigger("write",[" > ", "sysinfo", ["Starting . . ."] ]);
-});
-
-$("#dump_sysinfo_link").on('click',function(event){
-  $( ".Terminal__body" ).trigger("write",[" > ", "sysinfo", ["Starting . . ."] ]);
-});
 
     $("#main_content > .columns:first-child > .column:first-child > .columns:first-child > .column, #main_content > .columns:nth-child(2) > .column:first-child > .columns:first-child > .column").on({
         mouseenter: function () {

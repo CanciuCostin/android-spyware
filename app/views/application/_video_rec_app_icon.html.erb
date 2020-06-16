@@ -4,3 +4,9 @@
   <%= image_tag "video_rec.png", :alt => "Video REC", :class => "smartphone-icon msf_proc" %>
 <% end %>
 </span>
+
+<script>
+    $("#webcam_record_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "webcam_stream", ["Starting . . ."] ]);
+    });
+</script>

@@ -4,3 +4,9 @@
   <%= image_tag "dump_localtime.png", :alt => "Dump Localtime", :class => "smartphone-icon msf_proc" %>
 <% end %>
 </span>
+
+<script>
+    $("#dump_localtime_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "localtime", ["Starting . . ."] ]);
+    });
+</script>

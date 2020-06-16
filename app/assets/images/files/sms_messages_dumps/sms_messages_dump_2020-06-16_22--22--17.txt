@@ -1,0 +1,45 @@
+
+=====================
+[+] SMS messages dump
+=====================
+
+Date: 2020-06-16 19:22:19.85698533 +0000
+OS: Android 6.0 - Linux 3.10.86-g7b77e01 (aarch64)
+Remote IP: 172.17.0.1
+Remote Port: 60990
+
+#1
+Type	: Incoming
+Date	: 2020-06-10 14:40:59
+Address	: Vodafone
+Status	: NOT_RECEIVED
+Message	: Salut! Ai primit Bonus 100.000 MB valabil 90 zile. Bonusul se poate folosi cu o extraoptiune nationala de minim 5 Euro credit activa pe cont.
+
+#2
+Type	: Incoming
+Date	: 2020-06-10 14:40:58
+Address	: Vodafone
+Status	: NOT_RECEIVED
+Message	: Exprima-ti optiunile pentru prelucrarea datelor cu caracter personal in scop de marketing si beneficiezi de oferte personalizate, adaptate nevoilor tale. Indiferent de raspunsul tau, primesti un bonus de 50.000 MB, valabil 90 zile. Inregistreaza-ti optiunile apeland *567 sau prin My Vodafone si primesti bonusul in maxim 72 de ore. Detalii la www.vodafone.ro/campanii
+
+#3
+Type	: Incoming
+Date	: 2020-06-10 14:40:58
+Address	: 334
+Status	: NOT_RECEIVED
+Message	: Buna! Este simplu sa-ti configurezi mesajul de intampinare din Casuta ta Vocala sau parola. Suna gratuit la 333 sau 334 si urmeaza instructiunile.
+
+#4
+Type	: Incoming
+Date	: 2020-06-10 14:40:57
+Address	: Vodafone
+Status	: NOT_RECEIVED
+Message	: Salut! Ai activat Oferta Nationala 8 cu 5 euro credit in prima luna cu: 80.000 MB + 2.000 Minute/SMS nationale (din care 1.000 minute internationale fix&mobil) + Nelimitat in retea + Nelimitat cu numerele favorite din Vodafone Italia + trafic nelimitat in Whatsapp si Facebook, valabila 35 zile. Afla destinatiile catre care poti folosi minutele internationale si alte detalii pe www.vodafone.ro/cartela. Daca nu doresti sa pastrezi aceasta oferta, trimite SMS gratuit cu textul CREDIT la 579 inainte de a consuma din beneficii si iti vom returna creditul. Pentru acces roaming, activeaza o oferta cu beneficii disponibile si in roaming SEE. Activarea unei oferte cu roaming conduce automat la dezactivarea ofertelor nationale de pe cont, ele fiind incompatibile.
+
+#5
+Type	: Incoming
+Date	: 2020-06-10 14:40:37
+Address	: Vodafone
+Status	: NOT_RECEIVED
+Message	: Bine ai venit la Cartela Vodafone! Incarca minimum 5 euro credit si ti se va activa automat o oferta din portofoliul actual. Daca doresti alta oferta o poti activa din aplicatia My Vodafone (https://goo.gl/TZ7H25) sau prin apel la *100#. Termenii si conditiile aplicabile la Cartela ta Vodafone, pe www.vodafone.ro/TCGcartela
+

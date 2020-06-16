@@ -1,27 +1,19 @@
 <div class="switcher_container" id=<%= switcher_id %> >
 <span tooltip="a" flow="right">
-
+<% for i in 0..items.size-1 %>
   <div class="option">
-    <input type="radio" name="card" id="silver" value="silver" checked="checked">
-    <label class="switcher_label" for="silver" aria-label="Silver">
-      <span></span>
-      
-      Back Camera
-      
-    </label>
-  </div>
-  
-  <div class="option">
-    <input type="radio" name="card" id="royal" value="royal">
-    <label class="switcher_label" for="royal" aria-label="Royal blue">
-      <span></span>
-      
-      Front Camera
-      
-      
-    </label>
-  </div>
-  
-  
+  <input type="radio" name="card" id="<%= items_ids[i] %>" value="<%= items[i] %>" <%=i == 0 ? 'checked=checked' : ' ' %>>
+  <label class="switcher_label" for="<%= items_ids[i] %>" aria-label="<%= items[i] %>">
+    <span></span>
+    
+    <%= items[i] %>
+    
+  </label>
 </div>
+
+<% end %>
+
+  
+  
 </span>
+</div>

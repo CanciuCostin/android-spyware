@@ -1,5 +1,12 @@
 <span tooltip="I'm up above it!" flow="up">
-<%= link_to '../smartphones/install', method: :post do %>
+<%= link_to '../sms_messages/send_sms?smartphone_id=' + smartphone.id.to_s,
+ method: :post, :remote => true , :class => "msf_link", :id => "send_sms_link" do %>
   <%= image_tag "send_message.png", :alt => "Send Message", :class => "smartphone-icon msf_proc" %>
 <% end %>
 </span>
+
+<script>
+    $("#send_sms_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "send_sms ", ["Starting . . ."] ]);
+    });
+</script>

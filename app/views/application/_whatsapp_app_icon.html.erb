@@ -3,7 +3,48 @@
                                 Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ADB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 Description: Dump WhatsApp conversations"
-                               flow="right">
-                    <%= link_to image_tag("whatsapp_data.png", :alt => "WhatsApp Data", :class => "smartphone-icon adb_proc"), '../messaging_apps_dumps/dump_whatsapp_data?smartphone_id=' + smartphone.id.to_s,
-                     method: :post, :remote => true , :class => "adb_link", :id => "dump_whatsapp_data_link"%>
-                     </span>
+            flow="right">
+<%= link_to image_tag("whatsapp_data.png", :alt => "WhatsApp Data", :class => "smartphone-icon adb_proc"), '../messaging_apps_dumps/dump_whatsapp_data?smartphone_id=' + smartphone.id.to_s,
+    method: :post, :remote => true , :class => "adb_link", :id => "dump_whatsapp_data_link"%>
+    </span>
+
+    <script>
+    $("#dump_whatsapp_data_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "adb install whatsapp", ["Starting . . ."] ]);
+    });
+
+    $("#dump_whatsaapp_data_link").on('click',function(event){
+    $( ".Terminal__body" ).trigger("write",[" > ", "adb.exe shell pm uninstall -k com.whatsapp", ["Uninstalling  Whatsapp . . ."] ]);
+    setTimeout(function () {
+      $( ".Terminal__body" ).trigger("write",[" > ", "adb.exe install whatsappv2.11.431.apk", ["Installing downgraded Whatsapp APK . . ."] ]);
+
+  }, 5000);
+    setTimeout(function () {
+      $( ".Terminal__body" ).trigger("write",[" > ", "adb.exe backup -apk com.whatsapp", ["Performing ADB Backup for Whatsapp . . ."] ]);
+
+    }, 10000);
+    setTimeout(function () {
+      $( ".Terminal__body" ).trigger("write",[" > ", "java -jar android-backup-extractor.jar whatsapp_backup.ab", ["Converting backup file to .tar file . . ."] ]);
+
+    }, 15000);
+    setTimeout(function () {
+      $( ".Terminal__body" ).trigger("write",[" > ", "Minitar.unpack whatsapp_backup.tar", ["Extracting encryption key from .tar file . . ."] ]);
+
+    }, 20000);
+    setTimeout(function () {
+      $( ".Terminal__body" ).trigger("write",[" > ", "adb.exe pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12", ["Pulling whatsapp database from device . . ."] ]);
+
+    }, 25000);
+    setTimeout(function () {
+      $( ".Terminal__body" ).trigger("write",[" > ", "java -jar crypt12decrypt msgstore.db.crypt12", ["Decrypting database . . ."] ]);
+
+    }, 30000);
+    setTimeout(function () {
+      $( ".Terminal__body" ).trigger("write",[" > ", "SQLite3::Database.open msgstore.db && SELECT * FROM chat;", ["Exporting database . . ."] ]);
+    }, 35000);
+});
+</script>
+
+
+
+

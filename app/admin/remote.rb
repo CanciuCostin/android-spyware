@@ -76,7 +76,8 @@ ActiveAdmin.register_page "Remote" do
                                         render partial: "input_box", locals: {input_name: "File Path", input_id: "input_box_filepath"}
                                     end
                                     column do
-                                        render partial: "switcher", locals: { items: ["Back Camera", "Front Camera"], switcher_id: "switcher_camera"}
+                                        render partial: "switcher", locals: { items: ["Back Camera", "Front Camera"], items_ids: ["back_camera_input","front_camera_input"],
+                                         switcher_id: "switcher_camera"}
 
                                     end
                                 end

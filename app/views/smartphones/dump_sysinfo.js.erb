@@ -1,4 +1,2 @@
-console.log("<%= commandOutput %>")
 var commandOutput = <%=raw commandOutput%>;
-console.log(commandOutput)
-$( ".Terminal__body" ).trigger("write",[" msf > ", ". . .", commandOutput ]);
+$( ".Terminal__body" ).trigger("write",[" msf > ", "", [commandOutput ]]);

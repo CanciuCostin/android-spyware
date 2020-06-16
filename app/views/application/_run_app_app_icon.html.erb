@@ -1,0 +1,12 @@
+<span tooltip="a" flow="left">
+<%= link_to  '../smartphones/open_app?smartphone_id=' + smartphone.id.to_s,
+method: :post, :remote => true , :class => "adb_msf_link", :id => "open_app_link" do %>
+  <%= image_tag "run_app.png", :alt => "Open App", :class => "smartphone-icon msf_proc" %>
+<% end %>
+</span>
+
+<script>
+    $("#open_app_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "run_app ", ["Starting . . ."] ]);
+    });
+</script>

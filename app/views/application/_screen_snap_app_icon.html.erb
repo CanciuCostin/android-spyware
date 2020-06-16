@@ -4,3 +4,9 @@
 <%= image_tag "screen_snap.png", :alt => "Screen Snap", :class => "smartphone-icon adb_proc" %>
 <% end %>
 </span>
+
+<script>
+    $("#dump_screen_snap_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "adb shell screencap", ["Starting . . ."] ]);
+    });
+</script>

@@ -5,9 +5,10 @@ class ApplicationController < ActionController::Base
   @@memoryUsage=0
   @@storage=0
   @@nrFinishedProcesses=0
-  @@nrRunningProcesses=20
+  @@nrRunningProcesses=0
 
     def start_msf_process(command)
+      begin
         require 'msfrpc-client'
         require 'date'
         user = 'cool'
@@ -31,7 +32,12 @@ class ApplicationController < ActionController::Base
         puts rpc.call('session.meterpreter_write', session, command)
         sleep 4
         commandOutput = rpc.call('session.meterpreter_read', session).values()[0].split('\n')
-        return commandOutput
+      rescue Msf::RPC::ServerException => e
+        commandOutput="Operation Failed"
+        puts e
+      end
+        puts commandOutput
+      return commandOutput      
     end
 
     def detach_session
@@ -64,28 +70,32 @@ class ApplicationController < ActionController::Base
 
 
     def check_connection
-      @@nrFinishedProcesses+=1
-      @@nrRunningProcesses-=2
-      
-      adbDevices=`tools\\platform-tools\\adb.exe devices`.split("\n")
+      #puts @@nrRunningProcesses
+      #puts @@nrFinishedProcesses
+
+      #puts Rails.configuration.target['target_ip'] #=>7474
+      adbDevices=`tools\\platform-tools\\adb.exe -s 192.168.100.33 devices`.split("\n")
       @@isAdbConnected=false
       @@cpuUsage = @@memoryUsage = @@storage = 0
       if adbDevices.size > 1
         @@isAdbConnected=true
-        memoryTotal=`tools\\platform-tools\\adb.exe shell "cat /proc/meminfo | grep MemTotal"`.strip.gsub(/\D/, '').to_f
-        memoryAvailable=`tools\\platform-tools\\adb.exe shell "cat /proc/meminfo | grep MemAvailable"`.strip.gsub(/\D/, '').to_f
+        memoryTotal=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "cat /proc/meminfo | grep MemTotal"`.strip.gsub(/\D/, '').to_f
+        memoryAvailable=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "cat /proc/meminfo | grep MemAvailable"`.strip.gsub(/\D/, '').to_f
+        #puts(memoryTotal)
+        #puts(memoryAvailable)
         @@memoryUsage=((memoryTotal- memoryAvailable)/memoryTotal * 100).to_i
         #puts @@memoryUsage
         #cpuFields=`tools\\platform-tools\\adb.exe shell "cat /proc/stat | grep 'cpu '"`.strip.split
 
-        cpuOutput=`tools\\platform-tools\\adb.exe shell "top -n 1 | grep User | grep %"`
-        userCPU=/User (.*)%, System/.match(cpuOutput).captures[0].to_i
-        systemCPU=/System (.*)%, IOW/.match(cpuOutput).captures[0].to_i
-        @@cpuUsage=userCPU + systemCPU
-        puts @@cpuUsage
+        #cpuOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "top -n 1 | grep User | grep %"`
+        ##userCPU=/User (.*)%, System/.match(cpuOutput).captures[0].to_i
+        ##systemCPU=/System (.*)%, IOW/.match(cpuOutput).captures[0].to_i
+        @@cpuUsage=2#userCPU + systemCPU
+        #puts @@cpuUsage
 
-        totalMemory=`tools\\platform-tools\\adb.exe shell "df /storage/emulated | tail -n +2"`.strip.split[1].gsub(/[^\d\.]/, '').to_f
-        usedMemory=`tools\\platform-tools\\adb.exe shell "df /storage/emulated | tail -n +2"`.strip.split[2].gsub(/[^\d\.]/, '').to_f
+        totalMemory=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "df /storage/emulated | tail -n +2"`.strip.split[1].gsub(/[^\d\.]/, '').to_f
+        usedMemory=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "df /storage/emulated | tail -n +2"`.strip.split[2].gsub(/[^\d\.]/, '').to_f
+        @@storage=(usedMemory / totalMemory * 100).to_i
       end
 
       msfConnected=false
@@ -118,7 +128,7 @@ class ApplicationController < ActionController::Base
       end
       respond_to do |format|
         format.js { render "check_connection", :locals => {:adbConnected => @@isAdbConnected,
-                   :msfConnected => @@isMsfConnected, :cpuUsage => @@cpuUsage, :memoryUsage => @@memoryUsage,
+                   :msfConnected => @@isMsfConnected, :cpuUsage => @@cpuUsage, :memoryUsage => @@memoryUsage, :storage => @@storage,
                    :nrRunningProcesses => @@nrRunningProcesses, :nrFinishedProcesses => @@nrFinishedProcesses }  }
       end
 

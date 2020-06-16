@@ -6,9 +6,8 @@
                 <% end %>
                 </span>
 <script>
-$("#webcam_snap_link").click(function() {
-    $(this).attr("href", function() {
-      return this.href + "&filename=" + $('#input_box_filename').val();
-    });
-  });
+$("#webcam_snap_link").on('click',function(event){
+    $( ".Terminal__body" ).trigger("write",[" > ", "webcam_snap", ["Starting . . ."] ]);
+});
 </script>
+

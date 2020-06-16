@@ -4,3 +4,9 @@
       <%= image_tag "dump_contacts.png", :alt => "Dump Contacts", :class => "smartphone-icon msf_proc" %>
 <% end %>
 </span>
+
+<script>
+    $("#dump_contacts_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "dump_contacts", ["Starting . . ."] ]);
+    });
+</script>

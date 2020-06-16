@@ -4,3 +4,9 @@
                       <%= image_tag "sound_level.png", :alt => "Audio Mode", :class => "smartphone-icon msf_proc" %>
                     <% end %>
                 </span>
+
+                <script>
+                $("#set_audio_mode_link").on('click',function(event){
+                    $( ".Terminal__body" ).trigger("write",[" > ", "set_audio_mode", ["Starting . . ."] ]);
+                });
+            </script>

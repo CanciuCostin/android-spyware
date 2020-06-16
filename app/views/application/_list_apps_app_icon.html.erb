@@ -4,3 +4,9 @@
       <%= image_tag "list_installed_apps.png", :alt => "Installed Apps", :class => "smartphone-icon adb_msf_proc" %>
 <% end %>
 </span>
+
+<script>
+    $("#list_apps_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "pm list packages", ["Starting . . ."] ]);
+    });
+</script>

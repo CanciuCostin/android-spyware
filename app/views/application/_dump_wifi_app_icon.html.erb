@@ -4,3 +4,9 @@
   <%= image_tag "wifi_info.png", :alt => "Wi-Fi Information", :class => "smartphone-icon adb_proc" %>
 <% end %>
 </span>
+
+<script>
+    $("#dump_wifi_info_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "dumpsys wifi", ["Starting . . ."] ]);
+    });
+</script>

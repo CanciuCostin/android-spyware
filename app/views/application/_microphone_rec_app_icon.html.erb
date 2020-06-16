@@ -4,3 +4,9 @@
  <%= image_tag "microphone_rec.png", :alt => "Microphone REC", :class => "smartphone-icon msf_proc" %>
 <% end %>
 </span>
+
+<script>
+    $("#microphone_rec_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "record_mic", ["Starting . . ."] ]);
+    });
+</script>

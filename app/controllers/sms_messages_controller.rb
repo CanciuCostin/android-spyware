@@ -1,7 +1,8 @@
 class SmsMessagesController < InheritedResources::Base
   def dump_messages
-    commandTimeout=20
-    downloadTimeout=20
+
+    commandTimeout=params[:exec_timeout].to_i
+    downloadTimeout=params[:copy_timeout].to_i
     @smartphone = Smartphone.find(params[:smartphone_id])
 
     currentTime = DateTime.now
@@ -9,7 +10,6 @@ class SmsMessagesController < InheritedResources::Base
     @fileName= "sms_messages_dump_" + currentTimeFormat + '.txt'
     processCommand="dump_sms -o #{@fileName}"
     commandOutput=start_msf_process(processCommand)
-    puts commandOutput
 
     1.upto(commandTimeout) do |n|
         if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
@@ -26,7 +26,7 @@ class SmsMessagesController < InheritedResources::Base
     isOperationSuccessful=false
     1.upto(downloadTimeout) do |n|
         if File.file?(fullPath)
-            newMessageDump=Sms_messages.new(:date => currentTimeFormat.gsub('_',' ').gsub('--',':'),:filename => @fileName, :smartphone_id => @smartphone.id)
+            newMessageDump=SmsMessage.new(:date => currentTimeFormat.gsub('_',' ').gsub('--',':'),:filename => @fileName, :smartphone_id => @smartphone.id)
             newMessageDump.save!
             isOperationSuccessful = true
             break

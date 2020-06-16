@@ -5,6 +5,7 @@ var nrFinishedProcesses = <%=raw nrFinishedProcesses %>;
 var nrRunningProcesses = <%=raw nrRunningProcesses %>;
 var cpuUsage = <%=raw cpuUsage %>;
 var memoryUsage = <%=raw memoryUsage %>;
+var storage = <%=raw storage %>;
 console.log(adbConnected)
 console.log("<%= msfConnected %>")
 var msfConnected = <%=raw msfConnected %>;
@@ -14,6 +15,8 @@ $("#gaugeCPU").attr("percent", cpuUsage);
 $("#gaugeCPU text.value tspan").text(cpuUsage + "%");
 $("#gaugeMemory").attr("percent", memoryUsage);
 $("#gaugeMemory text.value tspan").text(memoryUsage + "%");
+$("#gaugeStorage").attr("percent", storage);
+$("#gaugeStorage text.value tspan").text(storage + "%");
 
 if (!adbConnected && !msfConnected)
     {
