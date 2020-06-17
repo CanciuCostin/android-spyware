@@ -1,12 +1,12 @@
 <span tooltip="I'm up above it!" flow="right">
 <%= link_to '../screenshots/dump_screen_snap?smartphone_id=' + smartphone.id.to_s,
- method: :get,:remote => true , :class => "adb_link", :id => "dump_screen_snap_link" do %>
+ method: :get, :remote => true , :class => "adb_link", :id => "dump_screen_snap_link" do %>
 <%= image_tag "screen_snap.png", :alt => "Screen Snap", :class => "smartphone-icon adb_proc" %>
 <% end %>
 </span>
 
 <script>
     $("#dump_screen_snap_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "adb shell screencap", ["Starting . . ."] ]);
+        $( ".Terminal__body" ).trigger("write",[" > ", "adb screencap", ["Starting . . ."] ]);
     });
 </script>

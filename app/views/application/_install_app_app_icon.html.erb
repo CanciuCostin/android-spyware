@@ -1,6 +1,6 @@
 <span tooltip="a" flow="left">
 <%= link_to  '../smartphones/install_apk?smartphone_id=' + smartphone.id.to_s,
-method: :post, :remote => true , :class => "msf_link", :id => "install_apk_link" do %>
+method: :post, :remote => true , :class => "adb_msf_link", :id => "install_apk_link" do %>
   <%= image_tag "install_apk.png", :alt => "Install APK", :class => "smartphone-icon msf_proc" %>
 <% end %>
 </span>

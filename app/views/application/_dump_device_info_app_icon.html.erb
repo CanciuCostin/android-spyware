@@ -7,6 +7,6 @@ method: :post, :remote => true , :class => "adb_msf_link", :id => "dump_device_i
 
 <script>
     $("#dump_device_info_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "dumpsys deviceinfo", ["Starting . . ."] ]);
+        $( ".Terminal__body" ).trigger("write",[" > ", "deviceinfo", ["Starting . . ."] ]);
     });
 </script>

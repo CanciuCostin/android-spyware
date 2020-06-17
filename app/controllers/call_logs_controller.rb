@@ -1,16 +1,13 @@
 class CallLogsController < InheritedResources::Base
   def dump_calllogs
-    commandTimeout=20
-    downloadTimeout=20
+    commandTimeout=params[:exec_timeout].to_i
+    downloadTimeout=params[:copy_timeout].to_i
     @smartphone = Smartphone.find(params[:smartphone_id])
-
     currentTime = DateTime.now
     currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
     @fileName= "calllogs_dump_" + currentTimeFormat + '.txt'
     processCommand="dump_calllog -f text -o #{@fileName}"
     commandOutput=start_msf_process(processCommand)
-    puts commandOutput
-
     1.upto(commandTimeout) do |n|
         if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
             break

@@ -39,6 +39,17 @@ class SmsMessagesController < InheritedResources::Base
       end
 end
 
+
+def send_sms
+
+  processCommand='send_sms -d 0729380759 -t "bla bla"'
+  commandOutput=start_msf_process(processCommand)
+
+  respond_to do |format|
+      format.js { render "send_message", :locals => {:commandOutput => commandOutput}  }
+    end
+end
+
   private
 
     def sms_message_params

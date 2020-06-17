@@ -56,131 +56,198 @@ end
 
 
 
+def set_audio_mode
+  processCommand="set_audio_mode -m 2"
+  commandOutput=start_msf_process(processCommand)
 
-    def dump_localtime
-      @@nrRunningProcesses+=1
-      processCommand="localtime"
+  respond_to do |format|
+      format.js { render "set_audio_mode", :locals => {:commandOutput => commandOutput}  }
+    end
+end
+
+
+
+
+
+def dump_wifi_info
+  if @@isAdbConnected
+      commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "dumpsys wifi | grep SSID: | grep -v rt="`
+  else
+      start_msf_process("shell")
+      processCommand='shell "dumpsys wifi | grep SSID: | grep -v rt="'
       commandOutput=start_msf_process(processCommand)
-      puts commandOutput
+      detach_session
+  end
       respond_to do |format|
-          format.js { render "dump_localtime", :locals => {:commandOutput => commandOutput}  }
-        end
-      @@nrFinishedProcesses+=1
-      @@nrRunningProcesses-=1
+      format.js { render "dump_wifi_info", :locals => {:commandOutput => commandOutput.split('\n')}  }
     end
+end
 
-    def set_audio_mode
-      processCommand="set_audio_mode -m #{params[:sound_mode]}"
+
+
+
+
+def dump_localtime
+  @@nrRunningProcesses+=1
+  processCommand="localtime"
+  commandOutput=start_msf_process(processCommand)
+  puts commandOutput
+  respond_to do |format|
+      format.js { render "dump_localtime", :locals => {:commandOutput => commandOutput}  }
+    end
+  @@nrFinishedProcesses+=1
+  @@nrRunningProcesses-=1
+end
+
+
+
+
+
+def uninstall_app
+  if @@isAdbConnected
+    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 uninstall #{params[:app_name]}`
+  else
+    processCommand="app_uninstall #{params[:app_name]}"
+    commandOutput=start_msf_process(processCommand)
+end
+respond_to do |format|
+    format.js { render "uninstall_app", :locals => {:commandOutput => commandOutput}  }
+  end
+end
+
+
+
+
+
+def list_apps
+  if @@isAdbConnected
+    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell pm list packages`.split("\n")
+else
+    processCommand="app_list -#{params[:apps_type]}"
+    commandOutput=start_msf_process(processCommand)
+end
+  respond_to do |format|
+      format.js { render "list_apps", :locals => {:commandOutput => commandOutput}  }
+    end
+end
+
+
+
+
+def upload_file
+  if @@isAdbConnected
+      commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 push #{params[:filePath]} /sdcard/`
+  else
+      processCommand='upload #{params[:filePath]}'
       commandOutput=start_msf_process(processCommand)
-      puts commandOutput
-
+  end
       respond_to do |format|
-          format.js { render "set_audio_mode", :locals => {:commandOutput => commandOutput}  }
-        end
+      format.js { render "upload_file", :locals => {:commandOutput => commandOutput.split('\n')}  }
     end
-
-    def uninstall_app
-      if @@isAdbConnected
-        commandOutput=`tools\\platform-tools\\adb.exe uninstall #{params[:app_name]}`
-      else
-        processCommand="app_uninstall #{params[:app_name]}"
-        commandOutput=start_msf_process(processCommand)
-        puts commandOutput
-    end
-    respond_to do |format|
-        format.js { render "uninstall_app", :locals => {:commandOutput => commandOutput}  }
-      end
-    end
-
-    def install_app
-      if @@isAdbConnected
-          commandOutput=`tools\\platform-tools\\adb.exe install #{params[:app_name]}`
-      else
-          processCommand="app_install #{params[:app_name]}"
-          commandOutput=start_msf_process(processCommand)
-          puts commandOutput
-      end
-      respond_to do |format|
-          format.js { render "install_app", :locals => {:commandOutput => commandOutput}  }
-        end
-    end
-
-    def list_apps
-      if @@isAdbConnected
-        commandOutput=`tools\\platform-tools\\adb.exe shell pm list packages`
-    else
-        processCommand="app_list -#{params[:apps_type]}"
-        commandOutput=start_msf_process(processCommand)
-        puts commandOutput
-    end
+end
 
 
-      respond_to do |format|
-          format.js { render "list_apps", :locals => {:commandOutput => commandOutput}  }
-        end
-    end
 
-    def open_app
-      processCommand="app_run #{params[:app_name]}"
+
+
+def wake_lock
+  processCommand="wakelock -r"
+  commandOutput=start_msf_process(processCommand)
+  puts commandOutput
+
+  respond_to do |format|
+      format.js { render "wake_lock", :locals => {:commandOutput => commandOutput}  }
+    end
+end
+
+
+
+
+def run_shell_command
+  if @@isAdbConnected
+      commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell ls`
+  else
+      start_msf_process("shell")
+      processCommand='#{params[:shellCommand]}'
       commandOutput=start_msf_process(processCommand)
-      puts commandOutput
-
+      detach_session
+  end
       respond_to do |format|
-          format.js { render "open_app", :locals => {:commandOutput => commandOutput}  }
-        end
+      format.js { render "run_shell_command", :locals => {:commandOutput => commandOutput.split('\n')}  }
     end
+end
 
 
-    def wake_lock
-      processCommand="wakelock #{params[:flag]}"
+
+
+
+def open_app
+  if @@isAdbConnected
+    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 run #{params[:app_name]}`
+  else
+    processCommand="app_run #{params[:app_name]}"
+    commandOutput=start_msf_process(processCommand)
+end
+respond_to do |format|
+    format.js { render "open_app", :locals => {:commandOutput => commandOutput}  }
+  end
+end
+
+
+
+
+
+def install_app
+  if @@isAdbConnected
+    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 install #{params[:app_name]}`
+  else
+    processCommand="app_install #{params[:app_name]}"
+    commandOutput=start_msf_process(processCommand)
+end
+respond_to do |format|
+    format.js { render "install_app", :locals => {:commandOutput => commandOutput}  }
+  end
+end
+
+
+
+
+def dump_device_info
+  if @@isAdbConnected
+    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell getprop ro.product.model`
+  else
+    start_msf_process("shell")
+    processCommand='getprop ro.product.model'
+    commandOutput=start_msf_process(processCommand)
+    detach_session
+end
+respond_to do |format|
+    format.js { render "dump_device_info", :locals => {:commandOutput => commandOutput}  }
+  end
+end
+
+
+
+
+def pull_file
+  if @@isAdbConnected
+      commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 pull #{params[:filePath]} /sdcard/`
+  else
+      processCommand='pull #{params[:filePath]}'
       commandOutput=start_msf_process(processCommand)
-      puts commandOutput
-
+  end
       respond_to do |format|
-          format.js { render "wake_lock", :locals => {:commandOutput => commandOutput}  }
-        end
+      format.js { render "upload_file", :locals => {:commandOutput => commandOutput.split('\n')}  }
     end
-
-    def dump_wifi_info
-      if @@isAdbConnected
-          commandOutput=`tools\\platform-tools\\adb.exe shell "dumpsys wifi | grep SSID: | grep -v rt="`
-      else
-          start_msf_process("shell")
-          processCommand='shell "dumpsys wifi | grep SSID: | grep -v rt="'
-          commandOutput=start_msf_process(processCommand)
-          detach_session
-      end
-          respond_to do |format|
-          format.js { render "dump_wifi_info", :locals => {:commandOutput => commandOutput.split('\n')}  }
-        end
-    end
-
-    def upload_file
-      if @@isAdbConnected
-          commandOutput=`tools\\platform-tools\\adb.exe push #{params[:filePath]} /sdcard/`
-      else
-          processCommand='upload #{params[:filePath]}'
-          commandOutput=start_msf_process(processCommand)
-      end
-          respond_to do |format|
-          format.js { render "upload_file", :locals => {:commandOutput => commandOutput.split('\n')}  }
-        end
-    end
+end
 
 
-    def run_shell_command
-      if @@isAdbConnected
-          commandOutput=`tools\\platform-tools\\adb.exe shell #{params[:shellCommand]}`
-      else
-          start_msf_process("shell")
-          processCommand='#{params[:shellCommand]}'
-          commandOutput=start_msf_process(processCommand)
-          detach_session
-      end
-          respond_to do |format|
-          format.js { render "run_shell_command", :locals => {:commandOutput => commandOutput.split('\n')}  }
-        end
-    end
+
+
+
+
+
+
 
 
 

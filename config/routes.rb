@@ -14,6 +14,7 @@ end
   resources :sms_messages do
     collection do
         post :dump_messages
+        post :send_sms
     end
 end
   resources :call_logs do
@@ -34,7 +35,7 @@ end
 resources :screenshots do
   collection do
       get :dump_screen_snap
-      get :dump_screen_record
+      post :screen_record
   end
 end
   resources :pictures do
@@ -64,7 +65,9 @@ end
         post :dump_wifi_info
         get :webcam_record
         get :upload_file
-        get :run_shell_command
+        post :run_shell_command
+        post :dump_device_info
+        post :pull_file
 
 
 

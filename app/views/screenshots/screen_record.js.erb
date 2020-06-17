@@ -2,5 +2,5 @@ var commandOutput = <%=raw commandOutput%>;
 $( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
 
 if (commandOutput[0] != "Operation Failed"){
-    window.open("/assets/files/contacts_dumps/<%= fileName %>")
+    window.open("/assets/files/screen_snaps/<%= fileName %>")
 }
