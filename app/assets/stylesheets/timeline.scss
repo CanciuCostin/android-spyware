@@ -45,16 +45,16 @@
   }
   
   .direction-l {
-    right: 14% !important;
+    right: 38% !important;
     position: relative !important;
     text-align: right !important;
-    width: 50% !important;
+    width: 80% !important;
   }
   
   .direction-r {
     left: 62% !important;
     position: relative !important;
-    width: 50% !important;
+    width: 80% !important;
   }
   
   .flag-wrapper {
@@ -71,8 +71,9 @@
     padding: 6px 10px !important;
     border-radius: 5px !important;
     
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     text-align: left !important;
+    font-size: 9px;
   }
   
   .direction-l .flag {
@@ -91,7 +92,7 @@
   .direction-r .flag:before {
     position: absolute !important;
     top: 50% !important;
-    right: -44% !important;
+    //right: -44% !important;
     content: ' ' !important;
     display: block !important;
     width: 25px !important;
@@ -125,8 +126,16 @@
 //   }
   
   .direction-r .flag:before {
-    left: -38% !important;
+    //left: -38% !important;
+    right: 115%;
   }
+
+  .direction-l .flag:before {
+    //left: -38% !important;
+    left:105%;
+  }
+
+  
   
   .direction-l .flag:after {
     content: "" !important;

@@ -2,16 +2,23 @@ div.columns:nth-child(3) > div.column > div.panel > div.panel_contents {
     width: auto;
 }
 //map
+div.columns:nth-child(3) > div.column:first-child > div.panel{
+    margin-bottom: 0;
+}
 div.columns:nth-child(3) > div.column:first-child > div.panel > div.panel_contents {
-    height: 350px ;
+    height: 360px ;
     //width: 820.567px;
     padding: 0 !important;
 
 }
 
 //radar
+div.columns:nth-child(3) > div.column:nth-child(2) > div.panel{
+    margin-bottom: 0;
+}
+
 div.columns:nth-child(3) > div.column:nth-child(2) > div.panel > div.panel_contents {
-    height: 325px ;
+    height: 360px ;
     //width: 820.567px;
     padding: 0 !important;
 
@@ -19,7 +26,7 @@ div.columns:nth-child(3) > div.column:nth-child(2) > div.panel > div.panel_conte
 
 //timeline
 body.admin_dashboard #main_content div.columns:first-child div.column:nth-child(2) > div.panel > div.panel_contents{
-    height: 633px;
+    height: 610px;
 }
 
 div.columns:nth-child(3) > div.column > div.panel > div.panel_contents {

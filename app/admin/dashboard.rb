@@ -6,21 +6,29 @@ ActiveAdmin.register_page "Dashboard" do
     class Activity
         attr_reader :type
         attr_reader :date
-        attr_reader :name
       
-          def initialize(type,date,name)
+          def initialize(type,date)
           @type=type
           @date=date
-          @name=name
           end
       end
 
-    pictures=Picture.all.limit(10)
+    objects=Picture.all + CallLog.all + Contact.all + GeoLocation.all + Recording.all + Screenshot.all + SmsMessage.all
     activities=[]
-	#what to do when no pictures
-    pictures.each do |picture|
-        activities << Activity.new("Picture", picture.date, picture.filename)
+    objects.each do |object|
+        activities << Activity.new(object.class.to_s, object.date.to_s)
     end
+
+
+    activities = activities.sort_by(&:date).reverse!.take(10)
+
+
+    def getContactsOfInterest
+
+    end
+
+
+
 
 
 
@@ -36,26 +44,26 @@ ActiveAdmin.register_page "Dashboard" do
                     columns do
                   column  do 
 
-                      render partial: "calls_count", locals: {name: "CALL DUMPS", count: "2"}
+                      render partial: "calls_count", locals: {name: "CALL DUMPS", count: CallLog.all.size}
                   end
                 
 
                   column do
 
-                      render partial: "messages_count", locals: {name: "SMS DUMPS ", count: "3"}
+                      render partial: "messages_count", locals: {name: "SMS DUMPS ", count: SmsMessage.all.size}
                   end
                 
 
 
                   column do
 
-                      render partial: "screenshots_count", locals: {name: "SCREEN SNAPS", count: "0"}
+                      render partial: "screenshots_count", locals: {name: "SCREEN SNAPS", count: Screenshot.all.size}
                 end
                 
 
                 column do
             
-                    render partial: "contacts_count", locals: {name: "CONTACTS DUMPS", count: "4"}
+                    render partial: "contacts_count", locals: {name: "CONTACTS DUMPS", count: Contact.all.size}
             end
         end
     end
@@ -100,25 +108,25 @@ ActiveAdmin.register_page "Dashboard" do
 
                     column do
                 
-                        render partial: "recordings_count", locals: {name: "MICROPHONE RECS", count: "11"}
+                        render partial: "recordings_count", locals: {name: "MICROPHONE RECS", count: Recording.all.size}
                 end
                     
     
                 column do
                 
-                    render partial: "pictures_count", locals: {name: "CAMERA SNAPS", count: "13"}
+                    render partial: "pictures_count", locals: {name: "CAMERA SNAPS", count: Picture.all.size}
             end
                     
     
             column do
                 
-                render partial: "videos_count", locals: {name: "VIDEO RECS", count: "2"}
+                render partial: "videos_count", locals: {name: "VIDEO RECS", count: MessagingAppsDump.all.size}
         end
                     
     
         column do
             
-            render partial: "locations_count", locals: {name: "LOCATION DUMPS", count: "0"}
+            render partial: "locations_count", locals: {name: "LOCATION DUMPS", count: GeoLocation.all.size}
       end
     end
 end
@@ -130,7 +138,7 @@ end
     columns do
         column span: 2 do
             panel "Locations" do
-                        render partial: "map"
+                        render partial: "map", locals: {locations: GeoLocation.all.sort_by(&:date).reverse!.take(5)}
                         render partial: "triangle_info", locals: {color: "orange"}
 
                 end
