@@ -69,18 +69,18 @@ div.column:first-child, div.column:nth-child(2){
 }
 //specific settings
 #main_content .columns:first-child .column:nth-child(2) .columns:nth-child(2) .panel .panel_contents{
-    height: 365px;
+    height: 278px;
 }
 //gauges
 #main_content .columns:first-child .column:first-child .columns:nth-child(2) .panel .panel_contents{
-    height: 100px;
+    //height: 120px;
     padding-top: 0;
     padding-bottom: 0;
 }
 
 // common settings
 #main_content .columns:first-child .column:nth-child(2) .columns:first-child .panel .panel_contents .columns .column .custom-rangeslider{
-    height: 120px;
+    //height: 120px;
 }
 
 #main_content .columns:first-child .column:nth-child(2) .columns:first-child .panel .panel_contents .columns .column .toggle_container{
@@ -135,7 +135,7 @@ div.column:first-child, div.column:nth-child(2){
 }
 
 #main_content .columns:first-child .column:nth-child(2) .columns:nth-child(2) .column .panel .panel_contents .tabs .tab-content{
-    padding-top: 30px !important;
+    padding-top: 12px !important;
 }
 
 
@@ -194,7 +194,7 @@ body.admin_remote #active_admin_content .tab-content .columns{
 }
 
 body.admin_remote .tabs.ui-tabs.ui-corner-all.ui-widget.ui-widget-content{
-    padding-top: 5%;
+    //padding-top: 5%;
 }
 
 li.ui-tabs-tab.ui-corner-top.ui-state-default.ui-tab.ui-tabs-active.ui-state-active a{

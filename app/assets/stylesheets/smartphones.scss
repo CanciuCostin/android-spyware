@@ -21,9 +21,9 @@
 	}
 }
 #terminalContainer{
-    width: 75%;
-    position: relative;
-    height: 367px;
+    //width: 75%;
+    //position: relative;
+    //height: 367px;
 }
 
 #infoi {
@@ -98,8 +98,8 @@
   }
 
   .smartphone-icon {
-      width: 45px;
-      height: 45px;
+      width: 40px;
+      height: 40px;
       margin-right: 8%;
       border-radius: 14px;
   }
@@ -108,7 +108,7 @@
     position: relative;
     top: 6%;
     left: 7%;
-    height: 450px;
+    height: 380px;
     padding-right: 15%;
     overflow: auto;
     width: 100%;
@@ -122,11 +122,12 @@
   .app_name{
     margin-bottom: 5%;
     width: 15%;
-    margin-right: 9%;
+    margin-right: 8.9%;
     position: relative;
     display: inline-block;
     top: 0px;
-    font-size: x-small;
+    font-size: 9px;
+    font-weight: 600;
     text-align: center;
     line-height: initial;
     //font-weight: bold;

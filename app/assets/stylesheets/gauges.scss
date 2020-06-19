@@ -1,10 +1,12 @@
 
-$w: 125px;
+$w: 120px;
 .gaugesSVG {
 	display: block;
 	width: 130px;
 	height: $w;
 	margin: 3px;
+	margin-bottom: 0;
+	margin-top: 0;
 	
 	circle {
 		fill: none;
@@ -49,13 +51,13 @@ $w: 125px;
 		fill: #EEE;
 		
 		&.value {
-			font-size: 26px;
+			font-size: 22px;
 			font-weight: 300;
 		}
 
 		&.caption {
 			font-weight: bold;
-			font-size: 15px;
+			font-size: 12px;
 			text-transform: uppercase;
 		}
 		

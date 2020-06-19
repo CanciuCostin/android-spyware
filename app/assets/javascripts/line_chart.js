@@ -77,7 +77,7 @@ function generateMinuteWiseTimeSeries(baseval, count, yrange) {
 
 var optionsLine = {
   chart: {
-    height: 297,
+    height: 225,
     type: 'line',
     stacked: true,
     animations: {

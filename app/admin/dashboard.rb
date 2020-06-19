@@ -120,7 +120,7 @@ ActiveAdmin.register_page "Dashboard" do
     
             column do
                 
-                render partial: "videos_count", locals: {name: "VIDEO RECS", count: MessagingAppsDump.all.size}
+                render partial: "videos_count", locals: {name: "WHATSAPP DUMPS", count: MessagingAppsDump.all.size}
         end
                     
     

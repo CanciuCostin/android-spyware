@@ -16,11 +16,11 @@
 
 
 $panelBorder: yellow !important;
-$skinActiveColor: #6B6C75 !default;
+$skinActiveColor: rgba(255, 255, 255, 0.7) !default;
 $bodyColor: #222326 !default;
 $skinTextColor: white !important;
 $skinTextActiveColor: black !default;
-$skinTextTable: blue !important;
+$skinTextTable: rgba(255, 255, 255, 0.7) !important;
 $skinHeaderBck: #27293d !important;
 $skinBlack: pink !important;
 $panelHeaderBck: #27293d !important;
@@ -678,7 +678,9 @@ div.bloc{
     margin-bottom: 0.5% !important;
 }
 
-#diplay-filter, html #active_admin_content a.table_tools_button, html #active_admin_content .table_tools .dropdown_menu_button,#title_bar .action_items span.action_item > a[href*="new"]{
+#diplay-filter, html #active_admin_content a.table_tools_button, html #active_admin_content .table_tools .dropdown_menu_button,#title_bar .action_items span.action_item > a[href*="new"],
+html form input[type="submit"], html a.button, html a:link.button, html a:visited.button,
+html form fieldset.buttons li.cancel a, html form fieldset.actions li.cancel a, html form.filter_form a.clear_filters_btn{
     font-size: 0.875rem !important;
     line-height: 1.35em !important;
     font-weight: 600 !important;
@@ -695,6 +697,10 @@ div.bloc{
     border: none !important;
     display: table-cell !important;
     vertical-align: middle !important;
+}
+html form fieldset.buttons li.cancel a:hover, html form fieldset.actions li.cancel a:hover, html form.filter_form a.clear_filters_btn:hover{
+    background-image: linear-gradient(to bottom left,#e14eca,#ba54f5,#e14eca) !important;
+
 }
 
 #active_admin_content {
@@ -716,3 +722,57 @@ a.button:not(.disabled):hover, a:link.button:not(.disabled):hover, a:visited.but
 }
 
 
+table.index_table th.sorted-asc, table.index_table th.sorted-desc {
+    background-color: #27293d;
+}
+
+
+html form fieldset.inputs{
+    background: #27293d;
+}
+
+body.admin_apk_payloads form input[type="text"], html form input[type="password"], html form input[type="email"], html form input[type="number"], html form input[type="url"], html form input[type="tel"], html form textarea{
+    background: #343A43 !important;
+    font-size:18px !important ;
+    //padding:10px 10px 10px 5px !important ;
+    display:block !important ;
+    width: 10% !important ;
+    border:none !important ;
+    border-bottom:1px solid  	#E14ECA !important ;
+    box-sizing: initial;
+    height: 15px !important;
+}
+
+//view page
+html .panel_contents table th, html .attributes_table table th,
+html .attributes_table table th, html .attributes_table table td{
+    text-shadow: none;
+    font-weight: 400;
+    font-family: Poppins,'sans-serif';
+    line-height: 35px;
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 14px;
+}
+
+.attributes_table table th, .attributes_table table td{
+    border-bottom: .0625rem solid #e3e3e3;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+.title_bar#title_bar .action_items span.action_item > a, .title_bar#title_bar .action_items span.action_item > .dropdown_menu > a {
+font-size: 0.875rem !important;
+line-height: 1.35em !important;
+font-weight: 600 !important;
+font-style: normal !important;
+text-shadow: none !important;
+text-align: center !important;
+color: #fff !important;
+background-image: linear-gradient(to bottom left, #e14eca, #ba54f5, #e14eca) !important;
+width: 135px !important;
+height: 40px !important;
+border-radius: .4285rem !important;
+box-shadow: none !important;
+padding: 0 !important;
+border: none !important;
+display: table-cell !important;
+vertical-align: middle !important;
+}
