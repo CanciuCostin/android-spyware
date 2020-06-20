@@ -5,12 +5,12 @@ class MessagingAppsDumpsController < InheritedResources::Base
         require 'sqlite3'
         db = SQLite3::Database.open "app\\assets\\images\\files\\whatsapp\\msgstore.db"
 
-        stm = db.prepare "SELECT * FROM chat;" 
+        stm = db.prepare "SELECT _id,key_remote_jid,data,timestamp FROM messages;" 
         rs = stm.execute 
         File.open(filePath, 'w') do |file|
             rs.each do |row|
                 #puts row.join "\s"
-                file.write(row.join("\s") + "\n")
+                file.write(row.join("---") + "\n")
             end
         end
     rescue SQLite3::Exception => e 

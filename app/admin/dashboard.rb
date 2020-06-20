@@ -75,6 +75,10 @@ contactsOfInterest.merge!  [whatsappNumbers.detect {|k,v| whatsappNumbers[k] == 
                                           .map { |k,v| [k, :whatsapp_count => v,
                                                            :calls_count => callNumbers.key?(k) ? callNumbers[k] : 0,
                                                            :sms_count => smsNumbers.key?(k) ? smsNumbers[k] : 0 ]}.to_h
+
+contacts=[{"contact"=>"Unknown", "polygons"=>["polygon(50% 4.0%, 23.0% 82.0%, 77.0% 82.0%)", "polygon(50% 4.0%, 20.0% 85.0%, 80.0% 85.0%)"]},
+          {"contact"=>"Unknown", "polygons"=>["polygon(50% 69.0%, 0.0% 97.0%, 77.0% 82.0%)", "polygon(50% 66.0%, 0.0% 100.0%, 80.0% 85.0%)"]},
+          {"contact"=>"Unknown", "polygons"=>["polygon(50% 69.0%, 23.0% 82.0%, 97.0% 97.0%)", "polygon(50% 66.0%, 20.0% 85.0%, 100.0% 100.0%)"]}]
 @contacts=[]
 contactsOfInterest.each { |k,v| @contacts.append({ "contact" => k, "polygons" => generateClipPath(v[:calls_count],v[:sms_count],v[:whatsapp_count]) })}
 puts contactsOfInterest
@@ -195,8 +199,6 @@ end
         column span: 2 do
             panel "Locations" do
                         render partial: "map", locals: {locations: GeoLocation.all.sort_by(&:date).reverse!.take(5)}
-                        render partial: "triangle_info", locals: {color: "orange"}
-
                 end
 
         end
