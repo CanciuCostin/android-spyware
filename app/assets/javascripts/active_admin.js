@@ -8,6 +8,7 @@ var detachedMenuButton;
 function openNav() {
     $("div#menu_modal")[0].style.setProperty('display','block');
     $("#header")[0].style.setProperty('transform', 'translateX(0px) translateZ(0px)');
+    document.getElementById("site_title").innerText="Android Spyware";
     //document.getElementById("tabs").style.width = "100%";
     //$(".eBLDUv")[0].style.setProperty('bottom', '4rem');
     //$(".eBLDUv")[0].style.setProperty('transform', 'translateX(5vw) rotate(0deg) translateZ(0px)');
@@ -15,6 +16,7 @@ function openNav() {
     $(".left_menu_icons").css('float', 'left');
     $(".left_menu_title").css('float', 'right');
     $(".left_menu_icon").css('float', 'left');
+    $(".WQebA").css('display', 'none');
 
 }
 
@@ -29,6 +31,7 @@ function closeNav() {
     $(".left_menu_icons").css('float', 'right');
     $(".left_menu_title").css('float', 'left');
     $(".left_menu_icon").css('float', 'right');
+    $(".WQebA").css('display', 'initial');
 }
 
 
@@ -76,7 +79,7 @@ $(document).ready(function(){
         
         mouseleave: function () {
             this.style.setProperty('background-color','#27293d');
-            $(".dashboard_icon_container > .dashboard_icon > .count_icon",this)[0].style.setProperty('padding-left','15%');
+            $(".dashboard_icon_container > .dashboard_icon > .count_icon",this)[0].style.setProperty('padding-left','17%');
             $('.dashboard_icon_container > .dashboard_counts_container > .category', this)[0].style.setProperty('right','0');
             $('.dashboard_icon_container > .dashboard_counts_container > .category', this)[0].style.setProperty('font-size','initial');
             $('.dashboard_icon_container > .dashboard_counts_container > .count', this)[0].style.setProperty('font-size','initial');

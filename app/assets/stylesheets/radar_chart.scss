@@ -102,34 +102,7 @@ li.label3 {
 li.label4 {
     animation-name: label4-anim
 }
-@keyframes in-anim {
-    0%, 100%, 8% {
-        background-color: #561034;
-        clip-path: polygon(50% 66%, 28% 84%, 95% 98%)
-    }
-    25% {
-        background-color: #25486b;
-        clip-path: polygon(50% 7%, 5% 97%, 66% 82%)
-    }
-    50% {
-        background-color: #565034;
-        clip-path: polygon(50% 50%, 5% 97%, 95% 98%)
-    }
-}
-@keyframes out-anim {
-    0%, 100%, 8% {
-        background-color: #2196f3;
-        clip-path: polygon(50% 61%, 23% 86%, 100% 100%)
-    }
-    25% {
-        background-color: #009688;
-        clip-path: polygon(51% 1%, 0 100%, 69% 84%)
-    }
-    50% {
-        background-color: #9c27b0;
-        clip-path: polygon(50% 45%, 0 100%, 100% 100%)
-    }
-}
+
 @keyframes label1-anim {
     0%, 10%, 100% {
         background-color: #2196f3

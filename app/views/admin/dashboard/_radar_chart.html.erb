@@ -3,8 +3,8 @@
   <div class="labelcontainer">
   <ul>
   <% i=1 %>
-  <% persons.each do |person| %>
-    <li class="label<%= i.to_s %>"><span><%= person %></span></li>
+  <% contacts.each do |contact| %>
+    <li class="label<%= i.to_s %>"><span><%= contact["contact"] %></span></li>
   <% i+=1 %>
   <% end %>
     </ul>
@@ -22,3 +22,34 @@
 <span id="messages_title">Messages</span>
 <span id="social_media">Social Media</span>
 </div>
+<style>
+@keyframes in-anim {
+    0%, 100%, 8% {
+        background-color: #561034;
+        clip-path: <%= contacts[0]["polygons"][0] %>
+    }
+    25% {
+        background-color: #25486b;
+        clip-path: <%= contacts[1]["polygons"][0] %>
+    }
+    50% {
+        background-color: #565034;
+        clip-path: <%= contacts[2]["polygons"][0] %>
+    }
+}
+@keyframes out-anim {
+    0%, 100%, 8% {
+        background-color: #2196f3;
+        clip-path: <%= contacts[0]["polygons"][1] %>
+    }
+    25% {
+        background-color: #009688;
+        clip-path: <%= contacts[1]["polygons"][1] %>
+    }
+    50% {
+        background-color: #9c27b0;
+        clip-path: <%= contacts[2]["polygons"][1] %>
+    }
+}
+
+</style>

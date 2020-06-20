@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <long name="timespent_last_activity_time" value="1591622839" />
-    <long name="timespent_rollover_time" value="1591686000" />
-    <long name="timespent_foreground_count" value="1" />
-    <long name="timespent_start_time" value="1591622773" />
-    <long name="timespent_end_time" value="1591622840" />
-    <long name="timespent_session_total" value="67" />
+    <long name="timespent_last_activity_time" value="1592576385" />
+    <long name="timespent_rollover_time" value="1592636400" />
+    <long name="timespent_foreground_count" value="6" />
+    <long name="timespent_start_time" value="1592574973" />
+    <long name="timespent_end_time" value="1592576392" />
+    <long name="timespent_session_total" value="188" />
 </map>

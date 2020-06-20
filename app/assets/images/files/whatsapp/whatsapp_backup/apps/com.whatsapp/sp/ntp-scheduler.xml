@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <int name="/ntp/succeeded" value="1" />
-    <long name="/ntp/last_event_timestamp" value="1591995603199" />
-    <int name="/ntp/started" value="1" />
+    <int name="/ntp/succeeded" value="3" />
+    <long name="/ntp/last_event_timestamp" value="1592576012558" />
+    <int name="/ntp/started" value="3" />
 </map>

@@ -1,22 +1,19 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <string name="ab_props:status_ads_params_json">{&quot;min_media&quot;: 10, &quot;min_total&quot;: 10, &quot;view_slot&quot;: 10, &quot;time_gap&quot;: 10}</string>
-    <string name="ab_props:status_ads_params_json_validated">{&quot;min_media&quot;: 10, &quot;min_total&quot;: 10, &quot;view_slot&quot;: 10, &quot;time_gap&quot;: 10}</string>
     <boolean name="ab_props:watls_enabled" value="true" />
+    <string name="ab_props:status_ads_params_json_validated">{&quot;min_media&quot;: 10, &quot;min_total&quot;: 10, &quot;view_slot&quot;: 10, &quot;time_gap&quot;: 10}</string>
+    <string name="ab_props:status_ads_params_json">{&quot;min_media&quot;: 10, &quot;min_total&quot;: 10, &quot;view_slot&quot;: 10, &quot;time_gap&quot;: 10}</string>
     <int name="ab_props:sys:fetch_attemp_count" value="0" />
-    <string name="ab_props:work_manager_ntp_sync_expo_key">564</string>
-    <boolean name="ab_props:watls_no_dns" value="true" />
-    <long name="ab_props:sys:refresh" value="86400000" />
     <boolean name="ab_props:watls_prefer_ip6" value="true" />
-    <set name="ab_props:sys:last_exposure_keys">
-        <string>564</string>
-    </set>
+    <long name="ab_props:sys:refresh" value="86400000" />
+    <boolean name="ab_props:watls_no_dns" value="true" />
+    <set name="ab_props:sys:last_exposure_keys" />
     <int name="ab_props:sys:last_error_code" value="0" />
     <boolean name="ab_props:disable_prewarm" value="true" />
-    <string name="ab_props:sys:config_key">xu,96</string>
-    <boolean name="ab_props:watls_early_data" value="true" />
+    <long name="ab_props:sys:last_refresh_time" value="1592575036527" />
+    <string name="ab_props:sys:config_key">yU,9z</string>
     <boolean name="ab_props:stream_progressive_jpeg_enabled" value="true" />
-    <boolean name="ab_props:work_manager_ntp_sync" value="false" />
+    <boolean name="ab_props:watls_early_data" value="true" />
     <set name="ab_props:sys:last_config_names">
         <string>smb_banner_max_dismiss_count</string>
         <string>status_image_max_edge_test</string>
@@ -119,4 +116,5 @@
         <string>mms_media_conn_foreground_only_enabled</string>
         <string>lazy_camera_view_inflation</string>
     </set>
+    <string name="ab_props:sys:config_hash">tJyEK</string>
 </map>

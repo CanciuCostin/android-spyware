@@ -1,6 +1,4 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <int name="/cron/hourly/completed" value="17" />
-    <int name="/cron/hourly/started" value="17" />
-    <long name="/cron/last_event_timestamp" value="1591995603197" />
+    <long name="/cron/last_event_timestamp" value="1592576012553" />
 </map>

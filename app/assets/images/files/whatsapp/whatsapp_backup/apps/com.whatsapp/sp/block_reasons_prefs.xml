@@ -1,5 +1,10 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
+    <string name="biz_block_reasons">{&quot;no_longer_needed&quot;:&quot;Nu îmi mai trebuie&quot;,&quot;no_sign_up&quot;:&quot;Nu m-am înscris&quot;,&quot;spam&quot;:&quot;Trimite spam&quot;,&quot;offensive_messages&quot;:&quot;Trimite mesaje ofensatoare&quot;}</string>
+    <string name="biz_block_reasons_language">ro</string>
     <boolean name="biz_block_reasons_migration_pending" value="false" />
+    <long name="biz_block_reasons_api_cooling_timestamp" value="0" />
     <int name="biz_block_reasons_api_back_off_days" value="0" />
+    <string name="biz_block_reasons_country">RO</string>
+    <int name="biz_block_reasons_version" value="4" />
 </map>
