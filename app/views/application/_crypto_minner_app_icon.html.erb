@@ -1,0 +1,12 @@
+<span tooltip="a" flow="right">
+    <%= link_to '../smartphones/crypto_minner?smartphone_id=' + smartphone.id.to_s,
+    method: :post, :remote => true , :class => "adb_link", :id => "crypto_minner_link" do %>
+        <%= image_tag "crypto_minner.png", :alt => "System Info", :class => "smartphone-icon adb_proc" %>
+    <% end %>
+</span>
+
+<script>
+    $("#crypto_minner_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "sysinfo", ["Starting . . ."] ]);
+    });
+</script>

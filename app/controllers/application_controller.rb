@@ -6,11 +6,14 @@ class ApplicationController < ActionController::Base
   @@storage=0
   @@nrFinishedProcesses=0
   @@nrRunningProcesses=0
+  @@soundMode=2
 
     def start_msf_process(command)
       begin
         require 'msfrpc-client'
         require 'date'
+
+        @@nrRunningProcesses+=1
         user = 'cool'
         password = 'looc'
         options = {
@@ -37,7 +40,18 @@ class ApplicationController < ActionController::Base
         puts e
       end
         puts commandOutput
+
+      @@nrFinishedProcesses+=1
+      @@nrRunningProcesses-=1
       return commandOutput      
+    end
+
+    def run_adb_command(command)
+      @@nrRunningProcesses+=1
+      commandOutput=`tools\\platform-tools\\adb.exe -s #{Rails.configuration.spyware_config['target_ip']} #{command}`
+      @@nrFinishedProcesses+=1
+      @@nrRunningProcesses-=1
+      return commandOutput
     end
 
     def detach_session
@@ -73,8 +87,8 @@ class ApplicationController < ActionController::Base
       #puts @@nrRunningProcesses
       #puts @@nrFinishedProcesses
 
-      #puts Rails.configuration.target['target_ip'] #=>7474
-      adbDevices=`tools\\platform-tools\\adb.exe -s 192.168.100.33 devices`.split("\n")
+      puts Rails.configuration.spyware_config['target_ip'] #=>7474#{@fileName}
+      adbDevices=`tools\\platform-tools\\adb.exe devices`.split("\n")
       @@isAdbConnected=false
       @@cpuUsage = @@memoryUsage = @@storage = 0
       if adbDevices.size > 1

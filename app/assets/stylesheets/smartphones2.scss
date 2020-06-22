@@ -187,3 +187,24 @@ box-sizing: border-box !important;
   -webkit-box-sizing: border-box !important;
   box-sizing: border-box !important;
 }
+
+.screen-toolbar{
+  height: 20px;
+  width: 100%;
+  background: rgba(235, 166, 193, 1);
+  line-height: 18px;
+}
+
+.right-toolbar-items{
+  float: right;
+}
+
+.left-toolbar-items{
+  margin-left: 5px;
+}
+
+.battery-icon{
+  height: 14px;
+  width: 19px;
+  fill: white;
+}

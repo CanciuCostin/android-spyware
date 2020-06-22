@@ -45,8 +45,8 @@
     <int name="gdrive_activity_msgstore_init_key" value="1" />
     <boolean name="signal_protocol_store_is_new" value="false" />
     <long name="spam_banned_expiry_timestamp" value="0" />
-    <long name="last_daily_cron" value="1592576016842" />
-    <long name="last_heartbeat_login" value="1592495003063" />
+    <long name="last_daily_cron" value="1592816300846" />
+    <long name="last_heartbeat_login" value="1592815397358" />
     <long name="sticker_store_last_fetch_time" value="1592574974688" />
     <long name="phoneid_timestamp" value="1591806425066" />
     <int name="registration_sms_code_length" value="6" />
@@ -74,13 +74,13 @@
     <int name="profile_photo_thumb_id" value="1575356981" />
     <long name="phoneid_last_sync_timestamp" value="1592576012724" />
     <boolean name="read_receipts_enabled" value="true" />
-    <long name="next_daily_cron_catchup" value="1592575873957" />
+    <long name="next_daily_cron_catchup" value="1592816296218" />
     <int name="current_data_action_string_version" value="4" />
     <boolean name="underage_account_banned" value="false" />
     <int name="gdrive_state" value="0" />
     <long name="dithered_last_signed_prekey_rotation" value="1592466810058" />
     <string name="registration_code">336681</string>
-    <long name="last_daily_event" value="1592576012551" />
+    <long name="last_daily_event" value="1592816299356" />
     <string name="com.whatsapp.registration.RegisterPhone.mistyped_state">6</string>
     <long name="client_version_upgrade_timestamp" value="1592574971751" />
     <string name="push_name">canciucostin15</string>

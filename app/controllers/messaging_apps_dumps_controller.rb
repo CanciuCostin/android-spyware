@@ -4,12 +4,10 @@ class MessagingAppsDumpsController < InheritedResources::Base
     begin
         require 'sqlite3'
         db = SQLite3::Database.open "app\\assets\\images\\files\\whatsapp\\msgstore.db"
-
         stm = db.prepare "SELECT _id,key_remote_jid,data,timestamp FROM messages;" 
         rs = stm.execute 
         File.open(filePath, 'w') do |file|
             rs.each do |row|
-                #puts row.join "\s"
                 file.write(row.join("---") + "\n")
             end
         end
@@ -19,7 +17,6 @@ class MessagingAppsDumpsController < InheritedResources::Base
     ensure
         stm.close if stm
         db.close if db
-
 end
 end
 
@@ -28,20 +25,14 @@ end
 def dump_whatsapp_data
     require 'minitar'
     #uninstall newest version
-    commandOutput=["Uninstall Success","Install Success","
-    WARNING: adb backup is deprecated and may be removed in a future release,Backup Success",
-    "Converted backup file to tar",
-    "Tar file extract Success",
-    "/sdcard/WhatsApp/Databases/msgstore.db.crypt12: 1 file pulled, 0 skipped. 1.3 MB/s (41921 bytes in 0.030s)",
-    "Pull db file Success",
-    "Decryption Success",
-    "Database Export Success"]
-    system("tools\\platform-tools\\adb.exe -s 192.168.100.33 shell pm uninstall -k com.whatsapp")
-
+    #system("tools\\platform-tools\\adb.exe -s 192.168.100.33 shell pm uninstall -k com.whatsapp")
+    run_adb_command('shell pm uninstall -k com.whatsapp')
     #install old version
-    system("tools\\platform-tools\\adb.exe -s 192.168.100.33 install payloads\\WhatsApp-v2.11.431-AndroidBucket.com.apk")
+    #system("tools\\platform-tools\\adb.exe -s 192.168.100.33 install payloads\\WhatsApp-v2.11.431-AndroidBucket.com.apk")
+    run_adb_command('install payloads\\WhatsApp-v2.11.431-AndroidBucket.com.apk')
     #backup whatsapp
-    system("tools\\platform-tools\\adb.exe -s 192.168.100.33 backup -apk com.whatsapp -f app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab")
+    #system("tools\\platform-tools\\adb.exe -s 192.168.100.33 backup -apk com.whatsapp -f app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab")
+    run_adb_command('backup -apk com.whatsapp -f app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab')
     #adb shell input keyevent 82
     #adb shell input tap 521 1130
     #convert ab backup file to tar
@@ -49,14 +40,14 @@ def dump_whatsapp_data
     #untar the tar file
     Minitar.unpack('app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab.tar', 'app\assets\images\files\whatsapp\whatsapp_backup')
     #pull the db file
-    system("tools\\platform-tools\\adb.exe -s 192.168.100.33 pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12 app\\assets\\images\\files\\whatsapp\\msgstore.db.crypt12") 
+    #system("tools\\platform-tools\\adb.exe -s 192.168.100.33 pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12 app\\assets\\images\\files\\whatsapp\\msgstore.db.crypt12") 
+    run_adb_command('pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12 app\\assets\\images\\files\\whatsapp\\msgstore.db.crypt12')
     #decrypt it using the key
     system("java -jar tools\\crypt12-decrypt\\master\\decrypt12.jar app\\assets\\images\\files\\whatsapp\\whatsapp_backup\\apps\\com.whatsapp\\f\\key app\\assets\\images\\files\\whatsapp\\msgstore.db.crypt12 app\\assets\\images\\files\\whatsapp\\msgstore.db")
     #export the database to a txt file
 
     downloadTimeout=params[:copy_timeout].to_i
     @smartphone = Smartphone.find(params[:smartphone_id])
-
     currentTime = DateTime.now
     currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
     @fileName= "whatsapp_dump_" + currentTimeFormat + '.txt'
@@ -73,8 +64,6 @@ def dump_whatsapp_data
         end 
     end
     commandOutput=["Operation Failed"] if not isOperationSuccessful
-
-
 
     respond_to do |format|
       format.js { render "dump_whatsapp_data", :locals => {:commandOutput => commandOutput, :fileName => @fileName }  }

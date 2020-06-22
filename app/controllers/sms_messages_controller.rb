@@ -1,16 +1,14 @@
 class SmsMessagesController < InheritedResources::Base
   def dump_messages
-
     commandTimeout=params[:exec_timeout].to_i
     downloadTimeout=params[:copy_timeout].to_i
+    fileName=params[:filename].to_s
     @smartphone = Smartphone.find(params[:smartphone_id])
-
     currentTime = DateTime.now
     currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-    @fileName= "sms_messages_dump_" + currentTimeFormat + '.txt'
+    @fileName= fileName.empty? ? "sms_messages_dump_" + currentTimeFormat + '.txt' : fileName + '.txt'
     processCommand="dump_sms -o #{@fileName}"
     commandOutput=start_msf_process(processCommand)
-
     1.upto(commandTimeout) do |n|
         if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
             break
@@ -21,7 +19,6 @@ class SmsMessagesController < InheritedResources::Base
       end
     copyMessagesCommand="docker cp kali_container:/#{@fileName} app\\assets\\images\\files\\sms_messages_dumps\\#{@fileName}"
     system(copyMessagesCommand)
-
     fullPath="app\\assets\\images\\files\\sms_messages_dumps\\" + @fileName
     isOperationSuccessful=false
     1.upto(downloadTimeout) do |n|
@@ -30,10 +27,12 @@ class SmsMessagesController < InheritedResources::Base
             newMessageDump.save!
             isOperationSuccessful = true
             break
+        else
+            puts "Waiting ..."
         end 
+        sleep 1
     end
     commandOutput=["Operation Failed"] if not isOperationSuccessful
-
     respond_to do |format|
         format.js { render "dump_messages", :locals => {:commandOutput => commandOutput, :fileName => @fileName}  }
       end
@@ -41,17 +40,14 @@ end
 
 
 def send_sms
-
   processCommand='send_sms -d 0729380759 -t "bla bla"'
   commandOutput=start_msf_process(processCommand)
-
   respond_to do |format|
       format.js { render "send_message", :locals => {:commandOutput => commandOutput}  }
     end
 end
 
   private
-
     def sms_message_params
       params.require(:sms_message).permit(:date, :filename, :smartphone_id)
     end

@@ -1,17 +1,15 @@
 class RecordingsController < InheritedResources::Base
 
   def microphone_rec
-    commandTimeout=20
-    downloadTimeout=20
+    commandTimeout=params[:exec_timeout].to_i
+    downloadTimeout=params[:copy_timeout].to_i
+    fileName=params[:filename].to_s
     @smartphone = Smartphone.find(params[:smartphone_id])
-
     currentTime = DateTime.now
     currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-    @fileName= "microphone_rec_" + currentTimeFormat + '.wav'
+    @fileName= fileName.empty? ? "microphone_rec_" + currentTimeFormat + '.wav' : fileName + '.txt'
     processCommand="record_mic -d 10 -f #{@fileName}"
-    sleep(5)
     commandOutput=start_msf_process(processCommand)
-    puts commandOutput
 
     1.upto(commandTimeout) do |n|
         if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
@@ -32,7 +30,8 @@ class RecordingsController < InheritedResources::Base
             newRec.save!
             isOperationSuccessful = true
             break
-        end 
+        end
+        sleep 1
     end
     commandOutput=["Operation Failed"] if not isOperationSuccessful
 

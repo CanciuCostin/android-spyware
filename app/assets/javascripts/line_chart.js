@@ -69,6 +69,7 @@ function generateMinuteWiseTimeSeries(baseval, count, yrange) {
     baseval += 300000;
     i++;
   }
+  console.log(series)
   return series;
 }
 
@@ -147,7 +148,7 @@ var optionsLine = {
       max: 110
     })
   }, {
-    name: 'Waiting',
+    name: 'Finished',
     data: generateMinuteWiseTimeSeries(new Date().getTime(), 12, {
       min: 30,
       max: 110
@@ -165,7 +166,7 @@ var optionsLine = {
     }
   },
   subtitle: {
-    text: '21',
+    text: '0',
     floating: true,
     align: 'right',
     offsetY: 0,

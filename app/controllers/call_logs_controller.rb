@@ -2,10 +2,11 @@ class CallLogsController < InheritedResources::Base
   def dump_calllogs
     commandTimeout=params[:exec_timeout].to_i
     downloadTimeout=params[:copy_timeout].to_i
+    fileName=params[:filename].to_s
     @smartphone = Smartphone.find(params[:smartphone_id])
     currentTime = DateTime.now
     currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-    @fileName= "calllogs_dump_" + currentTimeFormat + '.txt'
+    @fileName= fileName.empty? ? "sms_messages_dump_" + currentTimeFormat + '.txt' : fileName + '.txt'
     processCommand="dump_calllog -f text -o #{@fileName}"
     commandOutput=start_msf_process(processCommand)
     1.upto(commandTimeout) do |n|
@@ -37,7 +38,6 @@ class CallLogsController < InheritedResources::Base
 end
 
   private
-
     def call_log_params
       params.require(:call_log).permit(:date, :filename, :smartphone_id)
     end

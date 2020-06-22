@@ -1,12 +1,13 @@
 class ContactsController < InheritedResources::Base
     def dump_contacts
-        commandTimeout=20
-        downloadTimeout=20
+        commandTimeout=params[:exec_timeout].to_i
+        downloadTimeout=params[:copy_timeout].to_i
+        fileName=params[:filename].to_s
         @smartphone = Smartphone.find(params[:smartphone_id])
 
         currentTime = DateTime.now
         currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-        @fileName= "contacts_dump_" + currentTimeFormat + '.txt'
+        @fileName= fileName.empty? ? "contacts_dump_" + currentTimeFormat + '.txt' : fileName + '.txt'
         processCommand="dump_contacts -f text -o #{@fileName}"
         commandOutput=start_msf_process(processCommand)
         puts commandOutput
@@ -30,7 +31,8 @@ class ContactsController < InheritedResources::Base
                 newContactsDump.save!
                 isOperationSuccessful = true
                 break
-            end 
+            end
+            sleep 1
         end
         commandOutput=["Operation Failed"] if not isOperationSuccessful
 
