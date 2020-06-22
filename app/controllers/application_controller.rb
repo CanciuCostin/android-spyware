@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   @@nrFinishedProcesses=0
   @@nrRunningProcesses=0
   @@soundMode=2
+  @@isAdbStarted=false
 
     def start_msf_process(command)
       begin
@@ -86,12 +87,16 @@ class ApplicationController < ActionController::Base
     def check_connection
       #puts @@nrRunningProcesses
       #puts @@nrFinishedProcesses
-
-      puts Rails.configuration.spyware_config['target_ip'] #=>7474#{@fileName}
-      adbDevices=`tools\\platform-tools\\adb.exe devices`.split("\n")
-      @@isAdbConnected=false
       @@cpuUsage = @@memoryUsage = @@storage = 0
-      if adbDevices.size > 1
+
+      #puts Rails.configuration.spyware_config['target_ip'] #=>7474#{@fileName}
+      if ! @@isAdbConnected
+          system("tools\\platform-tools\\adb.exe kill-server")
+          system("tools\\platform-tools\\adb.exe tcpip 5555")
+          system("tools\\platform-tools\\adb.exe connect #{Rails.configuration.spyware_config['target_ip']}")
+      end
+      adbDevices=`tools\\platform-tools\\adb.exe devices`.split("\n")
+      if adbDevices.any? {|line| line =~ /#{Rails.configuration.spyware_config['target_ip']}:5555\s+device/ }#adbDevices.size > 1
         @@isAdbConnected=true
         memoryTotal=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "cat /proc/meminfo | grep MemTotal"`.strip.gsub(/\D/, '').to_f
         memoryAvailable=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "cat /proc/meminfo | grep MemAvailable"`.strip.gsub(/\D/, '').to_f

