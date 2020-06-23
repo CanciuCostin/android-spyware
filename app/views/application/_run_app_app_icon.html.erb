@@ -1,4 +1,8 @@
-<span tooltip="a" flow="left">
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
+
+              DESCRIPTION: Open an application on the device" flow="right">
 <%= link_to  '../smartphones/open_app?smartphone_id=' + smartphone.id.to_s,
 method: :post, :remote => true , :class => "adb_msf_link", :id => "open_app_link" do %>
   <%= image_tag "run_app.png", :alt => "Open App", :class => "smartphone-icon msf_proc" %>

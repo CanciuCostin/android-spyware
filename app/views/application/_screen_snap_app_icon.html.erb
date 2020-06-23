@@ -1,4 +1,8 @@
-<span tooltip="I'm up above it!" flow="right">
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB
+
+              DESCRIPTION: Dump a screenshot from the device" flow="right">
 <%= link_to '../screenshots/dump_screen_snap?smartphone_id=' + smartphone.id.to_s,
  method: :get, :remote => true , :class => "adb_link", :id => "dump_screen_snap_link" do %>
 <%= image_tag "screen_snap.png", :alt => "Screen Snap", :class => "smartphone-icon adb_proc" %>

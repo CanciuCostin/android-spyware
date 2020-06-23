@@ -1,4 +1,8 @@
-<span tooltip="I'm up above it!" flow="down">
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: MSF
+
+              DESCRIPTION: Dump geo location coordinates and save them (persistent)" flow="down">
     <%= link_to '../geo_locations/dump_location?smartphone_id=' + smartphone.id.to_s,
     method: :get, :remote => true , :class => "msf_link", :id => "dump_location_link" do %>
         <%= image_tag "dump_location.png", :alt => "Dump Location", :class => "smartphone-icon msf_proc" %>

@@ -1,7 +1,7 @@
 <%= stylesheet_link_tag 'input_box', media: 'all', 'data-turbolinks-track': 'reload' %>
   <div class="input_box_container">
   <form>
-  <span tooltip="a" flow="left">
+  <span tooltip="<%=tooltip_message%>" flow="left">
     <div class="input_box_group">
     <%= text_field :resource , input_id  , :class=>'input_box', :id => input_id, " required" => ''%>      
       <span class="input_box_highlight"></span>

@@ -4,7 +4,7 @@
 <%= stylesheet_link_tag 'dropdown', media: 'all', 'data-turbolinks-track': 'reload' %>
 <div class="dropdown_input_container">
   <!-- Btn-->
-<span tooltip="a" flow="right">
+<span tooltip="<%=tooltip_message%>" flow="right">
 
   <button class="dropdown_input_btn" id=<%= dropdown_id %>><span id="dropdown_title">Sound Mode</span><i class="material-icons">volume_up</i>
     <ul class="dropdown_input">

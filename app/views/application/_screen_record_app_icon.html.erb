@@ -1,4 +1,8 @@
-<span tooltip="I'm up above it!" flow="up">
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB
+
+              DESCRIPTION: Record the device screen and save as .mp4 file (persistent)" flow="up">
 <%= link_to '../screenshots/screen_record?smartphone_id=' + smartphone.id.to_s,
  method: :post, :remote => true , :class => "adb_link", :id => "screen_record_link" do %>
 <%= image_tag "screen_record.png", :alt => "Screen Record", :class => "smartphone-icon adb_proc" %>

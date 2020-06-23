@@ -127,13 +127,24 @@
 </div>
 <span class="arrow_container_right">
     <span class="demos">
-        <span class="demo">
-            <span class="msf_status server-status" type="down"></span>
-            <span class="service_status service_status_msf">MSF</span>
+        <span tooltip="A green MSF box means the malware is installed and running on the device.
+
+        A red box means the malware is not running on the device. Make sure you have installed the APK and is opened." flow="up">
+            <span class="demo">
+                <span class="msf_status server-status" type="down"></span>
+                <span class="service_status service_status_msf">MSF</span>
+            </span>
         </span>
-        <span class="demo">
-            <span class="adb_status server-status" type="down"></span>
-            <span class="service_status service_status_adb">ADB</span>
+        <span tooltip="A green ADB box means the device target specified in the configuration (either USB or IP) is connected through ADB.
+
+        A red box means the device is not connected through ADB. Make sure:
+        - the correct IP (if USB is not selected) is specified in the configuration.
+        - USB debugging is enabled on the device
+        - try to unplug the usb and restart" flow="down">
+            <span class="demo">
+                <span class="adb_status server-status" type="down"></span>
+                <span class="service_status service_status_adb">ADB</span>
+            </span>
         </span>
     </span>
 

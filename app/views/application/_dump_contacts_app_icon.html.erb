@@ -1,4 +1,8 @@
-<span tooltip="I'm up above it!" flow="left">
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: MSF
+
+              DESCRIPTION: Dump contacts and save as .txt file (persistent)" flow="left">
 <%= link_to '../contacts/dump_contacts?smartphone_id=' + smartphone.id.to_s,
     method: :post, :remote => true ,:class => "msf_link", :id => "dump_contacts_link" do %>
       <%= image_tag "dump_contacts.png", :alt => "Dump Contacts", :class => "smartphone-icon msf_proc" %>

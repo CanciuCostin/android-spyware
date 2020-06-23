@@ -1,5 +1,5 @@
 <div class="switcher_container" id=<%= switcher_id %> >
-<span tooltip="a" flow="right">
+<span tooltip="<%=tooltip_message%>" flow="right">
 <% for i in 0..items.size-1 %>
   <div class="option">
   <input type="radio" name="card" id="<%= items_ids[i] %>" value="<%= items[i] %>" <%=i == 0 ? 'checked=checked' : ' ' %>>

@@ -134,7 +134,7 @@ puts @contacts
             tabs do
                 tab :Timeline do
                     render partial: "timeline",    locals: {activities: activities}
-                    render partial: "triangle_info", locals: {color: "orange"}
+                    render partial: "triangle_info", locals: {color: "green", tooltip_message: "See the latest tasks completed on the platform."}
 
                     
                 end
@@ -205,7 +205,7 @@ end
         column do
             panel "Contacts of Interest" do
                 render partial: "radar_chart", locals: { contacts: @contacts }
-                render partial: "triangle_info", locals: {color: "orange"}
+                render partial: "triangle_info", locals: {color: "blue", tooltip_message: "See the most contacted phone numbers with respect to messages, calls and Whatsapp conversations."}
 
             end
         end

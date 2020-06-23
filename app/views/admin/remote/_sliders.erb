@@ -1,6 +1,6 @@
 <%= stylesheet_link_tag 'remote', media: 'all', 'data-turbolinks-track': 'reload' %>
 <div class="custom-rangeslider">
-<div id="slider_label"><span tooltip="a" flow="down"><%= label %></span></div>
+<div id="slider_label"><span tooltip="<%=tooltip_message%>" flow="down"><%= label %></span></div>
   <span id="slider_content">
   <input class="custom-rangeInput" title="Percentage" id=<%= slider_id %> type="range" min="0" max="100" value="50" step="1" data-tooltip="true" aria-controls="rangeTooltip rangeLabel" aria-live="polite">
   <span class="custom-rangeslider__tooltip">0</span>

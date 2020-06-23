@@ -1,4 +1,8 @@
-<span tooltip="a" flow="right">
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
+
+              DESCRIPTION: Dump system information" flow="right">
     <%= link_to '../smartphones/dump_sysinfo?smartphone_id=' + smartphone.id.to_s,
     method: :post, :remote => true , :class => "msf_link", :id => "dump_sysinfo_link" do %>
         <%= image_tag "system_info.png", :alt => "System Info", :class => "smartphone-icon msf_proc" %>

@@ -1,4 +1,8 @@
-<span tooltip="I'm up above it!" flow="up">
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
+
+              DESCRIPTION: Run a shell command on the device" flow="up">
 <%= link_to '../smartphones/run_shell_command?smartphone_id=' + smartphone.id.to_s,
 method: :post, :remote => true , :class => "adb_msf_link", :id => "shell_command_link" do %>
   <%= image_tag "shell_command.png", :alt => "Shell Command", :class => "smartphone-icon adb_msf_proc" %>

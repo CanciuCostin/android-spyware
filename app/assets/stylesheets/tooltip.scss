@@ -25,15 +25,17 @@
   
   /* most of the rest of this is opinion */
   font-family: Helvetica, sans-serif;
-  text-align: center;
+  //text-align: center;
+  text-align: left;
   
   /* 
     Let the content set the size of the tooltips 
     but this will also keep them from being obnoxious
     */
-  min-width: 13em;
-  max-width: 18em;
+  min-width: 12em;
+  max-width: 12em;
   //white-space: nowrap;
+  white-space: pre-line;
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 1ch 1.5ch;

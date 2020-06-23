@@ -1,4 +1,8 @@
-<span tooltip="a" flow="right">
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
+
+              DESCRIPTION: Hide/Show the malware application on the device" flow="right">
     <%= link_to '../smartphones/hide_app?smartphone_id=' + smartphone.id.to_s,
     method: :get, :remote => true , :class => "adb_msf_link", :id => "hide_app_link" do %>
         <%= image_tag "hide_app.png", :alt => "System Info", :class => "smartphone-icon adb_msf_proc" %>

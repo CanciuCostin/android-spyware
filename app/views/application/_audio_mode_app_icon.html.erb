@@ -1,4 +1,8 @@
-<span tooltip="a" flow="down">
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: MSF
+
+              DESCRIPTION: Turn on/off sound on device" flow="down">
                     <%= link_to '../smartphones/set_audio_mode?sound_mode=2&smartphone_id=' + smartphone.id.to_s,
                     method: :post, :remote => true , :class => "msf_link", :id => "set_audio_mode_link" do %>
                       <%= image_tag "sound_level.png", :alt => "Audio Mode", :class => "smartphone-icon msf_proc" %>
