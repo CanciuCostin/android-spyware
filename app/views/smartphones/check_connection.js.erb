@@ -1,16 +1,23 @@
 
-console.log("<%= adbConnected %>")
 var adbConnected = <%=raw adbConnected %>;
 var nrFinishedProcesses = <%=raw nrFinishedProcesses %>;
 var nrRunningProcesses = <%=raw nrRunningProcesses %>;
 var cpuUsage = <%=raw cpuUsage %>;
 var memoryUsage = <%=raw memoryUsage %>;
 var storage = <%=raw storage %>;
-console.log(adbConnected)
-console.log("<%= msfConnected %>")
 var msfConnected = <%=raw msfConnected %>;
-console.log(msfConnected)
+var ipAddress = "<%=raw ipAddress %>"
+var operatingSystem = "<%=raw operatingSystem %>"
+var isRooted = "<%=raw isRooted %>"
+var batteryLevel = "<%=raw batteryLevel %>"
+var localHour = "<%=raw localHour %>"
 
+
+$("#ip_address").text(ipAddress)
+$("#operating_system").text(operatingSystem)
+$("#is_rooted").text(isRooted)
+$("#battery_level").text(batteryLevel)
+$("#local_hour").text(localHour)
 $("#gaugeCPU").attr("percent", cpuUsage);
 $("#gaugeCPU text.value tspan").text(cpuUsage + "%");
 $("#gaugeMemory").attr("percent", memoryUsage);

