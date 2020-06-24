@@ -1,5 +1,6 @@
 class ScreenshotsController < InheritedResources::Base
 
+
   def dump_screen_snap
     downloadTimeout=params[:copy_timeout].to_i
     @smartphone = Smartphone.find(params[:smartphone_id])

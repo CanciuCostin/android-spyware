@@ -1,0 +1,6 @@
+var commandOutput = <%=raw commandOutput%>;
+$( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
+
+if (commandOutput[0] != "Operation Failed"){
+    window.open("/assets/files/whatsapp/<%= fileName %>")
+}

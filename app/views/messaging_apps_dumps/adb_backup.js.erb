@@ -1,0 +1,9 @@
+var smartphone_id = <%=raw smartphone_id%>;
+var copy_timeout = <%=raw copy_timeout%>;
+$( ".Terminal__body" ).trigger("write",[" > ", "Extracting .ab backup file to .tar file . . .", ["java -jar abe.jar unpack whatsapp_backup.ab whatsapp_backup.ab.tar"] ]);
+
+jQuery.ajax({
+    url: "/messaging_apps_dumps/extract_backup?smartphone_id=" + smartphone_id + "&copy_timeout=" + copy_timeout,
+    type: "GET",
+    dataType: "script"
+});

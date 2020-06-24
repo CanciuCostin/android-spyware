@@ -1,0 +1,9 @@
+var smartphone_id = <%=raw smartphone_id%>;
+var copy_timeout = <%=raw copy_timeout%>;
+$( ".Terminal__body" ).trigger("write",[" > ", "Exporting database . . .", ["SELECT * FROM chat;"] ]);
+
+jQuery.ajax({
+    url: "/messaging_apps_dumps/export_whatsapp_database?smartphone_id=" + smartphone_id + "&copy_timeout=" + copy_timeout,
+    type: "POST",
+    dataType: "script"
+});

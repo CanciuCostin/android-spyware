@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  @@adbTarget=nil
   @@isAdbConnected=false
   @@isMsfConnected=false
   @@cpuUsage=0
@@ -13,6 +14,7 @@ class ApplicationController < ActionController::Base
   @@isRooted="Unknown"
   @@batteryLevel="Unknown"
   @@localHour="Unknown"
+
 
 
     def start_msf_process(command)
@@ -55,9 +57,12 @@ class ApplicationController < ActionController::Base
 
     def run_adb_command(command)
       @@nrRunningProcesses+=1
-      commandOutput=`tools\\platform-tools\\adb.exe -s #{Rails.configuration.spyware_config['target_ip']} #{command}`
+      puts command
+      puts @@adbTarget
+      commandOutput=`tools\\platform-tools\\adb.exe -s #{@@adbTarget} #{command}`
       @@nrFinishedProcesses+=1
       @@nrRunningProcesses-=1
+      puts commandOutput
       return commandOutput
     end
 
@@ -91,26 +96,34 @@ class ApplicationController < ActionController::Base
 
 
     def check_connection
+      @@adbTarget = Rails.configuration.spyware_config['target_ip']
       #puts @@nrRunningProcesses
       #puts @@nrFinishedProcesses
       @@cpuUsage = @@memoryUsage = @@storage = 0
 
       #puts Rails.configuration.spyware_config['target_ip'] #=>7474#{@fileName}
       if ! @@isAdbConnected
-          system("tools\\platform-tools\\adb.exe kill-server")
-          system("tools\\platform-tools\\adb.exe tcpip 5555")
-          system("tools\\platform-tools\\adb.exe connect #{Rails.configuration.spyware_config['target_ip']}")
+          if @@adbTarget != 'usb'
+              system("tools\\platform-tools\\adb.exe kill-server")
+              system("tools\\platform-tools\\adb.exe tcpip 5555")
+              system("tools\\platform-tools\\adb.exe connect #{@@adbTarget}")
+          else
+              system("tools\\platform-tools\\adb.exe kill-server")
+              system("tools\\platform-tools\\adb.exe start-server")
+          end
       end
       adbDevices=`tools\\platform-tools\\adb.exe devices`.split("\n")
-      if adbDevices.any? {|line| line =~ /#{Rails.configuration.spyware_config['target_ip']}:5555\s+device/ }#adbDevices.size > 1
+      
+      if (@@adbTarget == 'usb' and adbDevices.size > 1 and adbDevices.any? { |line| line.strip.end_with? "device" }) or adbDevices.any? {|line| line =~ /#{@@adbTarget}:5555\s+device/ }
+        @@adbTarget=adbDevices.find { |line| line.strip.end_with? "device" }.split[0] if @@adbTarget == 'usb'
         @@isAdbConnected=true
-        @@ipAddress=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "ip addr show wlan0 | grep inet | grep -v inet6"`.split[1].gsub(/\/\d*/,'')
-        @@operatingSystem='Android ' + `tools\\platform-tools\\adb.exe -s 192.168.100.33 shell getprop ro.build.version.release`.strip
+        @@ipAddress=`tools\\platform-tools\\adb.exe -s #{@@adbTarget} shell "ip addr show wlan0 | grep inet | grep -v inet6"`.split[1].gsub(/\/\d*/,'')
+        @@operatingSystem='Android ' + `tools\\platform-tools\\adb.exe -s #{@@adbTarget} shell getprop ro.build.version.release`.strip
         @@isRooted="Rooted: No"
-        @@localHour=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell date +%R`.strip
-        @@batteryLevel=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "dumpsys battery | grep level"`.split(':')[1].strip + '%'
-        memoryTotal=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "cat /proc/meminfo | grep MemTotal"`.strip.gsub(/\D/, '').to_f
-        memoryAvailable=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "cat /proc/meminfo | grep MemAvailable"`.strip.gsub(/\D/, '').to_f
+        @@localHour=`tools\\platform-tools\\adb.exe -s #{@@adbTarget} shell date +%R`.strip
+        @@batteryLevel=`tools\\platform-tools\\adb.exe -s #{@@adbTarget} shell "dumpsys battery | grep level"`.split(':')[1].strip + '%'
+        memoryTotal=`tools\\platform-tools\\adb.exe -s #{@@adbTarget} shell "cat /proc/meminfo | grep MemTotal"`.strip.gsub(/\D/, '').to_f
+        memoryAvailable=`tools\\platform-tools\\adb.exe -s #{@@adbTarget} shell "cat /proc/meminfo | grep MemAvailable"`.strip.gsub(/\D/, '').to_f
 
         #puts(memoryTotal)
         #puts(memoryAvailable)
@@ -124,8 +137,8 @@ class ApplicationController < ActionController::Base
         @@cpuUsage=2#userCPU + systemCPU
         #puts @@cpuUsage
 
-        totalMemory=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "df /storage/emulated | tail -n +2"`.strip.split[1].gsub(/[^\d\.]/, '').to_f
-        usedMemory=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell "df /storage/emulated | tail -n +2"`.strip.split[2].gsub(/[^\d\.]/, '').to_f
+        totalMemory=`tools\\platform-tools\\adb.exe -s #{@@adbTarget} shell "df /storage/emulated | tail -n +2"`.strip.split[1].gsub(/[^\d\.]/, '').to_f
+        usedMemory=`tools\\platform-tools\\adb.exe -s #{@@adbTarget} shell "df /storage/emulated | tail -n +2"`.strip.split[2].gsub(/[^\d\.]/, '').to_f
         @@storage=(usedMemory / totalMemory * 100).to_i
       end
 

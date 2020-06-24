@@ -1,0 +1,9 @@
+var smartphone_id = <%=raw smartphone_id%>;
+var copy_timeout = <%=raw copy_timeout%>;
+$( ".Terminal__body" ).trigger("write",[" > ", "Pulling Whatsapp database file . . .", ["adb pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12"] ]);
+
+jQuery.ajax({
+    url: "/messaging_apps_dumps/pull_whatsapp_db?smartphone_id=" + smartphone_id + "&copy_timeout=" + copy_timeout,
+    type: "GET",
+    dataType: "script"
+});

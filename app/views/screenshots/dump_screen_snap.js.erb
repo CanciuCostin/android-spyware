@@ -4,3 +4,9 @@ $( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
 if (commandOutput != "Operation Failed"){
     window.open("/assets/files/screen_snaps/<%= fileName %>")
 }
+
+jQuery.ajax({
+                    url: "/screenshots/redirect1",
+                    type: "POST",
+                    dataType: "script"
+                });

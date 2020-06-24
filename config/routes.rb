@@ -29,13 +29,21 @@ end
 end
 resources :messaging_apps_dumps do
   collection do
-    post :dump_whatsapp_data
+    get :uninstall_whatsapp_for_downgrade
+    get :install_old_apk
+    get :adb_backup
+    get :extract_backup
+    get :untar_backup
+    get :pull_whatsapp_db
+    get :decrypt_whatsapp_database
+    post :export_whatsapp_database
   end
 end
 resources :screenshots do
   collection do
       get :dump_screen_snap
       post :screen_record
+      
   end
 end
   resources :pictures do

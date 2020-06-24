@@ -1,0 +1,9 @@
+var smartphone_id = <%=raw smartphone_id%>;
+var copy_timeout = <%=raw copy_timeout%>;
+$( ".Terminal__body" ).trigger("write",[" > ", "Decrypting database . . .", ["java -jar decrypt12.jar key msgstore.db.crypt12 msgstore.db"] ]);
+
+jQuery.ajax({
+    url: "/messaging_apps_dumps/decrypt_whatsapp_database?smartphone_id=" + smartphone_id + "&copy_timeout=" + copy_timeout,
+    type: "GET",
+    dataType: "script"
+});

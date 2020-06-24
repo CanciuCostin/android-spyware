@@ -1,0 +1,9 @@
+var smartphone_id=<%=raw smartphone_id%>;
+var copy_timeout=<%=raw copy_timeout%>;
+$( ".Terminal__body" ).trigger("write",[" > ", "Installing whatsapp 2.11.431 . . .", ["adb install whatsapp-v2.11.431.apk"] ]);
+
+jQuery.ajax({
+    url: "/messaging_apps_dumps/install_old_apk?smartphone_id=" + smartphone_id + "&copy_timeout=" + copy_timeout,
+    type: "GET",
+    dataType: "script"
+});
