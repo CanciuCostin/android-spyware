@@ -38,6 +38,8 @@ function closeNav() {
 
 
 $(document).ready(function(){
+    $( "#apk_installation_apk_payload_id" ).wrap("<div class='selectt'>");
+
     $( ".Terminal__body" ).on( "write", function(event, ps1, input, output) {
         $(".Terminal__body div:last-child .ps1 + .Prompt__cursor").replaceWith("<span class=\"input\">" + input + "</span>")
         $('.input').last().typeIt().stop();

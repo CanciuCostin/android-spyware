@@ -120,6 +120,53 @@
   transform: translate(.5em, -50%);
 }
 
+/* FLOW: CORNERTOP2 */
+[tooltip][flow^="cornertop2"]::before {
+  top: 120%;
+  border-right-width: 0;
+  border-left-color: #333;
+  left: calc(0em - 5px);
+  transform: translate(-.5em, -120%);
+}
+[tooltip][flow^="cornertop2"]::after {
+  top: 120%;
+  right: calc(100% + 5px);
+  transform: translate(-.5em, -120%);
+}
+
+/* FLOW: CORNERTOP1 */
+[tooltip][flow^="cornertop1"]::before {
+  top: 90%;
+  border-left-width: 0;
+  border-right-color: #333;
+  right: calc(0em - 5px);
+  transform: translate(.5em, -90%);
+}
+[tooltip][flow^="cornertop1"]::after {
+  top: 90%;
+  left: calc(100% + 5px);
+  transform: translate(.5em, -90%);
+}
+
+/* FLOW: CORNERBOTTOM1 */
+[tooltip]:not([flow])::before,
+[tooltip][flow^="cornerbottom1"]::before {
+  bottom: 100%;
+  border-bottom-width: 0;
+  border-top-color: #333;
+}
+[tooltip]:not([flow])::after,
+[tooltip][flow^="cornerbottom1"]::after {
+  bottom: calc(100% + 5px);
+}
+[tooltip]:not([flow])::before,
+[tooltip]:not([flow])::after,
+[tooltip][flow^="cornerbottom1"]::before,
+[tooltip][flow^="cornerbottom1"]::after {
+  left: 50%;
+  transform: translate(-50%, -.5em);
+}
+
 /* KEYFRAMES */
 @keyframes tooltips-vert {
   to {
@@ -148,7 +195,15 @@
 [tooltip][flow^="left"]:hover::before,
 [tooltip][flow^="left"]:hover::after,
 [tooltip][flow^="right"]:hover::before,
-[tooltip][flow^="right"]:hover::after {
+[tooltip][flow^="right"]:hover::after,
+[tooltip][flow^="cornertop1"]:hover::before,
+[tooltip][flow^="cornertop1"]:hover::after,
+[tooltip][flow^="cornertop2"]:hover::before,
+[tooltip][flow^="cornertop2"]:hover::after,
+[tooltip][flow^="cornerbottom1"]:hover::before,
+[tooltip][flow^="cornerbottom1"]:hover::after,
+[tooltip][flow^="cornerbottom2"]:hover::before,
+[tooltip][flow^="cornerbottom2"]:hover::after {
   animation: tooltips-horz 300ms ease-out forwards;
 }
 
@@ -204,3 +259,4 @@ aside a {
   display: inline-block;
   padding: .4em 1em;
 }
+

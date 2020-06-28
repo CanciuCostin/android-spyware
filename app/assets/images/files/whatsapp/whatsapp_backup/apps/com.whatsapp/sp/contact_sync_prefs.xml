@@ -1,23 +1,2 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
-<map>
-    <long name="sidelist_sync_backoff" value="-1" />
-    <long name="sidelist_full_sync_wait" value="528027000" />
-    <long name="picture_sync_backoff" value="-1" />
-    <long name="devices_sync_backoff" value="-1" />
-    <long name="contact_full_sync_wait" value="485656000" />
-    <int name="contact_version" value="1" />
-    <long name="payment_sync_backoff" value="-1" />
-    <long name="last_contact_full_sync" value="1592575057935" />
-    <long name="last_sidelist_full_sync" value="1592575057935" />
-    <long name="business_full_sync_wait" value="326014000" />
-    <long name="last_business_full_sync" value="1592575057935" />
-    <long name="last_status_full_sync" value="1592575057935" />
-    <long name="status_full_sync_wait" value="547917000" />
-    <long name="last_devices_full_sync" value="1592575057936" />
-    <long name="status_sync_backoff" value="-1" />
-    <long name="business_sync_backoff" value="-1" />
-    <long name="contact_sync_backoff" value="-1" />
-    <set name="queued_running_sync_set">
-        <string>{&quot;sync_type_code&quot;:4,&quot;sync_is_urgent&quot;:false,&quot;sync_only_if_changed&quot;:true,&quot;sync_only_if_registered&quot;:true,&quot;sync_clear_whatsapp_sync_data&quot;:false,&quot;sync_should_retry&quot;:true,&quot;sync_retry_count&quot;:0,&quot;sync_contact&quot;:true,&quot;sync_sidelist&quot;:true,&quot;sync_status&quot;:true,&quot;sync_picture&quot;:false}</string>
-    </set>
-</map>
+<map />

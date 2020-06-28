@@ -4,6 +4,17 @@
 # the maximum value specified for Puma. Default is set to 5 threads for minimum
 # and maximum; this matches the default thread size of Active Record.
 #
+path_to_key="C:/Users/Costin/Desktop/Workspaces/android-spyware/server.key"
+path_to_cert="C:/Users/Costin/Desktop/Workspaces/android-spyware/server.crt"
+if ENV.fetch("RAILS_ENV") == 'development'
+  ssl_bind '127.0.0.1', '3000', {
+    key: path_to_key,
+    cert: path_to_cert,
+    verify_mode: 'none'
+  }
+end
+
+
 max_threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
 min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
 threads min_threads_count, max_threads_count
@@ -15,7 +26,11 @@ port        ENV.fetch("PORT") { 3000 }
 # Specifies the `environment` that Puma will run in.
 #
 environment ENV.fetch("RAILS_ENV") { "development" }
-
+#ssl_bind '127.0.0.1', '3000', { key: path_to_key, cert: path_to_cert, :verify_mode => :none}
+#ssl_bind '127.0.0.1', '443', {
+#   cert: path_to_cert,
+#   key: path_to_key
+#}
 # Specifies the `pidfile` that Puma will use.
 pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 

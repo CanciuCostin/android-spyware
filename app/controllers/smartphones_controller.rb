@@ -61,16 +61,21 @@ end
 
 
 def dump_wifi_info
-  if @@isAdbConnected
-      commandOutput=run_adb_command('shell "dumpsys wifi | grep SSID: | grep -v rt="')
-  else
-      start_msf_process("shell")
-      processCommand='dumpsys wifi | grep SSID: | grep -v rt='
-      commandOutput=start_msf_process(processCommand)
-      detach_session
-  end
-      respond_to do |format|
-      format.js { render "dump_wifi_info", :locals => {:commandOutput => commandOutput.split('\n')}  }
+    begin
+        if @@isAdbConnected
+            commandOutput=run_adb_command('shell "dumpsys wifi | grep SSID: | grep -v rt="')
+        else
+            start_msf_process("shell")
+            processCommand='dumpsys wifi | grep SSID: | grep -v rt='
+            commandOutput=start_msf_process(processCommand)
+            detach_session
+        end
+    rescue
+        commandOutput="Operation Failed"
+        puts "Error dumping wi-fi info."
+    end
+    respond_to do |format|
+        format.js { render "dump_wifi_info", :locals => {:commandOutput => commandOutput.split('\n')}  }
     end
 end
 
@@ -91,15 +96,24 @@ end
 
 
 def uninstall_app
-  if @@isAdbConnected
-    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 uninstall #{params[:app]}`
-  else
-    processCommand="app_uninstall #{params[:app]}"
-    commandOutput=start_msf_process(processCommand)
-end
-respond_to do |format|
-    format.js { render "uninstall_app", :locals => {:commandOutput => commandOutput}  }
-  end
+    begin
+        appName=params[:app]
+        if ! appName.empty?
+            if @@isAdbConnected
+              commandOutput=run_adb_command("uninstall #{appName}")
+            else
+              processCommand="app_uninstall #{params[:app]}"
+              commandOutput=start_msf_process(processCommand)
+            end
+        end
+        commandOutput=["Installation done."]
+    rescue
+        commandOutput=["Operation Failed"]
+        puts "Error uninstalling app."
+    end
+    respond_to do |format|
+        format.js { render "uninstall_app", :locals => {:commandOutput => commandOutput}  }
+    end
 end
 
 
@@ -107,14 +121,20 @@ end
 
 
 def list_apps
-  if @@isAdbConnected
-    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell pm list packages`.split("\n")
-else
-    processCommand="app_list -#{params[:apps_type]}"
-    commandOutput=start_msf_process(processCommand)
-end
-  respond_to do |format|
-      format.js { render "list_apps", :locals => {:commandOutput => commandOutput}  }
+    begin
+        apps_type=params[:system_apps] == 'true' ? '-s' : '-u'
+        if @@isAdbConnected
+            commandOutput=run_adb_command('shell "pm list packages"').split("\n")
+        else
+            processCommand="app_list #{apps_type}"
+            commandOutput=start_msf_process(processCommand)
+        end
+    rescue
+        commandOutput=["Operation Failed"]
+        puts "Error listing apps." 
+    end
+    respond_to do |format|
+        format.js { render "list_apps", :locals => {:commandOutput => commandOutput}  }
     end
 end
 

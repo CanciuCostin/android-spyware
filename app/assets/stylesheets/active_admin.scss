@@ -729,7 +729,7 @@ html form fieldset.inputs{
     background: #27293d;
 }
 
-body.admin_apk_payloads form input[type="text"], html form input[type="password"], html form input[type="email"], html form input[type="number"], html form input[type="url"], html form input[type="tel"], html form textarea{
+body.new form input[type="text"], html body.new form input[type="password"], html body.new form input[type="email"], html body.new form input[type="number"], html body.new form input[type="url"], html body.new form input[type="tel"], html form textarea{
     background: #343A43 !important;
     font-size:18px !important ;
     //padding:10px 10px 10px 5px !important ;
@@ -739,6 +739,10 @@ body.admin_apk_payloads form input[type="text"], html form input[type="password"
     border-bottom:1px solid  	#E14ECA !important ;
     box-sizing: initial;
     height: 15px !important;
+}
+body.active_admin.logged_out.new form input[type="email"], html body.active_admin.logged_out.new form input[type="password"]{
+    height: 100% !important;
+    width: 100% !important;
 }
 
 //view page
@@ -778,3 +782,81 @@ vertical-align: middle !important;
 .header#header .header-item.tabs#tabs li a{
     line-height: 33px;
 }
+
+
+html form fieldset.inputs{
+    top: 20px;
+    border-radius: 30px;
+    border: .0625rem solid #e3e3e3;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+    background: transparent;
+}
+
+html form fieldset.inputs input{
+    color: white;
+}
+
+body.new.admin_apk_payloads,body.new.admin_apk_installations,body.new.admin_admin_users{
+    overflow: hidden;
+}
+
+body.admin_apk_payloads,body.admin_apk_installations,body.admin_admin_users,body.admin_call_logs,body.admin_comments,body.admin_contacts,body.admin_geo_locations,body.admin_messaging_apps_dumps,body.admin_pictures,body.admin_recordings,body.admin_screenshots,body.admin_sms_messages{
+    overflow-x: hidden;
+}
+
+
+//select
+
+/* Reset Select */
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    appearance: none;
+    outline: 0;
+    box-shadow: none;
+    border: 0 !important;
+    background: #343A43;
+    background-image: none;
+  }
+  /* Remove IE arrow */
+  select::-ms-expand {
+    display: none;
+  }
+  /* Custom Select */
+  .selectt {
+    position: relative;
+    display: flex;
+    width: 14.4em;
+    height: 3em;
+    line-height: 3;
+    //background: #2c3e50;
+    overflow: hidden;
+    border-radius: .25em;
+  }
+  select {
+    flex: 1;
+    padding: 0 .5em;
+    color: #fff;
+    cursor: pointer;
+  }
+  /* Arrow */
+  .selectt::after {
+    content: '\25BC';
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0 1em;
+    background: #39414D;
+    cursor: pointer;
+    pointer-events: none;
+    -webkit-transition: .25s all ease;
+    -o-transition: .25s all ease;
+    transition: .25s all ease;
+  }
+  /* Transition */
+  .selectt:hover::after {
+    color: #f39c12;
+  }
+  

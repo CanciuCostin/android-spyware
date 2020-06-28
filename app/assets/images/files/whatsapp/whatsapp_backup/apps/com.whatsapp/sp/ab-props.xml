@@ -1,19 +1,5 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <boolean name="ab_props:watls_enabled" value="true" />
-    <string name="ab_props:status_ads_params_json_validated">{&quot;min_media&quot;: 10, &quot;min_total&quot;: 10, &quot;view_slot&quot;: 10, &quot;time_gap&quot;: 10}</string>
-    <string name="ab_props:status_ads_params_json">{&quot;min_media&quot;: 10, &quot;min_total&quot;: 10, &quot;view_slot&quot;: 10, &quot;time_gap&quot;: 10}</string>
-    <int name="ab_props:sys:fetch_attemp_count" value="0" />
-    <boolean name="ab_props:watls_prefer_ip6" value="true" />
-    <long name="ab_props:sys:refresh" value="86400000" />
-    <boolean name="ab_props:watls_no_dns" value="true" />
-    <set name="ab_props:sys:last_exposure_keys" />
-    <int name="ab_props:sys:last_error_code" value="0" />
-    <boolean name="ab_props:disable_prewarm" value="true" />
-    <long name="ab_props:sys:last_refresh_time" value="1592575036527" />
-    <string name="ab_props:sys:config_key">yU,9z</string>
-    <boolean name="ab_props:stream_progressive_jpeg_enabled" value="true" />
-    <boolean name="ab_props:watls_early_data" value="true" />
     <set name="ab_props:sys:last_config_names">
         <string>smb_banner_max_dismiss_count</string>
         <string>status_image_max_edge_test</string>
@@ -23,12 +9,15 @@
         <string>status_image_compression_quality_test</string>
         <string>new_wam_runtime_beaconing</string>
         <string>smb_banner_display_days_consec</string>
+        <string>async_init_after_thread_idle</string>
         <string>stream_progressive_jpeg_enabled</string>
         <string>status_aggressive_prefetch_seconds</string>
+        <string>wamsys_encryption_individual_enabled</string>
         <string>photo_download_realtime_bandwidth_enabled</string>
         <string>reusable_video_player_enabled</string>
         <string>connect_with_friends_dialog_enabled</string>
         <string>wamsys_registration_v3_enabled</string>
+        <string>android_test_scheduler_period_hours</string>
         <string>mms_media_conn_persist_enabled</string>
         <string>smb_banner_max_display_days</string>
         <string>image_max_kb_for_skipping_compression</string>
@@ -46,9 +35,11 @@
         <string>offline_aa_test_config_v2</string>
         <string>mms_tcp_congestion_bbr</string>
         <string>receiver_higher_quality_bandwidth_threshold</string>
+        <string>wamsys_decryption_group_enabled</string>
         <string>auto_expo_status_tab_open</string>
         <string>consumer_reg_profile_design</string>
         <string>camera_core_integration_enabled</string>
+        <string>wamsys_encryption_group_enabled</string>
         <string>status_fast_streaming_enable_test</string>
         <string>watls_enabled</string>
         <string>roundtable</string>
@@ -59,6 +50,7 @@
         <string>status_video_max_duration</string>
         <string>image_compression_quality_test</string>
         <string>status_fast_streaming_initial_buffering_second_test</string>
+        <string>android_test_scheduler_run_seconds</string>
         <string>bandwidth_estimation_algorithm</string>
         <string>watls_no_dns</string>
         <string>disable_prewarm</string>
@@ -66,9 +58,12 @@
         <string>photo_download_bandwidth_estimation_enabled</string>
         <string>status_ads_params_string</string>
         <string>wamsys_registration_v4_enabled</string>
+        <string>wamsys_decryption_individual_enabled</string>
         <string>offline_aa_test_config</string>
         <string>autodownload_priority_policy</string>
+        <string>android_test_scheduler_period_impl</string>
         <string>liger_enabled</string>
+        <string>android_test_scheduler_api</string>
         <string>pjeg_data_saver_enabled</string>
         <string>whats_my_number_enabled</string>
         <string>image_quality_group</string>
@@ -116,5 +111,4 @@
         <string>mms_media_conn_foreground_only_enabled</string>
         <string>lazy_camera_view_inflation</string>
     </set>
-    <string name="ab_props:sys:config_hash">tJyEK</string>
 </map>
