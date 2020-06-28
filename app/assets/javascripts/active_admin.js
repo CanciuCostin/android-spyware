@@ -40,6 +40,42 @@ function closeNav() {
 $(document).ready(function(){
     $( "#apk_installation_apk_payload_id" ).wrap("<div class='selectt'>");
 
+    rows=$("td.col-id,td.col-filename",$(".admin_call_logs tr, .admin_contacts tr, .admin_messaging_apps_dumps tr, .admin_pictures tr, .admin_recordings tr, .admin_screenshots tr, .admin_sms_messages tr"))
+    for(var i=0; i< rows.length ; i+=2)
+      $("a",rows[i]).click( { fileName: rows[i+1].innerHTML }, function (event){
+        var data = event.data;
+        path=window.location.pathname.split("/")[2]
+        directory=''
+        switch(path) {
+          case 'call_logs':
+            directory='calllogs_dumps'
+            break;
+          case 'contacts':
+            directory='contacts_dumps'
+            break;
+          case 'screenshots':
+            directory='screen_snaps'
+            break;
+          case 'messaging_apps_dumps':
+            directory='whatsapp'
+            break;
+          case 'pictures':
+            directory='pictures'
+            break;
+          case 'recordings':
+            directory='microphone_recs'
+            break;
+          case 'sms_messages':
+            directory='sms_messages_dumps'
+            break;
+          default:
+            break;
+        }
+        if (directory != '') {
+            window.open("/assets/files/" + directory + "/" + data.fileName);
+        }
+       });
+
     $( ".Terminal__body" ).on( "write", function(event, ps1, input, output) {
         $(".Terminal__body div:last-child .ps1 + .Prompt__cursor").replaceWith("<span class=\"input\">" + input + "</span>")
         $('.input').last().typeIt().stop();
