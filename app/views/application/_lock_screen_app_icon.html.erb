@@ -4,8 +4,8 @@
 
               DESCRIPTION: Lock/Unlock the device screen" flow="right">
 <%= link_to '../smartphones/wake_lock?smartphone_id=' + smartphone.id.to_s,
- method: :post, :remote => true , :class => "msf_link", :id => "lock_screen_link" do %>
-  <%= image_tag "lock_screen.png", :alt => "Lock Screen", :class => "smartphone-icon msf_proc" %>
+ method: :post, :remote => true , :class => "adb_msf_link", :id => "lock_screen_link" do %>
+  <%= image_tag "lock_screen.png", :alt => "Lock Screen", :class => "smartphone-icon adb_msf_proc" %>
 <% end %>
 </span>
 

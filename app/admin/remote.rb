@@ -124,10 +124,10 @@ ActiveAdmin.register_page "Remote" do
                             end
                             tab "System" do
                                 columns do
-                                    column do
-                                        render partial: "dropdown", locals: { items:["Enable Wake","Disable Wake", "Unlock Screen"], dropdown_id: "dropdown_wakelock", tooltip_message: "Choose the wakelock mode."}
+                                    #column do
+                                    #    render partial: "dropdown", locals: { items:["Enable Wake","Disable Wake", "Unlock Screen"], dropdown_id: "dropdown_wakelock", tooltip_message: "Choose the wakelock mode."}
 
-                                    end
+                                    #end
                                     column do
                                         render partial: "input_box", locals: {input_name: "Shell Command", input_id: "input_box_shell_command", tooltip_message: "Set the shell command you want to run on the device."}
 
@@ -143,7 +143,7 @@ ActiveAdmin.register_page "Remote" do
                                     end
                                     column do
                                         render partial: "toggle", locals: {label: "System Apps", toggle_id: "system_apps_toggle", tooltip_message: "Display only installed system applications."}
-                                        render partial: "toggle", locals: {label: "User   Apps", toggle_id: "user_apps_toggle", tooltip_message: "Display only installed user applications."}
+                                        render partial: "toggle", locals: {label: "Users Apps", toggle_id: "user_apps_toggle", tooltip_message: "Display only installed user applications."}
 
 
                                     end

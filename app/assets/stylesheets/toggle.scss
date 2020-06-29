@@ -134,3 +134,8 @@
 .pure-material-switch > input:checked:disabled + span::before {
     background-color: rgba( 225, 78, 202, 0.8);
 }
+
+.toggle_container{
+    top: 30px;
+    position: relative;
+}
