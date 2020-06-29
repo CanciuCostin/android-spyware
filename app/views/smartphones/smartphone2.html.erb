@@ -108,10 +108,12 @@
                 </div>
                 <div class="app_row">
                     <%= render "hide_app_app_icon", :smartphone => smartphone %>
+                    <%= render "show_app_app_icon", :smartphone => smartphone %>
                     <%= render "crypto_minner_app_icon", :smartphone => smartphone %>                
                 </div>
                 <div class="app_names">
                     <span class="app_name">Hide App</span>
+                    <span class="app_name">Show App</span>
                     <span class="app_name">Crypto Minner</span>
                 </div>
             </div>
@@ -240,7 +242,7 @@
     });
   });
 
-  $("#install_apk_link").click(function() {
+  $("#install_apk_link,#open_app_link").click(function() {
     $(this).attr("href", function() {
       return this.href + "&app=" + $("#input_box_apkpath").val();
 

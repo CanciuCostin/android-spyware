@@ -6,13 +6,13 @@
 #
 path_to_key="C:/Users/Costin/Desktop/Workspaces/android-spyware/server.key"
 path_to_cert="C:/Users/Costin/Desktop/Workspaces/android-spyware/server.crt"
-if ENV.fetch("RAILS_ENV") == 'development'
-  ssl_bind '127.0.0.1', '3000', {
-    key: path_to_key,
-    cert: path_to_cert,
-    verify_mode: 'none'
-  }
-end
+#if ENV.fetch("RAILS_ENV") == 'development'
+#  ssl_bind '127.0.0.1', '3000', {
+#    key: path_to_key,
+#    cert: path_to_cert,
+#    verify_mode: 'none'
+#  }
+#end
 
 
 max_threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }

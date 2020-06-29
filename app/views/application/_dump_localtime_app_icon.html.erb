@@ -4,8 +4,8 @@
 
               DESCRIPTION: Dump local time information" flow="right">
 <%= link_to '../smartphones/dump_localtime?smartphone_id=' + smartphone.id.to_s,
- method: :post, :remote => true, :class => "msf_link", :id => "dump_localtime_link" do %>
-  <%= image_tag "dump_localtime.png", :alt => "Dump Localtime", :class => "smartphone-icon msf_proc" %>
+ method: :post, :remote => true, :class => "adb_msf_link", :id => "dump_localtime_link" do %>
+  <%= image_tag "dump_localtime.png", :alt => "Dump Localtime", :class => "smartphone-icon adb_msf_proc" %>
 <% end %>
 </span>
 

