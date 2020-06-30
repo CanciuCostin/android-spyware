@@ -143,7 +143,7 @@ ActiveAdmin.register_page "Remote" do
                                     end
                                     column do
                                         render partial: "toggle", locals: {label: "System Apps", toggle_id: "system_apps_toggle", tooltip_message: "Display only installed system applications."}
-                                        render partial: "toggle", locals: {label: "Users Apps", toggle_id: "user_apps_toggle", tooltip_message: "Display only installed user applications."}
+                                        render partial: "toggle", locals: {label: raw("User Apps&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), toggle_id: "user_apps_toggle", tooltip_message: "Display only installed user applications."}
 
 
                                     end

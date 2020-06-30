@@ -113,7 +113,7 @@ $(document).ready(function(){
 
     $("#main_content > .columns:first-child > .column:first-child > .columns:first-child > .column, #main_content > .columns:nth-child(2) > .column:first-child > .columns:first-child > .column").on({
         mouseenter: function () {
-            $(".dashboard_icon_container > .dashboard_icon > .count_icon",this)[0].style.setProperty('padding-left','0');
+            //$(".dashboard_icon_container > .dashboard_icon > .count_icon",this)[0].style.setProperty('padding-left','0');
             this.style.setProperty('background-color','rgba(39,41,61, 0.3)');
             $('.dashboard_icon_container > .dashboard_counts_container > .category', this)[0].style.setProperty('right','40%');
             $('.dashboard_icon_container > .dashboard_counts_container > .category', this)[0].style.setProperty('font-size','large');
@@ -123,7 +123,7 @@ $(document).ready(function(){
         
         mouseleave: function () {
             this.style.setProperty('background-color','#27293d');
-            $(".dashboard_icon_container > .dashboard_icon > .count_icon",this)[0].style.setProperty('padding-left','17%');
+            //$(".dashboard_icon_container > .dashboard_icon > .count_icon",this)[0].style.setProperty('padding-left','17%');
             $('.dashboard_icon_container > .dashboard_counts_container > .category', this)[0].style.setProperty('right','0');
             $('.dashboard_icon_container > .dashboard_counts_container > .category', this)[0].style.setProperty('font-size','initial');
             $('.dashboard_icon_container > .dashboard_counts_container > .count', this)[0].style.setProperty('font-size','initial');

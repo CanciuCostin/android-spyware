@@ -89,7 +89,7 @@
                     <%= render "webcam_snap_app_icon", :smartphone => smartphone %>                
                 </div>
                 <div class="app_names">
-                    <span class="app_name">Lock Screen</span>
+                    <span class="app_name">Unlock Screen</span>
                     <span class="app_name">Screen Record</span>
                     <span class="app_name">Shell Command</span>
                     <span class="app_name">Webcam Snap</span>
@@ -220,7 +220,7 @@
     });
   });
 
-  $("#push_file_link").click(function() {
+  $("#upload_file_link").click(function() {
     $(this).attr("href", function() {
       return this.href + "&push_file=" + $("#input_box_push_file").val()
                        + "&destination=" + $("#input_box_push_file_destination").val();

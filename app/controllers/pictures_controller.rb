@@ -7,7 +7,7 @@ class PicturesController < InheritedResources::Base
             commandTimeout=params[:exec_timeout].to_i
             downloadTimeout=params[:copy_timeout].to_i
             camera=params[:back_camera] == "true" ? '1' : '2'
-            camera=params[:quality].to_s
+            quality=params[:quality].to_s
 
             @smartphone = Smartphone.find(params[:smartphone_id])
             currentTime = DateTime.now
@@ -39,8 +39,9 @@ class PicturesController < InheritedResources::Base
                 sleep 1
             end
             commandOutput=["Operation Failed"] if not isOperationSuccessful
-        rescue
+        rescue => e
             puts "Error on webcam snap."
+            puts e
             commandOutput=["Operation Failed"]
         end
         respond_to do |format|

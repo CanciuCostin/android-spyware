@@ -23,7 +23,7 @@ ActiveAdmin.register ApkInstallation do
               adbTarget=adbDevices.find { |line| line.strip.end_with? "device" }.split[0] if adbTarget == 'usb'
             end
             system("tools\\platform-tools\\adb kill-server")
-            if adbTarget == 'usb'
+            if adbTarget.upcase == 'USB'
               system("tools\\platform-tools\\adb start-server")
               adbTarget=adbDevices.find { |line| line.strip.end_with? "device" }.split[0]
             else

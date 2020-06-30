@@ -85,12 +85,12 @@ def dump_wifi_info
             commandOutput=run_adb_command('shell "dumpsys wifi | grep SSID: | grep -v rt="').split("\n")
         else
             start_msf_process("shell")
-            processCommand='dumpsys wifi | grep SSID: | grep -v rt='
+            processCommand="dumpsys wifi | grep SSID: | grep -v rt="
             commandOutput=start_msf_process(processCommand)
             detach_session
         end
     rescue
-        commandOutput="Operation Failed"
+        commandOutput=["Operation Failed"]
         puts "Error dumping wi-fi info."
     end
     respond_to do |format|
@@ -174,6 +174,8 @@ def upload_file
     begin
         push_file=params[:push_file]
         destination=params[:destination]
+        puts push_file
+        puts destination
         if @@isAdbConnected
             commandOutput=run_adb_command('push ' + push_file + ' ' + destination).split("\n")
         else
@@ -258,7 +260,7 @@ end
 
 
 
-def install_apk
+def install_app
     begin
         app=params[:app]
         if @@isAdbConnected
@@ -267,6 +269,7 @@ def install_apk
             processCommand="app_install " + app
             commandOutput=start_msf_process(processCommand)
         end
+        commandOutput=["Installation done."]
     rescue
         puts "Error installing app."
         commandOutput=["Operation Failed"]
@@ -289,7 +292,7 @@ def dump_device_info
 
         else
             start_msf_process("shell")
-            processCommand='getprop ro.product.model'
+            processCommand='getprop ro.product.model && getprop ro.product.brand && getprop gsm.sim.operator.alpha && getprop ro.config.bluetooth.name'
             commandOutput=start_msf_process(processCommand)
             detach_session
         end

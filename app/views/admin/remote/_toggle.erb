@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag 'toggle', media: 'all', 'data-turbolinks-track': 'reload' %>
-<div class="toggle_container">
+<div class="toggle_container" id=<%= toggle_id + '_container' %>>
 <label class="pure-material-switch">
   <input type="checkbox" checked="checked" id=<%= toggle_id %>>
   <span><span tooltip="<%=tooltip_message%>" flow="down"><%= label %></span></span>

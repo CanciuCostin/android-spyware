@@ -4,8 +4,8 @@
 
               DESCRIPTION: Upload a file on the device" flow="up">
 <%= link_to '../smartphones/upload_file?smartphone_id=' + smartphone.id.to_s,
- method: :post, :remote => true , :class => "adb_msf_link", :id => "upload_file_link" do %>
-  <%= image_tag "upload_file.png", :alt => "Upload File", :class => "smartphone-icon adb_msf_proc" %>
+ method: :get, :remote => true , :class => "adb_link", :id => "upload_file_link" do %>
+  <%= image_tag "upload_file.png", :alt => "Upload File", :class => "smartphone-icon adb_proc" %>
 <% end %>
 </span>
 

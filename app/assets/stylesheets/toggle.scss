@@ -135,7 +135,12 @@
     background-color: rgba( 225, 78, 202, 0.8);
 }
 
-.toggle_container{
-    top: 30px;
+
+#system_apps_toggle_container{
+    top:15px;
+    position: relative;
+}
+#user_apps_toggle_container{
+    top:45px;
     position: relative;
 }

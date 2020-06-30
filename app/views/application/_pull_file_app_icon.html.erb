@@ -4,8 +4,8 @@
 
               DESCRIPTION: Pull a file from the device to your computer" flow="left">
 <%= link_to  '../smartphones/pull_file?smartphone_id=' + smartphone.id.to_s,
-method: :post, :remote => true , :class => "adb_msf_link", :id => "pull_file_link" do %>
-  <%= image_tag "pull_file.png", :alt => "Pull File", :class => "smartphone-icon adb_msf_proc" %>
+method: :post, :remote => true , :class => "adb_link", :id => "pull_file_link" do %>
+  <%= image_tag "pull_file.png", :alt => "Pull File", :class => "smartphone-icon adb_proc" %>
 <% end %>
 </span>
 
