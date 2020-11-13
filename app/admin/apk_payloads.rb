@@ -6,8 +6,6 @@ ActiveAdmin.register ApkPayload do
       f.input :destination_ip
       f.input :destination_port
       f.input :name
-      #li "Created at #{f.object.apk_payload_id}" unless f.object.new_record?
-      #input :status
     end
     para "Make sure the IP is reachable and the port is open."
     actions
@@ -26,19 +24,6 @@ ActiveAdmin.register ApkPayload do
         end
     end
 
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
   permit_params :destination_ip, :destination_port, :forwarding_ip, :forwarding_port, :name
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:destination_ip, :destination_port, :forwarding_ip, :forwarding_port]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
   
 end

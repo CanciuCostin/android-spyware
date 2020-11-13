@@ -1,11 +1,11 @@
-2020-06-28 11:03:50.860 LL_I W [668:AsyncTask #1] ==== logfile level=3 tz=+0300 ====
-2020-06-28 11:03:50.863 LL_I W [635:WhatsApp Worker #2] WaMsysSetup/bootstrapForMMS
-2020-06-28 11:03:50.866 LL_I W [635:WhatsApp Worker #2] app-init/permissions/com.whatsapp w=true
-2020-06-28 11:03:50.867 LL_I W [635:WhatsApp Worker #2] app-init/permissions/files w=true
-2020-06-28 11:03:50.867 LL_I W [635:WhatsApp Worker #2] app-init/permissions/Logs w=true
-2020-06-28 11:03:50.867 LL_I W [635:WhatsApp Worker #2] app-init/permissions/databases w=true
-2020-06-28 11:03:50.867 LL_I W [635:WhatsApp Worker #2] app-init/async/screen/off
-2020-06-28 11:03:50.870 LL_I W [635:WhatsApp Worker #2] network/info
+2020-07-01 09:15:53.727 LL_I W [869:AsyncTask #1] ==== logfile level=3 tz=+0300 ====
+2020-07-01 09:15:53.728 LL_I W [837:WhatsApp Worker #2] WaMsysSetup/bootstrapForMMS
+2020-07-01 09:15:53.745 LL_I W [837:WhatsApp Worker #2] app-init/permissions/com.whatsapp w=true
+2020-07-01 09:15:53.745 LL_I W [837:WhatsApp Worker #2] app-init/permissions/files w=true
+2020-07-01 09:15:53.745 LL_I W [837:WhatsApp Worker #2] app-init/permissions/Logs w=true
+2020-07-01 09:15:53.746 LL_I W [837:WhatsApp Worker #2] app-init/permissions/databases w=true
+2020-07-01 09:15:53.746 LL_I W [837:WhatsApp Worker #2] app-init/async/screen/on
+2020-07-01 09:15:53.749 LL_I W [837:WhatsApp Worker #2] network/info
 [type: MOBILE[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: false], type: 0, subtype: 0
 [type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "HUAWEI-XsfB", roaming: false, failover: false, isAvailable: true], type: 1, subtype: 0
 [type: MOBILE_MMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 2, subtype: 0
@@ -25,159 +25,141 @@
 [type: MOBILE_BIP4[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 42, subtype: 0
 [type: MOBILE_BIP5[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 43, subtype: 0
 [type: MOBILE_BIP6[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 44, subtype: 0
-2020-06-28 11:03:50.898 LL_I W [635:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 11:03:50.901 LL_I W [632:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
-2020-06-28 11:03:50.907 LL_I W [635:WhatsApp Worker #2] app-init/async/done
-2020-06-28 11:03:50.912 LL_I W [668:AsyncTask #1] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 11:03:50.914 LL_I W [668:AsyncTask #1] language-pack-store/delete-unused-language-packs
-2020-06-28 11:03:50.918 LL_I W [667:SignalExecutor] skipping key generation because already more than 812 are unsent
-2020-06-28 11:03:50.920 LL_I W [667:SignalExecutor] axolotl deleted expired direct distribution keys:0
-2020-06-28 11:03:50.922 LL_I W [667:SignalExecutor] axolotl deleteExpiredServerPreKeys, not enough key uploads yet:0
-2020-06-28 11:03:50.925 LL_I W [668:AsyncTask #1] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 11:03:50.934 LL_I W [666:WhatsApp Worker #6] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 11:03:50.934 LL_I W [668:AsyncTask #1] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 11:03:50.940 LL_I W [668:AsyncTask #1] StatusAdOpenHelperdeleteTemporaryFiles/journalDeleted=true; writeAheadLogDeleted=true; sharedDeleted=true
-2020-06-28 11:03:50.940 LL_I W [668:AsyncTask #1] mediamessagefixer/db is not ready
-2020-06-28 11:03:50.943 LL_I W [668:AsyncTask #1] SharedMediaIdsStore/deleteOutdatedRecords
-2020-06-28 11:03:50.946 LL_I W [668:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
-2020-06-28 11:03:50.947 LL_I W [668:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Mon Jun 29 02:00:00 GMT+03:00 2020
-2020-06-28 11:03:50.950 LL_I W [668:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Mon Jun 29 00:00:00 GMT+03:00 2020
-2020-06-28 11:03:50.953 LL_I W [668:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
-2020-06-28 11:03:50.954 LL_I W [668:AsyncTask #1] work-manager/configuration/created
-2020-06-28 11:03:51.005 LL_I W [668:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
-2020-06-28 11:03:51.012 LL_I W [668:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
-2020-06-28 11:03:51.012 LL_I W [668:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
-2020-06-28 11:03:51.021 LL_I W [668:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-06-28 11:03:51.010+0300; lastSignedPrekeyRotation=2020-06-10 20:21:33.785+0300; deltaToAlarm=1070262775
-2020-06-28 11:03:51.025 LL_I W [668:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 11:18:15.748+0200
-2020-06-28 11:03:51.040 LL_I W [668:AsyncTask #1] AlarmService#updateNtp; intent=null
-2020-06-28 11:03:51.113 LL_I W [668:AsyncTask #1] resolving 2.android.pool.ntp.org
-2020-06-28 11:03:51.187 LL_I W [668:AsyncTask #1] ntp update processed; device time: Sun Jun 28 11:03:51 GMT+03:00 2020 ntp time: Sun Jun 28 11:03:52 GMT+03:00 2020
-2020-06-28 11:04:46.194 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=73, plugged=2, scale=100, percent=73.0}
-2020-06-28 11:05:14.830 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=73, plugged=0, scale=100, percent=73.0}
-2020-06-28 11:05:14.897 LL_I W [1:main] ScreenLockReceiver; tag=unlock; locked=false; oldLocked=true
-2020-06-28 11:05:15.408 LL_I W [1:main] ScreenLockReceiver; tag=on; locked=false; oldLocked=false
-2020-06-28 11:05:17.936 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=73, plugged=2, scale=100, percent=73.0}
-2020-06-28 11:05:48.592 LL_I W [1:main] ScreenLockReceiver; tag=off; locked=true; oldLocked=false
-2020-06-28 11:06:46.543 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=74, plugged=2, scale=100, percent=74.0}
-2020-06-28 11:07:56.697 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=75, plugged=2, scale=100, percent=75.0}
-2020-06-28 11:08:50.713 LL_I W [623:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:08:50.714 LL_I W [623:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:09:36.894 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=76, plugged=2, scale=100, percent=76.0}
-2020-06-28 11:11:17.099 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=77, plugged=2, scale=100, percent=77.0}
-2020-06-28 11:12:57.299 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=78, plugged=2, scale=100, percent=78.0}
-2020-06-28 11:13:50.810 LL_I W [623:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:13:50.812 LL_I W [623:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:14:17.455 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=79, plugged=2, scale=100, percent=79.0}
-2020-06-28 11:15:57.654 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=80, plugged=2, scale=100, percent=80.0}
-2020-06-28 11:17:37.866 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=81, plugged=2, scale=100, percent=81.0}
-2020-06-28 11:18:50.841 LL_I W [623:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:18:50.843 LL_I W [623:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:19:18.051 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=82, plugged=2, scale=100, percent=82.0}
-2020-06-28 11:20:58.279 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=83, plugged=2, scale=100, percent=83.0}
-2020-06-28 11:22:38.474 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=84, plugged=2, scale=100, percent=84.0}
-2020-06-28 11:22:54.317 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=84, plugged=0, scale=100, percent=84.0}
-2020-06-28 11:22:54.407 LL_I W [1:main] ScreenLockReceiver; tag=unlock; locked=false; oldLocked=true
-2020-06-28 11:22:54.663 LL_I W [1:main] ScreenLockReceiver; tag=on; locked=false; oldLocked=false
-2020-06-28 11:50:49.922 LL_I D [651:Logger] ==== logfile level=3 tz=+0300 ====
-2020-06-28 11:50:49.918 LL_I D [1:main] ==== logfile version=2.20.193.9 level=3====
-2020-06-28 11:50:50.075 LL_I D [1:main] WATLS: using external persistent cache directory /storage/emulated/0/Android/data/com.whatsapp/cache/watls-sessions
-2020-06-28 11:50:50.076 LL_I D [1:main] appshell/debug_info: pkg=com.whatsapp; v=2.20.193.9-play-release; vc=204309000; p=consumer; e=180; g=base-v2.20.193.9-dirty; t=1592845416105; d=HUAWEI ALE-L21; os=Android 6.0; abis=arm64-v8a,armeabi-v7a,armeabi
-2020-06-28 11:50:50.078 LL_I D [1:main] whatsapplibloader/system-load-library-with-install start, loading: superpack
-2020-06-28 11:50:50.086 LL_I D [1:main] whatsapplibloader/system-load-library-with-install end
-2020-06-28 11:50:50.087 LL_I D [1:main] whatsappassetdecompressor/decompressor-usable isLibraryUsable: True
-2020-06-28 11:50:50.087 LL_I D [1:main] whatsappassetdecompressor/decompress: superpack architecture is arm64-v8a
-2020-06-28 11:50:50.098 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 11:50:50.133 LL_I D [1:main]         os_core_unix.c !pjlib 2.8 for POSIX initialized
-2020-06-28 11:50:50.135 LL_I D [1:main]        wa_call_media.c !init_media_endpt_and_codecs Enter
-2020-06-28 11:50:50.135 LL_I D [1:main]        wa_audio_dev.cc  WA Audio sound library initialized
-2020-06-28 11:50:50.135 LL_I D [1:main]                  pjlib  select() I/O Queue created (0x5567a3b128)
-2020-06-28 11:50:50.136 LL_I D [1:main]        wa_call_media.c  pjmedia_endpt_create = 0
-2020-06-28 11:50:50.136 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init start
-2020-06-28 11:50:50.136 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init success
-2020-06-28 11:50:50.136 LL_I D [1:main]        wa_call_media.c  init_audio_codecs = 0
-2020-06-28 11:50:50.136 LL_I D [1:main]        wa_call_media.c  init_media_endpt_and_codecs Exit
-2020-06-28 11:50:50.143 LL_W D [1:main] whatsappassetdecompressor/load-library-from-archive File missing: codec2
-2020-06-28 11:50:50.143 LL_I D [1:main] whatsapplibloader/system-load-optional-library start
-2020-06-28 11:50:50.155 LL_I D [1:main] whatsapplibloader/system-load-optional-library end
-2020-06-28 11:50:50.155 LL_I D [1:main] native library usability testing in progress
-2020-06-28 11:50:50.155 LL_I D [1:main] native library usability testing complete
-2020-06-28 11:50:50.156 LL_I D [1:main] whatsapplibloader/usable jniVersion: 2.20.193.9
-2020-06-28 11:50:50.157 LL_I D [1:main] whatsapplibloader/usable isLibraryUsable: True
-2020-06-28 11:50:50.163 LL_I D [1:main] Loading module: breakpad
-2020-06-28 11:50:50.163 LL_I D [1:main] Module breakpad health file deleted: true
-2020-06-28 11:50:50.164 LL_I D [1:main] Module loaded: breakpad load time: 3
-2020-06-28 11:50:50.493 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 11:50:50.496 LL_I D [1:main] messagethumbcache/construct 24576
-2020-06-28 11:50:50.512 LL_I D [1:main] message_handler/logged_flag/must_reconnect initialize to true
-2020-06-28 11:50:50.512 LL_I D [1:main] message_handler/logged_flag/must_ignore_network_once initialize to false
-2020-06-28 11:50:50.512 LL_I D [1:main] message_handler/logged_flag/disconnected initialize to true
-2020-06-28 11:50:50.622 LL_I W [1:main] whatsapplocale/loadandapplyforcedlanguage/no language to load
-2020-06-28 11:50:50.627 LL_I W [667:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 11:50:50.652 LL_I W [1:main] throw away fix line - X.0Rz@284be24 - X.0S8@84c1d8d - X.0ST@177bb42
-2020-06-28 11:50:50.683 LL_I W [654:Wam_internal] wambuffer/header/init: header=2 bufferCount=2 maxMetadataSize=65536 maxEventBufferSize=65536 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 11:50:50.686 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.686 LL_I W [1:main] memanager/load-me
-2020-06-28 11:50:50.686 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.686 LL_I W [665:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/active_network/wifi
-2020-06-28 11:50:50.686 LL_I W [665:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/message-restore/true
-2020-06-28 11:50:50.687 LL_I W [1:main] statistics/init
-2020-06-28 11:50:50.687 LL_I W [665:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/media-restore/true
-2020-06-28 11:50:50.687 LL_I W [665:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/backup/true
-2020-06-28 11:50:50.687 LL_I W [654:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 11:50:50.687 LL_I W [654:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 11:50:50.688 LL_I W [654:Wam_internal] wambuffer/header/init: header=2 bufferCount=8 maxMetadataSize=65536 maxEventBufferSize=16384 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 11:50:50.689 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.689 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.689 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/2: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.689 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/3: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.689 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/4: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.689 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/5: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.689 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/6: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.690 LL_I W [654:Wam_internal] wambuffer/header/init/eventBufferMetadata/7: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 11:50:50.690 LL_I W [654:Wam_internal] InMemorySingleEventBufferManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0
-2020-06-28 11:50:50.690 LL_I W [687:stat-save] statistics data init: Text Messages: 0 sent, 0 received / Media Messages: 0 sent (0 bytes), 0 received (0 bytes) / Offline Messages: 0 received (0 msec average delay) / Status : 0 sent (0 bytes), 0 received (0 bytes) / Payment Messages : 0 sent, 0 received / Message Service: 0 bytes sent, 0 bytes received / Voip Calls: 0 outgoing calls, 0 incoming calls, 0 bytes sent, 0 bytes received / Google Drive: 0 bytes sent, 0 bytes received / Roaming: 0 bytes sent, 0 bytes received / Total Data: 0 bytes sent, 0 bytes received
-2020-06-28 11:50:50.694 LL_I W [655:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:50:50.695 LL_I W [655:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:50:50.696 LL_I W [1:main] media-state-manager/refresh-media-state/writable-media
-2020-06-28 11:50:50.701 LL_W W [1:main] PAY: phoneNumber: countryCode:
-2020-06-28 11:50:50.701 LL_I W [1:main] app-init/main/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 11:50:50.702 LL_I W [1:main] InterAppCommunicationManager/smbIsCapableOfMigratingFromConsumer=false
-2020-06-28 11:50:50.704 LL_I W [1:main] InterAppCommunicationManager/sendInitialMigrationInfoNeededBroadcast/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 11:50:50.704 LL_I W [1:main] InterAppCommunicationManager/sendRequesterToProviderOrderedBroadcast/action = com.whatsapp.registration.directmigration.initialMigrationInfoAction
-2020-06-28 11:50:50.710 LL_I W [689:WhatsApp Worker #4] media-state-manager/refresh-media-state/internal-storage available:4,644,913,152 total:11,289,227,264
-2020-06-28 11:50:50.717 LL_I W [689:WhatsApp Worker #4] media-state-manager/refresh-media-state/writable-media/external-storage available: 4,623,941,632 total: 11,268,255,744
-2020-06-28 11:50:50.722 LL_I W [1:main] loginmanager/loadloginfailed/none
-2020-06-28 11:50:50.724 LL_I W [1:main] androidcontactscontentobserver/registered
-2020-06-28 11:50:50.746 LL_I W [1:main] app-init/async/device_info/OS_BUILD_NUMBER ALE-L21C02B589
-2020-06-28 11:50:50.747 LL_I W [1:main] app-init/main/done
-2020-06-28 11:50:50.747 LL_I W [667:WhatsApp Worker #2] app-init/async/start
-2020-06-28 11:50:50.747 LL_I W [667:WhatsApp Worker #2] WaMsysSetup/bootstrapForReg
-2020-06-28 11:50:50.747 LL_I W [667:WhatsApp Worker #2] WaMsysSetup/bootstrap
-2020-06-28 11:50:50.749 LL_I W [1:main] AlarmBroadcastReceiver dispatching to AlarmService; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmBroadcastReceiver (has extras) }; elapsedRealtime=3791709
-2020-06-28 11:50:50.783 LL_I W [1:main] gdrive-conditions-manager/can-use-battery/battery-level/95
-2020-06-28 11:50:50.783 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-backup/true
-2020-06-28 11:50:50.784 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-media-restore/true
-2020-06-28 11:50:50.784 LL_I W [1:main] gdrive-conditions-manager/ignore-battery-status/false
-2020-06-28 11:50:50.789 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=95, plugged=1, scale=100, percent=95.0}
-2020-06-28 11:50:50.790 LL_I W [1:main] phone/state idle
-2020-06-28 11:50:50.790 LL_I W [1:main] OnTrimMemory/level: 80, trimming memory, app in background
-2020-06-28 11:50:50.809 LL_I W [688:WhatsApp Worker #3]       wa_call_utils.cc !Number of external threads now: 1
-2020-06-28 11:50:50.811 LL_I W [688:WhatsApp Worker #3]              wa_call.c  wa_call_update_network_medium Wifi 1400
-2020-06-28 11:50:50.812 LL_I W [688:WhatsApp Worker #3]              wa_call.c  About to set wa_call_set_network_medium Wifi, network_mtu 1400
-2020-06-28 11:50:50.813 LL_I W [688:WhatsApp Worker #3]              wa_call.c  Abort. But reset wa_call_set_network_medium to WAM_ENUM_CALL_NETWORK_MEDIUM_NONE
-2020-06-28 11:50:50.814 LL_I W [688:WhatsApp Worker #3]              wa_call.c  check_call_state_active_internal end relay info not received yet
-2020-06-28 11:50:50.866 LL_I W [667:WhatsApp Worker #2] WhatsAppLocale/setDerivedFieldsUnderLock/fieldCreationTimer/timer/stop: 102
-2020-06-28 11:50:50.869 LL_I W [665:WhatsApp Worker #1] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 11:50:50.882 LL_I W [699:SignalExecutor] axolotl retrieved latest signed prekey record successfully; id=0
-2020-06-28 11:50:50.895 LL_I W [667:WhatsApp Worker #2] WaMsysSetup/bootstrapForMMS
-2020-06-28 11:50:50.898 LL_I W [667:WhatsApp Worker #2] app-init/permissions/com.whatsapp w=true
-2020-06-28 11:50:50.898 LL_I W [667:WhatsApp Worker #2] app-init/permissions/files w=true
-2020-06-28 11:50:50.898 LL_I W [667:WhatsApp Worker #2] app-init/permissions/Logs w=true
-2020-06-28 11:50:50.899 LL_I W [667:WhatsApp Worker #2] app-init/permissions/databases w=true
-2020-06-28 11:50:50.900 LL_I W [667:WhatsApp Worker #2] app-init/async/screen/off
-2020-06-28 11:50:50.902 LL_I W [1:main] ProcessProviderMigrationInfo/on-receive
-2020-06-28 11:50:50.903 LL_I W [700:AsyncTask #1] AlarmService/hourlyCron; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmService (has extras) }
-2020-06-28 11:50:50.904 LL_I W [667:WhatsApp Worker #2] network/info
+2020-07-01 09:15:53.775 LL_I W [837:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
+2020-07-01 09:15:53.786 LL_I W [834:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
+2020-07-01 09:15:53.791 LL_I W [837:WhatsApp Worker #2] app-init/async/done
+2020-07-01 09:15:53.817 LL_I W [835:WhatsApp Worker #1] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
+2020-07-01 09:15:54.029 LL_I W [1:main] updated phone id from 5b7696bf-bee3-4ec5-b362-309f9aba7392 : 1593583250654 to 47656ffe-5f71-4750-87bc-dcbb97f69d14 : 1591806425066 based on package com.facebook.katana
+2020-07-01 09:15:54.055 LL_I W [869:AsyncTask #1] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
+2020-07-01 09:15:54.058 LL_I W [869:AsyncTask #1] language-pack-store/delete-unused-language-packs
+2020-07-01 09:15:54.064 LL_I W [870:SignalExecutor] skipping key generation because already more than 812 are unsent
+2020-07-01 09:15:54.066 LL_I W [870:SignalExecutor] axolotl deleted expired direct distribution keys:0
+2020-07-01 09:15:54.067 LL_I W [870:SignalExecutor] axolotl deleteExpiredServerPreKeys, not enough key uploads yet:0
+2020-07-01 09:15:54.106 LL_I W [869:AsyncTask #1] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
+2020-07-01 09:15:54.111 LL_I W [869:AsyncTask #1] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
+2020-07-01 09:15:54.119 LL_I W [869:AsyncTask #1] StatusAdOpenHelperdeleteTemporaryFiles/journalDeleted=true; writeAheadLogDeleted=true; sharedDeleted=true
+2020-07-01 09:15:54.120 LL_I W [869:AsyncTask #1] mediamessagefixer/db is not ready
+2020-07-01 09:15:54.124 LL_I W [869:AsyncTask #1] SharedMediaIdsStore/deleteOutdatedRecords
+2020-07-01 09:15:54.128 LL_I W [869:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
+2020-07-01 09:15:54.128 LL_I W [869:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Thu Jul 02 02:00:00 GMT+03:00 2020
+2020-07-01 09:15:54.133 LL_I W [869:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Thu Jul 02 00:00:00 GMT+03:00 2020
+2020-07-01 09:15:54.138 LL_I W [869:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
+2020-07-01 09:15:54.138 LL_I W [869:AsyncTask #1] work-manager/configuration/created
+2020-07-01 09:15:54.168 LL_I W [869:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
+2020-07-01 09:15:54.170 LL_I W [869:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
+2020-07-01 09:15:54.170 LL_I W [869:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
+2020-07-01 09:15:54.176 LL_I W [869:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-07-01 09:15:54.173+0300; lastSignedPrekeyRotation=2020-06-16 02:14:47.732+0300; deltaToAlarm=1270733559
+2020-07-01 09:15:54.180 LL_I W [869:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 23:28:31.436+0200
+2020-07-01 09:15:54.190 LL_I W [869:AsyncTask #1] AlarmService#updateNtp; intent=null
+2020-07-01 09:15:54.194 LL_I W [869:AsyncTask #1] resolving 2.android.pool.ntp.org
+2020-07-01 09:15:54.242 LL_I W [869:AsyncTask #1] ntp update processed; device time: Wed Jul 01 09:15:54 GMT+03:00 2020 ntp time: Wed Jul 01 09:15:54 GMT+03:00 2020
+2020-07-01 09:16:33.739 LL_I W [1:main] ScreenLockReceiver; tag=off; locked=true; oldLocked=false
+2020-07-01 09:19:39.100 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=100, plugged=0, scale=100, percent=100.0}
+2020-07-01 09:19:39.254 LL_I W [1:main] ScreenLockReceiver; tag=unlock; locked=false; oldLocked=true
+2020-07-01 09:19:39.899 LL_I W [1:main] ScreenLockReceiver; tag=on; locked=false; oldLocked=false
+2020-07-01 09:20:40.837 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
+2020-07-01 09:20:53.593 LL_I W [825:Wam_post] WamSender/send/mh-disconnected
+2020-07-01 09:20:53.593 LL_I W [825:Wam_post] WamSender/send/mh-disconnected
+2020-07-01 10:00:53.186 LL_I D [955:Logger] ==== logfile level=3 tz=+0300 ====
+2020-07-01 10:00:53.185 LL_I D [1:main] ==== logfile version=2.20.193.9 level=3====
+2020-07-01 10:00:53.293 LL_I D [1:main] WATLS: using external persistent cache directory /storage/emulated/0/Android/data/com.whatsapp/cache/watls-sessions
+2020-07-01 10:00:53.295 LL_I D [1:main] appshell/debug_info: pkg=com.whatsapp; v=2.20.193.9-play-release; vc=204309000; p=consumer; e=180; g=base-v2.20.193.9-dirty; t=1592845416105; d=HUAWEI ALE-L21; os=Android 6.0; abis=arm64-v8a,armeabi-v7a,armeabi
+2020-07-01 10:00:53.295 LL_I D [1:main] whatsapplibloader/system-load-library-with-install start, loading: superpack
+2020-07-01 10:00:53.303 LL_I D [1:main] whatsapplibloader/system-load-library-with-install end
+2020-07-01 10:00:53.304 LL_I D [1:main] whatsappassetdecompressor/decompressor-usable isLibraryUsable: True
+2020-07-01 10:00:53.304 LL_I D [1:main] whatsappassetdecompressor/decompress: superpack architecture is arm64-v8a
+2020-07-01 10:00:53.318 LL_I D [1:main] whatsappsoloader/init: already initialized
+2020-07-01 10:00:53.352 LL_I D [1:main]         os_core_unix.c !pjlib 2.8 for POSIX initialized
+2020-07-01 10:00:53.354 LL_I D [1:main]        wa_call_media.c !init_media_endpt_and_codecs Enter
+2020-07-01 10:00:53.354 LL_I D [1:main]        wa_audio_dev.cc  WA Audio sound library initialized
+2020-07-01 10:00:53.355 LL_I D [1:main]                  pjlib  select() I/O Queue created (0x55a29f5f48)
+2020-07-01 10:00:53.355 LL_I D [1:main]        wa_call_media.c  pjmedia_endpt_create = 0
+2020-07-01 10:00:53.355 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init start
+2020-07-01 10:00:53.355 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init success
+2020-07-01 10:00:53.355 LL_I D [1:main]        wa_call_media.c  init_audio_codecs = 0
+2020-07-01 10:00:53.356 LL_I D [1:main]        wa_call_media.c  init_media_endpt_and_codecs Exit
+2020-07-01 10:00:53.363 LL_W D [1:main] whatsappassetdecompressor/load-library-from-archive File missing: codec2
+2020-07-01 10:00:53.363 LL_I D [1:main] whatsapplibloader/system-load-optional-library start
+2020-07-01 10:00:53.373 LL_I D [1:main] whatsapplibloader/system-load-optional-library end
+2020-07-01 10:00:53.374 LL_I D [1:main] native library usability testing in progress
+2020-07-01 10:00:53.374 LL_I D [1:main] native library usability testing complete
+2020-07-01 10:00:53.374 LL_I D [1:main] whatsapplibloader/usable jniVersion: 2.20.193.9
+2020-07-01 10:00:53.375 LL_I D [1:main] whatsapplibloader/usable isLibraryUsable: True
+2020-07-01 10:00:53.376 LL_I D [1:main] Loading module: breakpad
+2020-07-01 10:00:53.379 LL_I D [1:main] Module breakpad health file deleted: true
+2020-07-01 10:00:53.379 LL_I D [1:main] Module loaded: breakpad load time: 2
+2020-07-01 10:00:53.684 LL_I D [1:main] whatsappsoloader/init: already initialized
+2020-07-01 10:00:53.687 LL_I D [1:main] messagethumbcache/construct 24576
+2020-07-01 10:00:53.702 LL_I D [1:main] message_handler/logged_flag/must_reconnect initialize to true
+2020-07-01 10:00:53.702 LL_I D [1:main] message_handler/logged_flag/must_ignore_network_once initialize to false
+2020-07-01 10:00:53.702 LL_I D [1:main] message_handler/logged_flag/disconnected initialize to true
+2020-07-01 10:00:53.813 LL_I W [1:main] whatsapplocale/loadandapplyforcedlanguage/no language to load
+2020-07-01 10:00:53.821 LL_I W [971:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
+2020-07-01 10:00:53.827 LL_I W [1:main] throw away fix line - X.0Rz@47ed30d - X.0S8@75c02c2 - X.0ST@f1078d3
+2020-07-01 10:00:53.851 LL_I W [1:main] memanager/load-me
+2020-07-01 10:00:53.853 LL_I W [1:main] statistics/init
+2020-07-01 10:00:53.853 LL_I W [958:Wam_internal] wambuffer/header/init: header=2 bufferCount=2 maxMetadataSize=65536 maxEventBufferSize=65536 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
+2020-07-01 10:00:53.854 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.854 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.856 LL_I W [990:stat-save] statistics data init: Text Messages: 0 sent, 0 received / Media Messages: 0 sent (0 bytes), 0 received (0 bytes) / Offline Messages: 0 received (0 msec average delay) / Status : 0 sent (0 bytes), 0 received (0 bytes) / Payment Messages : 0 sent, 0 received / Message Service: 0 bytes sent, 0 bytes received / Voip Calls: 0 outgoing calls, 0 incoming calls, 0 bytes sent, 0 bytes received / Google Drive: 0 bytes sent, 0 bytes received / Roaming: 0 bytes sent, 0 bytes received / Total Data: 0 bytes sent, 0 bytes received
+2020-07-01 10:00:53.858 LL_I W [958:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
+2020-07-01 10:00:53.858 LL_I W [958:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
+2020-07-01 10:00:53.864 LL_I W [958:Wam_internal] wambuffer/header/init: header=2 bufferCount=8 maxMetadataSize=65536 maxEventBufferSize=16384 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
+2020-07-01 10:00:53.865 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.865 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.865 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/2: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.865 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/3: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.865 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/4: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.865 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/5: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.866 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/6: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.866 LL_I W [958:Wam_internal] wambuffer/header/init/eventBufferMetadata/7: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
+2020-07-01 10:00:53.866 LL_I W [958:Wam_internal] InMemorySingleEventBufferManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0
+2020-07-01 10:00:53.868 LL_I W [1:main] media-state-manager/refresh-media-state/writable-media
+2020-07-01 10:00:53.879 LL_W W [1:main] PAY: phoneNumber: countryCode:
+2020-07-01 10:00:53.879 LL_I W [1:main] app-init/main/sendInitialMigrationInfoNeededBroadcast
+2020-07-01 10:00:53.880 LL_I W [1:main] InterAppCommunicationManager/smbIsCapableOfMigratingFromConsumer=false
+2020-07-01 10:00:53.881 LL_I W [1:main] InterAppCommunicationManager/sendInitialMigrationInfoNeededBroadcast/sendInitialMigrationInfoNeededBroadcast
+2020-07-01 10:00:53.882 LL_I W [1:main] InterAppCommunicationManager/sendRequesterToProviderOrderedBroadcast/action = com.whatsapp.registration.directmigration.initialMigrationInfoAction
+2020-07-01 10:00:53.886 LL_I W [992:WhatsApp Worker #4] media-state-manager/refresh-media-state/internal-storage available:4,579,917,824 total:11,289,227,264
+2020-07-01 10:00:53.888 LL_I W [1:main] loginmanager/loadloginfailed/none
+2020-07-01 10:00:53.891 LL_I W [1:main] androidcontactscontentobserver/registered
+2020-07-01 10:00:53.893 LL_I W [992:WhatsApp Worker #4] media-state-manager/refresh-media-state/writable-media/external-storage available: 4,558,946,304 total: 11,268,255,744
+2020-07-01 10:00:53.894 LL_I W [969:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/active_network/wifi
+2020-07-01 10:00:53.894 LL_I W [969:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/message-restore/true
+2020-07-01 10:00:53.895 LL_I W [969:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/media-restore/true
+2020-07-01 10:00:53.895 LL_I W [969:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/backup/true
+2020-07-01 10:00:53.899 LL_I W [959:Wam_post] WamSender/send/mh-disconnected
+2020-07-01 10:00:53.900 LL_I W [959:Wam_post] WamSender/send/mh-disconnected
+2020-07-01 10:00:53.910 LL_I W [1:main] app-init/async/device_info/OS_BUILD_NUMBER ALE-L21C02B589
+2020-07-01 10:00:53.911 LL_I W [1:main] app-init/main/done
+2020-07-01 10:00:53.911 LL_I W [994:WhatsApp Worker #5] app-init/async/start
+2020-07-01 10:00:53.911 LL_I W [994:WhatsApp Worker #5] WaMsysSetup/bootstrapForReg
+2020-07-01 10:00:53.912 LL_I W [994:WhatsApp Worker #5] WaMsysSetup/bootstrap
+2020-07-01 10:00:53.916 LL_I W [1:main] AlarmBroadcastReceiver dispatching to AlarmService; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmBroadcastReceiver (has extras) }; elapsedRealtime=7668614
+2020-07-01 10:00:53.952 LL_I W [1:main] gdrive-conditions-manager/can-use-battery/battery-level/98
+2020-07-01 10:00:53.953 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-backup/true
+2020-07-01 10:00:53.953 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-media-restore/true
+2020-07-01 10:00:53.953 LL_I W [1:main] gdrive-conditions-manager/ignore-battery-status/false
+2020-07-01 10:00:53.954 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=98, plugged=0, scale=100, percent=98.0}
+2020-07-01 10:00:53.955 LL_I W [1:main] phone/state idle
+2020-07-01 10:00:53.955 LL_I W [1:main] OnTrimMemory/level: 80, trimming memory, app in background
+2020-07-01 10:00:53.966 LL_I W [992:WhatsApp Worker #4]       wa_call_utils.cc !Number of external threads now: 1
+2020-07-01 10:00:53.966 LL_I W [992:WhatsApp Worker #4]              wa_call.c  wa_call_update_network_medium Wifi 1400
+2020-07-01 10:00:53.966 LL_I W [992:WhatsApp Worker #4]              wa_call.c  About to set wa_call_set_network_medium Wifi, network_mtu 1400
+2020-07-01 10:00:53.966 LL_I W [992:WhatsApp Worker #4]              wa_call.c  Abort. But reset wa_call_set_network_medium to WAM_ENUM_CALL_NETWORK_MEDIUM_NONE
+2020-07-01 10:00:53.966 LL_I W [992:WhatsApp Worker #4]              wa_call.c  check_call_state_active_internal end relay info not received yet
+2020-07-01 10:00:54.006 LL_I W [994:WhatsApp Worker #5] WhatsAppLocale/setDerivedFieldsUnderLock/fieldCreationTimer/timer/stop: 69
+2020-07-01 10:00:54.010 LL_I W [991:WhatsApp Worker #3] gdrive-conditions-manager/trigger-nothing/nothing-pending
+2020-07-01 10:00:54.027 LL_I W [1002:SignalExecutor] axolotl retrieved latest signed prekey record successfully; id=0
+2020-07-01 10:00:54.043 LL_I W [994:WhatsApp Worker #5] WaMsysSetup/bootstrapForMMS
+2020-07-01 10:00:54.044 LL_I W [1:main] ProcessProviderMigrationInfo/on-receive
+2020-07-01 10:00:54.045 LL_I W [1003:AsyncTask #1] AlarmService/hourlyCron; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmService (has extras) }
+2020-07-01 10:00:54.047 LL_I W [994:WhatsApp Worker #5] app-init/permissions/com.whatsapp w=true
+2020-07-01 10:00:54.047 LL_I W [994:WhatsApp Worker #5] app-init/permissions/files w=true
+2020-07-01 10:00:54.047 LL_I W [994:WhatsApp Worker #5] app-init/permissions/Logs w=true
+2020-07-01 10:00:54.047 LL_I W [994:WhatsApp Worker #5] app-init/permissions/databases w=true
+2020-07-01 10:00:54.048 LL_I W [994:WhatsApp Worker #5] app-init/async/screen/off
+2020-07-01 10:00:54.051 LL_I W [994:WhatsApp Worker #5] network/info
 [type: MOBILE[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: false], type: 0, subtype: 0
 [type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "HUAWEI-XsfB", roaming: false, failover: false, isAvailable: true], type: 1, subtype: 0
 [type: MOBILE_MMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 2, subtype: 0
@@ -197,964 +179,38 @@
 [type: MOBILE_BIP4[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 42, subtype: 0
 [type: MOBILE_BIP5[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 43, subtype: 0
 [type: MOBILE_BIP6[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 44, subtype: 0
-2020-06-28 11:50:50.938 LL_I W [667:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 11:50:50.953 LL_I W [664:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
-2020-06-28 11:50:50.959 LL_I W [667:WhatsApp Worker #2] app-init/async/done
-2020-06-28 11:50:51.000 LL_I W [689:WhatsApp Worker #4] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 11:50:51.102 LL_I W [700:AsyncTask #1] device/memory private_dirty=14864kB pss=29988kB shared_dirty=40860kB
-2020-06-28 11:50:51.240 LL_I W [700:AsyncTask #1] device/memory processes=1 total=30240
-2020-06-28 11:50:51.241 LL_I W [700:AsyncTask #1] device/battery BatteryState{health=good, level=95, plugged=1, scale=100, percent=95.0}
-2020-06-28 11:50:51.251 LL_I W [688:WhatsApp Worker #3] device/memory/system/available 911000 kiB (221184 kiB) lowMemory=false
-2020-06-28 11:50:51.307 LL_I W [688:WhatsApp Worker #3] device/memory/max 196608 kiB (~192 memory class)
-2020-06-28 11:50:51.308 LL_I W [688:WhatsApp Worker #3] device/memory/native/size 33836 kiB/allocated 33677 kiB/free 158 kiB
-2020-06-28 11:50:51.310 LL_I W [688:WhatsApp Worker #3] device/memory/dalvik/size 15529 kiB/allocated 13689 kiB/free 1839 kiB
-2020-06-28 11:50:51.310 LL_I W [700:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
-2020-06-28 11:50:51.311 LL_I W [700:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Mon Jun 29 02:00:00 GMT+03:00 2020
-2020-06-28 11:50:51.320 LL_I W [700:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Mon Jun 29 00:00:00 GMT+03:00 2020
-2020-06-28 11:50:51.325 LL_I W [700:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
-2020-06-28 11:50:51.325 LL_I W [700:AsyncTask #1] work-manager/configuration/created
-2020-06-28 11:50:51.364 LL_I W [700:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
-2020-06-28 11:50:51.367 LL_I W [700:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
-2020-06-28 11:50:51.368 LL_I W [700:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
-2020-06-28 11:50:51.385 LL_I W [700:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-06-28 11:50:51.375+0300; lastSignedPrekeyRotation=2020-06-10 20:21:33.785+0300; deltaToAlarm=1067442410
-2020-06-28 11:50:51.392 LL_I W [700:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 11:18:15.749+0200
-2020-06-28 11:50:51.413 LL_I W [700:AsyncTask #1] AlarmService#updateNtp; intent=null
-2020-06-28 11:50:51.414 LL_I W [700:AsyncTask #1] resolving 2.android.pool.ntp.org
-2020-06-28 11:50:51.491 LL_I W [700:AsyncTask #1] ntp update processed; device time: Sun Jun 28 11:50:51 GMT+03:00 2020 ntp time: Sun Jun 28 11:50:52 GMT+03:00 2020
-2020-06-28 11:50:52.693 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=96, plugged=1, scale=100, percent=96.0}
-2020-06-28 11:54:53.213 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=97, plugged=1, scale=100, percent=97.0}
-2020-06-28 11:55:50.796 LL_I W [655:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:55:50.798 LL_I W [655:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 11:59:48.436 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=97, plugged=0, scale=100, percent=97.0}
-2020-06-28 11:59:48.625 LL_I W [1:main] ScreenLockReceiver; tag=unlock; locked=false; oldLocked=true
-2020-06-28 12:50:51.239 LL_I D [719:Logger] ==== logfile level=3 tz=+0300 ====
-2020-06-28 12:50:51.238 LL_I D [1:main] ==== logfile version=2.20.193.9 level=3====
-2020-06-28 12:50:51.387 LL_I D [1:main] WATLS: using external persistent cache directory /storage/emulated/0/Android/data/com.whatsapp/cache/watls-sessions
-2020-06-28 12:50:51.388 LL_I D [1:main] appshell/debug_info: pkg=com.whatsapp; v=2.20.193.9-play-release; vc=204309000; p=consumer; e=180; g=base-v2.20.193.9-dirty; t=1592845416105; d=HUAWEI ALE-L21; os=Android 6.0; abis=arm64-v8a,armeabi-v7a,armeabi
-2020-06-28 12:50:51.388 LL_I D [1:main] whatsapplibloader/system-load-library-with-install start, loading: superpack
-2020-06-28 12:50:51.398 LL_I D [1:main] whatsapplibloader/system-load-library-with-install end
-2020-06-28 12:50:51.398 LL_I D [1:main] whatsappassetdecompressor/decompressor-usable isLibraryUsable: True
-2020-06-28 12:50:51.399 LL_I D [1:main] whatsappassetdecompressor/decompress: superpack architecture is arm64-v8a
-2020-06-28 12:50:51.419 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 12:50:51.469 LL_I D [1:main]         os_core_unix.c !pjlib 2.8 for POSIX initialized
-2020-06-28 12:50:51.471 LL_I D [1:main]        wa_call_media.c !init_media_endpt_and_codecs Enter
-2020-06-28 12:50:51.472 LL_I D [1:main]        wa_audio_dev.cc  WA Audio sound library initialized
-2020-06-28 12:50:51.472 LL_I D [1:main]                  pjlib  select() I/O Queue created (0x5567a3b128)
-2020-06-28 12:50:51.473 LL_I D [1:main]        wa_call_media.c  pjmedia_endpt_create = 0
-2020-06-28 12:50:51.473 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init start
-2020-06-28 12:50:51.473 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init success
-2020-06-28 12:50:51.473 LL_I D [1:main]        wa_call_media.c  init_audio_codecs = 0
-2020-06-28 12:50:51.474 LL_I D [1:main]        wa_call_media.c  init_media_endpt_and_codecs Exit
-2020-06-28 12:50:51.482 LL_W D [1:main] whatsappassetdecompressor/load-library-from-archive File missing: codec2
-2020-06-28 12:50:51.482 LL_I D [1:main] whatsapplibloader/system-load-optional-library start
-2020-06-28 12:50:51.495 LL_I D [1:main] whatsapplibloader/system-load-optional-library end
-2020-06-28 12:50:51.495 LL_I D [1:main] native library usability testing in progress
-2020-06-28 12:50:51.495 LL_I D [1:main] native library usability testing complete
-2020-06-28 12:50:51.496 LL_I D [1:main] whatsapplibloader/usable jniVersion: 2.20.193.9
-2020-06-28 12:50:51.497 LL_I D [1:main] whatsapplibloader/usable isLibraryUsable: True
-2020-06-28 12:50:51.498 LL_I D [1:main] Loading module: breakpad
-2020-06-28 12:50:51.501 LL_I D [1:main] Module breakpad health file deleted: true
-2020-06-28 12:50:51.502 LL_I D [1:main] Module loaded: breakpad load time: 2
-2020-06-28 12:50:51.894 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 12:50:51.898 LL_I D [1:main] messagethumbcache/construct 24576
-2020-06-28 12:50:51.915 LL_I D [1:main] message_handler/logged_flag/must_reconnect initialize to true
-2020-06-28 12:50:51.915 LL_I D [1:main] message_handler/logged_flag/must_ignore_network_once initialize to false
-2020-06-28 12:50:51.915 LL_I D [1:main] message_handler/logged_flag/disconnected initialize to true
-2020-06-28 12:50:52.058 LL_I W [1:main] whatsapplocale/loadandapplyforcedlanguage/no language to load
-2020-06-28 12:50:52.067 LL_I W [735:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 12:50:52.077 LL_I W [1:main] throw away fix line - X.0Rz@284be24 - X.0S8@84c1d8d - X.0ST@177bb42
-2020-06-28 12:50:52.119 LL_I W [733:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/active_network/wifi
-2020-06-28 12:50:52.120 LL_I W [733:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/message-restore/true
-2020-06-28 12:50:52.120 LL_I W [733:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/media-restore/true
-2020-06-28 12:50:52.120 LL_I W [733:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/backup/true
-2020-06-28 12:50:52.121 LL_I W [722:Wam_internal] wambuffer/header/init: header=2 bufferCount=2 maxMetadataSize=65536 maxEventBufferSize=65536 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 12:50:52.121 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.121 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.123 LL_I W [722:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 12:50:52.123 LL_I W [722:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 12:50:52.123 LL_I W [1:main] memanager/load-me
-2020-06-28 12:50:52.125 LL_I W [1:main] statistics/init
-2020-06-28 12:50:52.126 LL_I W [722:Wam_internal] wambuffer/header/init: header=2 bufferCount=8 maxMetadataSize=65536 maxEventBufferSize=16384 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 12:50:52.126 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.126 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.127 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/2: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.127 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/3: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.127 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/4: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.127 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/5: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.127 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/6: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.127 LL_I W [722:Wam_internal] wambuffer/header/init/eventBufferMetadata/7: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 12:50:52.127 LL_I W [722:Wam_internal] InMemorySingleEventBufferManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0
-2020-06-28 12:50:52.128 LL_I W [755:stat-save] statistics data init: Text Messages: 0 sent, 0 received / Media Messages: 0 sent (0 bytes), 0 received (0 bytes) / Offline Messages: 0 received (0 msec average delay) / Status : 0 sent (0 bytes), 0 received (0 bytes) / Payment Messages : 0 sent, 0 received / Message Service: 0 bytes sent, 0 bytes received / Voip Calls: 0 outgoing calls, 0 incoming calls, 0 bytes sent, 0 bytes received / Google Drive: 0 bytes sent, 0 bytes received / Roaming: 0 bytes sent, 0 bytes received / Total Data: 0 bytes sent, 0 bytes received
-2020-06-28 12:50:52.136 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 12:50:52.136 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 12:50:52.137 LL_I W [1:main] media-state-manager/refresh-media-state/writable-media
-2020-06-28 12:50:52.145 LL_W W [1:main] PAY: phoneNumber: countryCode:
-2020-06-28 12:50:52.147 LL_I W [1:main] app-init/main/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 12:50:52.147 LL_I W [1:main] InterAppCommunicationManager/smbIsCapableOfMigratingFromConsumer=false
-2020-06-28 12:50:52.148 LL_I W [1:main] InterAppCommunicationManager/sendInitialMigrationInfoNeededBroadcast/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 12:50:52.148 LL_I W [1:main] InterAppCommunicationManager/sendRequesterToProviderOrderedBroadcast/action = com.whatsapp.registration.directmigration.initialMigrationInfoAction
-2020-06-28 12:50:52.152 LL_I W [757:WhatsApp Worker #4] media-state-manager/refresh-media-state/internal-storage available:4,647,194,624 total:11,289,227,264
-2020-06-28 12:50:52.156 LL_I W [1:main] loginmanager/loadloginfailed/none
-2020-06-28 12:50:52.157 LL_I W [757:WhatsApp Worker #4] media-state-manager/refresh-media-state/writable-media/external-storage available: 4,626,219,008 total: 11,268,255,744
-2020-06-28 12:50:52.158 LL_I W [1:main] androidcontactscontentobserver/registered
-2020-06-28 12:50:52.183 LL_I W [1:main] app-init/async/device_info/OS_BUILD_NUMBER ALE-L21C02B589
-2020-06-28 12:50:52.184 LL_I W [1:main] app-init/main/done
-2020-06-28 12:50:52.184 LL_I W [735:WhatsApp Worker #2] app-init/async/start
-2020-06-28 12:50:52.184 LL_I W [735:WhatsApp Worker #2] WaMsysSetup/bootstrapForReg
-2020-06-28 12:50:52.185 LL_I W [735:WhatsApp Worker #2] WaMsysSetup/bootstrap
-2020-06-28 12:50:52.188 LL_I W [1:main] AlarmBroadcastReceiver dispatching to AlarmService; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmBroadcastReceiver (has extras) }; elapsedRealtime=7393147
-2020-06-28 12:50:52.227 LL_I W [1:main] gdrive-conditions-manager/can-use-battery/battery-level/100
-2020-06-28 12:50:52.228 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-backup/true
-2020-06-28 12:50:52.228 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-media-restore/true
-2020-06-28 12:50:52.228 LL_I W [1:main] gdrive-conditions-manager/ignore-battery-status/false
-2020-06-28 12:50:52.228 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 12:50:52.229 LL_I W [1:main] phone/state idle
-2020-06-28 12:50:52.230 LL_I W [1:main] OnTrimMemory/level: 80, trimming memory, app in background
-2020-06-28 12:50:52.254 LL_I W [766:WhatsApp Worker #6]       wa_call_utils.cc !Number of external threads now: 1
-2020-06-28 12:50:52.254 LL_I W [766:WhatsApp Worker #6]              wa_call.c  wa_call_update_network_medium Wifi 1400
-2020-06-28 12:50:52.255 LL_I W [766:WhatsApp Worker #6]              wa_call.c  About to set wa_call_set_network_medium Wifi, network_mtu 1400
-2020-06-28 12:50:52.255 LL_I W [766:WhatsApp Worker #6]              wa_call.c  Abort. But reset wa_call_set_network_medium to WAM_ENUM_CALL_NETWORK_MEDIUM_NONE
-2020-06-28 12:50:52.255 LL_I W [766:WhatsApp Worker #6]              wa_call.c  check_call_state_active_internal end relay info not received yet
-2020-06-28 12:50:52.302 LL_I W [735:WhatsApp Worker #2] WhatsAppLocale/setDerivedFieldsUnderLock/fieldCreationTimer/timer/stop: 95
-2020-06-28 12:50:52.309 LL_I W [733:WhatsApp Worker #1] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 12:50:52.348 LL_I W [768:SignalExecutor] axolotl retrieved latest signed prekey record successfully; id=0
-2020-06-28 12:50:52.362 LL_I W [735:WhatsApp Worker #2] WaMsysSetup/bootstrapForMMS
-2020-06-28 12:50:52.366 LL_I W [735:WhatsApp Worker #2] app-init/permissions/com.whatsapp w=true
-2020-06-28 12:50:52.366 LL_I W [735:WhatsApp Worker #2] app-init/permissions/files w=true
-2020-06-28 12:50:52.366 LL_I W [735:WhatsApp Worker #2] app-init/permissions/Logs w=true
-2020-06-28 12:50:52.366 LL_I W [735:WhatsApp Worker #2] app-init/permissions/databases w=true
-2020-06-28 12:50:52.366 LL_I W [735:WhatsApp Worker #2] app-init/async/screen/off
-2020-06-28 12:50:52.371 LL_I W [1:main] ProcessProviderMigrationInfo/on-receive
-2020-06-28 12:50:52.372 LL_I W [735:WhatsApp Worker #2] network/info
-[type: MOBILE[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: false], type: 0, subtype: 0
-[type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "HUAWEI-XsfB", roaming: false, failover: false, isAvailable: true], type: 1, subtype: 0
-[type: MOBILE_MMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 2, subtype: 0
-[type: MOBILE_SUPL[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 3, subtype: 0
-[type: MOBILE_DUN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 4, subtype: 0
-[type: MOBILE_HIPRI[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 5, subtype: 0
-[type: BLUETOOTH[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 7, subtype: 0
-[type: MOBILE_FOTA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 10, subtype: 0
-[type: MOBILE_IMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 11, subtype: 0
-[type: MOBILE_CBS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 12, subtype: 0
-[type: MOBILE_IA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 14, subtype: 0
-[type: VPN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 17, subtype: 0
-[type: MOBILE_BIP0[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 38, subtype: 0
-[type: MOBILE_BIP1[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 39, subtype: 0
-[type: MOBILE_BIP2[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 40, subtype: 0
-[type: MOBILE_BIP3[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 41, subtype: 0
-[type: MOBILE_BIP4[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 42, subtype: 0
-[type: MOBILE_BIP5[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 43, subtype: 0
-[type: MOBILE_BIP6[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 44, subtype: 0
-2020-06-28 12:50:52.374 LL_I W [769:AsyncTask #1] AlarmService/hourlyCron; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmService (has extras) }
-2020-06-28 12:50:52.399 LL_I W [735:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 12:50:52.409 LL_I W [732:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
-2020-06-28 12:50:52.413 LL_I W [735:WhatsApp Worker #2] app-init/async/done
-2020-06-28 12:50:52.438 LL_I W [756:WhatsApp Worker #3] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 12:50:52.525 LL_I W [769:AsyncTask #1] device/memory private_dirty=15452kB pss=30999kB shared_dirty=39804kB
-2020-06-28 12:50:52.653 LL_I W [769:AsyncTask #1] device/memory processes=1 total=31257
-2020-06-28 12:50:52.654 LL_I W [769:AsyncTask #1] device/battery BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 12:50:52.657 LL_I W [766:WhatsApp Worker #6] device/memory/system/available 1052996 kiB (221184 kiB) lowMemory=false
-2020-06-28 12:50:52.717 LL_I W [766:WhatsApp Worker #6] device/memory/max 196608 kiB (~192 memory class)
-2020-06-28 12:50:52.718 LL_I W [766:WhatsApp Worker #6] device/memory/native/size 33860 kiB/allocated 33713 kiB/free 146 kiB
-2020-06-28 12:50:52.718 LL_I W [766:WhatsApp Worker #6] device/memory/dalvik/size 16286 kiB/allocated 13700 kiB/free 2585 kiB
-2020-06-28 12:50:52.718 LL_I W [769:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
-2020-06-28 12:50:52.719 LL_I W [769:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Mon Jun 29 02:00:00 GMT+03:00 2020
-2020-06-28 12:50:52.729 LL_I W [769:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Mon Jun 29 00:00:00 GMT+03:00 2020
-2020-06-28 12:50:52.733 LL_I W [769:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
-2020-06-28 12:50:52.734 LL_I W [769:AsyncTask #1] work-manager/configuration/created
-2020-06-28 12:50:52.760 LL_I W [769:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
-2020-06-28 12:50:52.763 LL_I W [769:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
-2020-06-28 12:50:52.763 LL_I W [769:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
-2020-06-28 12:50:52.769 LL_I W [769:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-06-28 12:50:52.766+0300; lastSignedPrekeyRotation=2020-06-10 20:21:33.785+0300; deltaToAlarm=1063841019
-2020-06-28 12:50:52.774 LL_I W [769:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 11:18:15.749+0200
-2020-06-28 12:50:52.784 LL_I W [769:AsyncTask #1] AlarmService#updateNtp; intent=null
-2020-06-28 12:50:52.795 LL_I W [769:AsyncTask #1] resolving 2.android.pool.ntp.org
-2020-06-28 12:50:52.864 LL_I W [769:AsyncTask #1] ntp update processed; device time: Sun Jun 28 12:50:52 GMT+03:00 2020 ntp time: Sun Jun 28 12:50:53 GMT+03:00 2020
-2020-06-28 12:55:52.154 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 12:55:52.155 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:00:52.253 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:00:52.253 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:05:52.339 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:05:52.341 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:10:52.433 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:10:52.433 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:15:52.532 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:15:52.534 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:20:52.603 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:20:52.605 LL_I W [723:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:55:11.925 LL_I D [767:Logger] ==== logfile level=3 tz=+0300 ====
-2020-06-28 13:55:11.920 LL_I D [1:main] ==== logfile version=2.20.193.9 level=3====
-2020-06-28 13:55:12.062 LL_I D [1:main] WATLS: using external persistent cache directory /storage/emulated/0/Android/data/com.whatsapp/cache/watls-sessions
-2020-06-28 13:55:12.063 LL_I D [1:main] appshell/debug_info: pkg=com.whatsapp; v=2.20.193.9-play-release; vc=204309000; p=consumer; e=180; g=base-v2.20.193.9-dirty; t=1592845416105; d=HUAWEI ALE-L21; os=Android 6.0; abis=arm64-v8a,armeabi-v7a,armeabi
-2020-06-28 13:55:12.063 LL_I D [1:main] whatsapplibloader/system-load-library-with-install start, loading: superpack
-2020-06-28 13:55:12.071 LL_I D [1:main] whatsapplibloader/system-load-library-with-install end
-2020-06-28 13:55:12.071 LL_I D [1:main] whatsappassetdecompressor/decompressor-usable isLibraryUsable: True
-2020-06-28 13:55:12.071 LL_I D [1:main] whatsappassetdecompressor/decompress: superpack architecture is arm64-v8a
-2020-06-28 13:55:12.090 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 13:55:12.124 LL_I D [1:main]         os_core_unix.c !pjlib 2.8 for POSIX initialized
-2020-06-28 13:55:12.126 LL_I D [1:main]        wa_call_media.c !init_media_endpt_and_codecs Enter
-2020-06-28 13:55:12.126 LL_I D [1:main]        wa_audio_dev.cc  WA Audio sound library initialized
-2020-06-28 13:55:12.127 LL_I D [1:main]                  pjlib  select() I/O Queue created (0x5567a3b128)
-2020-06-28 13:55:12.127 LL_I D [1:main]        wa_call_media.c  pjmedia_endpt_create = 0
-2020-06-28 13:55:12.127 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init start
-2020-06-28 13:55:12.128 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init success
-2020-06-28 13:55:12.128 LL_I D [1:main]        wa_call_media.c  init_audio_codecs = 0
-2020-06-28 13:55:12.128 LL_I D [1:main]        wa_call_media.c  init_media_endpt_and_codecs Exit
-2020-06-28 13:55:12.134 LL_W D [1:main] whatsappassetdecompressor/load-library-from-archive File missing: codec2
-2020-06-28 13:55:12.135 LL_I D [1:main] whatsapplibloader/system-load-optional-library start
-2020-06-28 13:55:12.146 LL_I D [1:main] whatsapplibloader/system-load-optional-library end
-2020-06-28 13:55:12.147 LL_I D [1:main] native library usability testing in progress
-2020-06-28 13:55:12.147 LL_I D [1:main] native library usability testing complete
-2020-06-28 13:55:12.147 LL_I D [1:main] whatsapplibloader/usable jniVersion: 2.20.193.9
-2020-06-28 13:55:12.148 LL_I D [1:main] whatsapplibloader/usable isLibraryUsable: True
-2020-06-28 13:55:12.149 LL_I D [1:main] Loading module: breakpad
-2020-06-28 13:55:12.152 LL_I D [1:main] Module breakpad health file deleted: true
-2020-06-28 13:55:12.153 LL_I D [1:main] Module loaded: breakpad load time: 2
-2020-06-28 13:55:12.552 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 13:55:12.555 LL_I D [1:main] messagethumbcache/construct 24576
-2020-06-28 13:55:12.572 LL_I D [1:main] message_handler/logged_flag/must_reconnect initialize to true
-2020-06-28 13:55:12.573 LL_I D [1:main] message_handler/logged_flag/must_ignore_network_once initialize to false
-2020-06-28 13:55:12.573 LL_I D [1:main] message_handler/logged_flag/disconnected initialize to true
-2020-06-28 13:55:12.684 LL_I W [1:main] whatsapplocale/loadandapplyforcedlanguage/no language to load
-2020-06-28 13:55:12.689 LL_I W [783:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 13:55:12.698 LL_I W [1:main] throw away fix line - X.0Rz@284be24 - X.0S8@84c1d8d - X.0ST@177bb42
-2020-06-28 13:55:12.714 LL_I W [781:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/active_network/wifi
-2020-06-28 13:55:12.715 LL_I W [781:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/message-restore/true
-2020-06-28 13:55:12.715 LL_I W [781:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/media-restore/true
-2020-06-28 13:55:12.715 LL_I W [781:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/backup/true
-2020-06-28 13:55:12.725 LL_I W [770:Wam_internal] wambuffer/header/init: header=2 bufferCount=2 maxMetadataSize=65536 maxEventBufferSize=65536 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 13:55:12.725 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.725 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.726 LL_I W [770:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 13:55:12.726 LL_I W [770:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 13:55:12.727 LL_I W [770:Wam_internal] wambuffer/header/init: header=2 bufferCount=8 maxMetadataSize=65536 maxEventBufferSize=16384 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 13:55:12.728 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.728 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.728 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/2: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.728 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/3: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.728 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/4: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.728 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/5: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.729 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/6: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.729 LL_I W [770:Wam_internal] wambuffer/header/init/eventBufferMetadata/7: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 13:55:12.729 LL_I W [770:Wam_internal] InMemorySingleEventBufferManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0
-2020-06-28 13:55:12.729 LL_I W [1:main] memanager/load-me
-2020-06-28 13:55:12.730 LL_I W [1:main] statistics/init
-2020-06-28 13:55:12.733 LL_I W [803:stat-save] statistics data init: Text Messages: 0 sent, 0 received / Media Messages: 0 sent (0 bytes), 0 received (0 bytes) / Offline Messages: 0 received (0 msec average delay) / Status : 0 sent (0 bytes), 0 received (0 bytes) / Payment Messages : 0 sent, 0 received / Message Service: 0 bytes sent, 0 bytes received / Voip Calls: 0 outgoing calls, 0 incoming calls, 0 bytes sent, 0 bytes received / Google Drive: 0 bytes sent, 0 bytes received / Roaming: 0 bytes sent, 0 bytes received / Total Data: 0 bytes sent, 0 bytes received
-2020-06-28 13:55:12.734 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:55:12.734 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 13:55:12.756 LL_I W [1:main] media-state-manager/refresh-media-state/writable-media
-2020-06-28 13:55:12.760 LL_W W [1:main] PAY: phoneNumber: countryCode:
-2020-06-28 13:55:12.761 LL_I W [1:main] app-init/main/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 13:55:12.761 LL_I W [1:main] InterAppCommunicationManager/smbIsCapableOfMigratingFromConsumer=false
-2020-06-28 13:55:12.762 LL_I W [1:main] InterAppCommunicationManager/sendInitialMigrationInfoNeededBroadcast/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 13:55:12.763 LL_I W [1:main] InterAppCommunicationManager/sendRequesterToProviderOrderedBroadcast/action = com.whatsapp.registration.directmigration.initialMigrationInfoAction
-2020-06-28 13:55:12.767 LL_I W [805:WhatsApp Worker #4] media-state-manager/refresh-media-state/internal-storage available:4,644,331,520 total:11,289,227,264
-2020-06-28 13:55:12.768 LL_I W [1:main] loginmanager/loadloginfailed/none
-2020-06-28 13:55:12.769 LL_I W [1:main] androidcontactscontentobserver/registered
-2020-06-28 13:55:12.774 LL_I W [805:WhatsApp Worker #4] media-state-manager/refresh-media-state/writable-media/external-storage available: 4,623,364,096 total: 11,268,255,744
-2020-06-28 13:55:12.780 LL_I W [1:main] app-init/async/device_info/OS_BUILD_NUMBER ALE-L21C02B589
-2020-06-28 13:55:12.780 LL_I W [1:main] app-init/main/done
-2020-06-28 13:55:12.780 LL_I W [806:WhatsApp Worker #5] app-init/async/start
-2020-06-28 13:55:12.781 LL_I W [806:WhatsApp Worker #5] WaMsysSetup/bootstrapForReg
-2020-06-28 13:55:12.781 LL_I W [806:WhatsApp Worker #5] WaMsysSetup/bootstrap
-2020-06-28 13:55:12.783 LL_I W [1:main] AlarmBroadcastReceiver dispatching to AlarmService; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmBroadcastReceiver (has extras) }; elapsedRealtime=11253742
-2020-06-28 13:55:12.813 LL_I W [1:main] gdrive-conditions-manager/can-use-battery/battery-level/100
-2020-06-28 13:55:12.814 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-backup/true
-2020-06-28 13:55:12.814 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-media-restore/true
-2020-06-28 13:55:12.814 LL_I W [1:main] gdrive-conditions-manager/ignore-battery-status/false
-2020-06-28 13:55:12.814 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 13:55:12.815 LL_I W [1:main] phone/state idle
-2020-06-28 13:55:12.815 LL_I W [1:main] OnTrimMemory/level: 80, trimming memory, app in background
-2020-06-28 13:55:12.825 LL_I W [804:WhatsApp Worker #3]       wa_call_utils.cc !Number of external threads now: 1
-2020-06-28 13:55:12.834 LL_I W [804:WhatsApp Worker #3]              wa_call.c  wa_call_update_network_medium Wifi 1400
-2020-06-28 13:55:12.834 LL_I W [804:WhatsApp Worker #3]              wa_call.c  About to set wa_call_set_network_medium Wifi, network_mtu 1400
-2020-06-28 13:55:12.834 LL_I W [804:WhatsApp Worker #3]              wa_call.c  Abort. But reset wa_call_set_network_medium to WAM_ENUM_CALL_NETWORK_MEDIUM_NONE
-2020-06-28 13:55:12.834 LL_I W [804:WhatsApp Worker #3]              wa_call.c  check_call_state_active_internal end relay info not received yet
-2020-06-28 13:55:12.894 LL_I W [806:WhatsApp Worker #5] WhatsAppLocale/setDerivedFieldsUnderLock/fieldCreationTimer/timer/stop: 99
-2020-06-28 13:55:12.903 LL_I W [781:WhatsApp Worker #1] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 13:55:12.911 LL_I W [814:SignalExecutor] axolotl retrieved latest signed prekey record successfully; id=0
-2020-06-28 13:55:12.923 LL_I W [806:WhatsApp Worker #5] WaMsysSetup/bootstrapForMMS
-2020-06-28 13:55:12.926 LL_I W [806:WhatsApp Worker #5] app-init/permissions/com.whatsapp w=true
-2020-06-28 13:55:12.926 LL_I W [806:WhatsApp Worker #5] app-init/permissions/files w=true
-2020-06-28 13:55:12.926 LL_I W [806:WhatsApp Worker #5] app-init/permissions/Logs w=true
-2020-06-28 13:55:12.926 LL_I W [806:WhatsApp Worker #5] app-init/permissions/databases w=true
-2020-06-28 13:55:12.926 LL_I W [806:WhatsApp Worker #5] app-init/async/screen/off
-2020-06-28 13:55:12.930 LL_I W [806:WhatsApp Worker #5] network/info
-[type: MOBILE[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: false], type: 0, subtype: 0
-[type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "HUAWEI-XsfB", roaming: false, failover: false, isAvailable: true], type: 1, subtype: 0
-[type: MOBILE_MMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 2, subtype: 0
-[type: MOBILE_SUPL[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 3, subtype: 0
-[type: MOBILE_DUN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 4, subtype: 0
-[type: MOBILE_HIPRI[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 5, subtype: 0
-[type: BLUETOOTH[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 7, subtype: 0
-[type: MOBILE_FOTA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 10, subtype: 0
-[type: MOBILE_IMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 11, subtype: 0
-[type: MOBILE_CBS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 12, subtype: 0
-[type: MOBILE_IA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 14, subtype: 0
-[type: VPN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 17, subtype: 0
-[type: MOBILE_BIP0[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 38, subtype: 0
-[type: MOBILE_BIP1[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 39, subtype: 0
-[type: MOBILE_BIP2[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 40, subtype: 0
-[type: MOBILE_BIP3[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 41, subtype: 0
-[type: MOBILE_BIP4[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 42, subtype: 0
-[type: MOBILE_BIP5[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 43, subtype: 0
-[type: MOBILE_BIP6[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 44, subtype: 0
-2020-06-28 13:55:12.933 LL_I W [1:main] ProcessProviderMigrationInfo/on-receive
-2020-06-28 13:55:12.933 LL_I W [815:AsyncTask #1] AlarmService/hourlyCron; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmService (has extras) }
-2020-06-28 13:55:12.958 LL_I W [806:WhatsApp Worker #5] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 13:55:12.965 LL_I W [780:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
-2020-06-28 13:55:12.966 LL_I W [806:WhatsApp Worker #5] app-init/async/done
-2020-06-28 13:55:12.980 LL_I W [804:WhatsApp Worker #3] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 13:55:13.064 LL_I W [815:AsyncTask #1] device/memory private_dirty=15204kB pss=30236kB shared_dirty=39316kB
-2020-06-28 13:55:13.240 LL_I W [815:AsyncTask #1] device/memory processes=1 total=30558
-2020-06-28 13:55:13.242 LL_I W [815:AsyncTask #1] device/battery BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 13:55:13.245 LL_I W [781:WhatsApp Worker #1] device/memory/system/available 900296 kiB (221184 kiB) lowMemory=false
-2020-06-28 13:55:13.298 LL_I W [781:WhatsApp Worker #1] device/memory/max 196608 kiB (~192 memory class)
-2020-06-28 13:55:13.298 LL_I W [815:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
-2020-06-28 13:55:13.299 LL_I W [781:WhatsApp Worker #1] device/memory/native/size 33908 kiB/allocated 33696 kiB/free 211 kiB
-2020-06-28 13:55:13.300 LL_I W [781:WhatsApp Worker #1] device/memory/dalvik/size 15653 kiB/allocated 13504 kiB/free 2149 kiB
-2020-06-28 13:55:13.300 LL_I W [815:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Mon Jun 29 02:00:00 GMT+03:00 2020
-2020-06-28 13:55:13.311 LL_I W [815:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Mon Jun 29 00:00:00 GMT+03:00 2020
-2020-06-28 13:55:13.316 LL_I W [815:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
-2020-06-28 13:55:13.316 LL_I W [815:AsyncTask #1] work-manager/configuration/created
-2020-06-28 13:55:13.344 LL_I W [815:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
-2020-06-28 13:55:13.345 LL_I W [815:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
-2020-06-28 13:55:13.347 LL_I W [815:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
-2020-06-28 13:55:13.352 LL_I W [815:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-06-28 13:55:13.350+0300; lastSignedPrekeyRotation=2020-06-10 20:21:33.785+0300; deltaToAlarm=1059980435
-2020-06-28 13:55:13.356 LL_I W [815:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 11:18:15.749+0200
-2020-06-28 13:55:13.368 LL_I W [815:AsyncTask #1] AlarmService#updateNtp; intent=null
-2020-06-28 13:55:13.374 LL_I W [815:AsyncTask #1] resolving 2.android.pool.ntp.org
-2020-06-28 13:55:13.446 LL_I W [815:AsyncTask #1] ntp update processed; device time: Sun Jun 28 13:55:13 GMT+03:00 2020 ntp time: Sun Jun 28 13:55:13 GMT+03:00 2020
-2020-06-28 14:00:12.837 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:00:12.839 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:05:12.938 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:05:12.940 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:10:13.035 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:10:13.036 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:15:13.068 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:15:13.069 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:20:13.133 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:20:13.135 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:25:13.235 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:25:13.237 LL_I W [771:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:51:15.747 LL_I D [787:Logger] ==== logfile level=3 tz=+0300 ====
-2020-06-28 14:51:15.743 LL_I D [1:main] ==== logfile version=2.20.193.9 level=3====
-2020-06-28 14:51:15.943 LL_I D [1:main] WATLS: using external persistent cache directory /storage/emulated/0/Android/data/com.whatsapp/cache/watls-sessions
-2020-06-28 14:51:15.944 LL_I D [1:main] appshell/debug_info: pkg=com.whatsapp; v=2.20.193.9-play-release; vc=204309000; p=consumer; e=180; g=base-v2.20.193.9-dirty; t=1592845416105; d=HUAWEI ALE-L21; os=Android 6.0; abis=arm64-v8a,armeabi-v7a,armeabi
-2020-06-28 14:51:15.944 LL_I D [1:main] whatsapplibloader/system-load-library-with-install start, loading: superpack
-2020-06-28 14:51:15.953 LL_I D [1:main] whatsapplibloader/system-load-library-with-install end
-2020-06-28 14:51:15.953 LL_I D [1:main] whatsappassetdecompressor/decompressor-usable isLibraryUsable: True
-2020-06-28 14:51:15.954 LL_I D [1:main] whatsappassetdecompressor/decompress: superpack architecture is arm64-v8a
-2020-06-28 14:51:15.967 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 14:51:16.000 LL_I D [1:main]         os_core_unix.c !pjlib 2.8 for POSIX initialized
-2020-06-28 14:51:16.002 LL_I D [1:main]        wa_call_media.c !init_media_endpt_and_codecs Enter
-2020-06-28 14:51:16.002 LL_I D [1:main]        wa_audio_dev.cc  WA Audio sound library initialized
-2020-06-28 14:51:16.003 LL_I D [1:main]                  pjlib  select() I/O Queue created (0x5567a3b128)
-2020-06-28 14:51:16.003 LL_I D [1:main]        wa_call_media.c  pjmedia_endpt_create = 0
-2020-06-28 14:51:16.003 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init start
-2020-06-28 14:51:16.003 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init success
-2020-06-28 14:51:16.003 LL_I D [1:main]        wa_call_media.c  init_audio_codecs = 0
-2020-06-28 14:51:16.004 LL_I D [1:main]        wa_call_media.c  init_media_endpt_and_codecs Exit
-2020-06-28 14:51:16.009 LL_W D [1:main] whatsappassetdecompressor/load-library-from-archive File missing: codec2
-2020-06-28 14:51:16.009 LL_I D [1:main] whatsapplibloader/system-load-optional-library start
-2020-06-28 14:51:16.021 LL_I D [1:main] whatsapplibloader/system-load-optional-library end
-2020-06-28 14:51:16.021 LL_I D [1:main] native library usability testing in progress
-2020-06-28 14:51:16.021 LL_I D [1:main] native library usability testing complete
-2020-06-28 14:51:16.022 LL_I D [1:main] whatsapplibloader/usable jniVersion: 2.20.193.9
-2020-06-28 14:51:16.023 LL_I D [1:main] whatsapplibloader/usable isLibraryUsable: True
-2020-06-28 14:51:16.023 LL_I D [1:main] Loading module: breakpad
-2020-06-28 14:51:16.026 LL_I D [1:main] Module breakpad health file deleted: true
-2020-06-28 14:51:16.026 LL_I D [1:main] Module loaded: breakpad load time: 2
-2020-06-28 14:51:16.441 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 14:51:16.446 LL_I D [1:main] messagethumbcache/construct 24576
-2020-06-28 14:51:16.463 LL_I D [1:main] message_handler/logged_flag/must_reconnect initialize to true
-2020-06-28 14:51:16.464 LL_I D [1:main] message_handler/logged_flag/must_ignore_network_once initialize to false
-2020-06-28 14:51:16.464 LL_I D [1:main] message_handler/logged_flag/disconnected initialize to true
-2020-06-28 14:51:16.579 LL_I W [1:main] whatsapplocale/loadandapplyforcedlanguage/no language to load
-2020-06-28 14:51:16.585 LL_I W [803:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 14:51:16.593 LL_I W [1:main] throw away fix line - X.0Rz@284be24 - X.0S8@84c1d8d - X.0ST@177bb42
-2020-06-28 14:51:16.620 LL_I W [1:main] memanager/load-me
-2020-06-28 14:51:16.621 LL_I W [790:Wam_internal] wambuffer/header/init: header=2 bufferCount=2 maxMetadataSize=65536 maxEventBufferSize=65536 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 14:51:16.621 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.622 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.622 LL_I W [1:main] statistics/init
-2020-06-28 14:51:16.623 LL_I W [790:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 14:51:16.623 LL_I W [790:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 14:51:16.625 LL_I W [822:stat-save] statistics data init: Text Messages: 0 sent, 0 received / Media Messages: 0 sent (0 bytes), 0 received (0 bytes) / Offline Messages: 0 received (0 msec average delay) / Status : 0 sent (0 bytes), 0 received (0 bytes) / Payment Messages : 0 sent, 0 received / Message Service: 0 bytes sent, 0 bytes received / Voip Calls: 0 outgoing calls, 0 incoming calls, 0 bytes sent, 0 bytes received / Google Drive: 0 bytes sent, 0 bytes received / Roaming: 0 bytes sent, 0 bytes received / Total Data: 0 bytes sent, 0 bytes received
-2020-06-28 14:51:16.626 LL_I W [790:Wam_internal] wambuffer/header/init: header=2 bufferCount=8 maxMetadataSize=65536 maxEventBufferSize=16384 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 14:51:16.626 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.626 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.626 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/2: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.626 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/3: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.627 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/4: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.627 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/5: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.627 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/6: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.627 LL_I W [790:Wam_internal] wambuffer/header/init/eventBufferMetadata/7: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 14:51:16.628 LL_I W [790:Wam_internal] InMemorySingleEventBufferManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0
-2020-06-28 14:51:16.633 LL_I W [1:main] media-state-manager/refresh-media-state/writable-media
-2020-06-28 14:51:16.634 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:51:16.634 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:51:16.638 LL_W W [1:main] PAY: phoneNumber: countryCode:
-2020-06-28 14:51:16.638 LL_I W [1:main] app-init/main/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 14:51:16.638 LL_I W [1:main] InterAppCommunicationManager/smbIsCapableOfMigratingFromConsumer=false
-2020-06-28 14:51:16.639 LL_I W [1:main] InterAppCommunicationManager/sendInitialMigrationInfoNeededBroadcast/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 14:51:16.640 LL_I W [1:main] InterAppCommunicationManager/sendRequesterToProviderOrderedBroadcast/action = com.whatsapp.registration.directmigration.initialMigrationInfoAction
-2020-06-28 14:51:16.645 LL_I W [801:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/active_network/wifi
-2020-06-28 14:51:16.645 LL_I W [801:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/message-restore/true
-2020-06-28 14:51:16.646 LL_I W [801:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/media-restore/true
-2020-06-28 14:51:16.646 LL_I W [801:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/backup/true
-2020-06-28 14:51:16.646 LL_I W [824:WhatsApp Worker #4] media-state-manager/refresh-media-state/internal-storage available:4,649,803,776 total:11,289,227,264
-2020-06-28 14:51:16.646 LL_I W [1:main] loginmanager/loadloginfailed/none
-2020-06-28 14:51:16.648 LL_I W [1:main] androidcontactscontentobserver/registered
-2020-06-28 14:51:16.650 LL_I W [824:WhatsApp Worker #4] media-state-manager/refresh-media-state/writable-media/external-storage available: 4,628,832,256 total: 11,268,255,744
-2020-06-28 14:51:16.667 LL_I W [1:main] app-init/async/device_info/OS_BUILD_NUMBER ALE-L21C02B589
-2020-06-28 14:51:16.668 LL_I W [1:main] app-init/main/done
-2020-06-28 14:51:16.668 LL_I W [826:WhatsApp Worker #5] app-init/async/start
-2020-06-28 14:51:16.668 LL_I W [826:WhatsApp Worker #5] WaMsysSetup/bootstrapForReg
-2020-06-28 14:51:16.668 LL_I W [826:WhatsApp Worker #5] WaMsysSetup/bootstrap
-2020-06-28 14:51:16.670 LL_I W [1:main] AlarmBroadcastReceiver dispatching to AlarmService; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmBroadcastReceiver (has extras) }; elapsedRealtime=14617630
-2020-06-28 14:51:16.697 LL_I W [1:main] gdrive-conditions-manager/can-use-battery/battery-level/100
-2020-06-28 14:51:16.698 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-backup/true
-2020-06-28 14:51:16.698 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-media-restore/true
-2020-06-28 14:51:16.698 LL_I W [1:main] gdrive-conditions-manager/ignore-battery-status/false
-2020-06-28 14:51:16.698 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 14:51:16.699 LL_I W [1:main] phone/state idle
-2020-06-28 14:51:16.700 LL_I W [1:main] OnTrimMemory/level: 80, trimming memory, app in background
-2020-06-28 14:51:16.712 LL_I W [834:WhatsApp Worker #6]       wa_call_utils.cc !Number of external threads now: 1
-2020-06-28 14:51:16.713 LL_I W [834:WhatsApp Worker #6]              wa_call.c  wa_call_update_network_medium Wifi 1400
-2020-06-28 14:51:16.713 LL_I W [834:WhatsApp Worker #6]              wa_call.c  About to set wa_call_set_network_medium Wifi, network_mtu 1400
-2020-06-28 14:51:16.713 LL_I W [834:WhatsApp Worker #6]              wa_call.c  Abort. But reset wa_call_set_network_medium to WAM_ENUM_CALL_NETWORK_MEDIUM_NONE
-2020-06-28 14:51:16.714 LL_I W [834:WhatsApp Worker #6]              wa_call.c  check_call_state_active_internal end relay info not received yet
-2020-06-28 14:51:16.758 LL_I W [826:WhatsApp Worker #5] WhatsAppLocale/setDerivedFieldsUnderLock/fieldCreationTimer/timer/stop: 74
-2020-06-28 14:51:16.762 LL_I W [823:WhatsApp Worker #3] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 14:51:16.778 LL_I W [835:SignalExecutor] axolotl retrieved latest signed prekey record successfully; id=0
-2020-06-28 14:51:16.790 LL_I W [826:WhatsApp Worker #5] WaMsysSetup/bootstrapForMMS
-2020-06-28 14:51:16.800 LL_I W [1:main] ProcessProviderMigrationInfo/on-receive
-2020-06-28 14:51:16.801 LL_I W [836:AsyncTask #1] AlarmService/hourlyCron; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmService (has extras) }
-2020-06-28 14:51:16.801 LL_I W [826:WhatsApp Worker #5] app-init/permissions/com.whatsapp w=true
-2020-06-28 14:51:16.801 LL_I W [826:WhatsApp Worker #5] app-init/permissions/files w=true
-2020-06-28 14:51:16.802 LL_I W [826:WhatsApp Worker #5] app-init/permissions/Logs w=true
-2020-06-28 14:51:16.802 LL_I W [826:WhatsApp Worker #5] app-init/permissions/databases w=true
-2020-06-28 14:51:16.802 LL_I W [826:WhatsApp Worker #5] app-init/async/screen/off
-2020-06-28 14:51:16.806 LL_I W [826:WhatsApp Worker #5] network/info
-[type: MOBILE[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: false], type: 0, subtype: 0
-[type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "HUAWEI-XsfB", roaming: false, failover: false, isAvailable: true], type: 1, subtype: 0
-[type: MOBILE_MMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 2, subtype: 0
-[type: MOBILE_SUPL[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 3, subtype: 0
-[type: MOBILE_DUN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 4, subtype: 0
-[type: MOBILE_HIPRI[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 5, subtype: 0
-[type: BLUETOOTH[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 7, subtype: 0
-[type: MOBILE_FOTA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 10, subtype: 0
-[type: MOBILE_IMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 11, subtype: 0
-[type: MOBILE_CBS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 12, subtype: 0
-[type: MOBILE_IA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 14, subtype: 0
-[type: VPN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 17, subtype: 0
-[type: MOBILE_BIP0[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 38, subtype: 0
-[type: MOBILE_BIP1[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 39, subtype: 0
-[type: MOBILE_BIP2[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 40, subtype: 0
-[type: MOBILE_BIP3[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 41, subtype: 0
-[type: MOBILE_BIP4[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 42, subtype: 0
-[type: MOBILE_BIP5[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 43, subtype: 0
-[type: MOBILE_BIP6[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 44, subtype: 0
-2020-06-28 14:51:16.830 LL_I W [826:WhatsApp Worker #5] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 14:51:16.835 LL_I W [800:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
-2020-06-28 14:51:16.839 LL_I W [826:WhatsApp Worker #5] app-init/async/done
-2020-06-28 14:51:16.857 LL_I W [801:WhatsApp Worker #1] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 14:51:16.937 LL_I W [836:AsyncTask #1] device/memory private_dirty=15216kB pss=30318kB shared_dirty=39236kB
-2020-06-28 14:51:17.071 LL_I W [836:AsyncTask #1] device/memory processes=1 total=30723
-2020-06-28 14:51:17.072 LL_I W [836:AsyncTask #1] device/battery BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 14:51:17.074 LL_I W [836:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
-2020-06-28 14:51:17.074 LL_I W [836:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Mon Jun 29 02:00:00 GMT+03:00 2020
-2020-06-28 14:51:17.075 LL_I W [834:WhatsApp Worker #6] device/memory/system/available 983156 kiB (221184 kiB) lowMemory=false
-2020-06-28 14:51:17.139 LL_I W [834:WhatsApp Worker #6] device/memory/max 196608 kiB (~192 memory class)
-2020-06-28 14:51:17.140 LL_I W [834:WhatsApp Worker #6] device/memory/native/size 33864 kiB/allocated 33705 kiB/free 158 kiB
-2020-06-28 14:51:17.140 LL_I W [834:WhatsApp Worker #6] device/memory/dalvik/size 16002 kiB/allocated 13529 kiB/free 2473 kiB
-2020-06-28 14:51:17.149 LL_I W [836:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Mon Jun 29 00:00:00 GMT+03:00 2020
-2020-06-28 14:51:17.152 LL_I W [836:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
-2020-06-28 14:51:17.153 LL_I W [836:AsyncTask #1] work-manager/configuration/created
-2020-06-28 14:51:17.184 LL_I W [836:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
-2020-06-28 14:51:17.187 LL_I W [836:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
-2020-06-28 14:51:17.187 LL_I W [836:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
-2020-06-28 14:51:17.197 LL_I W [836:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-06-28 14:51:17.194+0300; lastSignedPrekeyRotation=2020-06-10 20:21:33.785+0300; deltaToAlarm=1056616591
-2020-06-28 14:51:17.205 LL_I W [836:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 11:18:15.749+0200
-2020-06-28 14:51:17.220 LL_I W [836:AsyncTask #1] AlarmService#updateNtp; intent=null
-2020-06-28 14:51:17.227 LL_I W [836:AsyncTask #1] resolving 2.android.pool.ntp.org
-2020-06-28 14:51:17.294 LL_I W [836:AsyncTask #1] ntp update processed; device time: Sun Jun 28 14:51:17 GMT+03:00 2020 ntp time: Sun Jun 28 14:51:17 GMT+03:00 2020
-2020-06-28 14:56:16.733 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 14:56:16.734 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:01:16.835 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:01:16.837 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:06:16.905 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:06:16.907 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:11:17.007 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:11:17.009 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:16:17.038 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:16:17.040 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:21:17.110 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:21:17.110 LL_I W [791:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:49:36.632 LL_I D [843:Logger] ==== logfile level=3 tz=+0300 ====
-2020-06-28 15:49:36.587 LL_I D [1:main] ==== logfile version=2.20.193.9 level=3====
-2020-06-28 15:49:36.732 LL_I D [1:main] WATLS: using external persistent cache directory /storage/emulated/0/Android/data/com.whatsapp/cache/watls-sessions
-2020-06-28 15:49:36.733 LL_I D [1:main] appshell/debug_info: pkg=com.whatsapp; v=2.20.193.9-play-release; vc=204309000; p=consumer; e=180; g=base-v2.20.193.9-dirty; t=1592845416105; d=HUAWEI ALE-L21; os=Android 6.0; abis=arm64-v8a,armeabi-v7a,armeabi
-2020-06-28 15:49:36.734 LL_I D [1:main] whatsapplibloader/system-load-library-with-install start, loading: superpack
-2020-06-28 15:49:36.750 LL_I D [1:main] whatsapplibloader/system-load-library-with-install end
-2020-06-28 15:49:36.751 LL_I D [1:main] whatsappassetdecompressor/decompressor-usable isLibraryUsable: True
-2020-06-28 15:49:36.752 LL_I D [1:main] whatsappassetdecompressor/decompress: superpack architecture is arm64-v8a
-2020-06-28 15:49:36.766 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 15:49:36.804 LL_I D [1:main]         os_core_unix.c !pjlib 2.8 for POSIX initialized
-2020-06-28 15:49:36.805 LL_I D [1:main]        wa_call_media.c !init_media_endpt_and_codecs Enter
-2020-06-28 15:49:36.806 LL_I D [1:main]        wa_audio_dev.cc  WA Audio sound library initialized
-2020-06-28 15:49:36.806 LL_I D [1:main]                  pjlib  select() I/O Queue created (0x5567a3b128)
-2020-06-28 15:49:36.806 LL_I D [1:main]        wa_call_media.c  pjmedia_endpt_create = 0
-2020-06-28 15:49:36.806 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init start
-2020-06-28 15:49:36.806 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init success
-2020-06-28 15:49:36.807 LL_I D [1:main]        wa_call_media.c  init_audio_codecs = 0
-2020-06-28 15:49:36.807 LL_I D [1:main]        wa_call_media.c  init_media_endpt_and_codecs Exit
-2020-06-28 15:49:36.838 LL_W D [1:main] whatsappassetdecompressor/load-library-from-archive File missing: codec2
-2020-06-28 15:49:36.839 LL_I D [1:main] whatsapplibloader/system-load-optional-library start
-2020-06-28 15:49:36.851 LL_I D [1:main] whatsapplibloader/system-load-optional-library end
-2020-06-28 15:49:36.851 LL_I D [1:main] native library usability testing in progress
-2020-06-28 15:49:36.851 LL_I D [1:main] native library usability testing complete
-2020-06-28 15:49:36.852 LL_I D [1:main] whatsapplibloader/usable jniVersion: 2.20.193.9
-2020-06-28 15:49:36.853 LL_I D [1:main] whatsapplibloader/usable isLibraryUsable: True
-2020-06-28 15:49:36.854 LL_I D [1:main] Loading module: breakpad
-2020-06-28 15:49:36.863 LL_I D [1:main] Module breakpad health file deleted: true
-2020-06-28 15:49:36.864 LL_I D [1:main] Module loaded: breakpad load time: 8
-2020-06-28 15:49:37.332 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 15:49:37.336 LL_I D [1:main] messagethumbcache/construct 24576
-2020-06-28 15:49:37.356 LL_I D [1:main] message_handler/logged_flag/must_reconnect initialize to true
-2020-06-28 15:49:37.356 LL_I D [1:main] message_handler/logged_flag/must_ignore_network_once initialize to false
-2020-06-28 15:49:37.356 LL_I D [1:main] message_handler/logged_flag/disconnected initialize to true
-2020-06-28 15:49:37.499 LL_I W [1:main] whatsapplocale/loadandapplyforcedlanguage/no language to load
-2020-06-28 15:49:37.508 LL_I W [859:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 15:49:37.515 LL_I W [1:main] throw away fix line - X.0Rz@284be24 - X.0S8@84c1d8d - X.0ST@177bb42
-2020-06-28 15:49:37.521 LL_I W [857:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/active_network/wifi
-2020-06-28 15:49:37.522 LL_I W [857:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/message-restore/true
-2020-06-28 15:49:37.522 LL_I W [857:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/media-restore/true
-2020-06-28 15:49:37.522 LL_I W [857:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/backup/true
-2020-06-28 15:49:37.543 LL_I W [846:Wam_internal] wambuffer/header/init: header=2 bufferCount=2 maxMetadataSize=65536 maxEventBufferSize=65536 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 15:49:37.544 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.544 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.546 LL_I W [846:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 15:49:37.546 LL_I W [846:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 15:49:37.548 LL_I W [1:main] memanager/load-me
-2020-06-28 15:49:37.549 LL_I W [846:Wam_internal] wambuffer/header/init: header=2 bufferCount=8 maxMetadataSize=65536 maxEventBufferSize=16384 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 15:49:37.549 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.549 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.549 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/2: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.549 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/3: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.549 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/4: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.550 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/5: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.550 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/6: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.550 LL_I W [846:Wam_internal] wambuffer/header/init/eventBufferMetadata/7: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 15:49:37.550 LL_I W [846:Wam_internal] InMemorySingleEventBufferManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0
-2020-06-28 15:49:37.550 LL_I W [1:main] statistics/init
-2020-06-28 15:49:37.557 LL_I W [879:stat-save] statistics data init: Text Messages: 0 sent, 0 received / Media Messages: 0 sent (0 bytes), 0 received (0 bytes) / Offline Messages: 0 received (0 msec average delay) / Status : 0 sent (0 bytes), 0 received (0 bytes) / Payment Messages : 0 sent, 0 received / Message Service: 0 bytes sent, 0 bytes received / Voip Calls: 0 outgoing calls, 0 incoming calls, 0 bytes sent, 0 bytes received / Google Drive: 0 bytes sent, 0 bytes received / Roaming: 0 bytes sent, 0 bytes received / Total Data: 0 bytes sent, 0 bytes received
-2020-06-28 15:49:37.559 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:49:37.559 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:49:37.569 LL_I W [1:main] media-state-manager/refresh-media-state/writable-media
-2020-06-28 15:49:37.574 LL_W W [1:main] PAY: phoneNumber: countryCode:
-2020-06-28 15:49:37.574 LL_I W [1:main] app-init/main/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 15:49:37.575 LL_I W [1:main] InterAppCommunicationManager/smbIsCapableOfMigratingFromConsumer=false
-2020-06-28 15:49:37.575 LL_I W [1:main] InterAppCommunicationManager/sendInitialMigrationInfoNeededBroadcast/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 15:49:37.576 LL_I W [1:main] InterAppCommunicationManager/sendRequesterToProviderOrderedBroadcast/action = com.whatsapp.registration.directmigration.initialMigrationInfoAction
-2020-06-28 15:49:37.584 LL_I W [881:WhatsApp Worker #4] media-state-manager/refresh-media-state/internal-storage available:4,651,134,976 total:11,289,227,264
-2020-06-28 15:49:37.584 LL_I W [1:main] loginmanager/loadloginfailed/none
-2020-06-28 15:49:37.586 LL_I W [1:main] androidcontactscontentobserver/registered
-2020-06-28 15:49:37.589 LL_I W [881:WhatsApp Worker #4] media-state-manager/refresh-media-state/writable-media/external-storage available: 4,630,163,456 total: 11,268,255,744
-2020-06-28 15:49:37.601 LL_I W [1:main] app-init/async/device_info/OS_BUILD_NUMBER ALE-L21C02B589
-2020-06-28 15:49:37.601 LL_I W [1:main] app-init/main/done
-2020-06-28 15:49:37.601 LL_I W [859:WhatsApp Worker #2] app-init/async/start
-2020-06-28 15:49:37.603 LL_I W [859:WhatsApp Worker #2] WaMsysSetup/bootstrapForReg
-2020-06-28 15:49:37.604 LL_I W [859:WhatsApp Worker #2] WaMsysSetup/bootstrap
-2020-06-28 15:49:37.606 LL_I W [1:main] AlarmBroadcastReceiver dispatching to AlarmService; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmBroadcastReceiver (has extras) }; elapsedRealtime=18118566
-2020-06-28 15:49:37.638 LL_I W [1:main] gdrive-conditions-manager/can-use-battery/battery-level/100
-2020-06-28 15:49:37.638 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-backup/true
-2020-06-28 15:49:37.639 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-media-restore/true
-2020-06-28 15:49:37.639 LL_I W [1:main] gdrive-conditions-manager/ignore-battery-status/false
-2020-06-28 15:49:37.639 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 15:49:37.641 LL_I W [1:main] phone/state idle
-2020-06-28 15:49:37.641 LL_I W [1:main] OnTrimMemory/level: 80, trimming memory, app in background
-2020-06-28 15:49:37.683 LL_I W [890:WhatsApp Worker #6]       wa_call_utils.cc !Number of external threads now: 1
-2020-06-28 15:49:37.683 LL_I W [890:WhatsApp Worker #6]              wa_call.c  wa_call_update_network_medium Wifi 1400
-2020-06-28 15:49:37.684 LL_I W [890:WhatsApp Worker #6]              wa_call.c  About to set wa_call_set_network_medium Wifi, network_mtu 1400
-2020-06-28 15:49:37.684 LL_I W [890:WhatsApp Worker #6]              wa_call.c  Abort. But reset wa_call_set_network_medium to WAM_ENUM_CALL_NETWORK_MEDIUM_NONE
-2020-06-28 15:49:37.686 LL_I W [890:WhatsApp Worker #6]              wa_call.c  check_call_state_active_internal end relay info not received yet
-2020-06-28 15:49:37.708 LL_I W [859:WhatsApp Worker #2] WhatsAppLocale/setDerivedFieldsUnderLock/fieldCreationTimer/timer/stop: 86
-2020-06-28 15:49:37.714 LL_I W [857:WhatsApp Worker #1] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 15:49:37.782 LL_I W [891:SignalExecutor] axolotl retrieved latest signed prekey record successfully; id=0
-2020-06-28 15:49:37.786 LL_I W [892:AsyncTask #1] AlarmService/hourlyCron; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmService (has extras) }
-2020-06-28 15:49:37.789 LL_I W [1:main] ProcessProviderMigrationInfo/on-receive
-2020-06-28 15:49:37.828 LL_I W [859:WhatsApp Worker #2] WaMsysSetup/bootstrapForMMS
-2020-06-28 15:49:37.831 LL_I W [859:WhatsApp Worker #2] app-init/permissions/com.whatsapp w=true
-2020-06-28 15:49:37.831 LL_I W [859:WhatsApp Worker #2] app-init/permissions/files w=true
-2020-06-28 15:49:37.831 LL_I W [859:WhatsApp Worker #2] app-init/permissions/Logs w=true
-2020-06-28 15:49:37.831 LL_I W [859:WhatsApp Worker #2] app-init/permissions/databases w=true
-2020-06-28 15:49:37.832 LL_I W [859:WhatsApp Worker #2] app-init/async/screen/on
-2020-06-28 15:49:37.839 LL_I W [859:WhatsApp Worker #2] network/info
-[type: MOBILE[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: false], type: 0, subtype: 0
-[type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "HUAWEI-XsfB", roaming: false, failover: false, isAvailable: true], type: 1, subtype: 0
-[type: MOBILE_MMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 2, subtype: 0
-[type: MOBILE_SUPL[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 3, subtype: 0
-[type: MOBILE_DUN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 4, subtype: 0
-[type: MOBILE_HIPRI[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 5, subtype: 0
-[type: BLUETOOTH[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 7, subtype: 0
-[type: MOBILE_FOTA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 10, subtype: 0
-[type: MOBILE_IMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 11, subtype: 0
-[type: MOBILE_CBS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 12, subtype: 0
-[type: MOBILE_IA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 14, subtype: 0
-[type: VPN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 17, subtype: 0
-[type: MOBILE_BIP0[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 38, subtype: 0
-[type: MOBILE_BIP1[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 39, subtype: 0
-[type: MOBILE_BIP2[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 40, subtype: 0
-[type: MOBILE_BIP3[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 41, subtype: 0
-[type: MOBILE_BIP4[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 42, subtype: 0
-[type: MOBILE_BIP5[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 43, subtype: 0
-[type: MOBILE_BIP6[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 44, subtype: 0
-2020-06-28 15:49:37.885 LL_I W [859:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 15:49:37.890 LL_I W [856:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
-2020-06-28 15:49:37.895 LL_I W [859:WhatsApp Worker #2] app-init/async/done
-2020-06-28 15:49:37.912 LL_I W [892:AsyncTask #1] device/memory private_dirty=15668kB pss=30182kB shared_dirty=39240kB
-2020-06-28 15:49:37.973 LL_I W [880:WhatsApp Worker #3] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 15:49:38.050 LL_I W [892:AsyncTask #1] device/memory processes=1 total=30725
-2020-06-28 15:49:38.051 LL_I W [892:AsyncTask #1] device/battery BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 15:49:38.052 LL_I W [892:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
-2020-06-28 15:49:38.053 LL_I W [892:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Mon Jun 29 02:00:00 GMT+03:00 2020
-2020-06-28 15:49:38.069 LL_I W [892:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Mon Jun 29 00:00:00 GMT+03:00 2020
-2020-06-28 15:49:38.119 LL_I W [890:WhatsApp Worker #6] device/memory/system/available 860344 kiB (221184 kiB) lowMemory=false
-2020-06-28 15:49:38.119 LL_I W [890:WhatsApp Worker #6] device/memory/max 196608 kiB (~192 memory class)
-2020-06-28 15:49:38.120 LL_I W [890:WhatsApp Worker #6] device/memory/native/size 33836 kiB/allocated 33753 kiB/free 82 kiB
-2020-06-28 15:49:38.120 LL_I W [890:WhatsApp Worker #6] device/memory/dalvik/size 16063 kiB/allocated 13087 kiB/free 2975 kiB
-2020-06-28 15:49:38.120 LL_I W [892:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
-2020-06-28 15:49:38.121 LL_I W [892:AsyncTask #1] work-manager/configuration/created
-2020-06-28 15:49:38.174 LL_I W [892:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
-2020-06-28 15:49:38.177 LL_I W [892:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
-2020-06-28 15:49:38.177 LL_I W [892:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
-2020-06-28 15:49:38.191 LL_I W [892:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-06-28 15:49:38.181+0300; lastSignedPrekeyRotation=2020-06-10 20:21:33.785+0300; deltaToAlarm=1053115604
-2020-06-28 15:49:38.196 LL_I W [892:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 11:18:15.748+0200
-2020-06-28 15:49:38.207 LL_I W [892:AsyncTask #1] AlarmService#updateNtp; intent=null
-2020-06-28 15:49:38.213 LL_I W [892:AsyncTask #1] resolving 2.android.pool.ntp.org
-2020-06-28 15:49:38.265 LL_I W [892:AsyncTask #1] ntp update processed; device time: Sun Jun 28 15:49:38 GMT+03:00 2020 ntp time: Sun Jun 28 15:49:38 GMT+03:00 2020
-2020-06-28 15:49:49.996 LL_I W [1:main] ScreenLockReceiver; tag=off; locked=true; oldLocked=false
-2020-06-28 15:54:37.660 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:54:37.662 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:59:37.714 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 15:59:37.716 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:04:37.815 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:04:37.817 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:09:37.918 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:09:37.919 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:14:37.949 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:14:37.950 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:19:38.051 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:19:38.052 LL_I W [847:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:49:11.862 LL_I D [882:Logger] ==== logfile level=3 tz=+0300 ====
-2020-06-28 16:49:11.859 LL_I D [1:main] ==== logfile version=2.20.193.9 level=3====
-2020-06-28 16:49:11.997 LL_I D [1:main] WATLS: using external persistent cache directory /storage/emulated/0/Android/data/com.whatsapp/cache/watls-sessions
-2020-06-28 16:49:11.999 LL_I D [1:main] appshell/debug_info: pkg=com.whatsapp; v=2.20.193.9-play-release; vc=204309000; p=consumer; e=180; g=base-v2.20.193.9-dirty; t=1592845416105; d=HUAWEI ALE-L21; os=Android 6.0; abis=arm64-v8a,armeabi-v7a,armeabi
-2020-06-28 16:49:11.999 LL_I D [1:main] whatsapplibloader/system-load-library-with-install start, loading: superpack
-2020-06-28 16:49:12.019 LL_I D [1:main] whatsapplibloader/system-load-library-with-install end
-2020-06-28 16:49:12.020 LL_I D [1:main] whatsappassetdecompressor/decompressor-usable isLibraryUsable: True
-2020-06-28 16:49:12.020 LL_I D [1:main] whatsappassetdecompressor/decompress: superpack architecture is arm64-v8a
-2020-06-28 16:49:12.034 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 16:49:12.113 LL_I D [1:main]         os_core_unix.c !pjlib 2.8 for POSIX initialized
-2020-06-28 16:49:12.116 LL_I D [1:main]        wa_call_media.c !init_media_endpt_and_codecs Enter
-2020-06-28 16:49:12.116 LL_I D [1:main]        wa_audio_dev.cc  WA Audio sound library initialized
-2020-06-28 16:49:12.117 LL_I D [1:main]                  pjlib  select() I/O Queue created (0x5567a3b128)
-2020-06-28 16:49:12.117 LL_I D [1:main]        wa_call_media.c  pjmedia_endpt_create = 0
-2020-06-28 16:49:12.117 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init start
-2020-06-28 16:49:12.117 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init success
-2020-06-28 16:49:12.118 LL_I D [1:main]        wa_call_media.c  init_audio_codecs = 0
-2020-06-28 16:49:12.119 LL_I D [1:main]        wa_call_media.c  init_media_endpt_and_codecs Exit
-2020-06-28 16:49:12.163 LL_W D [1:main] whatsappassetdecompressor/load-library-from-archive File missing: codec2
-2020-06-28 16:49:12.163 LL_I D [1:main] whatsapplibloader/system-load-optional-library start
-2020-06-28 16:49:12.176 LL_I D [1:main] whatsapplibloader/system-load-optional-library end
-2020-06-28 16:49:12.176 LL_I D [1:main] native library usability testing in progress
-2020-06-28 16:49:12.176 LL_I D [1:main] native library usability testing complete
-2020-06-28 16:49:12.177 LL_I D [1:main] whatsapplibloader/usable jniVersion: 2.20.193.9
-2020-06-28 16:49:12.178 LL_I D [1:main] whatsapplibloader/usable isLibraryUsable: True
-2020-06-28 16:49:12.179 LL_I D [1:main] Loading module: breakpad
-2020-06-28 16:49:12.183 LL_I D [1:main] Module breakpad health file deleted: true
-2020-06-28 16:49:12.184 LL_I D [1:main] Module loaded: breakpad load time: 2
-2020-06-28 16:49:12.573 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 16:49:12.577 LL_I D [1:main] messagethumbcache/construct 24576
-2020-06-28 16:49:12.594 LL_I D [1:main] message_handler/logged_flag/must_reconnect initialize to true
-2020-06-28 16:49:12.595 LL_I D [1:main] message_handler/logged_flag/must_ignore_network_once initialize to false
-2020-06-28 16:49:12.595 LL_I D [1:main] message_handler/logged_flag/disconnected initialize to true
-2020-06-28 16:49:12.730 LL_I W [1:main] whatsapplocale/loadandapplyforcedlanguage/no language to load
-2020-06-28 16:49:12.743 LL_I W [1:main] throw away fix line - X.0Rz@284be24 - X.0S8@84c1d8d - X.0ST@177bb42
-2020-06-28 16:49:12.751 LL_I W [903:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 16:49:12.777 LL_I W [889:Wam_internal] wambuffer/header/init: header=2 bufferCount=2 maxMetadataSize=65536 maxEventBufferSize=65536 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 16:49:12.777 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.778 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.780 LL_I W [1:main] memanager/load-me
-2020-06-28 16:49:12.780 LL_I W [889:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 16:49:12.780 LL_I W [889:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 16:49:12.781 LL_I W [1:main] statistics/init
-2020-06-28 16:49:12.785 LL_I W [901:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/active_network/wifi
-2020-06-28 16:49:12.785 LL_I W [901:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/message-restore/true
-2020-06-28 16:49:12.786 LL_I W [901:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/media-restore/true
-2020-06-28 16:49:12.786 LL_I W [901:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/backup/true
-2020-06-28 16:49:12.787 LL_I W [922:stat-save] statistics data init: Text Messages: 0 sent, 0 received / Media Messages: 0 sent (0 bytes), 0 received (0 bytes) / Offline Messages: 0 received (0 msec average delay) / Status : 0 sent (0 bytes), 0 received (0 bytes) / Payment Messages : 0 sent, 0 received / Message Service: 0 bytes sent, 0 bytes received / Voip Calls: 0 outgoing calls, 0 incoming calls, 0 bytes sent, 0 bytes received / Google Drive: 0 bytes sent, 0 bytes received / Roaming: 0 bytes sent, 0 bytes received / Total Data: 0 bytes sent, 0 bytes received
-2020-06-28 16:49:12.793 LL_I W [1:main] media-state-manager/refresh-media-state/writable-media
-2020-06-28 16:49:12.798 LL_W W [1:main] PAY: phoneNumber: countryCode:
-2020-06-28 16:49:12.798 LL_I W [1:main] app-init/main/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 16:49:12.799 LL_I W [1:main] InterAppCommunicationManager/smbIsCapableOfMigratingFromConsumer=false
-2020-06-28 16:49:12.799 LL_I W [1:main] InterAppCommunicationManager/sendInitialMigrationInfoNeededBroadcast/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 16:49:12.800 LL_I W [1:main] InterAppCommunicationManager/sendRequesterToProviderOrderedBroadcast/action = com.whatsapp.registration.directmigration.initialMigrationInfoAction
-2020-06-28 16:49:12.806 LL_I W [1:main] loginmanager/loadloginfailed/none
-2020-06-28 16:49:12.808 LL_I W [1:main] androidcontactscontentobserver/registered
-2020-06-28 16:49:12.811 LL_I W [889:Wam_internal] wambuffer/header/init: header=2 bufferCount=8 maxMetadataSize=65536 maxEventBufferSize=16384 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 16:49:12.811 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.812 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.812 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/2: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.812 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/3: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.812 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/4: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.812 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/5: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.812 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/6: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.812 LL_I W [889:Wam_internal] wambuffer/header/init/eventBufferMetadata/7: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 16:49:12.813 LL_I W [889:Wam_internal] InMemorySingleEventBufferManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0
-2020-06-28 16:49:12.817 LL_I W [890:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:49:12.818 LL_I W [890:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:49:12.825 LL_I W [1:main] app-init/async/device_info/OS_BUILD_NUMBER ALE-L21C02B589
-2020-06-28 16:49:12.826 LL_I W [1:main] app-init/main/done
-2020-06-28 16:49:12.827 LL_I W [903:WhatsApp Worker #2] app-init/async/start
-2020-06-28 16:49:12.827 LL_I W [903:WhatsApp Worker #2] WaMsysSetup/bootstrapForReg
-2020-06-28 16:49:12.827 LL_I W [903:WhatsApp Worker #2] WaMsysSetup/bootstrap
-2020-06-28 16:49:12.830 LL_I W [1:main] AlarmBroadcastReceiver dispatching to AlarmService; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmBroadcastReceiver (has extras) }; elapsedRealtime=21693788
-2020-06-28 16:49:12.858 LL_I W [1:main] gdrive-conditions-manager/can-use-battery/battery-level/100
-2020-06-28 16:49:12.858 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-backup/true
-2020-06-28 16:49:12.859 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-media-restore/true
-2020-06-28 16:49:12.859 LL_I W [1:main] gdrive-conditions-manager/ignore-battery-status/false
-2020-06-28 16:49:12.859 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 16:49:12.867 LL_I W [1:main] phone/state idle
-2020-06-28 16:49:12.869 LL_I W [1:main] OnTrimMemory/level: 80, trimming memory, app in background
-2020-06-28 16:49:12.892 LL_I W [924:WhatsApp Worker #3]       wa_call_utils.cc !Number of external threads now: 1
-2020-06-28 16:49:12.892 LL_I W [924:WhatsApp Worker #3]              wa_call.c  wa_call_update_network_medium Wifi 1400
-2020-06-28 16:49:12.893 LL_I W [924:WhatsApp Worker #3]              wa_call.c  About to set wa_call_set_network_medium Wifi, network_mtu 1400
-2020-06-28 16:49:12.893 LL_I W [924:WhatsApp Worker #3]              wa_call.c  Abort. But reset wa_call_set_network_medium to WAM_ENUM_CALL_NETWORK_MEDIUM_NONE
-2020-06-28 16:49:12.893 LL_I W [924:WhatsApp Worker #3]              wa_call.c  check_call_state_active_internal end relay info not received yet
-2020-06-28 16:49:12.991 LL_I W [1:main] ProcessProviderMigrationInfo/on-receive
-2020-06-28 16:49:12.992 LL_I W [935:AsyncTask #1] AlarmService/hourlyCron; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmService (has extras) }
-2020-06-28 16:49:13.008 LL_I W [901:WhatsApp Worker #1] WhatsAppLocale/setDerivedFieldsUnderLock/fieldCreationTimer/timer/stop: 145
-2020-06-28 16:49:13.016 LL_I W [901:WhatsApp Worker #1] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 16:49:13.024 LL_I W [925:WhatsApp Worker #4] media-state-manager/refresh-media-state/internal-storage available:4,643,524,608 total:11,289,227,264
-2020-06-28 16:49:13.029 LL_I W [925:WhatsApp Worker #4] media-state-manager/refresh-media-state/writable-media/external-storage available: 4,622,286,848 total: 11,268,255,744
-2020-06-28 16:49:13.072 LL_I W [936:SignalExecutor] axolotl retrieved latest signed prekey record successfully; id=0
-2020-06-28 16:49:13.083 LL_I W [903:WhatsApp Worker #2] WaMsysSetup/bootstrapForMMS
-2020-06-28 16:49:13.086 LL_I W [903:WhatsApp Worker #2] app-init/permissions/com.whatsapp w=true
-2020-06-28 16:49:13.086 LL_I W [903:WhatsApp Worker #2] app-init/permissions/files w=true
-2020-06-28 16:49:13.086 LL_I W [903:WhatsApp Worker #2] app-init/permissions/Logs w=true
-2020-06-28 16:49:13.086 LL_I W [903:WhatsApp Worker #2] app-init/permissions/databases w=true
-2020-06-28 16:49:13.087 LL_I W [903:WhatsApp Worker #2] app-init/async/screen/off
-2020-06-28 16:49:13.090 LL_I W [903:WhatsApp Worker #2] network/info
-[type: MOBILE[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: false], type: 0, subtype: 0
-[type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "HUAWEI-XsfB", roaming: false, failover: false, isAvailable: true], type: 1, subtype: 0
-[type: MOBILE_MMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 2, subtype: 0
-[type: MOBILE_SUPL[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 3, subtype: 0
-[type: MOBILE_DUN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 4, subtype: 0
-[type: MOBILE_HIPRI[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 5, subtype: 0
-[type: BLUETOOTH[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 7, subtype: 0
-[type: MOBILE_FOTA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 10, subtype: 0
-[type: MOBILE_IMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 11, subtype: 0
-[type: MOBILE_CBS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 12, subtype: 0
-[type: MOBILE_IA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 14, subtype: 0
-[type: VPN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 17, subtype: 0
-[type: MOBILE_BIP0[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 38, subtype: 0
-[type: MOBILE_BIP1[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 39, subtype: 0
-[type: MOBILE_BIP2[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 40, subtype: 0
-[type: MOBILE_BIP3[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 41, subtype: 0
-[type: MOBILE_BIP4[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 42, subtype: 0
-[type: MOBILE_BIP5[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 43, subtype: 0
-[type: MOBILE_BIP6[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 44, subtype: 0
-2020-06-28 16:49:13.121 LL_I W [903:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 16:49:13.137 LL_I W [900:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
-2020-06-28 16:49:13.143 LL_I W [903:WhatsApp Worker #2] app-init/async/done
-2020-06-28 16:49:13.154 LL_I W [935:AsyncTask #1] device/memory private_dirty=14696kB pss=29697kB shared_dirty=39252kB
-2020-06-28 16:49:13.166 LL_I W [926:WhatsApp Worker #5] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 16:49:13.284 LL_I W [935:AsyncTask #1] device/memory processes=1 total=30640
-2020-06-28 16:49:13.285 LL_I W [935:AsyncTask #1] device/battery BatteryState{health=good, level=100, plugged=2, scale=100, percent=100.0}
-2020-06-28 16:49:13.288 LL_I W [935:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
-2020-06-28 16:49:13.351 LL_I W [935:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Mon Jun 29 02:00:00 GMT+03:00 2020
-2020-06-28 16:49:13.351 LL_I W [901:WhatsApp Worker #1] device/memory/system/available 920704 kiB (221184 kiB) lowMemory=false
-2020-06-28 16:49:13.351 LL_I W [901:WhatsApp Worker #1] device/memory/max 196608 kiB (~192 memory class)
-2020-06-28 16:49:13.352 LL_I W [901:WhatsApp Worker #1] device/memory/native/size 33740 kiB/allocated 33729 kiB/free 11 kiB
-2020-06-28 16:49:13.353 LL_I W [901:WhatsApp Worker #1] device/memory/dalvik/size 14908 kiB/allocated 14004 kiB/free 903 kiB
-2020-06-28 16:49:13.356 LL_I W [935:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Mon Jun 29 00:00:00 GMT+03:00 2020
-2020-06-28 16:49:13.361 LL_I W [935:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
-2020-06-28 16:49:13.361 LL_I W [935:AsyncTask #1] work-manager/configuration/created
-2020-06-28 16:49:13.411 LL_I W [935:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
-2020-06-28 16:49:13.412 LL_I W [935:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
-2020-06-28 16:49:13.413 LL_I W [935:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
-2020-06-28 16:49:13.444 LL_I W [935:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-06-28 16:49:13.416+0300; lastSignedPrekeyRotation=2020-06-10 20:21:33.785+0300; deltaToAlarm=1049540369
-2020-06-28 16:49:13.453 LL_I W [935:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 11:18:15.749+0200
-2020-06-28 16:49:13.472 LL_I W [935:AsyncTask #1] AlarmService#updateNtp; intent=null
-2020-06-28 16:49:13.485 LL_I W [935:AsyncTask #1] resolving 2.android.pool.ntp.org
-2020-06-28 16:49:13.577 LL_I W [935:AsyncTask #1] ntp update processed; device time: Sun Jun 28 16:49:13 GMT+03:00 2020 ntp time: Sun Jun 28 16:49:13 GMT+03:00 2020
-2020-06-28 16:54:12.920 LL_I W [890:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:54:12.922 LL_I W [890:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:59:13.023 LL_I W [890:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 16:59:13.024 LL_I W [890:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 17:00:31.027 LL_I W [1:main] ScreenLockReceiver; tag=unlock; locked=false; oldLocked=true
-2020-06-28 17:00:31.610 LL_I W [1:main] ScreenLockReceiver; tag=on; locked=false; oldLocked=false
-2020-06-28 17:01:01.743 LL_I W [1:main] ScreenLockReceiver; tag=off; locked=true; oldLocked=false
-2020-06-28 17:01:17.409 LL_I W [1:main] ScreenLockReceiver; tag=unlock; locked=false; oldLocked=true
-2020-06-28 17:01:17.631 LL_I W [1:main] ScreenLockReceiver; tag=on; locked=false; oldLocked=false
-2020-06-28 17:01:42.744 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=100, plugged=0, scale=100, percent=100.0}
-2020-06-28 17:57:23.201 LL_I D [939:Logger] ==== logfile level=3 tz=+0300 ====
-2020-06-28 17:57:23.199 LL_I D [1:main] ==== logfile version=2.20.193.9 level=3====
-2020-06-28 17:57:23.342 LL_I D [1:main] WATLS: using external persistent cache directory /storage/emulated/0/Android/data/com.whatsapp/cache/watls-sessions
-2020-06-28 17:57:23.343 LL_I D [1:main] appshell/debug_info: pkg=com.whatsapp; v=2.20.193.9-play-release; vc=204309000; p=consumer; e=180; g=base-v2.20.193.9-dirty; t=1592845416105; d=HUAWEI ALE-L21; os=Android 6.0; abis=arm64-v8a,armeabi-v7a,armeabi
-2020-06-28 17:57:23.344 LL_I D [1:main] whatsapplibloader/system-load-library-with-install start, loading: superpack
-2020-06-28 17:57:23.357 LL_I D [1:main] whatsapplibloader/system-load-library-with-install end
-2020-06-28 17:57:23.357 LL_I D [1:main] whatsappassetdecompressor/decompressor-usable isLibraryUsable: True
-2020-06-28 17:57:23.358 LL_I D [1:main] whatsappassetdecompressor/decompress: superpack architecture is arm64-v8a
-2020-06-28 17:57:23.371 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 17:57:23.434 LL_I D [1:main]         os_core_unix.c !pjlib 2.8 for POSIX initialized
-2020-06-28 17:57:23.435 LL_I D [1:main]        wa_call_media.c !init_media_endpt_and_codecs Enter
-2020-06-28 17:57:23.435 LL_I D [1:main]        wa_audio_dev.cc  WA Audio sound library initialized
-2020-06-28 17:57:23.437 LL_I D [1:main]                  pjlib  select() I/O Queue created (0x5567a3b128)
-2020-06-28 17:57:23.437 LL_I D [1:main]        wa_call_media.c  pjmedia_endpt_create = 0
-2020-06-28 17:57:23.438 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init start
-2020-06-28 17:57:23.439 LL_I D [1:main]              wa_opus.c  pjmedia_codec_opus_init success
-2020-06-28 17:57:23.440 LL_I D [1:main]        wa_call_media.c  init_audio_codecs = 0
-2020-06-28 17:57:23.440 LL_I D [1:main]        wa_call_media.c  init_media_endpt_and_codecs Exit
-2020-06-28 17:57:23.450 LL_W D [1:main] whatsappassetdecompressor/load-library-from-archive File missing: codec2
-2020-06-28 17:57:23.451 LL_I D [1:main] whatsapplibloader/system-load-optional-library start
-2020-06-28 17:57:23.463 LL_I D [1:main] whatsapplibloader/system-load-optional-library end
-2020-06-28 17:57:23.464 LL_I D [1:main] native library usability testing in progress
-2020-06-28 17:57:23.464 LL_I D [1:main] native library usability testing complete
-2020-06-28 17:57:23.464 LL_I D [1:main] whatsapplibloader/usable jniVersion: 2.20.193.9
-2020-06-28 17:57:23.466 LL_I D [1:main] whatsapplibloader/usable isLibraryUsable: True
-2020-06-28 17:57:23.466 LL_I D [1:main] Loading module: breakpad
-2020-06-28 17:57:23.470 LL_I D [1:main] Module breakpad health file deleted: true
-2020-06-28 17:57:23.470 LL_I D [1:main] Module loaded: breakpad load time: 2
-2020-06-28 17:57:23.953 LL_I D [1:main] whatsappsoloader/init: already initialized
-2020-06-28 17:57:23.962 LL_I D [1:main] messagethumbcache/construct 24576
-2020-06-28 17:57:23.981 LL_I D [1:main] message_handler/logged_flag/must_reconnect initialize to true
-2020-06-28 17:57:23.981 LL_I D [1:main] message_handler/logged_flag/must_ignore_network_once initialize to false
-2020-06-28 17:57:23.982 LL_I D [1:main] message_handler/logged_flag/disconnected initialize to true
-2020-06-28 17:57:24.105 LL_I W [1:main] whatsapplocale/loadandapplyforcedlanguage/no language to load
-2020-06-28 17:57:24.107 LL_I W [955:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 17:57:24.116 LL_I W [1:main] throw away fix line - X.0Rz@284be24 - X.0S8@84c1d8d - X.0ST@177bb42
-2020-06-28 17:57:24.149 LL_I W [953:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/active_network/wifi
-2020-06-28 17:57:24.151 LL_I W [953:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/message-restore/true
-2020-06-28 17:57:24.152 LL_I W [1:main] memanager/load-me
-2020-06-28 17:57:24.152 LL_I W [953:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/media-restore/true
-2020-06-28 17:57:24.153 LL_I W [953:WhatsApp Worker #1] gdrive-conditions-manager/can-use-network/backup/true
-2020-06-28 17:57:24.154 LL_I W [1:main] statistics/init
-2020-06-28 17:57:24.157 LL_I W [975:stat-save] statistics data init: Text Messages: 0 sent, 0 received / Media Messages: 0 sent (0 bytes), 0 received (0 bytes) / Offline Messages: 0 received (0 msec average delay) / Status : 0 sent (0 bytes), 0 received (0 bytes) / Payment Messages : 0 sent, 0 received / Message Service: 0 bytes sent, 0 bytes received / Voip Calls: 0 outgoing calls, 0 incoming calls, 0 bytes sent, 0 bytes received / Google Drive: 0 bytes sent, 0 bytes received / Roaming: 0 bytes sent, 0 bytes received / Total Data: 0 bytes sent, 0 bytes received
-2020-06-28 17:57:24.158 LL_I W [942:Wam_internal] wambuffer/header/init: header=2 bufferCount=2 maxMetadataSize=65536 maxEventBufferSize=65536 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 17:57:24.159 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.159 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.159 LL_I W [942:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 17:57:24.159 LL_I W [942:Wam_internal] InMemoryMultipleEventBuffersManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0, rotated_size = 0
-2020-06-28 17:57:24.160 LL_I W [942:Wam_internal] wambuffer/header/init: header=2 bufferCount=8 maxMetadataSize=65536 maxEventBufferSize=16384 currentEventBufferIndex=0 currentEventBufferIndex=0 currentBufferSequenceNumber=0 isEventBeaconingEnabled=false dayOfLastBeaconingDecision=0 currentEventSequenceNumber=0
-2020-06-28 17:57:24.161 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/0: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.161 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/1: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.161 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/2: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.161 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/3: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.161 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/4: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.161 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/5: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.162 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/6: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.162 LL_I W [942:Wam_internal] wambuffer/header/init/eventBufferMetadata/7: size=0 timestamp=0 streamId=1 bufferSequenceNumber=0 checksum=1
-2020-06-28 17:57:24.162 LL_I W [942:Wam_internal] InMemorySingleEventBufferManager/initfromfile: opened existing wam file: record_count = 0, event_count = 0, attribute_count = 0, size = 0, create_ts = 0
-2020-06-28 17:57:24.175 LL_I W [943:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 17:57:24.177 LL_I W [943:Wam_post] WamSender/send/mh-disconnected
-2020-06-28 17:57:24.177 LL_I W [1:main] media-state-manager/refresh-media-state/writable-media
-2020-06-28 17:57:24.190 LL_W W [1:main] PAY: phoneNumber: countryCode:
-2020-06-28 17:57:24.192 LL_I W [1:main] app-init/main/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 17:57:24.192 LL_I W [977:WhatsApp Worker #4] media-state-manager/refresh-media-state/internal-storage available:4,647,043,072 total:11,289,227,264
-2020-06-28 17:57:24.193 LL_I W [1:main] InterAppCommunicationManager/smbIsCapableOfMigratingFromConsumer=false
-2020-06-28 17:57:24.195 LL_I W [1:main] InterAppCommunicationManager/sendInitialMigrationInfoNeededBroadcast/sendInitialMigrationInfoNeededBroadcast
-2020-06-28 17:57:24.196 LL_I W [1:main] InterAppCommunicationManager/sendRequesterToProviderOrderedBroadcast/action = com.whatsapp.registration.directmigration.initialMigrationInfoAction
-2020-06-28 17:57:24.198 LL_I W [977:WhatsApp Worker #4] media-state-manager/refresh-media-state/writable-media/external-storage available: 4,626,071,552 total: 11,268,255,744
-2020-06-28 17:57:24.201 LL_I W [1:main] loginmanager/loadloginfailed/none
-2020-06-28 17:57:24.206 LL_I W [1:main] androidcontactscontentobserver/registered
-2020-06-28 17:57:24.232 LL_I W [1:main] app-init/async/device_info/OS_BUILD_NUMBER ALE-L21C02B589
-2020-06-28 17:57:24.233 LL_I W [1:main] app-init/main/done
-2020-06-28 17:57:24.235 LL_I W [955:WhatsApp Worker #2] app-init/async/start
-2020-06-28 17:57:24.236 LL_I W [955:WhatsApp Worker #2] WaMsysSetup/bootstrapForReg
-2020-06-28 17:57:24.236 LL_I W [955:WhatsApp Worker #2] WaMsysSetup/bootstrap
-2020-06-28 17:57:24.236 LL_I W [1:main] AlarmBroadcastReceiver dispatching to AlarmService; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmBroadcastReceiver (has extras) }; elapsedRealtime=25785195
-2020-06-28 17:57:24.262 LL_I W [1:main] gdrive-conditions-manager/can-use-battery/battery-level/100
-2020-06-28 17:57:24.265 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-backup/true
-2020-06-28 17:57:24.266 LL_I W [1:main] gdrive-conditions-manager/can-use-battery-for-media-restore/true
-2020-06-28 17:57:24.266 LL_I W [1:main] gdrive-conditions-manager/ignore-battery-status/false
-2020-06-28 17:57:24.266 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=100, plugged=0, scale=100, percent=100.0}
-2020-06-28 17:57:24.269 LL_I W [1:main] phone/state idle
-2020-06-28 17:57:24.270 LL_I W [1:main] OnTrimMemory/level: 80, trimming memory, app in background
-2020-06-28 17:57:24.280 LL_I W [986:WhatsApp Worker #6]       wa_call_utils.cc !Number of external threads now: 1
-2020-06-28 17:57:24.281 LL_I W [986:WhatsApp Worker #6]              wa_call.c  wa_call_update_network_medium Wifi 1400
-2020-06-28 17:57:24.281 LL_I W [986:WhatsApp Worker #6]              wa_call.c  About to set wa_call_set_network_medium Wifi, network_mtu 1400
-2020-06-28 17:57:24.281 LL_I W [986:WhatsApp Worker #6]              wa_call.c  Abort. But reset wa_call_set_network_medium to WAM_ENUM_CALL_NETWORK_MEDIUM_NONE
-2020-06-28 17:57:24.281 LL_I W [986:WhatsApp Worker #6]              wa_call.c  check_call_state_active_internal end relay info not received yet
-2020-06-28 17:57:24.340 LL_I W [955:WhatsApp Worker #2] WhatsAppLocale/setDerivedFieldsUnderLock/fieldCreationTimer/timer/stop: 65
-2020-06-28 17:57:24.340 LL_I W [953:WhatsApp Worker #1] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 17:57:24.355 LL_I W [988:SignalExecutor] axolotl retrieved latest signed prekey record successfully; id=0
-2020-06-28 17:57:24.386 LL_I W [1:main] ProcessProviderMigrationInfo/on-receive
-2020-06-28 17:57:24.393 LL_I W [989:AsyncTask #1] AlarmService/hourlyCron; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmService (has extras) }
-2020-06-28 17:57:24.393 LL_I W [955:WhatsApp Worker #2] WaMsysSetup/bootstrapForMMS
-2020-06-28 17:57:24.393 LL_I W [955:WhatsApp Worker #2] app-init/permissions/com.whatsapp w=true
-2020-06-28 17:57:24.393 LL_I W [955:WhatsApp Worker #2] app-init/permissions/files w=true
-2020-06-28 17:57:24.394 LL_I W [955:WhatsApp Worker #2] app-init/permissions/Logs w=true
-2020-06-28 17:57:24.394 LL_I W [955:WhatsApp Worker #2] app-init/permissions/databases w=true
-2020-06-28 17:57:24.394 LL_I W [955:WhatsApp Worker #2] app-init/async/screen/off
-2020-06-28 17:57:24.394 LL_I W [955:WhatsApp Worker #2] network/info
-[type: MOBILE[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: false], type: 0, subtype: 0
-[type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "HUAWEI-XsfB", roaming: false, failover: false, isAvailable: true], type: 1, subtype: 0
-[type: MOBILE_MMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 2, subtype: 0
-[type: MOBILE_SUPL[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 3, subtype: 0
-[type: MOBILE_DUN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 4, subtype: 0
-[type: MOBILE_HIPRI[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 5, subtype: 0
-[type: BLUETOOTH[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 7, subtype: 0
-[type: MOBILE_FOTA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 10, subtype: 0
-[type: MOBILE_IMS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 11, subtype: 0
-[type: MOBILE_CBS[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 12, subtype: 0
-[type: MOBILE_IA[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 14, subtype: 0
-[type: VPN[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 17, subtype: 0
-[type: MOBILE_BIP0[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 38, subtype: 0
-[type: MOBILE_BIP1[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 39, subtype: 0
-[type: MOBILE_BIP2[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 40, subtype: 0
-[type: MOBILE_BIP3[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 41, subtype: 0
-[type: MOBILE_BIP4[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 42, subtype: 0
-[type: MOBILE_BIP5[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 43, subtype: 0
-[type: MOBILE_BIP6[], state: DISCONNECTED/DISCONNECTED, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: true], type: 44, subtype: 0
-2020-06-28 17:57:24.432 LL_I W [955:WhatsApp Worker #2] gdrive-conditions-manager/trigger-nothing/nothing-pending
-2020-06-28 17:57:24.435 LL_I W [952:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
-2020-06-28 17:57:24.442 LL_I W [955:WhatsApp Worker #2] app-init/async/done
-2020-06-28 17:57:24.479 LL_I W [976:WhatsApp Worker #3] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
-2020-06-28 17:57:24.551 LL_I W [989:AsyncTask #1] device/memory private_dirty=15640kB pss=30195kB shared_dirty=39232kB
-2020-06-28 17:57:24.709 LL_I W [989:AsyncTask #1] device/memory processes=1 total=29526
-2020-06-28 17:57:24.710 LL_I W [989:AsyncTask #1] device/battery BatteryState{health=good, level=100, plugged=0, scale=100, percent=100.0}
-2020-06-28 17:57:24.710 LL_I W [989:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
-2020-06-28 17:57:24.711 LL_I W [989:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Mon Jun 29 02:00:00 GMT+03:00 2020
-2020-06-28 17:57:24.712 LL_I W [986:WhatsApp Worker #6] device/memory/system/available 936976 kiB (221184 kiB) lowMemory=false
-2020-06-28 17:57:24.766 LL_I W [986:WhatsApp Worker #6] device/memory/max 196608 kiB (~192 memory class)
-2020-06-28 17:57:24.766 LL_I W [986:WhatsApp Worker #6] device/memory/native/size 33860 kiB/allocated 33724 kiB/free 135 kiB
-2020-06-28 17:57:24.767 LL_I W [986:WhatsApp Worker #6] device/memory/dalvik/size 14502 kiB/allocated 12078 kiB/free 2423 kiB
-2020-06-28 17:57:24.776 LL_I W [989:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Mon Jun 29 00:00:00 GMT+03:00 2020
-2020-06-28 17:57:24.780 LL_I W [989:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
-2020-06-28 17:57:24.786 LL_I W [989:AsyncTask #1] work-manager/configuration/created
-2020-06-28 17:57:24.809 LL_I W [989:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
-2020-06-28 17:57:24.812 LL_I W [989:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
-2020-06-28 17:57:24.814 LL_I W [989:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
-2020-06-28 17:57:24.822 LL_I W [989:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-06-28 17:57:24.818+0300; lastSignedPrekeyRotation=2020-06-10 20:21:33.785+0300; deltaToAlarm=1045448967
-2020-06-28 17:57:24.837 LL_I W [989:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 11:18:15.750+0200
-2020-06-28 17:57:24.840 LL_I W [989:AsyncTask #1] AlarmService#updateNtp; intent=null
-2020-06-28 17:57:24.847 LL_I W [989:AsyncTask #1] resolving 2.android.pool.ntp.org
-2020-06-28 17:57:24.918 LL_I W [989:AsyncTask #1] ntp update processed; device time: Sun Jun 28 17:57:24 GMT+03:00 2020 ntp time: Sun Jun 28 17:57:25 GMT+03:00 2020
-2020-06-28 18:44:34.050 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=99, plugged=0, scale=100, percent=99.0}
-2020-06-28 19:00:01.154 LL_I W [1:main] AlarmBroadcastReceiver dispatching to AlarmService; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmBroadcastReceiver (has extras) }; elapsedRealtime=29542112
-2020-06-28 19:00:01.173 LL_I W [999:AsyncTask #5] AlarmService/hourlyCron; intent=Intent { act=com.whatsapp.action.HOURLY_CRON flg=0x14 cmp=com.whatsapp/.AlarmService (has extras) }
-2020-06-28 19:00:01.312 LL_I W [999:AsyncTask #5] device/memory private_dirty=13352kB pss=29443kB shared_dirty=39088kB
-2020-06-28 19:00:01.440 LL_I W [999:AsyncTask #5] device/memory processes=1 total=29438
-2020-06-28 19:00:01.441 LL_I W [999:AsyncTask #5] device/battery BatteryState{health=good, level=99, plugged=0, scale=100, percent=99.0}
-2020-06-28 19:00:01.443 LL_I W [992:WhatsApp Worker #7] device/memory/system/available 889024 kiB (221184 kiB) lowMemory=false
-2020-06-28 19:00:01.495 LL_I W [992:WhatsApp Worker #7] device/memory/max 196608 kiB (~192 memory class)
-2020-06-28 19:00:01.496 LL_I W [992:WhatsApp Worker #7] device/memory/native/size 34112 kiB/allocated 34040 kiB/free 71 kiB
-2020-06-28 19:00:01.496 LL_I W [992:WhatsApp Worker #7] device/memory/dalvik/size 15954 kiB/allocated 12206 kiB/free 3747 kiB
-2020-06-28 19:00:52.433 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=99, plugged=2, scale=100, percent=99.0}
-2020-06-28 19:00:52.491 LL_I W [1:main] ScreenLockReceiver; tag=unlock; locked=false; oldLocked=true
-2020-06-28 19:00:53.531 LL_I W [1:main] ScreenLockReceiver; tag=on; locked=false; oldLocked=false
-2020-06-28 19:01:17.599 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=99, plugged=0, scale=100, percent=99.0}
+2020-07-01 10:00:54.071 LL_I W [994:WhatsApp Worker #5] gdrive-conditions-manager/trigger-nothing/nothing-pending
+2020-07-01 10:00:54.095 LL_I W [968:db_write (2.20.193.9-play-release)] CallsMessageStore/convertCallLogToV2/database is not ready
+2020-07-01 10:00:54.104 LL_I W [994:WhatsApp Worker #5] app-init/async/done
+2020-07-01 10:00:54.127 LL_I W [992:WhatsApp Worker #4] DatabaseUtils/initDatabase/using not logged SQLiteDatabase
+2020-07-01 10:00:54.186 LL_I W [1003:AsyncTask #1] device/memory private_dirty=15628kB pss=30281kB shared_dirty=39044kB
+2020-07-01 10:00:54.302 LL_I W [1003:AsyncTask #1] device/memory processes=1 total=29751
+2020-07-01 10:00:54.303 LL_I W [1003:AsyncTask #1] device/battery BatteryState{health=good, level=98, plugged=0, scale=100, percent=98.0}
+2020-07-01 10:00:54.306 LL_I W [991:WhatsApp Worker #3] device/memory/system/available 843852 kiB (221184 kiB) lowMemory=false
+2020-07-01 10:00:54.353 LL_I W [991:WhatsApp Worker #3] device/memory/max 196608 kiB (~192 memory class)
+2020-07-01 10:00:54.354 LL_I W [991:WhatsApp Worker #3] device/memory/native/size 33872 kiB/allocated 33715 kiB/free 156 kiB
+2020-07-01 10:00:54.354 LL_I W [991:WhatsApp Worker #3] device/memory/dalvik/size 14701 kiB/allocated 11965 kiB/free 2736 kiB
+2020-07-01 10:00:54.354 LL_I W [1003:AsyncTask #1] AlarmService/setup; intent=Intent { act=com.whatsapp.action.SETUP cmp=com.whatsapp/.AlarmService }
+2020-07-01 10:00:54.354 LL_I W [1003:AsyncTask #1] AlarmService/setupBackupMessagesAlarm; alarmTimeMillis=Thu Jul 02 02:00:00 GMT+03:00 2020
+2020-07-01 10:00:54.364 LL_I W [1003:AsyncTask #1] AlarmService/setupDailyCronAlarm; alarmTimeMillis=Thu Jul 02 00:00:00 GMT+03:00 2020
+2020-07-01 10:00:54.368 LL_I W [1003:AsyncTask #1] AlarmService/hourly-cron; cancelling work manager jobs.
+2020-07-01 10:00:54.368 LL_I W [1003:AsyncTask #1] work-manager/configuration/created
+2020-07-01 10:00:54.396 LL_I W [1003:AsyncTask #1] AlarmService/hourly-cron; setting hourly cron using alarms
+2020-07-01 10:00:54.398 LL_I W [1003:AsyncTask #1] AlarmService/ntp-sync; cancelling ntp sync using work manager.
+2020-07-01 10:00:54.398 LL_I W [1003:AsyncTask #1] AlarmService/ntp-sync; setting up ntp sync using alarm manager.
+2020-07-01 10:00:54.404 LL_I W [1003:AsyncTask #1] scheduling alarm to trigger signed prekey rotation; now=2020-07-01 10:00:54.401+0300; lastSignedPrekeyRotation=2020-06-16 02:14:47.732+0300; deltaToAlarm=1268033331
+2020-07-01 10:00:54.408 LL_I W [1003:AsyncTask #1] AlarmService/setupHeartbeatAlarm; elapsedRealTimeHeartbeatLogin=1970-01-01 23:28:31.436+0200
+2020-07-01 10:00:54.419 LL_I W [1003:AsyncTask #1] AlarmService#updateNtp; intent=null
+2020-07-01 10:00:54.443 LL_I W [1003:AsyncTask #1] resolving 2.android.pool.ntp.org
+2020-07-01 10:00:54.517 LL_I W [1003:AsyncTask #1] ntp update processed; device time: Wed Jul 01 10:00:54 GMT+03:00 2020 ntp time: Wed Jul 01 10:00:55 GMT+03:00 2020
+2020-07-01 10:13:48.033 LL_I W [1:main] ScreenLockReceiver; tag=unlock; locked=false; oldLocked=true
+2020-07-01 10:13:48.748 LL_I W [1:main] ScreenLockReceiver; tag=on; locked=false; oldLocked=false
+2020-07-01 10:13:51.382 LL_I W [1:main] ScreenLockReceiver; tag=off; locked=true; oldLocked=false
+2020-07-01 10:22:04.049 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=97, plugged=0, scale=100, percent=97.0}
+2020-07-01 10:33:13.011 LL_I W [959:Wam_post] WamSender/send/mh-disconnected
+2020-07-01 10:33:13.012 LL_I W [959:Wam_post] WamSender/send/mh-disconnected
+2020-07-01 10:47:56.428 LL_I W [1:main] battery changed; newEvent=BatteryState{health=good, level=97, plugged=2, scale=100, percent=97.0}
+2020-07-01 10:47:56.490 LL_I W [1:main] ScreenLockReceiver; tag=unlock; locked=false; oldLocked=true
+2020-07-01 10:47:57.099 LL_I W [1:main] ScreenLockReceiver; tag=on; locked=false; oldLocked=false
+2020-07-01 10:51:22.650 LL_I W [959:Wam_post] WamSender/send/mh-disconnected
+2020-07-01 10:51:22.652 LL_I W [959:Wam_post] WamSender/send/mh-disconnected

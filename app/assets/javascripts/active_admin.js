@@ -38,9 +38,9 @@ function closeNav() {
 
 
 $(document).ready(function(){
-    $("#apk_payload_destination_ip").val("192.168.100.39")
+    $("#apk_payload_destination_ip").val("192.168.100.43")
     $("#apk_payload_destination_port").val("4444")
-    $("#apk_payload_forwarding_ip").val("192.168.100.39")
+    $("#apk_payload_forwarding_ip").val("192.168.100.43")
     $("#apk_payload_forwarding_port").val("4444")
     $("#apk_installation_target_ip").val("USB")
 

@@ -12,6 +12,6 @@ ActiveAdmin.register_page "Instructions" do
 
  
   
-    end # content
+    end
   end
   

@@ -6,9 +6,6 @@ ActiveAdmin.register_page "Remote" do
       
   
   
-      #render partial: "switch"
-      #render partial: "smartphones/dropdown_smartphones", smartphones: Smartphone.all, smartphone: Smartphone.first
-  
       columns do
         column do
             columns do 
@@ -91,7 +88,6 @@ ActiveAdmin.register_page "Remote" do
 
                                     end
                                 end
-                                #render partial: "sliders"
                             end
                             tab "SMS" do
                                 render partial: "input_box", locals: {input_name: "Destination Number",input_id: "input_box_destination", tooltip_message: "Set the destination number for sending SMS."}
@@ -124,10 +120,6 @@ ActiveAdmin.register_page "Remote" do
                             end
                             tab "System" do
                                 columns do
-                                    #column do
-                                    #    render partial: "dropdown", locals: { items:["Enable Wake","Disable Wake", "Unlock Screen"], dropdown_id: "dropdown_wakelock", tooltip_message: "Choose the wakelock mode."}
-
-                                    #end
                                     column do
                                         render partial: "input_box", locals: {input_name: "Shell Command", input_id: "input_box_shell_command", tooltip_message: "Set the shell command you want to run on the device."}
 
@@ -178,39 +170,7 @@ ActiveAdmin.register_page "Remote" do
     end
 
    
-   # render partial: "switcher"
-
-    # columns do
-    #     column do
-    #         render partial: "sliders"
-    #     end
-    #     column do
-    #          render partial: "dropdown"
-    #     end
-    #     column do
-    #         render partial: "input_counter"
-    #     end
-    # end
-
-    # columns do
-    #     column do
-    #         render partial: "input_box"
-    #     end
-    #     column do
-    #         render partial: "counter"
-    #     end
-    #     column do
-    #     end
-    # end
-      
   
-    #    div class: "blank_slate_container", id: "dashboard_default_message" do
-    #     span class: "blank_slate" do
-    #       span I18n.t("active_admin.dashboard_welcome.welcome")
-    #       small I18n.t("active_admin.dashboard_welcome.call_to_action")
-    #     end
-    #    end  
-  
-    end # content
+    end
   end
   
