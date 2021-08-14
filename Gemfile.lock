@@ -5,6 +5,13 @@ GIT
     active_admin_flat_skin (0.1.2)
       font-awesome-rails (~> 4.6, >= 4.6.3.0)
 
+GIT
+  remote: https://github.com/mimemagicrb/mimemagic.git
+  revision: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
+  ref: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
+  specs:
+    mimemagic (0.3.5)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -74,7 +81,7 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
       zeitwerk (~> 2.2)
-    addressable (2.7.0)
+    addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     arbre (1.2.1)
       activesupport (>= 3.0.0)
@@ -154,9 +161,6 @@ GEM
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
     method_source (0.9.2)
-    mimemagic (0.3.10)
-      nokogiri (~> 1)
-      rake
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitar (0.9)
@@ -176,7 +180,7 @@ GEM
     polyamorous (2.3.2)
       activerecord (>= 5.2.1)
     popper_js (1.16.0)
-    public_suffix (4.0.3)
+    public_suffix (4.0.6)
     puma (4.3.8)
       nio4r (~> 2.0)
     rack (2.2.2)
@@ -292,6 +296,7 @@ DEPENDENCIES
   devise
   jbuilder (~> 2.7)
   jquery-rails
+  mimemagic!
   minitar
   msfrpc-client
   pg (>= 0.18, < 2.0)
