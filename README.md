@@ -88,7 +88,6 @@ tbd
 
 ## Usage
 
-[![Login Screen Shot][login-screenshot]](https://github.com/CanciuCostin/android-spyware)
 [![Remote Screen Shot][remote-screenshot]](https://github.com/CanciuCostin/android-spyware)
 
 tbd
@@ -128,4 +127,3 @@ tbd
 [linkedin-url]: https://ro.linkedin.com/in/costin-canciu-b3572a105
 [product-screenshot]: images/dashboard.png
 [remote-screenshot]: images/remote.png
-[login-screenshot]: images/login.png
