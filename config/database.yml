@@ -24,8 +24,8 @@ default: &default
 development:
   <<: *default
   database: android_spyware_development
-  username: postgres
-  password: 28Noiembrie
+  username: app
+  password: password
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
@@ -60,8 +60,8 @@ development:
 test:
   <<: *default
   database: android_spyware_test
-  username: postgres
-  password: 28Noiembrie
+  username: app
+  password: password
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -85,5 +85,6 @@ test:
 production:
   <<: *default
   database: androidspyware_production
-  username: androidspyware
-  password: <%= ENV['ANDROIDSPYWARE_DATABASE_PASSWORD'] %>
+  username: app
+  password: password
+#<%= ENV['ANDROIDSPYWARE_DATABASE_PASSWORD'] %>
