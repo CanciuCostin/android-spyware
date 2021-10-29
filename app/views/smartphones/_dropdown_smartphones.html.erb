@@ -1,17 +1,13 @@
 <%= javascript_pack_tag 'smartphones', 'data-turbolinks-track': 'reload' %>
 <div id="dashboardContainer">
-
-<% @selected_smartphone = smartphone.nil? ? "No Smartphones Yet" : smartphone.id.to_s + " - " + smartphone.name  %>
-
-<div id ="drop" class="dropdown">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:50px !important;">
-  <%= @selected_smartphone %>
-  </button>
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+  <% @selected_smartphone = smartphone.nil? ? "No Smartphones Yet" : smartphone.id.to_s + " - " + smartphone.name  %>
+  <div id ="drop" class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:50px !important;">
+      <%= @selected_smartphone %>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <% smartphones.each do |smartphone| %>
         <%= link_to smartphone.id.to_s + " - " + smartphone.name, 'smartphones/select_smartphone?smartphone_id=' + smartphone.id.to_s, class: "dropdown-item", method: :post %>
-    <% end %>
+      <% end %>
+    </div>
   </div>
-
-
-</div>

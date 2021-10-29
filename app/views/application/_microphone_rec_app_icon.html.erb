@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: MSF
 
               DESCRIPTION: Record the device microphone and save it as .wav file (persistent)" flow="up">
-<%= link_to '../recordings/microphone_rec?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to '../recordings/microphone_rec?smartphone_id=' + smartphone.id.to_s,
  method: :post, :remote => true, :class => "msf_link", :id => "microphone_rec_link" do %>
- <%= image_tag "microphone_rec.png", :alt => "Microphone REC", :class => "smartphone-icon msf_proc" %>
-<% end %>
+    <%= image_tag "microphone_rec.png", :alt => "Microphone REC", :class => "smartphone-icon msf_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#microphone_rec_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "record_mic", ["Starting . . ."] ]);
-    });
+  $("#microphone_rec_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "record_mic", ["Starting . . ."] ]);
+  });
 </script>

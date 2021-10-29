@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: MSF
 
               DESCRIPTION: Dump local time information" flow="right">
-<%= link_to '../smartphones/dump_localtime?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to '../smartphones/dump_localtime?smartphone_id=' + smartphone.id.to_s,
  method: :post, :remote => true, :class => "adb_msf_link", :id => "dump_localtime_link" do %>
-  <%= image_tag "dump_localtime.png", :alt => "Dump Localtime", :class => "smartphone-icon adb_msf_proc" %>
-<% end %>
+    <%= image_tag "dump_localtime.png", :alt => "Dump Localtime", :class => "smartphone-icon adb_msf_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#dump_localtime_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "localtime", ["Starting . . ."] ]);
-    });
+  $("#dump_localtime_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "localtime", ["Starting . . ."] ]);
+  });
 </script>

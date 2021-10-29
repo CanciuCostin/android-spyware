@@ -1,219 +1,219 @@
+/* General Rules For Range Slider */
+.custom-rangeslider {
+  position: relative;
+  padding: 0;
+  width: 100%;
+  height: 120px;
+}
 
-  
-  /* General Rules For Range Slider */
-  .custom-rangeslider { 
-    position:relative ;
-    //margin-top:60px ;
-    padding:0 ;
-    width: 100%;
-    height: 120px;
+// ----- Variables -----
+
+// Range Slider
+$range-height: 20px;
+$range-background-color: transparent; // Test
+
+// Thumb
+$thumb-background-color: #00796b; // Test
+$thumb-border: 2px solid #ffffff;
+$thumb-height: 20px;
+$thumb-width: 20px;
+$thumb-border-radius: 50%; // Circle
+
+// Track
+$track-height: 3px;
+$track-background-color: #00796b;
+
+// Tool Tip
+$tool-tip-border: 1px #e14eca solid;
+$tool-tip-border-arrow: $tool-tip-border;
+
+// ----- Mixins -----
+
+// Cursor
+@mixin cursorGrab {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  &:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
   }
-  
-  
-  // ----- Variables -----
-  
-  // Range Slider
-  $range-height : 20px ;
-  $range-background-color : transparent ; // Test
-  
+}
+
+// Range Track
+@mixin rangeTrack {
+  appearance: none; // Reset Appearance
+  box-sizing: border-box; // Border need to be inset
+  height: $track-height;
+  width: 100%;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: grey;
+}
+
+@mixin rangeTrackFocus {
+  // background: yellow ; // Test
+}
+
+// Range Thumb
+@mixin rangeThumb {
+  appearance: none; // Reset Appearance
+  box-sizing: border-box; // Border need to be inset
+  background-image: linear-gradient(to bottom left, #e14eca, #ba54f5, #e14eca);
+  width: $thumb-width;
+  height: $thumb-height;
+  border: none;
+  border-radius: $thumb-border-radius;
+  @include cursorGrab; // Optional
+}
+
+@mixin unSelectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+@mixin avoidClicks {
+  pointer-events: none;
+}
+
+// ----- Style -----
+
+.custom-rangeInput {
+  width: 100%;
+  background: transparent;
+  appearance: none; // Reset Appearance
+  box-sizing: border-box; // Border need to be inset
+  cursor: pointer;
+  outline: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background-color: $range-background-color;
+  height: $range-height;
+
   // Thumb
-  $thumb-background-color : #00796b ; // Test
-  $thumb-border : 2px solid #ffffff ;
-  $thumb-height : 20px ;
-  $thumb-width : 20px ;
-  $thumb-border-radius : 50% ; // Circle
-  
+  &::-webkit-slider-thumb {
+    @include rangeThumb;
+    margin-top: -8px;
+  } // Webkit
+  &::-moz-range-thumb {
+    @include rangeThumb;
+  } // Mozilla
+  &::-ms-thumb {
+    @include rangeThumb;
+    margin: auto;
+  } // IE
+
   // Track
-  $track-height : 3px ;
-  $track-background-color : #00796b ;
+  &::-webkit-slider-runnable-track {
+    @include rangeTrack;
+  }
+  &::-moz-range-track {
+    @include rangeTrack;
+  }
+  &::-ms-track {
+    @include rangeTrack;
+    color: transparent;
+    border: none;
+    outline: none;
+  }
 
-  // Tool Tip
-  $tool-tip-border : 1px #e14eca solid ;
-  $tool-tip-border-arrow : $tool-tip-border ;
-  
-  
-  // ----- Mixins -----
-  
-  // Cursor
-  @mixin cursorGrab {
-      cursor: move ; /* fallback if grab cursor is unsupported */
-      cursor: grab ;
-      cursor: -moz-grab ;
-      cursor: -webkit-grab ;
-      &:active { 
-        cursor: grabbing ;
-        cursor: -moz-grabbing ;
-        cursor: -webkit-grabbing ;
-      }
-  }
-  
-  // Range Track
-  @mixin rangeTrack {
-      appearance: none ; // Reset Appearance
-      box-sizing: border-box ; // Border need to be inset
-      height: $track-height ;
-      width: 100% ;
-      cursor: pointer ;
-      border: none ;
-      padding : 0 ;
-      margin : 0 ;
-      background : grey ;
-  }
-  
-  @mixin rangeTrackFocus {
-      // background: yellow ; // Test
-  }
-  
-  // Range Thumb
-  @mixin rangeThumb {
-      appearance: none ; // Reset Appearance
-      box-sizing: border-box ; // Border need to be inset
-      //background-color: $thumb-background-color ;
-      background-image: linear-gradient(to bottom left,#e14eca,#ba54f5,#e14eca);
-      //border: $thumb-border ;
-      //outline : $thumb-border ;
-      width: $thumb-width ;
-      height: $thumb-height ;
-      border: none ;
-      border-radius: $thumb-border-radius ;
-      //box-shadow: 0 0 3px #ddd;
-      @include cursorGrab ; // Optional
-  }
-  
-  @mixin unSelectable {
-      -webkit-touch-callout: none ;
-      -webkit-user-select: none ;
-      -khtml-user-select: none ;
-      -moz-user-select: none ;
-      -ms-user-select: none ;
-      -o-user-select: none ;
-      user-select: none ;
-  }
-  
-  @mixin avoidClicks {
-    pointer-events: none ;
-  }
-  
-  // ----- Style -----
-  
-  .custom-rangeInput {
-    width: 100% ;
-    background: transparent ;
-    appearance: none ; // Reset Appearance
-    box-sizing: border-box ; // Border need to be inset
-    cursor: pointer ;
-    outline: 0 ;
-    border: 0 ;
-    padding: 0 ;
-    margin: 0 ;
-    background-color: $range-background-color ;
-    height: $range-height ;
-    
-    // Thumb
-    &::-webkit-slider-thumb { 
-      @include rangeThumb ;
-      margin-top:-8px ;
-    } // Webkit
-    &::-moz-range-thumb { 
-      @include rangeThumb ; 
-    } // Mozilla
-    &::-ms-thumb { 
-      @include rangeThumb ;
-      margin:auto ;
-    } // IE
-    
-    // Track
-    &::-webkit-slider-runnable-track { @include rangeTrack ; }
-    &::-moz-range-track { @include rangeTrack ; }
-    &::-ms-track { @include rangeTrack ; color: transparent ; border:none ; outline: none ; }
-  
-    
-    // ----- States -----
-    
-    &:focus, &:active {
-      outline: none ; // Removes the blue border.
-      &::-webkit-slider-runnable-track { @include rangeTrackFocus ; }
-      &::-moz-range-track { @include rangeTrackFocus ; }
-      &::-ms-track { @include rangeTrackFocus ; } 
+  // ----- States -----
+
+  &:focus,
+  &:active {
+    outline: none; // Removes the blue border.
+    &::-webkit-slider-runnable-track {
+      @include rangeTrackFocus;
     }
-    
-    &::-ms-tooltip {
-      display : none ;
+    &::-moz-range-track {
+      @include rangeTrackFocus;
     }
-  }
-  
-  
-    // Tooltip
-    .custom-rangeslider__tooltip {
-      line-height : 20px ;
-      position : absolute ;
-      height : 20px ;
-      width : 40px ;
-      background-color : #27293d ;
-      padding : 3px 3px ;
-      border : $tool-tip-border ;
-      top : -40px ;
-      left : 0 ;
-      text-align : center ;
-      transform: translate(-26%, 0) ;
-      border-radius : 3px ;
-      visibility: hidden;
-      
-      @include unSelectable ;
-      @include avoidClicks ;
-      
-      &:after {
-        display: block ;
-        content : ' ' ;
-        background : #27293d ;
-        position : absolute ;
-        border: $tool-tip-border-arrow ;
-        border-top : 0 ; 
-        border-left :0 ;
-        width: 10px ;
-        height: 10px ;
-        left: calc(50% - 6px) ;
-        bottom : -10px ;
-        transform:rotate(45deg) ;
-      }
-    }
-  
-  .custom-rangeslider__label {
-    width : 100% ;
-    display : block ;
-    
-    span {
-      display:block ;
-    }
-    &-min {
-      float:left ;
-    }
-    &-max {
-      float:right ;
-    }
-    &:after {
-      content: "" ;
-      display: table ;
-      clear: both ;
+    &::-ms-track {
+      @include rangeTrackFocus;
     }
   }
 
-  #range-slider2::-moz-range-track {
-      
-    //background: linear-gradient(to right, #e945c5 0%, #e945c5 70%, #9c9e9f 70%, #9c9e9f 100%) !important;
+  &::-ms-tooltip {
+    display: none;
+  }
 }
 
-#slider_content{
-    float: right;
-    width: 45%;
-    padding-right: 10%;
-    top:42%;
-    position: relative;
+// Tooltip
+.custom-rangeslider__tooltip {
+  line-height: 20px;
+  position: absolute;
+  height: 20px;
+  width: 40px;
+  background-color: #27293d;
+  padding: 3px 3px;
+  border: $tool-tip-border;
+  top: -40px;
+  left: 0;
+  text-align: center;
+  transform: translate(-26%, 0);
+  border-radius: 3px;
+  visibility: hidden;
+
+  @include unSelectable;
+  @include avoidClicks;
+
+  &:after {
+    display: block;
+    content: " ";
+    background: #27293d;
+    position: absolute;
+    border: $tool-tip-border-arrow;
+    border-top: 0;
+    border-left: 0;
+    width: 10px;
+    height: 10px;
+    left: calc(50% - 6px);
+    bottom: -10px;
+    transform: rotate(45deg);
+  }
 }
 
-#slider_label{
+.custom-rangeslider__label {
+  width: 100%;
+  display: block;
+
+  span {
+    display: block;
+  }
+  &-min {
     float: left;
-    top:42%;
-    position: relative;
-    padding-left: 10%;
+  }
+  &-max {
+    float: right;
+  }
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+#slider_content {
+  float: right;
+  width: 45%;
+  padding-right: 10%;
+  top: 42%;
+  position: relative;
+}
+
+#slider_label {
+  float: left;
+  top: 42%;
+  position: relative;
+  padding-left: 10%;
 }

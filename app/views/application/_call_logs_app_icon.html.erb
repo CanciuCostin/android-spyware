@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: MSF
 
               DESCRIPTION: Dump call logs and save as .txt file (persistent)" flow="left">
-<%= link_to  '../call_logs/dump_calllogs?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to  '../call_logs/dump_calllogs?smartphone_id=' + smartphone.id.to_s,
 method: :post, :remote => true , :class => "msf_link", :id => "dump_callogs_link" do %>
-  <%= image_tag "dump_call_logs.png", :alt => "Call Logs", :class => "smartphone-icon msf_proc" %>
-<% end %>
+    <%= image_tag "dump_call_logs.png", :alt => "Call Logs", :class => "smartphone-icon msf_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#dump_callogs_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "dump_calllog", ["Starting . . ."] ]);
-    });
+  $("#dump_callogs_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "dump_calllog", ["Starting . . ."] ]);
+  });
 </script>

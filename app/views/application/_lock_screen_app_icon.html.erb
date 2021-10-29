@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: MSF
 
               DESCRIPTION: Lock/Unlock the device screen" flow="right">
-<%= link_to '../smartphones/wake_lock?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to '../smartphones/wake_lock?smartphone_id=' + smartphone.id.to_s,
  method: :post, :remote => true , :class => "adb_msf_link", :id => "lock_screen_link" do %>
-  <%= image_tag "lock_screen.png", :alt => "Lock Screen", :class => "smartphone-icon adb_msf_proc" %>
-<% end %>
+    <%= image_tag "lock_screen.png", :alt => "Lock Screen", :class => "smartphone-icon adb_msf_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#lock_screen_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "wakelock", ["Starting . . ."] ]);
-    });
+  $("#lock_screen_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "wakelock", ["Starting . . ."] ]);
+  });
 </script>

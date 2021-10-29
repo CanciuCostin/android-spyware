@@ -5,31 +5,25 @@
 //= require particles.js
 //= require_tree .
 //= require turbolinks
-require("@rails/ujs").start()
-require("@rails/activestorage").start()
-require("channels")
-require("turbolinks").start()
+require("@rails/ujs").start();
+require("@rails/activestorage").start();
+require("channels");
+require("turbolinks").start();
 
+import "../stylesheets/application";
 
-//import "bootstrap"
-import "../stylesheets/application" 
-
-
-$(document).on('turbolinks:load', function (){ alert("turbolinks on load event works") });
-
+$(document).on("turbolinks:load", function () {
+  alert("turbolinks on load event works");
+});
 
 document.addEventListener("turbolinks:load", () => {
-    console.log("load");
-    alert("turbolinks on load event works");
-    $('[data-toggle="tooltip"]').tooltip()
-    $('[data-toggle="popover"]').popover()
-    $('[data-toggle="carousel"]').carousel()
-    $('[data-toggle="dropdown"]').dropdown()
-
-})
-
-
-
+  console.log("load");
+  alert("turbolinks on load event works");
+  $('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="popover"]').popover();
+  $('[data-toggle="carousel"]').carousel();
+  $('[data-toggle="dropdown"]').dropdown();
+});
 
 // Uncomment to copy all static images under ../images to the output folder and reference
 // them with the image_pack_tag helper in views (e.g <%= image_pack_tag 'rails.png' %>)

@@ -1,17 +1,15 @@
-
 <span tooltip="OS SUPPORT: <= 10
 
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
 
               DESCRIPTION: Uninstall an application from the device" flow="up">
-<%= link_to '../smartphones/uninstall_app?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to '../smartphones/uninstall_app?smartphone_id=' + smartphone.id.to_s,
  method: :post, :remote => true, :class => "adb_msf_link", :id => "uninstall_app_link" do %>
-  <%= image_tag "uninstall_app.png", :alt => "Uninstall App", :class => "smartphone-icon adb_msf_proc" %>
-<% end %>
+    <%= image_tag "uninstall_app.png", :alt => "Uninstall App", :class => "smartphone-icon adb_msf_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#uninstall_app_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "adb uninstall", ["Starting . . ."] ]);
-    });
+  $("#uninstall_app_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "adb uninstall", ["Starting . . ."] ]);
+  });
 </script>

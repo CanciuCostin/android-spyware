@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
 
               DESCRIPTION: Dump device specific information" flow="up">
-<%= link_to  '../smartphones/dump_device_info?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to  '../smartphones/dump_device_info?smartphone_id=' + smartphone.id.to_s,
 method: :post, :remote => true , :class => "adb_msf_link", :id => "dump_device_info_link" do %>
-  <%= image_tag "dump_device_info.png", :alt => "Device Info", :class => "smartphone-icon adb_msf_proc" %>
-<% end %>
+    <%= image_tag "dump_device_info.png", :alt => "Device Info", :class => "smartphone-icon adb_msf_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#dump_device_info_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "deviceinfo", ["Starting . . ."] ]);
-    });
+  $("#dump_device_info_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "deviceinfo", ["Starting . . ."] ]);
+  });
 </script>

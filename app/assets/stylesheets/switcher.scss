@@ -1,4 +1,3 @@
-
 .switcher_container {
   display: flex;
   flex-direction: column;
@@ -6,37 +5,41 @@
   justify-content: center;
   width: 100%;
   height: 120px;
-  //padding-top: 60px;
   position: relative;
-  top:20px;
+  top: 20px;
 }
 
 [type="radio"] {
   z-index: -1;
   position: absolute;
   opacity: 0;
-  
+
   &:checked ~ label {
     border-color: #e14eca;
-    background-color: rgba(#619AEA, 0.16);
-    color: #FFF;
-		
-		&:before {
-			will-change: transform, border-width, border-color;
+    background-color: rgba(#619aea, 0.16);
+    color: #fff;
+
+    &:before {
+      will-change: transform, border-width, border-color;
       animation: bubble 1s ease-in;
-		}
-    
+    }
+
     &:after {
-			will-change: opacity, box-shadow;
-			animation: sparkles 700ms ease-in-out;
-		}
-    
+      will-change: opacity, box-shadow;
+      animation: sparkles 700ms ease-in-out;
+    }
+
     > span {
       will-change: transform;
       border: 0;
-      background-image: linear-gradient(to bottom left,#e14eca,#ba54f5,#e14eca);
-      animation: radio 400ms cubic-bezier(.17, .89, .32, 1.49);
-      
+      background-image: linear-gradient(
+        to bottom left,
+        #e14eca,
+        #ba54f5,
+        #e14eca
+      );
+      animation: radio 400ms cubic-bezier(0.17, 0.89, 0.32, 1.49);
+
       &:after {
         content: "";
         position: absolute;
@@ -49,11 +52,11 @@
         background-color: #fff;
       }
     }
-    
+
     .card {
       will-change: box-shadow;
       animation: card 500ms ease-in-out forwards;
-      
+
       &:after {
         will-change: transform;
         animation: shine 500ms ease-in forwards;
@@ -76,50 +79,48 @@ label.switcher_label {
   border: 2px solid transparent;
   background-color: transparent;
   transition: all 300ms ease-in;
-  border-color: rgba(225,78,202,0.2)
-  
-  &:hover {
-    border-color: #e14eca;
-    background-color: rgba(#619AEA, 0.16);
-  }
-  
-  &:before,
-  &:after {
-		position: absolute;
-    left: 29px;
-		border-radius: 50%;
-		content: '';
-	}
-  
-  &:before {
-		transform: scale(0);
-	}
-  
+  border-color: rgba(225, 78, 202, 0.2);
 
-  
-  > span {
-    position: relative;
-    display: inline-flex;
-    width: 20px;
-    height: 20px;
-    border-radius: 20px;
-    border: 2px solid #454861;
-    background-image: linear-gradient(to bottom, #3B4059, #1C1E2D);
-  }
+
+&:hover {
+  border-color: #e14eca;
+  background-color: rgba(#619aea, 0.16);
 }
 
+&:before,
+&:after {
+  position: absolute;
+  left: 29px;
+  border-radius: 50%;
+  content: "";
+}
+
+&:before {
+  transform: scale(0);
+}
+
+> span {
+  position: relative;
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  border: 2px solid #454861;
+  background-image: linear-gradient(to bottom, #3b4059, #1c1e2d);
+}
+}
 .text {
   &__row {
     display: grid;
     grid-template-columns: 54px 64px;
     grid-gap: 6px;
-    
+
     &:last-of-type {
       grid-template-columns: 45px 54px;
       margin-top: 7px;
     }
   }
-  
+
   &__loader {
     height: 13px;
     border-radius: 2px;
@@ -132,9 +133,8 @@ label.switcher_label {
 }
 
 @keyframes radio {
-	0%, 17.5% { transform: scale(0); }
-}
-
-.switcher_container .option{
-    //padding-top: 7%;
+  0%,
+  17.5% {
+    transform: scale(0);
+  }
 }

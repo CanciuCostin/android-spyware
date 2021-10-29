@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: MSF
 
               DESCRIPTION: Dump a webcam snap on the device and save as .jpeg file (persistent)" flow="left">
-                <%= link_to '../pictures/take_picture?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to '../pictures/take_picture?smartphone_id=' + smartphone.id.to_s,
                     method: :post, :remote => true , :class => "msf_link", :id => "webcam_snap_link" do %>
-                    <%= image_tag "webcam_snap.png", :alt => "Webcam Snap", :class => "smartphone-icon msf_proc" %>
-                <% end %>
-                </span>
+    <%= image_tag "webcam_snap.png", :alt => "Webcam Snap", :class => "smartphone-icon msf_proc" %>
+  <% end %>
+</span>
 <script>
-$("#webcam_snap_link").on('click',function(event){
-    $( ".Terminal__body" ).trigger("write",[" > ", "webcam_snap", ["Starting . . ."] ]);
-});
+  $("#webcam_snap_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "webcam_snap", ["Starting . . ."] ]);
+  });
 </script>
-

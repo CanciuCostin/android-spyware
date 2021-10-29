@@ -2,143 +2,134 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: https://sass-lang.com/
 
-.terminal{
-    transform: translatey(0px);
-	animation: float 6s ease-in-out infinite;
+.terminal {
+  transform: translatey(0px);
+  animation: float 6s ease-in-out infinite;
 }
 @keyframes float {
-	0% {
-		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
-		transform: translatey(0px);
-	}
-	50% {
-		box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
-		transform: translatey(-20px);
-	}
-	100% {
-		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
-		transform: translatey(0px);
-	}
-}
-#terminalContainer{
-    //width: 75%;
-    //position: relative;
-    //height: 367px;
+  0% {
+    box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.6);
+    transform: translatey(0px);
+  }
+  50% {
+    box-shadow: 0 25px 15px 0px rgba(0, 0, 0, 0.2);
+    transform: translatey(-20px);
+  }
+  100% {
+    box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.6);
+    transform: translatey(0px);
+  }
 }
 
 #infoi {
-    position: relative  ;
-    bottom: 300px;
-    z-index: 10;
-  }
-  #navi {
-    position: relative  ;
-    top: 0;
-    left: 0;
-    width: 25%;
-    height: 660px;
-    float: left;
-  }
+  position: relative;
+  bottom: 300px;
+  z-index: 10;
+}
+#navi {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 25%;
+  height: 660px;
+  float: left;
+}
 
+#acustom {
+  color: #ffffff;
+  text-decoration: none;
+}
 
-
-  #acustom {
-    color: #ffffff;
-    text-decoration: none;
-  }
-
-  .dashboardContainer{
-    position: absolute;
+.dashboardContainer {
+  position: absolute;
 }
 
 .smartphone {
-    position: relative !important;
-    width: 360px !important;
-    height: 615px !important;
-    margin: auto !important;
-    border: 8px black solid !important;
-    border-top-width: 60px !important;
-    border-bottom-width: 60px !important;
-    border-radius: 36px !important;
-  }
-  
-  /* The horizontal line on the top of the device */
-  .smartphone:before {
-    content: '' !important;
-    display: block !important;
-    width: 60px !important;
-    height: 5px !important;
-    position: absolute !important;
-    top: -30px !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    background: #333 !important;
-    border-radius: 10px !important;
-  }
-  
-  /* The circle on the bottom of the device */
-  .smartphone:after {
-    content: '' !important;
-    display: block !important;
-    width: 35px !important;
-    height: 35px !important;
-    position: absolute !important;
-    left: 50% !important;
-    bottom: -65px !important;
-    transform: translate(-50%, -50%) !important;
-    background: #333 !important;
-    border-radius: 50% !important;
-  }
+  position: relative !important;
+  width: 360px !important;
+  height: 615px !important;
+  margin: auto !important;
+  border: 8px black solid !important;
+  border-top-width: 60px !important;
+  border-bottom-width: 60px !important;
+  border-radius: 36px !important;
+}
 
-  .smartphone .content {
-    width: 342px;
-    height: 500px;
-    background-image: url("hack.png ");
-    position:relative;
-  }
+/* The horizontal line on the top of the device */
+.smartphone:before {
+  content: "" !important;
+  display: block !important;
+  width: 60px !important;
+  height: 5px !important;
+  position: absolute !important;
+  top: -30px !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  background: #333 !important;
+  border-radius: 10px !important;
+}
 
-  .smartphone-icon {
-      width: 40px;
-      height: 40px;
-      margin-right: 8%;
-      border-radius: 14px;
-  }
+/* The circle on the bottom of the device */
+.smartphone:after {
+  content: "" !important;
+  display: block !important;
+  width: 35px !important;
+  height: 35px !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: -65px !important;
+  transform: translate(-50%, -50%) !important;
+  background: #333 !important;
+  border-radius: 50% !important;
+}
 
-  .top-icons {
-    position: relative;
-    top: 3%;
-    left: 7%;
-    height: 350px;
-    padding-right: 15%;
-    overflow: auto;
-    width: 100%;
-  }
+.smartphone .content {
+  width: 342px;
+  height: 500px;
+  background-image: url("hack.png ");
+  position: relative;
+}
 
-  .bottom-icons {
-    position: relative;
-    top: 25px;
-  }
+.smartphone-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 7.2%;
+  border-radius: 14px;
+}
 
-  .app_name{
-    margin-bottom: 5%;
-    width: 15%;
-    margin-right: 8.9%;
-    position: relative;
-    display: inline-block;
-    top: 0px;
-    font-size: 9px;
-    font-weight: 600;
-    text-align: center;
-    line-height: initial;
-    //font-weight: bold;
-  }
+.top-icons {
+  position: relative;
+  top: 3%;
+  left: 7%;
+  height: 350px;
+  padding-right: 15%;
+  overflow: auto;
+  width: 100%;
+}
 
-  .app_names{
-      position: relative;
-      bottom: 4%;
-  }
+.bottom-icons {
+  position: relative;
+  top: 25px;
+}
 
+.app_name {
+  margin-bottom: 5%;
+  width: 15%;
+  margin-right: 8.2%;
+  position: relative;
+  display: inline-block;
+  top: 0px;
+  font-size: 9px;
+  font-weight: 600;
+  text-align: center;
+  line-height: initial;
+}
 
-  .app_row{
-      margin-bottom: 4%;
-  }
+.app_names {
+  position: relative;
+  bottom: 4%;
+}
+
+.app_row {
+  margin-bottom: 4%;
+}

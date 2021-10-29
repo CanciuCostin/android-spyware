@@ -1,155 +1,185 @@
-require 'sqlite3'
-require 'minitar'
+require "sqlite3"
+require "minitar"
 
 class MessagingAppsDumpsController < InheritedResources::Base
-
-    def export_database(filePath)
-      begin
-          db = SQLite3::Database.open "app\\assets\\images\\files\\whatsapp\\msgstore.db"
-          stm = db.prepare "SELECT _id,key_remote_jid,data,timestamp FROM messages;" 
-          rs = stm.execute 
-          File.open(filePath, 'w') do |file|
-              rs.each do |row|
-                  file.write(row.join("---") + "\n")
-              end
-          end
-      rescue SQLite3::Exception => e 
-          puts "Error exporting database"
-          puts e
-      rescue
-          puts "Error exporting database"
-      ensure
-          stm.close if stm
-          db.close if db
+  def export_database(filePath)
+    begin
+      db = SQLite3::Database.open "files/dumps/whatsapp/msgstore.db"
+      stm = db.prepare "SELECT _id,key_remote_jid,data,timestamp FROM messages;"
+      rs = stm.execute
+      File.open(filePath, "w") do |file|
+        rs.each do |row|
+          file.write(row.join("---") + "\n")
+        end
       end
+    rescue SQLite3::Exception => e
+      puts "Error exporting database"
+      puts e
+    rescue
+      puts "Error exporting database"
+    ensure
+      stm.close if stm
+      db.close if db
+    end
   end
 
-def uninstall_whatsapp_for_downgrade
+  def uninstall_whatsapp_for_downgrade
     begin
-        commandOutput=[run_adb_command('shell pm uninstall -k com.whatsapp')]
+      commandOutput = [run_adb_command("shell pm uninstall -k com.whatsapp")]
     rescue
-        commandOutput="Operation Failed"
-        puts "Error uninstalling whatsapp."
+      commandOutput = "Operation Failed"
+      puts "Error uninstalling whatsapp."
     end
     respond_to do |format|
-        format.js { render "uninstall_whatsapp_for_downgrade", :locals => {:copy_timeout => params[:copy_timeout].to_i,
-                                                                           :smartphone_id => params[:smartphone_id]  }  }
+      format.js {
+        render "uninstall_whatsapp_for_downgrade",
+               :locals => { :copy_timeout => params[:copy_timeout].to_i,
+                            :smartphone_id => params[:smartphone_id] }
+      }
     end
-end
+  end
 
-def install_old_apk
+  def install_old_apk
     begin
-        commandOutput=run_adb_command('install payloads\\WhatsApp-v2.11.431-AndroidBucket.com.apk')
+      commandOutput = run_adb_command("install payloads/WhatsApp-v2.11.431-AndroidBucket.com.apk")
     rescue
-        commandOutput="Operation Failed"
-        puts "Error installing old whatsapp version."
+      commandOutput = "Operation Failed"
+      puts "Error installing old whatsapp version."
     end
     respond_to do |format|
-        format.js { render "install_old_apk", :locals => {:copy_timeout => params[:copy_timeout].to_i,
-                                                          :smartphone_id => params[:smartphone_id]  }  }
+      format.js {
+        render "install_old_apk",
+               :locals => { :copy_timeout => params[:copy_timeout].to_i,
+                            :smartphone_id => params[:smartphone_id] }
+      }
     end
-end
+  end
 
-def adb_backup
+  def adb_backup
     begin
-        Thread.new {
-            sleep(5)
-            run_adb_command("shell input keyevent 82")
-            run_adb_command("shell input tap 521 1130")
-         }
-        commandOutput=run_adb_command('backup -apk com.whatsapp -f app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab')
+      Thread.new {
+        sleep(5)
+        run_adb_command("shell input keyevent 82")
+        run_adb_command("shell input tap 521 1130")
+      }
+      commandOutput = run_adb_command("backup -apk com.whatsapp -f files/whatsapp/whatsapp_backup.ab")
     rescue
-      commandOutput="Operation Failed"
+      commandOutput = "Operation Failed"
       puts "Error performing ADB backup."
     end
     respond_to do |format|
-        format.js { render "adb_backup", :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                                                      :smartphone_id => params[:smartphone_id]  }  }
+      format.js {
+        render "adb_backup",
+               :locals => { :copy_timeout => params[:copy_timeout].to_i,
+                            :smartphone_id => params[:smartphone_id] }
+      }
     end
-end
+  end
 
-def extract_backup
+  def extract_backup
     begin
-        system("java -jar tools\\android-backup-extractor\\android-backup-extractor-20180521-bin\\abe.jar unpack app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab.tar")
+      system("java -jar tools/android-backup-extractor/android-backup-extractor-20180521-bin/abe.jar unpack files/whatsapp/whatsapp_backup.ab files/whatsapp/whatsapp_backup.ab.tar")
     rescue
-        puts "Error converting .ab file to .ab.tar"
+      puts "Error converting .ab file to .ab.tar"
     end
     respond_to do |format|
-        format.js { render "extract_backup", :locals => {:copy_timeout => params[:copy_timeout].to_i,
-                                                         :smartphone_id => params[:smartphone_id]  }  }
+      format.js {
+        render "extract_backup",
+               :locals => { :copy_timeout => params[:copy_timeout].to_i,
+                            :smartphone_id => params[:smartphone_id] }
+      }
     end
-end
+  end
 
-def untar_backup
+  def untar_backup
     begin
-        Minitar.unpack('app\\assets\\images\\files\\whatsapp\\whatsapp_backup.ab.tar', 'app\assets\images\files\whatsapp\whatsapp_backup')
+      Minitar.unpack("files/whatsapp/whatsapp_backup.ab.tar", 'files\whatsapp\whatsapp_backup')
     rescue
-        puts "Error extracting .tar backup file."
+      puts "Error extracting .tar backup file."
     end
     respond_to do |format|
-        format.js { render "untar_backup", :locals => {:copy_timeout => params[:copy_timeout].to_i,
-                                                       :smartphone_id => params[:smartphone_id]  }  }
+      format.js {
+        render "untar_backup",
+               :locals => { :copy_timeout => params[:copy_timeout].to_i,
+                            :smartphone_id => params[:smartphone_id] }
+      }
     end
-end
+  end
 
-def pull_whatsapp_db
+  def pull_whatsapp_db
     begin
-        commandOutput=run_adb_command('pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12 app\\assets\\images\\files\\whatsapp\\msgstore.db.crypt12')
+      commandOutput = run_adb_command("pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12 files/whatsapp/msgstore.db.crypt12")
     rescue
-        commandOutput="Operation Failed"
+      commandOutput = "Operation Failed"
     end
     respond_to do |format|
-        format.js { render "pull_whatsapp_db", :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                                                            :smartphone_id => params[:smartphone_id]  }  }
+      format.js {
+        render "pull_whatsapp_db",
+               :locals => { :copy_timeout => params[:copy_timeout].to_i,
+                            :smartphone_id => params[:smartphone_id] }
+      }
     end
-end
+  end
 
-def decrypt_whatsapp_database
+  def decrypt_whatsapp_database
     begin
-        system("java -jar tools\\crypt12-decrypt\\master\\decrypt12.jar app\\assets\\images\\files\\whatsapp\\whatsapp_backup\\apps\\com.whatsapp\\f\\key app\\assets\\images\\files\\whatsapp\\msgstore.db.crypt12 app\\assets\\images\\files\\whatsapp\\msgstore.db")
+      system("java -jar tools/crypt12-decrypt/master/decrypt12.jar files/whatsapp/whatsapp_backup/apps/com.whatsapp/f/key files/whatsapp/msgstore.db.crypt12 files/whatsapp/msgstore.db")
     rescue
-        puts "Error decrypting db file"
+      puts "Error decrypting db file"
     end
     respond_to do |format|
-        format.js { render "decrypt_whatsapp_database", :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                                                                     :smartphone_id => params[:smartphone_id]  }  }
+      format.js {
+        render "decrypt_whatsapp_database",
+               :locals => { :copy_timeout => params[:copy_timeout].to_i,
+                            :smartphone_id => params[:smartphone_id] }
+      }
     end
-end
+  end
 
-def export_whatsapp_database
+  def export_whatsapp_database
     begin
-        downloadTimeout=params[:copy_timeout].to_i
-        fileName=params[:filename].to_s
-        @smartphone = Smartphone.find(params[:smartphone_id])
-        currentTime = DateTime.now
-        currentTimeFormat=currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-        @fileName= fileName.empty? ? "whatsapp_dump_" + currentTimeFormat + '.txt' : fileName + '.txt'
-        fullPath="app\\assets\\images\\files\\whatsapp\\" + @fileName
-        export_database(fullPath)
-        commandOutput=["Done"]
-
-        isOperationSuccessful=false
-        1.upto(downloadTimeout) do |n|
-            if File.file?(fullPath)
-                newDump=MessagingAppsDump.new(:date => currentTimeFormat.gsub('_',' ').gsub('--',':'),:app_name => "WhatsApp", :filename => @fileName, :smartphone_id => @smartphone.id)
-                newDump.save!
-                isOperationSuccessful = true
-                break
-            end 
+      downloadTimeout = params[:copy_timeout].to_i
+      fileName = params[:filename].to_s
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      currentTime = DateTime.now
+      currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
+      @fileName = fileName.empty? ?
+        "whatsapp_dump_" + currentTimeFormat + ".txt" :
+        fileName + ".txt"
+      fullPath = "files/whatsapp/" + @fileName
+      export_database(fullPath)
+      commandOutput = ["Done"]
+      isOperationSuccessful = false
+      1.upto(downloadTimeout) do |n|
+        if File.file?(fullPath)
+          newDump = MessagingAppsDump.new(:date => currentTimeFormat.gsub("_", " ").gsub("--", ":"),
+                                          :app_name => "WhatsApp",
+                                          :filename => @fileName,
+                                          :smartphone_id => @smartphone.id)
+          newDump.save!
+          isOperationSuccessful = true
+          break
         end
-        commandOutput=["Operation Failed"] if not isOperationSuccessful
+      end
+      commandOutput = ["Operation Failed"] if not isOperationSuccessful
     rescue
-        commandOutput="Operation Failed"
-    end 
-    respond_to do |format|
-        format.js { render "export_whatsapp_database", :locals => {:commandOutput => commandOutput,
-                                                                   :fileName => @fileName }  }
+      commandOutput = "Operation Failed"
     end
-end
+    respond_to do |format|
+      format.js {
+        render "export_whatsapp_database",
+               :locals => { :commandOutput => commandOutput,
+                            :fileName => @fileName }
+      }
+    end
+  end
 
   private
-    def messaging_apps_dump_params
-      params.require(:messaging_apps_dump).permit(:date, :app_name, :filename, :smartphone_id)
-    end
 
+  def messaging_apps_dump_params
+    params.require(:messaging_apps_dump).permit(:date,
+                                                :app_name,
+                                                :filename,
+                                                :smartphone_id)
+  end
 end

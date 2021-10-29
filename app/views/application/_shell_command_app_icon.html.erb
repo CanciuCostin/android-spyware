@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
 
               DESCRIPTION: Run a shell command on the device" flow="up">
-<%= link_to '../smartphones/run_shell_command?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to '../smartphones/run_shell_command?smartphone_id=' + smartphone.id.to_s,
 method: :post, :remote => true , :class => "adb_msf_link", :id => "shell_command_link" do %>
-  <%= image_tag "shell_command.png", :alt => "Shell Command", :class => "smartphone-icon adb_msf_proc" %>
-<% end %>
+    <%= image_tag "shell_command.png", :alt => "Shell Command", :class => "smartphone-icon adb_msf_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#shell_command_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "shell", ["Starting . . ."] ]);
-    });
+  $("#shell_command_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "shell", ["Starting . . ."] ]);
+  });
 </script>

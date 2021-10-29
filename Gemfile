@@ -67,7 +67,7 @@ gem 'msfrpc-client'
 
 gem 'minitar'
 
-gem 'sqlite3'
+#gem 'sqlite3'
 
 
 

@@ -1,2 +1,2 @@
-ActiveAdmin.register CallLog do  
+ActiveAdmin.register CallLog do
 end

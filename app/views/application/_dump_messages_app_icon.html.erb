@@ -3,13 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: MSF
 
               DESCRIPTION: Dump SMS messages and save as .txt file (persistent)" flow="cornertop2">
-<%= link_to '../sms_messages/dump_messages?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to '../sms_messages/dump_messages?smartphone_id=' + smartphone.id.to_s,
         method: :post, :remote => true , :class => "msf_link", :id => "dump_messages_link" do %>
-          <%= image_tag "dump_messages.png", :alt => "Dump SMS", :class => "smartphone-icon msf_proc" %>
-        <% end %>
-      </span>
-      <script>
-$("#dump_messages_link").on('click',function(event){
-$( ".Terminal__body" ).trigger("write",[" > ", "dump_sms", ["Starting . . ."] ]);
-});
+    <%= image_tag "dump_messages.png", :alt => "Dump SMS", :class => "smartphone-icon msf_proc" %>
+  <% end %>
+</span>
+<script>
+  $("#dump_messages_link").on('click',function(event){
+  $( ".Terminal__body" ).trigger("write",[" > ", "dump_sms", ["Starting . . ."] ]);
+  });
 </script>

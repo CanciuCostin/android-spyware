@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
 
               DESCRIPTION: Hide the malware application on the device" flow="cornerbottom1">
-    <%= link_to '../smartphones/hide_app?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to '../smartphones/hide_app?smartphone_id=' + smartphone.id.to_s,
     method: :get, :remote => true , :class => "adb_msf_link", :id => "hide_app_link" do %>
-        <%= image_tag "hide_app.png", :alt => "System Info", :class => "smartphone-icon adb_msf_proc" %>
-    <% end %>
+    <%= image_tag "hide_app.png", :alt => "System Info", :class => "smartphone-icon adb_msf_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#hide_app_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "pm hide com.metasploit.stage", ["Starting . . ."] ]);
-    });
+  $("#hide_app_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "pm hide com.metasploit.stage", ["Starting . . ."] ]);
+  });
 </script>

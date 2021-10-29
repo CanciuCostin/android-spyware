@@ -1,13 +1,4 @@
 <%= javascript_pack_tag 'smartphones' %>
-
-
-
-<%# <div id="carouselContainer">
-  <div class="jumbotron jumbotron-fluid" id="particles-js">
-  </div> %>
-
-
-
 <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel" >
   <ol class="carousel-indicators">
     <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
@@ -16,21 +7,23 @@
   </ol>
   <div class="carousel-inner">
     <div class="carousel-item active">
-          <%= image_tag "step1.jpg", class: "d-block w-30" %>
+      <%= image_tag "step1.jpg", class: "d-block w-30" %>
       <div class="carousel-caption d-none d-md-block">
         <h5>Step 1</h5>
-        <a href="#"><p style="color:black;">Generate the APK file to be installed on the target smartphone.</p></a>
+        <a href="#">
+          <p style="color:black;">Generate the APK file to be installed on the target smartphone.</p>
+        </a>
       </div>
     </div>
     <div class="carousel-item">
-          <%= image_tag "step2.jpg", class: "d-block w-30" %>
+      <%= image_tag "step2.jpg", class: "d-block w-30" %>
       <div class="carousel-caption d-none d-md-block">
         <h5>Step 2</h5>
         <p style="color:black;">Install the APK on the target smartphone.</p>
       </div>
     </div>
     <div class="carousel-item">
-          <%= image_tag "step3.jpg", class: "d-block w-30" %>
+      <%= image_tag "step3.jpg", class: "d-block w-30" %>
       <div class="carousel-caption d-none d-md-block">
         <h5>Step 3</h5>
         <p style="color:black;">Use the dashbboard buttons to control the smartphone.</p>
@@ -46,7 +39,6 @@
     <span class="sr-only">Next</span>
   </a>
 </div>
-
 <div class="progress">
   <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 25%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
 </div>

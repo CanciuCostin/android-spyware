@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
 
               DESCRIPTION: Install an APK on the device" flow="up">
-<%= link_to  '../smartphones/install_app?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to  '../smartphones/install_app?smartphone_id=' + smartphone.id.to_s,
 method: :post, :remote => true , :class => "adb_msf_link", :id => "install_apk_link" do %>
-  <%= image_tag "install_apk.png", :alt => "Install APK", :class => "smartphone-icon adb_msf_proc" %>
-<% end %>
+    <%= image_tag "install_apk.png", :alt => "Install APK", :class => "smartphone-icon adb_msf_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#install_apk_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "adb install  ", ["Starting . . ."] ]);
-    });
+  $("#install_apk_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "adb install  ", ["Starting . . ."] ]);
+  });
 </script>

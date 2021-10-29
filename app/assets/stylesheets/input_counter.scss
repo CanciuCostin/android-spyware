@@ -1,25 +1,28 @@
-span {cursor:pointer !important ; }
-.number{
-    margin:100px !important ;
+span {
+  cursor: pointer !important ;
 }
-.minus, .plus{
-    width:20px !important ;
-    height:20px !important ;
-    background:#f2f2f2 !important ;
-    border-radius:4px !important ;
-    padding:8px 5px 8px 5px !important ;
-    border:1px solid #ddd !important ;
-display: inline-block !important ;
-vertical-align: middle !important ;
-text-align: center !important ;
+.number {
+  margin: 100px !important ;
 }
-input{
-    height:34px !important ;
-width: 100px !important ;
-text-align: center !important ;
-font-size: 26px !important ;
-    border:1px solid #ddd !important ;
-    border-radius:4px !important ;
-display: inline-block !important ;
-vertical-align: middle !important ;
+.minus,
+.plus {
+  width: 20px !important ;
+  height: 20px !important ;
+  background: #f2f2f2 !important ;
+  border-radius: 4px !important ;
+  padding: 8px 5px 8px 5px !important ;
+  border: 1px solid #ddd !important ;
+  display: inline-block !important ;
+  vertical-align: middle !important ;
+  text-align: center !important ;
+}
+input {
+  height: 34px !important ;
+  width: 100px !important ;
+  text-align: center !important ;
+  font-size: 26px !important ;
+  border: 1px solid #ddd !important ;
+  border-radius: 4px !important ;
+  display: inline-block !important ;
+  vertical-align: middle !important ;
 }

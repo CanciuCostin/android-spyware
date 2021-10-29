@@ -3,14 +3,13 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB
 
               DESCRIPTION: Record the device screen and save as .mp4 file (persistent)" flow="up">
-<%= link_to '../screenshots/screen_record?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to '../screenshots/screen_record?smartphone_id=' + smartphone.id.to_s,
  method: :post, :remote => true , :class => "adb_link", :id => "screen_record_link" do %>
-<%= image_tag "screen_record.png", :alt => "Screen Record", :class => "smartphone-icon adb_proc" %>
-<% end %>
+    <%= image_tag "screen_record.png", :alt => "Screen Record", :class => "smartphone-icon adb_proc" %>
+  <% end %>
 </span>
-
 <script>
-    $("#screen_record_link").on('click',function(event){
-        $( ".Terminal__body" ).trigger("write",[" > ", "screenrecord", ["Starting . . ."] ]);
-    });
+  $("#screen_record_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" > ", "screenrecord", ["Starting . . ."] ]);
+  });
 </script>

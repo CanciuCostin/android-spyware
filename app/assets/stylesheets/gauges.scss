@@ -1,94 +1,67 @@
-
 $w: 120px;
 .gaugesSVG {
-	display: block;
-	width: 130px;
-	height: $w;
-	margin: 3px;
-	margin-bottom: 0;
-	margin-top: 0;
-	
-	circle {
-		fill: none;
-		stroke-width: 12px;
-		transform-origin: $w/2 $w/2 0;
-		transform: rotate(270deg);
-		
-		&:nth-child(1) {
-			stroke: rgba(white, .2);
-		}
-		&:nth-child(2) {
-			stroke: #7FC146;
-			//stroke-linecap: round;
-			//stroke-linejoin: round;
-			stroke-dasharray: 328;
-			stroke-dashoffset: 402.124;
-			transition: all .5s ease-out;
+  display: block;
+  width: 130px;
+  height: $w;
+  margin: 3px;
+  margin-bottom: 0;
+  margin-top: 0;
 
-		}
-	} // circle
-	
-	@for $i from 1 through 100 {
-		&[percent="#{$i}"] {
-			circle {
-				&:nth-child(2) {
-					stroke-dashoffset: #{402.124 - (402.124 * ($i/100))};
-					@if ($i < 40) {
-						stroke: #7FC146;
-					}
-					@elseif ($i < 80) {
-						stroke: #FF9500;
-					}
-					@else {
-						stroke: #FA4E3B;
-					}
-				}
-			}
-		}
-	} // percent dashoffset
-	
-	text {
-		fill: #EEE;
-		
-		&.value {
-			font-size: 22px;
-			font-weight: 300;
-		}
+  circle {
+    fill: none;
+    stroke-width: 12px;
+    transform-origin: $w/2 $w/2 0;
+    transform: rotate(270deg);
 
-		&.caption {
-			font-weight: bold;
-			font-size: 12px;
-			text-transform: uppercase;
-		}
-		
-		
-	} //text
-	/*
-	&#gaugeCPU circle:nth-child(2) {
-		stroke: #7FC146;
-	}
+    &:nth-child(1) {
+      stroke: rgba(white, 0.2);
+    }
+    &:nth-child(2) {
+      stroke: #7fc146;
+      stroke-dasharray: 328;
+      stroke-dashoffset: 402.124;
+      transition: all 0.5s ease-out;
+    }
+  } // circle
 
-	&#gaugeMemory circle:nth-child(2) {
-		stroke: #FA4E3B;
-	}
-	
-	&#gaugeStorage circle:nth-child(2) {
-		stroke: #FF9500;
-	}*/
+  @for $i from 1 through 100 {
+    &[percent="#{$i}"] {
+      circle {
+        &:nth-child(2) {
+          stroke-dashoffset: #{402.124 - (402.124 * ($i/100))};
+          @if ($i < 40) {
+            stroke: #7fc146;
+          }
+          @elseif ($i < 80) {
+            stroke: #ff9500;
+          } @else {
+            stroke: #fa4e3b;
+          }
+        }
+      }
+    }
+  } // percent dashoffset
 
+  text {
+    fill: #eee;
+
+    &.value {
+      font-size: 22px;
+      font-weight: 300;
+    }
+
+    &.caption {
+      font-weight: bold;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+  }
 } // svg
 
-
-
-.gaugeCPU{
-    float: left;
+.gaugeCPU {
+  float: left;
 }
 
-.gaugeMemory{
-    float: right;
-}
-
-.gaugeStorage{
-    //position: relative;
-    //left: 5%;
+.gaugeMemory {
+  float: right;
 }

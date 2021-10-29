@@ -1,17 +1,17 @@
 <%= stylesheet_link_tag 'dashboard', media: 'all', 'data-turbolinks-track': 'reload' %>
 <div id="content">
   <ul class="timeline">
-  <% i=0 %>
-  <% activities.each do |activity| %>
-    <li>
-		<div class="direction-<%= if i%2 == 0 then 'r' else 'l' end %>">
-			<div class="flag-wrapper">
-				<span class="flag color-<%= (i%4) + 1 %>"><%= activity.type.slice(0,8) + " - " + activity.date.to_s.slice(0,10) %></span>
-			</div>
-			<div class="desc"><%=  %></div>
-		</div>
-	</li>
-  <% i+=1 %>
-  <% end %>
+    <% i=0 %>
+    <% activities.each do |activity| %>
+      <li>
+        <div class="direction-<%= if i%2 == 0 then 'r' else 'l' end %>">
+          <div class="flag-wrapper">
+            <span class="flag color-<%= (i%4) + 1 %>"><%= activity.type.slice(0,8) + " - " + activity.date.to_s.slice(0,10) %></span>
+          </div>
+          <div class="desc"><%=  %></div>
+        </div>
+      </li>
+      <% i+=1 %>
+    <% end %>
   </ul>
 </div>
