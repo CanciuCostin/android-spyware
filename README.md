@@ -62,8 +62,10 @@ The tool:
 * Uses RPC calls to communicate with the Metasploit framework API
 * Uses ADB to install the payload on the target device(the device must be in the same LAN)
 
-The tool should not be used on real Android devices as this is illegal.
+### Disclaimer
+This software is for educational purposes only. Using the tool for spying real devices is strctly illegal. USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHOR ASSUMES NO RESPONSIBILITY FOR YOUR USAGE.
 
+We strongly recommend you to have coding and Docker knowledge. Do not hesitate to read the source code and understand the mechanism of the tool.
 ### Built With
 * [Bootstrap](https://getbootstrap.com)
 * [JQuery](https://jquery.com)
@@ -72,21 +74,58 @@ The tool should not be used on real Android devices as this is illegal.
 * [ActiveAdmin](https://activeadmin.info/)
 * [Docker](https://www.docker.com/)
 
+### Features
+
+## Main actions using Metasploit framework
+
+- [x] Dump System Info
+- [x] Dump Location
+- [x] Live Webcam Stream
+- [x] Dump Messages
+- [x] Change Audio Mode
+- [x] Dump Call Logs
+- [x] Dump Local Time
+- [x] Microphone Recording
+- [x] Unistall App
+- [x] List Installed Apps
+- [x] Send Message
+- [x] Dump Contacts
+- [x] Locl/Unlock Screen
+- [x] Run Shell Command
+- [x] Webcam Snap
+- [x] Open App
+- [x] Install App
+- [x] Device Info
+- [x] Hide/Show payload app icon
+
+## Additional actions via ADB (only available for standalone deployment)
+
+- [x] Dump Whatsapp conversations from backup DB
+- [x] Dump Wi-Fi Information
+- [x] Screen Snap
+- [x] Upload File
+- [x] Record Screen
+- [x] Pull File
+- [x] Start Monero crypto miner in background
+
+
 
 <!-- GETTING STARTED -->
-## Getting Started
+## How to run it
 
-tbd
+### Software requirements
+- [Docker](https://www.docker.com/products/docker) (Recommended)
 
-### Prerequisites
+### Installation & deployment 
+1. Docker Deployment (recommended)
+2. Standalone Deployment (more features available; requires build)
 
-tbd
 
-### Installation
+### Usage
 
-tbd
+## Build
 
-## Usage
+
 
 [![Remote Screen Shot][remote-screenshot]](https://github.com/CanciuCostin/android-spyware)
 
