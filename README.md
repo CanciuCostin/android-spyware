@@ -141,6 +141,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 ### Software requirements
 - [Docker](https://www.docker.com/products/docker)
 - [NodeJS & npm](https://nodejs.org/en/download/)
+- [Ruby 2.6.6](https://rubyinstaller.org/downloads/archives/)
 
 ```
 git clone https://github.com/CanciuCostin/android-spyware.git
