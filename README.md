@@ -114,17 +114,42 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 ## How to run it
 
 ### Software requirements
-- [Docker](https://www.docker.com/products/docker) (Recommended)
+- [Docker](https://www.docker.com/products/docker)
 
 ### Installation & deployment 
 1. Docker Deployment (recommended)
 2. Standalone Deployment (more features available; requires build)
+  2.1 Postgres Database Container
+  2.2 Metasploit Container
+  2.3 Rails server
 
 
 ### Usage
+1. Open the rails app in the browser: localhost/admin and login. Default credentials:
+  User: admin@example.com
+  Password: password
+2. Generate APK
+3. Install APK
+  Option 1 - Directly from the interface (only for standalone deployment)
+  Option 2 - Via ADB
+  Option 3 - Manually
+4. Open Remote
+5. Run Actions
 
 ## Build
 
+### Software requirements
+- [Docker](https://www.docker.com/products/docker)
+- [NodeJS & npm](https://nodejs.org/en/download/)
+
+```
+git clone https://github.com/CanciuCostin/android-spyware.git
+cd android-spyware
+gem install bundler:2.1.4
+bundle
+npm install yarn -g
+yarn install --check-files
+```
 
 
 [![Remote Screen Shot][remote-screenshot]](https://github.com/CanciuCostin/android-spyware)
