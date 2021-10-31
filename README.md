@@ -122,6 +122,8 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
   2.1 Postgres Database Container
   2.2 Metasploit Container
   2.3 Rails server
+  
+### Debugging issues
 
 
 ### Usage
@@ -142,6 +144,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 - [Docker](https://www.docker.com/products/docker)
 - [NodeJS & npm](https://nodejs.org/en/download/)
 - [Ruby 2.6.6](https://rubyinstaller.org/downloads/archives/)
+### Optional - Google Maps API Key
 
 ```
 git clone https://github.com/CanciuCostin/android-spyware.git
