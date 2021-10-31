@@ -5,5 +5,5 @@ console.log(commandOutput)
 $( ".Terminal__body" ).trigger("write",[" msf > ", ". . .", commandOutput ]);
 
 if (commandOutput[0] != "Operation Failed"){
-    window.open("/assets/files/microphone_recs/<%= fileName %>")
+    window.open("/files/dumps/microphone_recs/<%= fileName %>")
 }
