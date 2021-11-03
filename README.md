@@ -117,11 +117,25 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 - [Docker](https://www.docker.com/products/docker)
 
 ### Installation & deployment 
-1. Docker Deployment (recommended)
-2. Standalone Deployment (more features available; requires build)
+1. Fully Dockerized Deployment (recommended)
+
+2. Standalone Rails Servers (more features available; requires build)
   2.1 Postgres Database Container
+  
+  Note: local postgresql database can also be used as alternative, but you will need to run the rake scripts for initialization:
+  ```
+  rake db:create //alternatively run createdb android_spyware_[developmen|test|production]
+  rake db:schema:load
+  rake db:seed /too add mock data required for start-up
+  ```
+  
   2.2 Metasploit Container
+  
   2.3 Rails server
+  
+  1. Follow the below Build steps
+  2. 
+  
   
 ### Debugging issues
 
