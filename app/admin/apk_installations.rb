@@ -14,21 +14,21 @@ ActiveAdmin.register ApkInstallation do
   after_create do |apk_installation|
     begin
       @apk_payload = ApkPayload.find(apk_installation.apk_payload_id)
-      adbDevices = `tools/platform-tools/adb.exe devices`.split("\n")
+      adbDevices = `adb -H #{ENV["ADB_HOST"]} devices`.split("\n")
       adbTarget = apk_installation.target_ip
       if (adbTarget == "usb" and adbDevices.size > 1 and adbDevices.any? { |line| line.strip.end_with? "device" }) or adbDevices.any? { |line| line =~ /#{adbTarget}:5555\s+device/ }
         adbTarget = adbDevices.find { |line| line.strip.end_with? "device" }.split[0] if adbTarget == "usb"
       end
       if adbTarget.upcase == "USB"
         adbTarget = adbDevices.find { |line| line.strip.end_with? "device" }.split[0]
-      else
-        system("tools/platform-tools/adb kill-server")
-        system("tools/platform-tools/adb.exe tcpip 5555")
-        system("tools/platform-tools/adb connect #{adbTarget}")
-        sleep 2
+        #else
+        #  system("tools/platform-tools/adb kill-server")
+        #  system("tools/platform-tools/adb.exe tcpip 5555")
+        #  system("tools/platform-tools/adb connect #{adbTarget}")
+        #  sleep 2
       end
 
-      system("tools/platform-tools/adb -s #{adbTarget} install files/payloads/#{@apk_payload.name}.apk")
+      system("adb -H #{ENV["ADB_HOST"]} -s #{adbTarget} install files/payloads/#{@apk_payload.name}.apk")
     rescue
       puts "Error installing APK."
     end

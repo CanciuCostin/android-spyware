@@ -2,7 +2,7 @@ var commandOutput = <%=raw commandOutput%>;
 $( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
 
 if (commandOutput != "Operation Failed"){
-    window.open("/files/dumps/screen_snaps/<%= fileName %>")
+    window.open("localhost/<%= fileName %>")
 }
 
 jQuery.ajax({

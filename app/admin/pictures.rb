@@ -11,7 +11,7 @@ ActiveAdmin.register Picture do
     div do
       resource_selection_cell picture
       a :href => admin_picture_path(picture) do
-        image_tag("files/pictures/" + picture.filename, { :style => "width:100px;height:100px;" })
+        image_tag("files/dumps/pictures/" + picture.filename, { :style => "width:100px;height:100px;" })
       end
     end
     a truncate(picture.filename), :href => admin_picture_path(picture)

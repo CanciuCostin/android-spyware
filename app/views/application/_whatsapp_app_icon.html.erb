@@ -3,7 +3,7 @@
               REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB
 
               DESCRIPTION: Dump Whatsapp conversations and save as .txt file (persistent)" flow="right">
-  <%= link_to image_tag("whatsapp_data.png", :alt => "WhatsApp Data", :class => "smartphone-icon adb_proc"), '../messaging_apps_dumps/uninstall_whatsapp_for_downgrade?smartphone_id=' + smartphone.id.to_s,
+  <%= link_to image_tag("whatsapp_data.png", :alt => "WhatsApp Data", :class => "smartphone-icon adb_proc", :id => "whatsapp"), '../messaging_apps_dumps/uninstall_whatsapp_for_downgrade?smartphone_id=' + smartphone.id.to_s,
     method: :get, :remote => true , :class => "adb_link", :id => "dump_whatsapp_data_link"%>
 </span>
 <script>

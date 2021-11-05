@@ -37,53 +37,53 @@ if (!adbConnected && !msfConnected)
         $(".msf_link").css("pointer-events","none");
         $(".service_status_adb,.service_status_msf").css("color","#E74C3C");
     }
+else{
+
+    if (adbConnected){
+        $(".adb_status.server-status").attr("type","up");
+        $(".service_status_adb").css("color","#2ECC71");
+        $(".adb_proc:not(#whatsapp)").css("opacity","1");
+        $(".adb_msf_proc").css("opacity","1");
+        $(".adb_msf_link").css("pointer-events","all");
+        $(".adb_link:not(#dump_whatsapp_data_link)").css("pointer-events","all");
+        }
     else{
-
-        if (adbConnected){
-            $(".adb_status.server-status").attr("type","up");
-            $(".service_status_adb").css("color","#2ECC71");
-            $(".adb_proc").css("opacity","1");
-            $(".adb_msf_proc").css("opacity","1");
-            $(".adb_msf_link").css("pointer-events","all");
-            $(".adb_link").css("pointer-events","all");
-
+        $(".adb_status.server-status").attr("type","down");
+        $(".service_status_adb").css("color","#E74C3C");
+        $(".adb_proc").css("opacity","0.5");
         }
-        else{
-            $(".adb_status.server-status").attr("type","down");
-            $(".service_status_adb").css("color","#E74C3C");
-            $(".adb_proc").css("opacity","0.5");
-        }
-        if (msfConnected){
-            $(".msf_status.server-status").attr("type","up");
-            $(".service_status_msf").css("color","#2ECC71");
-            $(".msf_proc").css("opacity","1");
-            $(".adb_msf_proc").css("opacity","1");
-            $(".adb_msf_link").css("pointer-events","all");
-            $(".msf_link").css("pointer-events","all");
-            
-        }
-        else{
-            $(".msf_status.server-status").attr("type","down");
-            $(".service_status_msf").css("color","#E74C3C");
-            $(".msf_proc").css("opacity","0.5");
-            $(".msf_link").css("pointer-events","none");
-        
-        }
+    if (msfConnected){
+        $(".msf_status.server-status").attr("type","up");
+        $(".service_status_msf").css("color","#2ECC71");
+        $(".msf_proc").css("opacity","1");
+        $(".adb_msf_proc").css("opacity","1");
+        $(".adb_msf_link").css("pointer-events","all");
+        $(".msf_link").css("pointer-events","all");
+    }
+    else{
+        $(".msf_status.server-status").attr("type","down");
+        $(".service_status_msf").css("color","#E74C3C");
+        $(".msf_proc").css("opacity","0.5");
+        $(".msf_link").css("pointer-events","none");
+    }
     }
 
+$(".adb_proc#whatsapp").css("opacity","0.5");
+$(".adb_link#dump_whatsapp_data_link").css("pointer-events","none");
 
-    chartLine.updateSeries([{
-        data: [...chartLine.w.config.series[0].data,
-          [
-            chartLine.w.globals.maxX + 300000,
-            nrRunningProcesses
-          ]
-        ]
-      }, {
-        data: [...chartLine.w.config.series[1].data,
-          [
-            chartLine.w.globals.maxX + 300000,
-            nrFinishedProcesses
-          ]
-        ]
-      }])
+
+chartLine.updateSeries([{
+    data: [...chartLine.w.config.series[0].data,
+      [
+        chartLine.w.globals.maxX + 300000,
+        nrRunningProcesses
+      ]
+    ]
+  }, {
+    data: [...chartLine.w.config.series[1].data,
+      [
+        chartLine.w.globals.maxX + 300000,
+        nrFinishedProcesses
+      ]
+    ]
+  }])

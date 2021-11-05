@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
       user = "cool"
       password = "looc"
       options = {
-        host: "127.0.0.1",
+        host: ENV["RAILS_HOST"],
         port: 3333,
         uri: "/api/",
         ssl: true,
@@ -56,7 +56,7 @@ class ApplicationController < ActionController::Base
     begin
       sleep 1
       @@nrRunningProcesses += 1
-      commandOutput = `tools/platform-tools/adb.exe -s #{@@adbTarget} #{command}`
+      commandOutput = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} #{command}`
       @@nrFinishedProcesses += 1
       @@nrRunningProcesses -= 1
     rescue
@@ -73,7 +73,7 @@ class ApplicationController < ActionController::Base
       user = "cool"
       password = "looc"
       options = {
-        host: "127.0.0.1",
+        host: ENV["RAILS_HOST"],
         port: 3333,
         uri: "/api/",
         ssl: true,
@@ -101,11 +101,11 @@ class ApplicationController < ActionController::Base
   def update_cpu_usage
     begin
       puts " target"
-      cpuOutput1 = `tools/platform-tools/adb.exe -s #{@@adbTarget} shell cat /proc/stat`.split("\n")[0].split.drop(1).map(&:to_f)
+      cpuOutput1 = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell cat /proc/stat`.split("\n")[0].split.drop(1).map(&:to_f)
       totalJiffles1 = cpuOutput1.inject(:+)
       workJiffles1 = cpuOutput1.slice(0, 3).inject(:+)
       sleep(0.5)
-      cpuOutput2 = `tools/platform-tools/adb.exe -s #{@@adbTarget} shell cat /proc/stat`.split("\n")[0].split.drop(1).map(&:to_f)
+      cpuOutput2 = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell cat /proc/stat`.split("\n")[0].split.drop(1).map(&:to_f)
       totalJiffles2 = cpuOutput2.inject(:+)
       workJiffles2 = cpuOutput2.slice(0, 3).inject(:+)
       workOverPeriod = workJiffles2 - workJiffles1
@@ -119,8 +119,8 @@ class ApplicationController < ActionController::Base
 
   def update_memory_usage
     begin
-      memoryTotal = `tools/platform-tools/adb.exe -s #{@@adbTarget} shell "cat /proc/meminfo | grep MemTotal"`.strip.gsub(/\D/, "").to_f
-      memoryAvailable = `tools/platform-tools/adb.exe -s #{@@adbTarget} shell "cat /proc/meminfo | grep MemAvailable"`.strip.gsub(/\D/, "").to_f
+      memoryTotal = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "cat /proc/meminfo | grep MemTotal"`.strip.gsub(/\D/, "").to_f
+      memoryAvailable = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "cat /proc/meminfo | grep MemAvailable"`.strip.gsub(/\D/, "").to_f
       @@memoryUsage = ((memoryTotal - memoryAvailable) / memoryTotal * 100).to_i
     rescue
       @@memoryUsage = 0
@@ -130,8 +130,8 @@ class ApplicationController < ActionController::Base
 
   def update_storage_usage
     begin
-      totalMemory = `tools/platform-tools/adb.exe -s #{@@adbTarget} shell "df /storage/emulated | tail -n +2"`.strip.split[1].gsub(/[^\d\.]/, "").to_f
-      usedMemory = `tools/platform-tools/adb.exe -s #{@@adbTarget} shell "df /storage/emulated | tail -n +2"`.strip.split[2].gsub(/[^\d\.]/, "").to_f
+      totalMemory = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "df /storage/emulated | tail -n +2"`.strip.split[1].gsub(/[^\d\.]/, "").to_f
+      usedMemory = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "df /storage/emulated | tail -n +2"`.strip.split[2].gsub(/[^\d\.]/, "").to_f
       @@storage = (usedMemory / totalMemory * 100).to_i
     rescue
       @@storage = 0
@@ -140,11 +140,11 @@ class ApplicationController < ActionController::Base
 
   def update_device_info
     begin
-      @@ipAddress = `tools/platform-tools/adb.exe -s #{@@adbTarget} shell "ip addr show wlan0 | grep inet | grep -v inet6"`.split[1].gsub(/\/\d*/, "")
-      @@operatingSystem = "Android " + `tools/platform-tools/adb.exe -s #{@@adbTarget} shell getprop ro.build.version.release`.strip
+      @@ipAddress = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "ip addr show wlan0 | grep inet | grep -v inet6"`.split[1].gsub(/\/\d*/, "")
+      @@operatingSystem = "Android " + `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell getprop ro.build.version.release`.strip
       @@isRooted = "Rooted: No"
-      @@localHour = `tools/platform-tools/adb.exe -s #{@@adbTarget} shell date +%R`.strip
-      @@batteryLevel = `tools/platform-tools/adb.exe -s #{@@adbTarget} shell "dumpsys battery | grep level"`.split(":")[1].strip + "%"
+      @@localHour = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell date +%R`.strip
+      @@batteryLevel = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "dumpsys battery | grep level"`.split(":")[1].strip + "%"
     rescue
       puts "Error updating device info."
     end
@@ -155,7 +155,7 @@ class ApplicationController < ActionController::Base
       user = "cool"
       password = "looc"
       options = {
-        host: "127.0.0.1",
+        host: ENV["RAILS_HOST"],
         port: 3333,
         uri: "/api/",
         ssl: true,
@@ -182,16 +182,16 @@ class ApplicationController < ActionController::Base
     begin
       @@adbTarget = Rails.configuration.spyware_config["target_ip"]
       if !@@isAdbConnected
-        if @@adbTarget != "usb"
-          system("tools/platform-tools/adb.exe kill-server")
-          system("tools/platform-tools/adb.exe tcpip 5555")
-          system("tools/platform-tools/adb.exe connect #{@@adbTarget}")
-        else
-          system("tools/platform-tools/adb.exe kill-server")
-          system("tools/platform-tools/adb.exe start-server")
-        end
+        #  if @@adbTarget != "usb"
+        #    system("adb kill-server")
+        #    system("adb tcpip 5555")
+        #    system("adb connect #{@@adbTarget}")
+        #  else
+        #    system("adb kill-server")
+        #    system("adb start-server")
+        #  end
       end
-      adbDevices = `tools/platform-tools/adb.exe devices`.split("\n")
+      adbDevices = `adb -H #{ENV["ADB_HOST"]} devices`.split("\n")
       if (@@adbTarget == "usb" and adbDevices.size > 1 and adbDevices.any? { |line| line.strip.end_with? "device" }) or adbDevices.any? { |line| line =~ /#{@@adbTarget}:5555\s+device/ }
         @@adbTarget = adbDevices.find { |line| line.strip.end_with? "device" }.split[0] if @@adbTarget == "usb"
         @@isAdbConnected = true

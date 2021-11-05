@@ -8,7 +8,7 @@ class CallLogsController < InheritedResources::Base
       currentTime = DateTime.now
       currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
       @fileName = fileName.empty? ?
-        "sms_messages_dump_" + currentTimeFormat + ".txt" :
+        "calllogs_dump_" + currentTimeFormat + ".txt" :
         fileName + ".txt"
       processCommand = "dump_calllog -f text -o #{@fileName}"
       commandOutput = start_msf_process(processCommand)
