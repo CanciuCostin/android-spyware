@@ -62,8 +62,10 @@ The tool:
 * Uses RPC calls to communicate with the Metasploit framework API
 * Uses ADB to install the payload on the target device(the device must be in the same LAN)
 
-The tool should not be used on real Android devices as this is illegal.
+### Disclaimer
+This software is for educational purposes only. Using the tool for spying real devices is strctly illegal. USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHOR ASSUMES NO RESPONSIBILITY FOR YOUR USAGE.
 
+We strongly recommend you to have coding and Docker knowledge. Do not hesitate to read the source code and understand the mechanism of the tool.
 ### Built With
 * [Bootstrap](https://getbootstrap.com)
 * [JQuery](https://jquery.com)
@@ -72,21 +74,119 @@ The tool should not be used on real Android devices as this is illegal.
 * [ActiveAdmin](https://activeadmin.info/)
 * [Docker](https://www.docker.com/)
 
+### Features
+
+## Main actions using Metasploit framework
+
+- [x] Dump System Info
+- [x] Dump Location
+- [x] Live Webcam Stream
+- [x] Dump Messages
+- [x] Change Audio Mode
+- [x] Dump Call Logs
+- [x] Dump Local Time
+- [x] Microphone Recording
+- [x] Unistall App
+- [x] List Installed Apps
+- [x] Send Message
+- [x] Dump Contacts
+- [x] Locl/Unlock Screen
+- [x] Run Shell Command
+- [x] Webcam Snap
+- [x] Open App
+- [x] Install App
+- [x] Device Info
+- [x] Hide/Show payload app icon
+
+## Additional actions via ADB (only available for standalone deployment)
+
+- [x] Dump Whatsapp conversations from backup DB
+- [x] Dump Wi-Fi Information
+- [x] Screen Snap
+- [x] Upload File
+- [x] Record Screen
+- [x] Pull File
+- [x] Start Monero crypto miner in background
+
+
 
 <!-- GETTING STARTED -->
-## Getting Started
+## How to run it
 
-tbd
-
-### Prerequisites
-
-tbd
+### Software requirements
+- [Docker](https://www.docker.com/products/docker)
+- [Chocolatey] (https://chocolatey.org/install)
 
 ### Installation
 
-tbd
+1. Install ADB via Chocolatey. From an elevated powershell prompt (Run as administrator):
+```
+choco install adb --version=1.0.39
+```
+2. Create a project directory, and download docker-compose image:
+```
+curl https://raw.githubusercontent.com/CanciuCostin/android-spyware/docker-compose.yml -o docker-compose.yml
+```
+3. Download required images:
+```
+docker-compose pull
+```
 
-## Usage
+### Deployment
+1. Start ADB server from a command prompt:
+```
+adb server
+```
+2.Start the container (inside the project directory):
+```
+docker-compose up
+```
+3. Wait for the containers to initialize, and access the application in the browser via http://localhost/admin. Recommended browser zoom ratio is 80%
+  
+### Usage
+1. Open the rails app in the browser: localhost/admin and login. Default credentials:
+
+  User: **admin@example.com**
+  Password: **password**
+2. Generate APK
+3. Install APK
+  Option 1 - Directly from the interface (only for standalone deployment)
+  Option 2 - Via ADB
+  Option 3 - Manually
+4. Open Remote
+5. Run Actions
+  2.1 Postgres Database Container
+  
+  Note: local postgresql database can also be used as alternative, but you will need to run the rake scripts for initialization:
+  ```
+  rake db:create //alternatively run createdb android_spyware_[developmen|test|production]
+  rake db:schema:load
+  rake db:seed /too add mock data required for start-up
+  ```
+  
+  
+### Debugging issues
+
+
+
+
+## Build
+
+### Software requirements
+- [Docker](https://www.docker.com/products/docker)
+- [NodeJS & npm](https://nodejs.org/en/download/)
+- [Ruby 2.6.6](https://rubyinstaller.org/downloads/archives/)
+### Optional - Google Maps API Key
+
+```
+git clone https://github.com/CanciuCostin/android-spyware.git
+cd android-spyware
+gem install bundler:2.1.4
+bundle
+npm install yarn -g
+yarn install --check-files
+```
+
 
 [![Remote Screen Shot][remote-screenshot]](https://github.com/CanciuCostin/android-spyware)
 
