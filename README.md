@@ -115,11 +115,46 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 
 ### Software requirements
 - [Docker](https://www.docker.com/products/docker)
+- [Chocolatey] (https://chocolatey.org/install)
 
-### Installation & deployment 
-1. Fully Dockerized Deployment (recommended)
+### Installation
 
-2. Standalone Rails Servers (more features available; requires build)
+1. Install ADB via Chocolatey. From an elevated powershell prompt (Run as administrator):
+```
+choco install adb --version=1.0.39
+```
+2. Create a project directory, and download docker-compose image:
+```
+curl https://raw.githubusercontent.com/CanciuCostin/android-spyware/docker-compose.yml -o docker-compose.yml
+```
+3. Download required images:
+```
+docker-compose pull
+```
+
+### Deployment
+1. Start ADB server from a command prompt:
+```
+adb server
+```
+2.Start the container (inside the project directory):
+```
+docker-compose up
+```
+3. Wait for the containers to initialize, and access the application in the browser via http://localhost/admin. Recommended browser zoom ratio is 80%
+  
+### Usage
+1. Open the rails app in the browser: localhost/admin and login. Default credentials:
+
+  User: **admin@example.com**
+  Password: **password**
+2. Generate APK
+3. Install APK
+  Option 1 - Directly from the interface (only for standalone deployment)
+  Option 2 - Via ADB
+  Option 3 - Manually
+4. Open Remote
+5. Run Actions
   2.1 Postgres Database Container
   
   Note: local postgresql database can also be used as alternative, but you will need to run the rake scripts for initialization:
@@ -129,28 +164,11 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
   rake db:seed /too add mock data required for start-up
   ```
   
-  2.2 Metasploit Container
-  
-  2.3 Rails server
-  
-  1. Follow the below Build steps
-  2. 
-  
   
 ### Debugging issues
 
 
-### Usage
-1. Open the rails app in the browser: localhost/admin and login. Default credentials:
-  User: admin@example.com
-  Password: password
-2. Generate APK
-3. Install APK
-  Option 1 - Directly from the interface (only for standalone deployment)
-  Option 2 - Via ADB
-  Option 3 - Manually
-4. Open Remote
-5. Run Actions
+
 
 ## Build
 
