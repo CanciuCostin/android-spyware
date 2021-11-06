@@ -55,7 +55,7 @@ The tool:
 * Uses ADB to install the payload on the target device & implement additional functionalities (the device must be in the same LAN)
 
 ### Disclaimer
-This software is for educational purposes only. Using the tool for spying real devices is strctly illegal. USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHOR ASSUMES NO RESPONSIBILITY FOR YOUR USAGE.
+This software is for educational purposes only. Using the tool for spying real devices is strictly illegal. USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHOR ASSUMES NO RESPONSIBILITY FOR YOUR USAGE.
 
 We strongly recommend you to have coding and Docker knowledge. Do not hesitate to read the source code and understand the mechanism of the tool.
 ### Built With
@@ -65,7 +65,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 * [Metasploit](https://www.metasploit.com/)
 * [ActiveAdmin](https://activeadmin.info/)
 * [Docker](https://www.docker.com/)
-* [ADB](https://developer.android.com/studio/command-line/adb)
+* [Android Debug Bridge](https://developer.android.com/studio/command-line/adb)
 
 ### Features
 
@@ -131,7 +131,7 @@ docker-compose pull
 adb server
 ```
 2. Optional, set your Google MAPS API Key in docker-compose file for dashboard widget
-3.Start the container (inside the project directory):
+3. Start the container (inside the project directory):
 ```
 docker-compose up
 ```
@@ -139,12 +139,14 @@ docker-compose up
 The files directory will be created. It will contain the payloads and the actions outputs.
   
 ### Usage
-1. Ensure USB Debugging is enabled on your Android device
-2. [Optional] Plug-in your Android device to the laptop via USB - Otherwise you won't be able to use ADB functions and you will have to install the malware manually
+1. Ensure USB Debugging is enabled on your Android device [tutorial HERE](https://www.embarcadero.com/starthere/xe5/mobdevsetup/android/en/enabling_usb_debugging_on_an_android_device.html)
+2. Optional: Plug-in your Android device to the laptop via USB - Otherwise you won't be able to use ADB functions and you will have to install the malware manually
 3. Open the rails app in the browser: http://localhost/admin and login. Default credentials:
 
-  User: **admin@example.com**
-  Password: **password**
+User: **admin@example.com**
+
+Password: **password**
+
 4. Generate APK
 * Check your machine IP address on LAN. For windows you can use
 ```
@@ -167,9 +169,9 @@ ipconfig
 ### Debugging Issues
 **MSF/ADB connection issues (green light not appearing in Remote page)**
 * Ensure you generated the apk with correct machine IP
-* Ensure connection from smartphone to your machine is not blocked by local firewall. Otherwise you should allow connection on ports 2222, 3333, 4444
+* Ensure connection from smartphone to your machine is not blocked by local firewall. Otherwise you should allow connection on ports 2222, 3333, 4444. 
 To check that, you can try to access http://[your machine IP]:2222 . You should be able to access the MSF container file system via http server
-* Ensure Docker container - HOST connectivity is working. Host machine is accesses via **gateway.docker.internal**, which is set in docker-compose file. If that doesn't work for you, you can also try to replace it with **docker.host.internal**
+* Ensure Docker container - HOST connectivity is working. Host machine is accessed via **gateway.docker.internal**, which is set in docker-compose file. If that doesn't work for you, you can also try to replace it with **docker.host.internal**
 * For ADB connection, you can try to restart the local server:
 ```
 adb kill-server
@@ -184,7 +186,7 @@ adb server
 - [NodeJS & npm](https://nodejs.org/en/download/)
 - [Ruby 2.6.6](https://rubyinstaller.org/downloads/archives/)
 
-* Rails Server build steps:
+Rails Server build steps:
 ```
 git clone https://github.com/CanciuCostin/android-spyware.git
 cd android-spyware
@@ -192,7 +194,15 @@ gem install bundler:2.1.4
 bundle
 npm install yarn -g
 yarn install --check-files
-#run server
+```
+Ensure the following environment variables are set:
+```
+ANDROIDSPYWARE_DATABASE_HOST=localhost
+ADB_HOST=localhost
+RAILS_HOST=127.0.0.1
+```
+Run the server:
+```
 rails server
 ```
 * Note: local postgresql database can also be used as alternative, but you will need to run the rake scripts for initialization:
@@ -202,9 +212,9 @@ rake db:schema:load
 rake db:seed /too add mock data required for start-up
 ```
 ## Roadmap
-* Implement "Instructions" page
-* Implement option for persistence script (connection is lost after reboot)
-* Implement option for public IP handler (either ngrok or cloud solution) to be able to track device outside of LAN
+- [ ] Implement "Instructions" page
+- [ ] Implement option for persistence script (connection is lost after reboot)
+- [ ] Implement option for public IP handler (either ngrok or cloud solution) to be able to track device outside of LAN
 
 ## License
 Distributed under the MIT License. See `LICENSE` for more information.
