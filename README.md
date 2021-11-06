@@ -192,6 +192,8 @@ gem install bundler:2.1.4
 bundle
 npm install yarn -g
 yarn install --check-files
+#run server
+rails server
 ```
 * Note: local postgresql database can also be used as alternative, but you will need to run the rake scripts for initialization:
 ```
