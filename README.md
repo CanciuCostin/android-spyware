@@ -16,9 +16,6 @@
   <h3 align="center">Android Spyware</h3>
 
   <p align="center">
-    WEB GUI Wrapper for Metasploit msfvenom & ADB
-    <br />
-    .
     <a href="https://github.com/CanciuCostin/android-spyware/issues">Report Bug</a>
     ·
     <a href="https://github.com/CanciuCostin/android-spyware/issues">Request Feature</a>
@@ -31,20 +28,19 @@
 ## Table of Contents
 
 * [About the Project](#about-the-project)
+  * [Disclaimer](#disclaimer)
   * [Built With](#built-with)
+  * [Features](#features)
+  * [Roadmap](#roadmap)
+  * [License](#license)
+  * [Contact](#contact)
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
-* [Usage](#usage)
-* [Roadmap](#roadmap)
-* [Contributing](#contributing)
-* [License](#license)
-* [Contact](#contact)
-
-
-
-
-
+  * [Deployment](#deployment)
+  * [Usage](#usage)
+  * [Debugging Issues](#debugging-issues)
+  * [Build](#build)
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -69,10 +65,11 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 * [Metasploit](https://www.metasploit.com/)
 * [ActiveAdmin](https://activeadmin.info/)
 * [Docker](https://www.docker.com/)
+* [ADB](https://developer.android.com/studio/command-line/adb)
 
 ### Features
 
-## Available actions using Metasploit framework
+**Available actions using Metasploit framework**
 
 - [x] Dump System Info
 - [x] Dump Location
@@ -94,7 +91,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 - [x] Device Info
 - [x] Hide/Show payload app icon
 
-## Additional actions via ADB
+**Additional actions via ADB**
 
 - [x] ~~Dump Whatsapp conversations from backup DB~~ (disabled for safety reasons)
 - [x] Dump Wi-Fi Information
@@ -107,9 +104,9 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 
 
 <!-- GETTING STARTED -->
-## How to run it
+## Getting Started
 
-### Software requirements
+### Prerequisites
 - [Docker](https://www.docker.com/products/docker)
 - [Chocolatey](https://chocolatey.org/install)
 
@@ -167,7 +164,8 @@ ipconfig
 * Run actions by clicking on the app-looking icons on the device widget. The output will be displayed in the terminal widget, and the output will be stored in [project path]/files/dumps
 [![Remote Screen Shot][remote-screenshot]](https://github.com/CanciuCostin/android-spyware)
   
-### Debugging MSF/ADB connection issues (green light not appearing in Remote page)
+### Debugging Issues
+**MSF/ADB connection issues (green light not appearing in Remote page)**
 * Ensure you generated the apk with correct machine IP
 * Ensure connection from smartphone to your machine is not blocked by local firewall. Otherwise you should allow connection on ports 2222, 3333, 4444
 To check that, you can try to access http://[your machine IP]:2222 . You should be able to access the MSF container file system via http server
@@ -179,9 +177,9 @@ adb server
 ```
 * For ADB connection, ensure USB debugging is enabled
 
-## Build
+### Build
 
-### Software requirements
+**Software requirements**
 - [Docker](https://www.docker.com/products/docker)
 - [NodeJS & npm](https://nodejs.org/en/download/)
 - [Ruby 2.6.6](https://rubyinstaller.org/downloads/archives/)
