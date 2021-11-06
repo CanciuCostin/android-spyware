@@ -86,7 +86,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 - [x] List Installed Apps
 - [x] Send Message
 - [x] Dump Contacts
-- [x] Locl/Unlock Screen
+- [x] Lock/Unlock Screen
 - [x] Run Shell Command
 - [x] Webcam Snap
 - [x] Open App
@@ -133,11 +133,12 @@ docker-compose pull
 ```
 adb server
 ```
-2.Start the container (inside the project directory):
+2. Optional, set your Google MAPS API Key in docker-compose file for dashboard widget
+3.Start the container (inside the project directory):
 ```
 docker-compose up
 ```
-3. Wait for the containers to initialize, and access the application in the browser via http://localhost/admin
+4. Wait for the containers to initialize, and access the application in the browser via http://localhost/admin
 The files directory will be created. It will contain the payloads and the actions outputs.
   
 ### Usage
@@ -152,32 +153,31 @@ The files directory will be created. It will contain the payloads and the action
 ```
 ipconfig
 ```
+[![Ipconfig Screen Shot][ipconfig-screenshot]](https://github.com/CanciuCostin/android-spyware)
 * Go to Payloads (http://localhost/admin/apk_payloads) and Create New
 * Select port 4444, input the machine IP address and give a name for the APK
-* The APK payload will be 
- 
-6. Install APK
-  Option 1 - Directly from the interface (only for standalone deployment)
-  Option 2 - Via ADB
-  Option 3 - Manually
-6. Open Remote
-7. Run Actions
-  2.1 Postgres Database Container
+* The APK payload will be generated in [project path]/files/payloads
+5. Install APK
+* Go to APK Installations (http://localhost/admin/apk_installations) and Create New
+* Select your previously generated apk from the list and leave the target as usb
+* You might have to approve a prompt on the device
+6. Run Actions
+* Go to Remote (http://localhost/admin/remote)
+* Open the installed app on your device. You should see green light for your MSF connectivity right after. The ADB should also turn green if your device is plugged via USB
+* Run actions by clicking on the app-looking icons on the device widget. The output will be displayed in the terminal widget, and the output will be stored in [project path]/files/dumps
+[![Remote Screen Shot][remote-screenshot]](https://github.com/CanciuCostin/android-spyware)
   
-  Note: local postgresql database can also be used as alternative, but you will need to run the rake scripts for initialization:
-  ```
-  rake db:create //alternatively run createdb android_spyware_[developmen|test|production]
-  rake db:schema:load
-  rake db:seed /too add mock data required for start-up
-  ```
-  
-  
-### Debugging issues
-1. Check firewall
-2.env variable docker
-3. adb restart
-
-
+### Debugging MSF/ADB connection issues (green light not appearing in Remote page)
+* Ensure you generated the apk with correct machine IP
+* Ensure connection from smartphone to your machine is not blocked by local firewall. Otherwise you should allow connection on ports 2222, 3333, 4444
+To check that, you can try to access http://[your machine IP]:2222 . You should be able to access the MSF container file system via http server
+* Ensure Docker container - HOST connectivity is working. Host machine is accesses via **gateway.docker.internal**, which is set in docker-compose file. If that doesn't work for you, you can also try to replace it with **docker.host.internal**
+* For ADB connection, you can try to restart the local server:
+```
+adb kill-server
+adb server
+```
+* For ADB connection, ensure USB debugging is enabled
 
 ## Build
 
@@ -185,8 +185,8 @@ ipconfig
 - [Docker](https://www.docker.com/products/docker)
 - [NodeJS & npm](https://nodejs.org/en/download/)
 - [Ruby 2.6.6](https://rubyinstaller.org/downloads/archives/)
-### Optional - Google Maps API Key
 
+* Rails Server build steps:
 ```
 git clone https://github.com/CanciuCostin/android-spyware.git
 cd android-spyware
@@ -195,32 +195,23 @@ bundle
 npm install yarn -g
 yarn install --check-files
 ```
-
-
-[![Remote Screen Shot][remote-screenshot]](https://github.com/CanciuCostin/android-spyware)
-
-tbd
-
+* Note: local postgresql database can also be used as alternative, but you will need to run the rake scripts for initialization:
+```
+rake db:create //alternatively run createdb android_spyware_[developmen|test|production]
+rake db:schema:load
+rake db:seed /too add mock data required for start-up
+```
 ## Roadmap
-
-tbd
-
-## Contributing
-
-tbd
+* Implement "Instructions" page
+* Implement option for persistence script (connection is lost after reboot)
+* Implement option for public IP handler (either ngrok or cloud solution) to be able to track device outside of LAN
 
 ## License
-
 Distributed under the MIT License. See `LICENSE` for more information.
-
-
 
 <!-- CONTACT -->
 ## Contact
-
-tbd
-
-
+costin.canciu@gmail.com
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
@@ -236,3 +227,4 @@ tbd
 [linkedin-url]: https://ro.linkedin.com/in/costin-canciu-b3572a105
 [product-screenshot]: images/dashboard.png
 [remote-screenshot]: images/remote.png
+[ipconfig-screenshot]: images/ipconfig.PNG
