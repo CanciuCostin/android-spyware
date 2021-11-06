@@ -16,12 +16,8 @@
   <h3 align="center">Android Spyware</h3>
 
   <p align="center">
-    Web console based spyware
+    WEB GUI Wrapper for Metasploit msfvenom & ADB
     <br />
-    <!-- <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a> -->
-    <br />
-    <br />
-    <!-- <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a> -->
     .
     <a href="https://github.com/CanciuCostin/android-spyware/issues">Report Bug</a>
     ·
@@ -85,7 +81,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 - [x] Change Audio Mode
 - [x] Dump Call Logs
 - [x] Dump Local Time
-- [x] Microphone Recording
+- [x] Microphone Recording - Only working for Android < 9.0
 - [x] Unistall App
 - [x] List Installed Apps
 - [x] Send Message
@@ -100,7 +96,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 
 ## Additional actions via ADB (only available for standalone deployment)
 
-- [x] Dump Whatsapp conversations from backup DB
+- [x] ~~Dump Whatsapp conversations from backup DB~~ (disabled for safety reasons)
 - [x] Dump Wi-Fi Information
 - [x] Screen Snap
 - [x] Upload File
@@ -123,9 +119,9 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 ```
 choco install adb --version=1.0.39
 ```
-2. Create a project directory, and download docker-compose image:
+2. Create a project directory, and download docker-compose file. You can use curl:
 ```
-curl https://raw.githubusercontent.com/CanciuCostin/android-spyware/docker-compose.yml -o docker-compose.yml
+curl https://raw.githubusercontent.com/CanciuCostin/android-spyware/master/docker/docker-compose.yml -o docker-compose.yml
 ```
 3. Download required images:
 ```
@@ -144,7 +140,9 @@ docker-compose up
 3. Wait for the containers to initialize, and access the application in the browser via http://localhost/admin. Recommended browser zoom ratio is 80%
   
 ### Usage
-1. Open the rails app in the browser: localhost/admin and login. Default credentials:
+1. Ensure USB Debugging is enabled on your Android device
+2. [Optional] Plug-in your Android device to the laptop via USB - Otherwise you won't be able to use ADB functions and you will have to install the malware manually
+3. Open the rails app in the browser: http://localhost/admin and login. Default credentials:
 
   User: **admin@example.com**
   Password: **password**
@@ -166,6 +164,7 @@ docker-compose up
   
   
 ### Debugging issues
+1. Check firewall
 
 
 
