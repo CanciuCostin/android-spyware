@@ -51,12 +51,12 @@
 
 [![Dashboard Screen Shot][product-screenshot]](https://github.com/CanciuCostin/android-spyware)
 
-The project is a web console based Android spyware, which allows accessing remotely the functionalities of a smartphone: contacts, SMS, camera, microphone, filesystem etc.
+Educational purpose, command & control, web GUI based Android spyware built around Metasploit & ADB.
 
 The tool:
 * Uses Docker containers to simulate a Kali Linux environment with the metasploit framework
 * Uses RPC calls to communicate with the Metasploit framework API
-* Uses ADB to install the payload on the target device(the device must be in the same LAN)
+* Uses ADB to install the payload on the target device & implement additional functionalities (the device must be in the same LAN)
 
 ### Disclaimer
 This software is for educational purposes only. Using the tool for spying real devices is strctly illegal. USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHOR ASSUMES NO RESPONSIBILITY FOR YOUR USAGE.
@@ -72,7 +72,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 
 ### Features
 
-## Main actions using Metasploit framework
+## Available actions using Metasploit framework
 
 - [x] Dump System Info
 - [x] Dump Location
@@ -94,7 +94,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 - [x] Device Info
 - [x] Hide/Show payload app icon
 
-## Additional actions via ADB (only available for standalone deployment)
+## Additional actions via ADB
 
 - [x] ~~Dump Whatsapp conversations from backup DB~~ (disabled for safety reasons)
 - [x] Dump Wi-Fi Information
@@ -111,7 +111,7 @@ We strongly recommend you to have coding and Docker knowledge. Do not hesitate t
 
 ### Software requirements
 - [Docker](https://www.docker.com/products/docker)
-- [Chocolatey] (https://chocolatey.org/install)
+- [Chocolatey](https://chocolatey.org/install)
 
 ### Installation
 
@@ -137,7 +137,8 @@ adb server
 ```
 docker-compose up
 ```
-3. Wait for the containers to initialize, and access the application in the browser via http://localhost/admin. Recommended browser zoom ratio is 80%
+3. Wait for the containers to initialize, and access the application in the browser via http://localhost/admin
+The files directory will be created. It will contain the payloads and the actions outputs.
   
 ### Usage
 1. Ensure USB Debugging is enabled on your Android device
@@ -146,13 +147,21 @@ docker-compose up
 
   User: **admin@example.com**
   Password: **password**
-2. Generate APK
-3. Install APK
+4. Generate APK
+* Check your machine IP address on LAN. For windows you can use
+```
+ipconfig
+```
+* Go to Payloads (http://localhost/admin/apk_payloads) and Create New
+* Select port 4444, input the machine IP address and give a name for the APK
+* The APK payload will be 
+ 
+6. Install APK
   Option 1 - Directly from the interface (only for standalone deployment)
   Option 2 - Via ADB
   Option 3 - Manually
-4. Open Remote
-5. Run Actions
+6. Open Remote
+7. Run Actions
   2.1 Postgres Database Container
   
   Note: local postgresql database can also be used as alternative, but you will need to run the rake scripts for initialization:
@@ -165,7 +174,8 @@ docker-compose up
   
 ### Debugging issues
 1. Check firewall
-
+2.env variable docker
+3. adb restart
 
 
 
