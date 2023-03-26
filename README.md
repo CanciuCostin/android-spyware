@@ -22,7 +22,12 @@
   </p>
 </p>
 
+## Support The Project
+I'm already working full time, so there isn't much time left for this project.
 
+- [Support the project on PAYPAL](https://www.paypal.com/paypalme/canciucostin?v=1&utm_source=unp&utm_medium=email&utm_campaign=RT000269&utm_unptid=8179359e-cbd0-11ed-981f-ac1f6bdb081c&ppid=RT000269&cnac=RO&rsta=en_US%28en-RO%29&cust=ZQ79GPJVPJB7L&unptid=8179359e-cbd0-11ed-981f-ac1f6bdb081c&calc=f804341d8e5ec&unp_tpcid=ppme-social-user-profile-created&page=main%3Aemail%3ART000269&pgrp=main%3Aemail&e=cl&mchn=em&s=ci&mail=sys&appVersion=1.155.0&xt=104038%2C127632)
+
+- [Support the project on PATREON](https://www.patreon.com/CostinCanciu)
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
