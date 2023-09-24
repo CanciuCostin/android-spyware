@@ -226,8 +226,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 <!-- CONTACT -->
 ## Contact
-costin.canciu@gmail.com
-
+admin@xspy.uk
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [rails-shield]: https://img.shields.io/badge/rails-v6.0.2.2-green
