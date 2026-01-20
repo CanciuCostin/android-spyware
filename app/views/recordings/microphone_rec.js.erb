@@ -2,8 +2,41 @@ console.log("<%= commandOutput %>")
 console.log("<%= fileName %>")
 var commandOutput = <%=raw commandOutput%>;
 console.log(commandOutput)
-$( ".Terminal__body" ).trigger("write",[" msf > ", ". . .", commandOutput ]);
+$( ".Terminal__body" ).trigger("write",[" msf > ", "Status Check:", commandOutput ]);
 
-if (commandOutput[0] != "Operation Failed"){
-    window.open("localhost/<%= fileName %>")
+// Check if successful (matches controller output)
+var isSuccess = false;
+if (Array.isArray(commandOutput)) {
+    commandOutput.forEach(function(line) {
+        if (line && (line.includes("Successful") || line.includes("Saved"))) {
+            isSuccess = true;
+        }
+    });
+}
+
+if (isSuccess){
+    var audioUrl = "/files/dumps/microphone_recs/<%= fileName %>";
+    
+    // Remove existing player if any
+    $('#live-audio-player').remove();
+
+    // Inject Audio Player Overlay
+    var playerHtml = `
+    <div id="live-audio-player" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: rgba(0,0,0,0.9); border: 2px solid #00ff00; padding: 15px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,255,0,0.4); font-family: monospace;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h4 style="color: #00ff00; margin: 0; font-size: 14px;">🎙️ LIVE AUDIO FEED</h4>
+            <button onclick="$('#live-audio-player').remove()" style="background: none; color: #ff0000; border: none; font-weight: bold; cursor: pointer;">[X]</button>
+        </div>
+        <audio controls autoplay style="width: 300px; outline: none;">
+            <source src="${audioUrl}" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+        <div style="margin-top: 5px; font-size: 10px; color: #666;">
+            File: <%= fileName %>
+        </div>
+    </div>
+    `;
+    
+    $('body').append(playerHtml);
+    $( ".Terminal__body" ).trigger("write",[" SYSTEM > ", "Audio Player Launched", [] ]);
 }

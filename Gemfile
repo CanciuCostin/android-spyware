@@ -7,6 +7,9 @@ gem "mimemagic", github: "mimemagicrb/mimemagic", ref: "01f92d86d15d85cfd0f20dab
 gem "rails", "~> 6.0.2", ">= 6.0.2.1"
 # Use postgresql as the database for Active Record
 gem "pg", ">= 0.18", "< 2.0"
+gem "ffi", "1.15.5"
+gem "concurrent-ruby", "1.3.4"
+gem "logger", "1.6.0"
 # Use Puma as the app server
 gem "puma", "~> 4.3"
 # Use SCSS for stylesheets
@@ -67,4 +70,18 @@ gem "msfrpc-client"
 
 gem "minitar"
 
-gem "sqlite3"
+gem "sqlite3", "1.3.13"
+
+# Tracing & Observability
+gem "opentelemetry-api"
+gem "opentelemetry-sdk"
+gem "opentelemetry-exporter-jaeger"
+gem "opentelemetry-instrumentation-rack"
+gem "opentelemetry-instrumentation-rails"
+gem "opentelemetry-instrumentation-http_client"
+
+gem 'rack-attack'
+
+group :development, :test do
+  gem 'rspec-rails', '~> 5.0'
+end

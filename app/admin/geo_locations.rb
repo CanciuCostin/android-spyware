@@ -1,18 +1,25 @@
 ActiveAdmin.register GeoLocation do
 
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-  # permit_params :date, :lat, :long, :smartphone_id
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:date, :lat, :long, :smartphone_id]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
-  
+  permit_params :date, :lat, :long, :smartphone_id
+
+  index do
+    selectable_column
+    id_column
+    column :smartphone
+    column :lat
+    column :long
+    column :date
+    actions
+  end
+
+  # Integrated Map View
+  action_item :view_map, only: :index do
+    link_to 'View on Map', map_admin_geo_locations_path
+  end
+
+  collection_action :map, method: :get do
+    @geo_locations = GeoLocation.all
+    render 'admin/geo_locations/map'
+  end
 end
+

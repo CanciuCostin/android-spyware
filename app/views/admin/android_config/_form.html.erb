@@ -1,0 +1,100 @@
+<%= form_tag admin_android_config_update_path, method: :post, class: "config-form" do %>
+  <div class="form-group">
+    <label for="server_url">Server IP/Domain:</label>
+    <input type="text" name="config[server_url]" id="server_url" value="<%= config[:server_url] %>" class="config-input" />
+  </div>
+
+  <div class="form-group">
+    <label for="server_port">Server Port:</label>
+    <input type="text" name="config[server_port]" id="server_port" value="<%= config[:server_port] %>" class="config-input" />
+  </div>
+
+  <div class="form-group">
+    <label for="use_ssl">
+      <input type="checkbox" name="config[use_ssl]" id="use_ssl" <%= 'checked' if config[:use_ssl] %> />
+      Use SSL (wss://)
+    </label>
+  </div>
+
+  <hr style="border-color: #30363d; margin: 20px 0;" />
+
+  <div class="form-group">
+    <label for="turn_server">TURN Server (IP:Port):</label>
+    <input type="text" name="config[turn_server]" id="turn_server" value="<%= config[:turn_server] %>" class="config-input" />
+  </div>
+
+  <div class="form-group">
+    <label for="turn_user">TURN Username:</label>
+    <input type="text" name="config[turn_user]" id="turn_user" value="<%= config[:turn_user] %>" class="config-input" />
+  </div>
+
+  <div class="form-group">
+    <label for="turn_password">TURN Password:</label>
+    <input type="password" name="config[turn_password]" id="turn_password" value="<%= config[:turn_password] %>" class="config-input" />
+  </div>
+
+  <div class="form-actions" style="margin-top: 20px;">
+    <%= submit_tag "💾 Save Configuration", class: "save-btn" %>
+  </div>
+<% end %>
+
+<style>
+  .config-form .form-group {
+    margin-bottom: 15px;
+  }
+  .config-form label {
+    display: block;
+    color: #8b949e;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  .config-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 12px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #c9d1d9;
+    font-size: 14px;
+  }
+  .config-input:focus {
+    border-color: #58a6ff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+  }
+  .save-btn {
+    background: linear-gradient(135deg, #238636, #2ea043);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .save-btn:hover {
+    background: linear-gradient(135deg, #2ea043, #3fb950);
+  }
+  .test-btn {
+    background: #21262d;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  .test-btn:hover {
+    background: #30363d;
+  }
+  .download-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #1f6feb, #388bfd);
+    color: white !important;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+  }
+</style>

@@ -8,25 +8,36 @@
 // $sidebar-width: 242px;
 
 // Active Admin's got SASS!
-// BASIC COLOR
+// HACKER THEME COLOR PALETTE
 @import url("https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800");
 
-$panelBorder: yellow !important;
-$skinActiveColor: rgba(255, 255, 255, 0.7) !default;
-$bodyColor: #222326 !default;
-$skinTextColor: white !important;
-$skinTextActiveColor: black !default;
-$skinTextTable: rgba(255, 255, 255, 0.7) !important;
-$skinHeaderBck: #27293d !important;
-$skinBlack: pink !important;
-$panelHeaderBck: #27293d !important;
-$skinBlackLight: #673ab7 !important;
-$textGray: brown !important;
+$hacker-bg-dark: #0d1117;
+$hacker-bg-panel: #161b22;
+$hacker-border: #30363d;
+$hacker-text-primary: #c9d1d9;
+$hacker-text-secondary: #8b949e;
+$hacker-accent: #00ff00; // Terminal Green
+$hacker-accent-hover: #00cc00;
+$hacker-accent-secondary: #58a6ff; // Cyber Blue
+$hacker-danger: #f85149;
+
+$panelBorder: $hacker-border !important;
+$skinActiveColor: rgba(255, 255, 255, 0.1) !default;
+$bodyColor: $hacker-bg-dark !default;
+$skinTextColor: $hacker-text-primary !important;
+$skinTextActiveColor: $hacker-accent !default;
+$skinTextTable: $hacker-text-primary !important;
+$skinHeaderBck: $hacker-bg-panel !important;
+$skinBlack: $hacker-bg-dark !important;
+$panelHeaderBck: $hacker-bg-panel !important;
+$skinBlackLight: $hacker-bg-panel !important;
+$textGray: $hacker-text-secondary !important;
 
 .header#header {
   height: calc(100% - 52px);
   border-radius: 15px;
   margin-top: 0.1%;
+  border-right: 1px solid $hacker-border;
 }
 
 .right_row {
@@ -130,8 +141,10 @@ svg:not(:root) {
 #title_bar {
   width: 97% !important;
 }
+
 html #title_bar {
-  background: rgba(39, 41, 61, 0.1) !important;
+  background: $hacker-bg-panel !important;
+  border-bottom: 1px solid $hacker-border !important;
 }
 
 #map {
@@ -146,11 +159,13 @@ html #title_bar {
 }
 
 .header#header {
-  background: linear-gradient(0deg, #ba54f5, #e14eca);
+  // background: linear-gradient(0deg, #ba54f5, #e14eca);
+  background: $hacker-bg-panel;
+  border-bottom: 1px solid $hacker-accent;
 }
 
-html .panel > h3,
-html .sidebar_section.panel > h3 {
+html .panel>h3,
+html .sidebar_section.panel>h3 {
   background: #27293d;
 }
 
@@ -175,14 +190,17 @@ html #footer {
 }
 
 .panel_contents table tr.even td {
-  background: #6b6c75 !important;
-}
-.panel_contents table tr.odd td {
-  background: #000000 !important;
+  background: $hacker-bg-panel !important;
+  color: $hacker-text-primary !important;
 }
 
-html .panel > h3,
-html .sidebar_section.panel > h3 {
+.panel_contents table tr.odd td {
+  background: $hacker-bg-dark !important;
+  color: $hacker-text-primary !important;
+}
+
+html .panel>h3,
+html .sidebar_section.panel>h3 {
   border-bottom: 1px solid #2b3553;
   border-bottom-style: solid;
 }
@@ -242,18 +260,18 @@ a:link.button:not(.disabled):hover,
 a:visited.button:not(.disabled):hover,
 input[type="submit"]:not(.disabled):hover,
 input[type="button"]:not(.disabled):hover,
-button:not(.disabled):hover {
-}
+button:not(.disabled):hover {}
 
 html #footer:hover {
   background: rgba(39, 41, 61, 0.2) !important;
 }
+
 html #title_bar:hover {
   background: rgba(39, 41, 61, 0.2) !important;
 }
 
-html #header ul.tabs > li:hover > a,
-html #header ul.tabs > li.current > a {
+html #header ul.tabs>li:hover>a,
+html #header ul.tabs>li.current>a {
   background: #27293d !important;
   border-radius: 0 !important;
   margin: -10px 0;
@@ -303,11 +321,13 @@ svg.count_icon:hover {
 #right_arrow {
   animation-timing-function: cubic-bezier(0.73, 1.46, 0.95, 0.85);
 }
+
 #left_arrow {
   transform-origin: 55% 50%;
   -moz-transform-origin: 55% 50%;
   animation: flip_left 3.6s infinite forwards;
 }
+
 #right_arrow {
   transform-origin: 43% 50%;
   -moz-transform-origin: 43% 50%;
@@ -319,15 +339,19 @@ svg.count_icon:hover {
   0% {
     transform: perspective(2000px) rotateY(90deg) skewY(-1deg);
   }
+
   30% {
     transform: perspective(2000px) rotateY(-25deg) skewY(-0.8deg);
   }
+
   50% {
     transform: perspective(2000px) rotateY(20deg) skewY(0.8deg);
   }
+
   70% {
     transform: perspective(2000px) rotateY(-10deg) skewY(-0.8deg);
   }
+
   100% {
     transform: perspective(2000px) rotateY(0deg);
   }
@@ -337,15 +361,19 @@ svg.count_icon:hover {
   0% {
     transform: perspective(2000px) rotateY(90deg) skewY(-3.5deg);
   }
+
   30% {
     transform: perspective(2000px) rotateY(-25deg) skewY(-0.8deg);
   }
+
   50% {
     transform: perspective(2000px) rotateY(20deg) skewY(0.8deg);
   }
+
   70% {
     transform: perspective(2000px) rotateY(-10deg) skewY(-0.8deg);
   }
+
   100% {
     transform: perspective(2000px) rotateY(0deg);
   }
@@ -539,24 +567,13 @@ html body.active_admin {
 }
 
 body.index.admin_pictures #wrapper #active_admin_content #main_content_wrapper,
-body.index.admin_apk_payloads
-  #wrapper
-  #active_admin_content
-  #main_content_wrapper {
+body.index.admin_apk_payloads #wrapper #active_admin_content #main_content_wrapper {
   background: #27293d;
   border-radius: 0.2857rem;
 }
 
-body.index.admin_pictures
-  #wrapper
-  #active_admin_content
-  #main_content_wrapper
-  #main_content,
-body.index.admin_apk_payloads
-  #wrapper
-  #active_admin_content
-  #main_content_wrapper
-  #main_content {
+body.index.admin_pictures #wrapper #active_admin_content #main_content_wrapper #main_content,
+body.index.admin_apk_payloads #wrapper #active_admin_content #main_content_wrapper #main_content {
   padding: 2%;
 }
 
@@ -634,7 +651,7 @@ div.bloc {
 #diplay-filter,
 html #active_admin_content a.table_tools_button,
 html #active_admin_content .table_tools .dropdown_menu_button,
-#title_bar .action_items span.action_item > a[href*="new"],
+#title_bar .action_items span.action_item>a[href*="new"],
 html form input[type="submit"],
 html a.button,
 html a:link.button,
@@ -648,13 +665,11 @@ html form.filter_form a.clear_filters_btn {
   font-style: normal !important;
   text-shadow: none !important;
   text-align: center !important;
-  color: #fff !important;
-  background-image: linear-gradient(
-    to bottom left,
-    #e14eca,
-    #ba54f5,
-    #e14eca
-  ) !important;
+  color: $hacker-bg-dark !important;
+  background-image: linear-gradient(to bottom left,
+      $hacker-accent-secondary,
+      $hacker-accent,
+      $hacker-accent-secondary) !important;
   width: 135px !important;
   height: 40px !important;
   border-radius: 0.4285rem !important;
@@ -664,15 +679,14 @@ html form.filter_form a.clear_filters_btn {
   display: table-cell !important;
   vertical-align: middle !important;
 }
+
 html form fieldset.buttons li.cancel a:hover,
 html form fieldset.actions li.cancel a:hover,
 html form.filter_form a.clear_filters_btn:hover {
-  background-image: linear-gradient(
-    to bottom left,
-    #e14eca,
-    #ba54f5,
-    #e14eca
-  ) !important;
+  background-image: linear-gradient(to bottom left,
+      $hacker-accent-secondary,
+      $hacker-accent,
+      $hacker-accent-secondary) !important;
 }
 
 #active_admin_content {
@@ -690,12 +704,10 @@ input[type="submit"]:not(.disabled):hover,
 input[type="button"]:not(.disabled):hover,
 button:not(.disabled):hover {
   background-color: "" !important;
-  background-image: linear-gradient(
-    to bottom left,
-    #e14eca,
-    #ba54f5,
-    #e14eca
-  ) !important;
+  background-image: linear-gradient(to bottom left,
+      $hacker-accent-secondary,
+      $hacker-accent,
+      $hacker-accent-secondary) !important;
 }
 
 .panel .panel_contents {
@@ -719,14 +731,15 @@ html body.new form input[type="url"],
 html body.new form input[type="tel"],
 html form textarea {
   background: #343a43 !important;
-  font-size: 18px !important ;
-  display: block !important ;
-  width: 10% !important ;
-  border: none !important ;
-  border-bottom: 1px solid #e14eca !important ;
+  font-size: 18px !important;
+  display: block !important;
+  width: 10% !important;
+  border: none !important;
+  border-bottom: 1px solid #e14eca !important;
   box-sizing: initial;
   height: 15px !important;
 }
+
 body.active_admin.logged_out.new form input[type="email"],
 html body.active_admin.logged_out.new form input[type="password"] {
   height: 100% !important;
@@ -750,21 +763,20 @@ html .attributes_table table td {
   border-bottom: 0.0625rem solid #e3e3e3;
   border-color: rgba(255, 255, 255, 0.1);
 }
-.title_bar#title_bar .action_items span.action_item > a,
-.title_bar#title_bar .action_items span.action_item > .dropdown_menu > a {
+
+.title_bar#title_bar .action_items span.action_item>a,
+.title_bar#title_bar .action_items span.action_item>.dropdown_menu>a {
   font-size: 0.875rem !important;
   line-height: 1.35em !important;
   font-weight: 600 !important;
   font-style: normal !important;
   text-shadow: none !important;
   text-align: center !important;
-  color: #fff !important;
-  background-image: linear-gradient(
-    to bottom left,
-    #e14eca,
-    #ba54f5,
-    #e14eca
-  ) !important;
+  color: $hacker-bg-dark !important;
+  background-image: linear-gradient(to bottom left,
+      $hacker-accent-secondary,
+      $hacker-accent,
+      $hacker-accent-secondary) !important;
   width: 135px !important;
   height: 40px !important;
   border-radius: 0.4285rem !important;
@@ -824,10 +836,12 @@ select {
   background: #343a43;
   background-image: none;
 }
+
 /* Remove IE arrow */
 select::-ms-expand {
   display: none;
 }
+
 /* Custom Select */
 .selectt {
   position: relative;
@@ -838,12 +852,14 @@ select::-ms-expand {
   overflow: hidden;
   border-radius: 0.25em;
 }
+
 select {
   flex: 1;
   padding: 0 0.5em;
   color: #fff;
   cursor: pointer;
 }
+
 /* Arrow */
 .selectt::after {
   content: "\25BC";
@@ -858,6 +874,7 @@ select {
   -o-transition: 0.25s all ease;
   transition: 0.25s all ease;
 }
+
 /* Transition */
 .selectt:hover::after {
   color: #f39c12;

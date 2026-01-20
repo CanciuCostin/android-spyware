@@ -1,0 +1,34 @@
+{
+    "compile-hero.disable-compile-files-on-did-save-code": false,
+    "editor.formatOnSave": true,
+    "terminal.integrated.suggest.enabled": true,
+    "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
+    "chat.tools.terminal.autoReplyToPrompts": true,
+    "chat.tools.terminal.blockDetectedFileWrites": "all",
+    "chat.tools.edits.autoApprove": {
+        "**/.vscode/*.json": true,
+        "**/.git/**": true,
+        "**/{package.json,package-lock.json,server.xml,build.rs,web.config,.gitattributes,.env}": true,
+        "**/*.{code-workspace,csproj,fsproj,vbproj,vcxproj,proj,targets,props}": true
+    },
+    "chat.useNestedAgentsMdFiles": true,
+    "inlineChat.enableV2": true,
+    "inlineChat.finishOnType": true,
+    "inlineChat.notebookAgent": true,
+    "chat.useClaudeSkills": true,
+    "chat.restoreLastPanelSession": true,
+    "chat.renderRelatedFiles": true,
+    "chat.mcp.gallery.enabled": true,
+    "chat.mcp.discovery.enabled": {
+        "cursor-global": true,
+        "cursor-workspace": true,
+        "windsurf": true,
+        "claude-desktop": true
+    },
+    "chat.mcp.assisted.nuget.enabled": true,
+    "chat.edits2.enabled": true,
+    "chat.editor.wordWrap": "on",
+    "chat.customAgentInSubagent.enabled": true,
+    "chat.checkpoints.showFileChanges": true,
+    "chat.allowAnonymousAccess": true
+}

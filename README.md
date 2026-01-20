@@ -13,14 +13,36 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">Android Spyware</h3>
+  <h3 align="center">Android Spyware (V5 Modernized)</h3>
 
   <p align="center">
+    <b>Now with Dark Mode, Live Audio, and Docker Optimization</b><br/>
     <a href="https://github.com/CanciuCostin/android-spyware/issues">Report Bug</a>
     ·
     <a href="https://github.com/CanciuCostin/android-spyware/issues">Request Feature</a>
   </p>
 </p>
+
+## 🚀 V5 Modernization Update (2026)
+This project has been heavily refactored and modernized. Key improvements:
+
+*   **Cyberpunk Dark UI**: Complete re-skin of ActiveAdmin with a hacker-themed palette.
+*   **Live Audio Streaming**: New HTML5 audio player for recordings.
+*   **Map Visualization**: Google Maps integration for device tracking.
+*   **Security**: Externalized credentials to `.env`, Basic Auth Rate Limiting (Rack Attack).
+*   **Docker Optimization**: 50% smaller images using multi-stage builds.
+*   **Observability**: OpenTelemetry & Jaeger tracing integrated.
+
+### Quick Start (V5)
+1.  Copy environment variables: `cp .env.example .env`
+2.  Edit `.env` with your API keys and credentials.
+3.  Build and Run:
+    ```sh
+    docker-compose build
+    docker-compose up -d
+    ```
+4.  Access Admin UI at `http://localhost:3000/admin`.
+
 
 ## Support The Project
 I'm already working full time, so there isn't much time left for this project.

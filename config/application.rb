@@ -10,6 +10,7 @@ module Androidspyware
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
+    config.middleware.use Rack::Attack
     config.spyware_config = config_for(:spyware_config)
     config.web_console.whiny_requests = false
     config.serve_static_files = true

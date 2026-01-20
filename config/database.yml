@@ -24,7 +24,8 @@ default: &default
 development:
   <<: *default
   database: android_spyware_development
-  username: postgres
+  username: <%= ENV.fetch('POSTGRES_USER', 'postgres') %>
+  password: <%= ENV.fetch('POSTGRES_PASSWORD', '') %>
   host: <%= ENV['ANDROIDSPYWARE_DATABASE_HOST'] %>
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.

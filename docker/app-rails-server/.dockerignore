@@ -1,0 +1,71 @@
+# Ignore git
+.git
+.gitignore
+.github
+
+# Ignore logs
+log/
+*.log
+
+# Ignore temp files
+tmp/
+temp/
+
+# Ignore node modules
+node_modules/
+**/node_modules/
+
+# Ignore Android client builds
+android-client/
+*.apk
+
+# Ignore IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Ignore test files
+test/
+spec/
+
+# Ignore documentation
+docs/
+*.md
+README*
+CHANGELOG*
+
+# Ignore local config
+.env.local
+.env.development.local
+.env.test.local
+
+# Ignore storage
+storage/
+files/dumps/
+files/payloads/
+
+# Ignore coverage
+coverage/
+
+# Ignore cache
+.cache/
+.sass-cache/
+
+# Ignore docker files (already in context)
+docker/
+Dockerfile
+docker-compose*
+
+# Ignore development certificates
+*.pem
+*.crt
+*.key
+!config/credentials.yml.enc
+
+# Ignore bundle cache
+vendor/bundle/
+
+# Ignore platform-tools
+platform-tools/

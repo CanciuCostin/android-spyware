@@ -1,0 +1,65 @@
+/* Live Streaming Page Styles */
+
+.streaming-container {
+    padding: 20px;
+}
+
+.streaming-select {
+    width: 300px;
+    padding: 10px;
+    font-size: 14px;
+    background: #161b22;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 5px;
+}
+
+.stream-btn {
+    padding: 12px 24px;
+    margin-right: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stream-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.camera-btn {
+    background: linear-gradient(135deg, #00ff00, #00cc00);
+    color: #0d1117;
+}
+
+.mic-btn {
+    background: linear-gradient(135deg, #58a6ff, #1f6feb);
+    color: #fff;
+}
+
+.both-btn {
+    background: linear-gradient(135deg, #a371f7, #8957e5);
+    color: #fff;
+}
+
+.stop-btn {
+    background: linear-gradient(135deg, #f85149, #da3633);
+    color: #fff;
+}
+
+.stream-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 255, 0, 0.3);
+}
+
+#remote-video {
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+}
+
+#stream-status {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
