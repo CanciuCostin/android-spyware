@@ -47,8 +47,8 @@ services:
       - "6832:6832/udp"
       - "16686:16686"
       - "14250:14250"
-    ports:
-      - "127.0.0.1:5432:5432"
+      - "9411:9411"
+    labels:
       - "com.example.description=Jaeger tracing collector for android-spyware"
   db:
     image: costincanciu/android-spyware-db:latest
