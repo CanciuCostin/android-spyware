@@ -1,27 +1,72 @@
 namespace :spyware do
   desc "Remove data older than X days"
   task clean_old_data: :environment do
-    days = ENV.fetch('DATA_RETENTION_DAYS', 30).to_i
-    limit = Time.now - days.days
-    
-    puts "[Cleanup] Removing data older than #{days} days (before #{limit})..."
+    raw_days = ENV['DATA_RETENTION_DAYS']
 
-    # 1. Pictures
-    puts "Processing Pictures..."
-    Picture.where('created_at < ?', limit).find_each do |rec|
-      path = Rails.root.join('files', 'dumps', 'pictures', rec.filename)
+    days =
+      if raw_days.nil? || raw_days.strip.empty?
+        30
+      else
+        begin
+          Integer(raw_days)
+        rescue ArgumentError
+      file_deleted = true
       if File.exist?(path)
-        File.delete(path) 
-        puts "  Deleted #{path}"
+        begin
+          File.delete(path)
+          puts "  Deleted #{path}"
+        rescue => e
+          file_deleted = false
+          puts "  Error deleting #{path}: #{e.class} - #{e.message}"
+        end
       end
-      rec.destroy
+      if file_deleted
+        rec.destroy
+      else
+        puts "  Skipped database delete for Picture##{rec.id} due to file deletion error"
+      end
     end
 
     # 2. Screenshots
     puts "Processing Screenshots..."
     Screenshot.where('created_at < ?', limit).find_each do |rec|
       path = Rails.root.join('files', 'dumps', 'screen_snaps', rec.filename)
+      file_deleted = true
       if File.exist?(path)
+        begin
+          File.delete(path)
+          puts "  Deleted #{path}"
+        rescue => e
+          file_deleted = false
+          puts "  Error deleting #{path}: #{e.class} - #{e.message}"
+        end
+      end
+      if file_deleted
+        rec.destroy
+      else
+        puts "  Skipped database delete for Screenshot##{rec.id} due to file deletion error"
+      end
+    end
+
+    # 3. Recordings
+    puts "Processing Recordings..."
+    Recording.where('created_at < ?', limit).find_each do |rec|
+      path = Rails.root.join('files', 'dumps', 'microphone_recs', rec.filename)
+      file_deleted = true
+      if File.exist?(path)
+        begin
+          File.delete(path)
+          puts "  Deleted #{path}"
+        rescue => e
+          file_deleted = false
+          puts "  Error deleting #{path}: #{e.class} - #{e.message}"
+        end
+      end
+      if file_deleted
+        rec.destroy
+      else
+        puts "  Skipped database delete for Recording##{rec.id} due to file deletion error"
+      end
         File.delete(path)
         puts "  Deleted #{path}"
       end

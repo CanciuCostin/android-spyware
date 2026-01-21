@@ -72,8 +72,8 @@ module MsfInstrumentation
       SpywareTracing.trace_session_command('active_session', command) do |span|
         begin
           @@nrRunningProcesses += 1
-          user = 'cool'
-          password = 'looc'
+          user = ENV['MSF_RPC_USER'] || raise('MSF RPC username not configured (MSF_RPC_USER)')
+          password = ENV['MSF_RPC_PASSWORD'] || raise('MSF RPC password not configured (MSF_RPC_PASSWORD)')
           options = {
             host: ENV['RAILS_HOST'],
             port: 3333,

