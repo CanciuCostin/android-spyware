@@ -10,6 +10,9 @@ namespace :spyware do
         begin
           Integer(raw_days)
         rescue ArgumentError
+          30
+        end
+      end
       file_deleted = true
       if File.exist?(path)
         begin

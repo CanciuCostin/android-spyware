@@ -15,7 +15,12 @@ services:
     volumes:
       - ../:/app/android-spyware
       - //var/run/docker.sock://var/run/docker.sock
-      - "127.0.0.1:9000:3000"
+    working_dir: /app/android-spyware
+    entrypoint: >
+      sh -c "rm -f tmp/pids/server.pid && 
+             bundle install && 
+             rails db:migrate 2>/dev/null || rails db:setup &&
+             rails s -b 0.0.0.0 -p 3000"
     tty: true
     mem_limit: 2g
     memswap_limit: 2g
@@ -42,8 +47,8 @@ services:
       - "6832:6832/udp"
       - "16686:16686"
       - "14250:14250"
-      - "9411:9411"
-    labels:
+    ports:
+      - "127.0.0.1:5432:5432"
       - "com.example.description=Jaeger tracing collector for android-spyware"
   db:
     image: costincanciu/android-spyware-db:latest
