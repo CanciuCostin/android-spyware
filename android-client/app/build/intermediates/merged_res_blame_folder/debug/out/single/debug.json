@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.stealth.eaglespy.app-merged_res-41:/layout_activity_main.xml.flat",
+        "source": "com.stealth.eaglespy.app-main-43:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.stealth.eaglespy.app-merged_res-41:/xml_network_security_config.xml.flat",
+        "source": "com.stealth.eaglespy.app-main-43:/xml/network_security_config.xml"
+    }
+]

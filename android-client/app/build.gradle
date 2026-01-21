@@ -60,8 +60,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    // WebRTC for Live Streaming
-    implementation 'org.webrtc:google-webrtc:1.0.32006'
+    // WebRTC for Live Streaming (packaged via webrtc-sdk)
+    implementation 'io.github.webrtc-sdk:android:125.6422.07'
 
     // Location Services
     implementation 'com.google.android.gms:play-services-location:21.0.1'

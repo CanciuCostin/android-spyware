@@ -1,0 +1,11 @@
+R_DEF: Internal format may change without notice
+local
+id iconUpdate
+id progressBar
+id statusText
+id subtitleText
+id titleText
+layout activity_main
+string app_name
+style Theme.EagleSpy
+xml network_security_config

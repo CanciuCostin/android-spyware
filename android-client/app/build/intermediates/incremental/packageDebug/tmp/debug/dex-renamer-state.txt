@@ -1,0 +1,22 @@
+#Wed Jan 21 10:24:45 EET 2026
+path.4=1/classes.dex
+path.3=13/classes.dex
+path.2=10/classes.dex
+path.1=0/classes.dex
+path.6=classes2.dex
+path.5=3/classes.dex
+path.0=classes.dex
+base.4=E\:\\EagleSpy V5\\android-client\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
+base.3=E\:\\EagleSpy V5\\android-client\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\13\\classes.dex
+base.2=E\:\\EagleSpy V5\\android-client\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\10\\classes.dex
+base.1=E\:\\EagleSpy V5\\android-client\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.0=E\:\\EagleSpy V5\\android-client\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+renamed.3=classes4.dex
+renamed.2=classes3.dex
+renamed.1=classes2.dex
+renamed.0=classes.dex
+renamed.6=classes7.dex
+renamed.5=classes6.dex
+base.6=E\:\\EagleSpy V5\\android-client\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+renamed.4=classes5.dex
+base.5=E\:\\EagleSpy V5\\android-client\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex

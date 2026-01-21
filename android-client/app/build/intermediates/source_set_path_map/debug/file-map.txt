@@ -1,0 +1,44 @@
+com.stealth.eaglespy.app-recyclerview-1.1.0-0 C:\Users\venci\.gradle\caches\transforms-3\0780361fbfc02d60bbedcf624638433b\transformed\recyclerview-1.1.0\res
+com.stealth.eaglespy.app-savedstate-1.2.1-1 C:\Users\venci\.gradle\caches\transforms-3\09105ff509fd54a92a41067aa5653918\transformed\savedstate-1.2.1\res
+com.stealth.eaglespy.app-appcompat-1.6.1-2 C:\Users\venci\.gradle\caches\transforms-3\1390ed0e93696117e0bd1340aa2458d6\transformed\appcompat-1.6.1\res
+com.stealth.eaglespy.app-play-services-basement-18.1.0-3 C:\Users\venci\.gradle\caches\transforms-3\1efef0bb2a1b0143895ab85c8b9baeb8\transformed\play-services-basement-18.1.0\res
+com.stealth.eaglespy.app-core-ktx-1.12.0-4 C:\Users\venci\.gradle\caches\transforms-3\2acbe4481b7fc8c5f50b265534157997\transformed\core-ktx-1.12.0\res
+com.stealth.eaglespy.app-emoji2-1.2.0-5 C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\res
+com.stealth.eaglespy.app-lifecycle-viewmodel-2.6.1-6 C:\Users\venci\.gradle\caches\transforms-3\2c5257ca0b4750fbc6993d9832ce9e8a\transformed\lifecycle-viewmodel-2.6.1\res
+com.stealth.eaglespy.app-work-runtime-ktx-2.9.0-7 C:\Users\venci\.gradle\caches\transforms-3\35834be774dd43b832c5ed93cd946b8a\transformed\work-runtime-ktx-2.9.0\res
+com.stealth.eaglespy.app-material-1.11.0-8 C:\Users\venci\.gradle\caches\transforms-3\3a347358b13a1901f4709358b2ed9945\transformed\material-1.11.0\res
+com.stealth.eaglespy.app-transition-1.2.0-9 C:\Users\venci\.gradle\caches\transforms-3\3d5a9a4578d2969d4bd4315ff0055d9a\transformed\transition-1.2.0\res
+com.stealth.eaglespy.app-lifecycle-runtime-2.6.1-10 C:\Users\venci\.gradle\caches\transforms-3\4c99685c9a3b53a84587d4da3afaf2a1\transformed\lifecycle-runtime-2.6.1\res
+com.stealth.eaglespy.app-room-runtime-2.5.0-11 C:\Users\venci\.gradle\caches\transforms-3\4e738ffa916343e5b453bfb62aaeb96c\transformed\room-runtime-2.5.0\res
+com.stealth.eaglespy.app-coordinatorlayout-1.1.0-12 C:\Users\venci\.gradle\caches\transforms-3\585a83745d6f9e1fac22fc0bb53982d6\transformed\coordinatorlayout-1.1.0\res
+com.stealth.eaglespy.app-annotation-experimental-1.3.0-13 C:\Users\venci\.gradle\caches\transforms-3\5d7b28e2c337942c251313b95151289f\transformed\annotation-experimental-1.3.0\res
+com.stealth.eaglespy.app-cardview-1.0.0-14 C:\Users\venci\.gradle\caches\transforms-3\7192bc092133145dc42fdafeebe5edee\transformed\cardview-1.0.0\res
+com.stealth.eaglespy.app-lifecycle-livedata-core-2.6.1-15 C:\Users\venci\.gradle\caches\transforms-3\7394e92b1c8f049e2d75df259411992f\transformed\lifecycle-livedata-core-2.6.1\res
+com.stealth.eaglespy.app-security-crypto-1.1.0-alpha06-16 C:\Users\venci\.gradle\caches\transforms-3\76aea83b90a71ec7dc6522a40b6359af\transformed\security-crypto-1.1.0-alpha06\res
+com.stealth.eaglespy.app-profileinstaller-1.3.0-17 C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\res
+com.stealth.eaglespy.app-play-services-base-18.1.0-18 C:\Users\venci\.gradle\caches\transforms-3\7ad58fe70a110582d803277c9b6abb05\transformed\play-services-base-18.1.0\res
+com.stealth.eaglespy.app-sqlite-2.3.0-19 C:\Users\venci\.gradle\caches\transforms-3\850b3373c938444c2d5dbc7b2a220a0c\transformed\sqlite-2.3.0\res
+com.stealth.eaglespy.app-appcompat-resources-1.6.1-20 C:\Users\venci\.gradle\caches\transforms-3\8605a899b8773ac145ece6082f168511\transformed\appcompat-resources-1.6.1\res
+com.stealth.eaglespy.app-emoji2-views-helper-1.2.0-21 C:\Users\venci\.gradle\caches\transforms-3\8848a2782bf9a6bb6a60c97957b5d2ed\transformed\emoji2-views-helper-1.2.0\res
+com.stealth.eaglespy.app-lifecycle-livedata-2.6.1-22 C:\Users\venci\.gradle\caches\transforms-3\884ff50124331334b950ccd18aba8e68\transformed\lifecycle-livedata-2.6.1\res
+com.stealth.eaglespy.app-constraintlayout-2.1.4-23 C:\Users\venci\.gradle\caches\transforms-3\899eb6999f1668ce0807a12ae7b79a42\transformed\constraintlayout-2.1.4\res
+com.stealth.eaglespy.app-lifecycle-service-2.6.1-24 C:\Users\venci\.gradle\caches\transforms-3\98236339e7644d2552fc4b8e7fa10a5a\transformed\lifecycle-service-2.6.1\res
+com.stealth.eaglespy.app-lifecycle-viewmodel-savedstate-2.6.1-25 C:\Users\venci\.gradle\caches\transforms-3\9c0d419c2a84932a876a9be5e46c69a8\transformed\lifecycle-viewmodel-savedstate-2.6.1\res
+com.stealth.eaglespy.app-viewpager2-1.0.0-26 C:\Users\venci\.gradle\caches\transforms-3\a32efcd196d0bec2db3454ba4a61052a\transformed\viewpager2-1.0.0\res
+com.stealth.eaglespy.app-core-runtime-2.2.0-27 C:\Users\venci\.gradle\caches\transforms-3\b142b6c20290fb766ef825d652df3fe1\transformed\core-runtime-2.2.0\res
+com.stealth.eaglespy.app-room-ktx-2.5.0-28 C:\Users\venci\.gradle\caches\transforms-3\b3053efe25ac8590ad5b42ed58f68d42\transformed\room-ktx-2.5.0\res
+com.stealth.eaglespy.app-work-runtime-2.9.0-29 C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\res
+com.stealth.eaglespy.app-startup-runtime-1.1.1-30 C:\Users\venci\.gradle\caches\transforms-3\d87d2cc011329dbc6915f58ad22ea6eb\transformed\startup-runtime-1.1.1\res
+com.stealth.eaglespy.app-activity-1.8.0-31 C:\Users\venci\.gradle\caches\transforms-3\db32f109a8dc95528f709c309c2d892e\transformed\activity-1.8.0\res
+com.stealth.eaglespy.app-core-1.12.0-32 C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\res
+com.stealth.eaglespy.app-sqlite-framework-2.3.0-33 C:\Users\venci\.gradle\caches\transforms-3\e71d276cf57f845a17196f3879a24834\transformed\sqlite-framework-2.3.0\res
+com.stealth.eaglespy.app-lifecycle-process-2.6.1-34 C:\Users\venci\.gradle\caches\transforms-3\ebeb0bbad0da86e0f22c3eb70a97fea9\transformed\lifecycle-process-2.6.1\res
+com.stealth.eaglespy.app-fragment-1.3.6-35 C:\Users\venci\.gradle\caches\transforms-3\f857ed6359b5be8e560853431861bafa\transformed\fragment-1.3.6\res
+com.stealth.eaglespy.app-drawerlayout-1.1.1-36 C:\Users\venci\.gradle\caches\transforms-3\fc1fa3c9bb04819bb481e180355a8187\transformed\drawerlayout-1.1.1\res
+com.stealth.eaglespy.app-pngs-37 E:\EagleSpy V5\android-client\app\build\generated\res\pngs\debug
+com.stealth.eaglespy.app-resValues-38 E:\EagleSpy V5\android-client\app\build\generated\res\resValues\debug
+com.stealth.eaglespy.app-packageDebugResources-39 E:\EagleSpy V5\android-client\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.stealth.eaglespy.app-packageDebugResources-40 E:\EagleSpy V5\android-client\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.stealth.eaglespy.app-merged_res-41 E:\EagleSpy V5\android-client\app\build\intermediates\merged_res\debug
+com.stealth.eaglespy.app-debug-42 E:\EagleSpy V5\android-client\app\src\debug\res
+com.stealth.eaglespy.app-main-43 E:\EagleSpy V5\android-client\app\src\main\res
