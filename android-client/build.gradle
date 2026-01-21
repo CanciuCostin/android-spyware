@@ -23,3 +23,8 @@ allprojects {
 tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
+
+// Provide a non-ambiguous Java compilation task for tools that expect `compileJava`
+tasks.register('compileJava') {
+    dependsOn(':app:compileDebugJavaWithJavac')
+}
