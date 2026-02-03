@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.stealth.eaglespy.app-mergeDebugResources-39:/values-ko/values-ko.xml",
+            "outputFile": "com.google.android.systemservice.app-mergeDebugResources-39:/values-ko/values-ko.xml",
             "map": [
                 {
                     "source": "C:\\Users\\venci\\.gradle\\caches\\transforms-3\\3a347358b13a1901f4709358b2ed9945\\transformed\\material-1.11.0\\res\\values-ko\\values-ko.xml",

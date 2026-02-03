@@ -290,6 +290,7 @@ GEM
       activerecord (>= 6.0.4)
       activesupport (>= 6.0.4)
       i18n
+    redis (4.8.1)
     regexp_parser (2.11.3)
     responders (3.1.1)
       actionpack (>= 5.2)
@@ -401,6 +402,7 @@ DEPENDENCIES
   puma (~> 4.3)
   rack-attack
   rails (~> 6.0.2, >= 6.0.2.1)
+  redis (~> 4.0)
   responders
   rspec-rails (~> 5.0)
   sass-rails (>= 6)

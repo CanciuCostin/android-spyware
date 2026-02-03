@@ -1,18 +1,26 @@
 ActiveAdmin.register Recording do
+  permit_params :date, :duration, :filename, :smartphone_id
 
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-  # permit_params :date, :duration, :filename, :smartphone_id
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:date, :duration, :filename, :smartphone_id]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
-  
+  includes :smartphone
+
+  index do
+    selectable_column
+    id_column
+    column :smartphone
+    column :filename
+    column :duration
+    column :date
+    actions
+  end
+
+  form do |f|
+    f.semantic_errors
+    f.inputs do
+      f.input :smartphone, collection: Smartphone.all, include_blank: false
+      f.input :filename
+      f.input :duration
+      f.input :date, as: :string, input_html: { type: :date }
+    end
+    f.actions
+  end
 end

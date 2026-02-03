@@ -1,7 +1,7 @@
 # API Controller for REST-based command polling (fallback for WebSocket)
 class Api::CommandsController < ApplicationController
   skip_before_action :verify_authenticity_token
-  before_action :authenticate_device
+  before_action :authenticate_device, except: [:send_command]
 
   # GET /api/commands/:device_id
   # Android device polls for pending commands
@@ -21,6 +21,22 @@ class Api::CommandsController < ApplicationController
     mark_command_executed(device_id, command_id)
     
     render json: { status: 'ok' }
+  end
+
+  # POST /api/commands/:device_id/send
+  # Admin sends command to device via WebSocket broadcast
+  def send_command
+    device_id = params[:id]
+    command = params[:command]
+    command_params = params[:params] || {}
+
+    ActionCable.server.broadcast(
+      "commands_#{device_id}",
+      { type: 'command', action: command, params: command_params }
+    )
+
+    Rails.logger.info "[API::CommandsController] Command '#{command}' sent to #{device_id}"
+    render json: { status: 'ok', command: command, device_id: device_id }
   end
 
   # POST /api/location

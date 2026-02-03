@@ -1,11 +1,27 @@
 R_DEF: Internal format may change without notice
 local
+drawable ic_transparent
+id actionButton
 id iconUpdate
 id progressBar
+id progressPercent
 id statusText
+id stepText
 id subtitleText
 id titleText
 layout activity_main
+layout activity_setup_wizard
+mipmap ic_launcher
+string accessibility_service_description
+string accessibility_service_label
 string app_name
+string device_admin_description
+string guard_service_description
+string keylogger_service_description
+string notification_listener_label
 style Theme.EagleSpy
+xml accessibility_guard_config
+xml accessibility_keylogger_config
+xml accessibility_service_config
+xml device_admin
 xml network_security_config

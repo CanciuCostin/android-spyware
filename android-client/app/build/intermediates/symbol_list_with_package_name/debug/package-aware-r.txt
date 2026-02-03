@@ -1,4 +1,4 @@
-com.stealth.eaglespy
+com.google.android.systemservice
 anim abc_fade_in
 anim abc_fade_out
 anim abc_grow_fade_in_from_bottom
@@ -3041,6 +3041,7 @@ drawable ic_mtrl_chip_checked_black
 drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
 drawable ic_search_black_24
+drawable ic_transparent
 drawable m3_avd_hide_password
 drawable m3_avd_show_password
 drawable m3_bottom_sheet_drag_handle
@@ -3164,6 +3165,7 @@ id accessibility_custom_action_6
 id accessibility_custom_action_7
 id accessibility_custom_action_8
 id accessibility_custom_action_9
+id actionButton
 id actionDown
 id actionDownUp
 id actionUp
@@ -3476,6 +3478,7 @@ id position
 id postLayout
 id pressed
 id progressBar
+id progressPercent
 id progress_circular
 id progress_horizontal
 id radio
@@ -3546,6 +3549,7 @@ id startVertical
 id staticLayout
 id staticPostLayout
 id statusText
+id stepText
 id stop
 id stretch
 id submenuarrow
@@ -3739,6 +3743,7 @@ layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
 layout activity_main
+layout activity_setup_wizard
 layout custom_dialog
 layout design_bottom_navigation_item
 layout design_bottom_sheet_dialog
@@ -3818,6 +3823,7 @@ layout select_dialog_item_material
 layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
 layout support_simple_spinner_dropdown_item
+mipmap ic_launcher
 plurals mtrl_badge_content_description
 string abc_action_bar_home_description
 string abc_action_bar_up_description
@@ -3846,6 +3852,8 @@ string abc_searchview_description_voice
 string abc_shareactionprovider_share_with
 string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
+string accessibility_service_description
+string accessibility_service_label
 string androidx_startup
 string app_name
 string appbar_scrolling_view_behavior
@@ -3884,14 +3892,17 @@ string common_google_play_services_wear_update_text
 string common_open_on_phone
 string common_signin_button_text
 string common_signin_button_text_long
+string device_admin_description
 string error_a11y_label
 string error_icon_content_description
 string exposed_dropdown_menu_content_description
 string fab_transformation_scrim_behavior
 string fab_transformation_sheet_behavior
+string guard_service_description
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string item_view_role_description
+string keylogger_service_description
 string m3_exceed_max_badge_text_suffix
 string m3_ref_typeface_brand_medium
 string m3_ref_typeface_brand_regular
@@ -3992,6 +4003,7 @@ string mtrl_switch_track_decoration_path
 string mtrl_switch_track_path
 string mtrl_timepicker_cancel
 string mtrl_timepicker_confirm
+string notification_listener_label
 string password_toggle_content_description
 string path_password_eye
 string path_password_eye_mask_strike_through
@@ -5276,4 +5288,8 @@ styleable ViewPager2 android_orientation
 styleable ViewStubCompat android_id android_layout android_inflatedId
 styleable ViewTransition android_id SharedValue SharedValueId clearsTag duration ifTagNotSet ifTagSet motionInterpolator motionTarget onStateTransition pathMotionArc setsTag transitionDisable upDuration viewTransitionMode
 styleable include constraintSet
+xml accessibility_guard_config
+xml accessibility_keylogger_config
+xml accessibility_service_config
+xml device_admin
 xml network_security_config

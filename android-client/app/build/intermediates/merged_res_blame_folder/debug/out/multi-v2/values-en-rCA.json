@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.stealth.eaglespy.app-mergeDebugResources-39:/values-en-rCA/values-en-rCA.xml",
+            "outputFile": "com.google.android.systemservice.app-mergeDebugResources-39:/values-en-rCA/values-en-rCA.xml",
             "map": [
                 {
                     "source": "C:\\Users\\venci\\.gradle\\caches\\transforms-3\\1390ed0e93696117e0bd1340aa2458d6\\transformed\\appcompat-1.6.1\\res\\values-en-rCA\\values-en-rCA.xml",

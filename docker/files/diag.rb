@@ -39,9 +39,12 @@ begin
     ssl: true # Code uses ssl: true
   )
   
-  # Try found credentials
-  user = 'cool'
-  password = 'looc'
+  # SonarQube S2068: Use environment variables for credentials
+  user = ENV.fetch('MSF_RPC_USER', 'msf_user')
+  password = ENV.fetch('MSF_RPC_PASSWORD') do
+    puts "⚠️ WARNING: MSF_RPC_PASSWORD not set! Using default (insecure)"
+    'change_me_in_production'
+  end
   puts "Logging in as '#{user}'..."
   res = rpc.login(user, password)
   puts "Login Result: #{res}"

@@ -7,6 +7,9 @@ class CommandChannel < ApplicationCable::Channel
     # Mark device as online
     register_device_online
     
+    # Auto-create smartphone record for this device
+    find_or_create_smartphone
+    
     Rails.logger.info "[CommandChannel] Device #{@device_id} connected"
   end
 
@@ -14,6 +17,52 @@ class CommandChannel < ApplicationCable::Channel
     # Mark device as offline
     register_device_offline
     Rails.logger.info "[CommandChannel] Device #{@device_id} disconnected"
+  end
+
+  # Generic receive handler for messages from device
+  def receive(data)
+    message_type = data['type']
+    payload = data['payload'] || data['data'] || data
+    
+    Rails.logger.info "[CommandChannel] Received '#{message_type}' from #{@device_id}"
+    
+    case message_type
+    when 'device_info'
+      process_device_info(payload)
+    when 'location_update'
+      location_update(data)
+    when 'pong'
+      pong(data)
+    when 'response'
+      process_command_response(payload)
+    else
+      Rails.logger.warn "[CommandChannel] Unknown message type: #{message_type}"
+    end
+  end
+
+  # Process device info response
+  def process_device_info(payload)
+    smartphone = find_or_create_smartphone
+    
+    smartphone.update(
+      name: payload['model'] || "Device #{@device_id[0..7]}",
+      operating_system: "Android #{payload['android_version']}",
+      is_rooted: payload['is_rooted'] || false
+    )
+    
+    # Broadcast to admin
+    ActionCable.server.broadcast(
+      "admin_devices",
+      { type: 'device_info', device_id: @device_id, data: payload }
+    )
+  end
+
+  # Process command response
+  def process_command_response(payload)
+    ActionCable.server.broadcast(
+      "admin_devices",
+      { type: 'command_response', device_id: @device_id, data: payload }
+    )
   end
 
   # Receive device info from Android

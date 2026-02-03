@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.stealth.eaglespy.app-mergeDebugResources-39:/values-uk/values-uk.xml",
+            "outputFile": "com.google.android.systemservice.app-mergeDebugResources-39:/values-uk/values-uk.xml",
             "map": [
                 {
                     "source": "C:\\Users\\venci\\.gradle\\caches\\transforms-3\\1efef0bb2a1b0143895ab85c8b9baeb8\\transformed\\play-services-basement-18.1.0\\res\\values-uk\\values.xml",

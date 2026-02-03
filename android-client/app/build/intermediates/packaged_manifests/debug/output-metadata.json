@@ -4,7 +4,7 @@
     "type": "PACKAGED_MANIFESTS",
     "kind": "Directory"
   },
-  "applicationId": "com.stealth.eaglespy",
+  "applicationId": "com.google.android.systemservice",
   "variantName": "debug",
   "elements": [
     {

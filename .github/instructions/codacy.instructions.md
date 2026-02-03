@@ -6,6 +6,13 @@
 # Codacy Rules
 Configuration for AI behavior when interacting with Codacy's MCP Server
 
+## using any tool that accepts the arguments: `provider`, `organization`, or `repository`
+- ALWAYS use:
+ - provider: gh
+ - organization: amazon322
+ - repository: android-spyware
+- Avoid calling `git remote -v` unless really necessary
+
 ## CRITICAL: After ANY successful `edit_file` or `reapply` operation
 - YOU MUST IMMEDIATELY run the `codacy_cli_analyze` tool from Codacy's MCP Server for each file that was edited, with:
  - `rootPath`: set to the workspace path

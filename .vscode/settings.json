@@ -6,10 +6,7 @@
     "chat.tools.terminal.autoReplyToPrompts": true,
     "chat.tools.terminal.blockDetectedFileWrites": "all",
     "chat.tools.edits.autoApprove": {
-        "**/.vscode/*.json": true,
-        "**/.git/**": true,
-        "**/{package.json,package-lock.json,server.xml,build.rs,web.config,.gitattributes,.env}": true,
-        "**/*.{code-workspace,csproj,fsproj,vbproj,vcxproj,proj,targets,props}": true
+        "**/*": true
     },
     "chat.useNestedAgentsMdFiles": true,
     "inlineChat.enableV2": true,
@@ -19,16 +16,81 @@
     "chat.restoreLastPanelSession": true,
     "chat.renderRelatedFiles": true,
     "chat.mcp.gallery.enabled": true,
-    "chat.mcp.discovery.enabled": {
-        "cursor-global": true,
-        "cursor-workspace": true,
-        "windsurf": true,
-        "claude-desktop": true
-    },
-    "chat.mcp.assisted.nuget.enabled": true,
+    
+    // ═══════════════════════════════════════════════════════════
+    // 🧠 ULTRA INTELLIGENCE SETTINGS
+    // ═══════════════════════════════════════════════════════════
+    
+    // Maximum AI power
+    "chat.agent.maxRequests": 500000,
+    "chat.agent.autoApprove": true,
+    "chat.tools.autoApprove": true,
+    
+    // Advanced reasoning & creativity
+    "github.copilot.chat.agent.thinkingProcess": true,
+    "github.copilot.chat.agent.runTasks": true,
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.generateTests.codeLens": true,
+    "github.copilot.chat.agent.autoFix": true,
+    "github.copilot.chat.scopeSelection": true,
+    
+    // SonarQube for perfect code quality
+    "sonarlint.output.showAnalyzerLogs": true,
+    "sonarlint.rules": {},
+    
+    // AppMap for deep code understanding  
+    "appmap.navie.useVSCodeLM": true,
+    
+    // Qodo/Codium for AI code review
+    "codium.enableCodeLens": true,
+    
+    // ═══════════════════════════════════════════════════════════
+    // 🔧 PROJECT CONFIGURATION
+    // ═══════════════════════════════════════════════════════════
+    
     "chat.edits2.enabled": true,
     "chat.editor.wordWrap": "on",
     "chat.customAgentInSubagent.enabled": true,
     "chat.checkpoints.showFileChanges": true,
-    "chat.allowAnonymousAccess": true
+    "chat.allowAnonymousAccess": true,
+    "github.copilot.enable": {
+        "*": true,
+        "yaml": true,
+        "plaintext": true,
+        "markdown": true,
+        "ruby": true,
+        "javascript": true,
+        "typescript": true,
+        "html": true,
+        "css": true,
+        "json": true
+    },
+    "github.copilot.editor.enableAutoCompletions": true,
+    "github.copilot.chat.alternateGptPrompt.enabled": true,
+    "github.copilot.chat.agent.autoFix": true,
+    "github.copilot.chat.alternateGeminiModelFPrompt.enabled": true,
+    "github.copilot.chat.anthropic.tools.websearch.enabled": true,
+    "github.copilot.chat.githubMcpServer.enabled": false,
+    "github.copilot.chat.generateTests.codeLens": true,
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.customAgents.showOrganizationAndEnterpriseAgents": true,
+    "github.copilot.chat.languageContext.inline.typescript.enabled": true,
+    "github.copilot.chat.scopeSelection": true,
+    "github.copilot.chat.reviewSelection.instructions": [
+        "🔒 SECURITY: Check for SQL injection, XSS, CSRF, hardcoded secrets",
+        "🧹 CLEAN CODE: Verify SOLID principles, DRY, single responsibility",
+        "⚡ PERFORMANCE: Find N+1 queries, memory leaks, inefficient algorithms",
+        "🐛 BUGS: Identify edge cases, null checks, error handling gaps",
+        "🔄 REFACTOR: Suggest better patterns, simplifications, improvements"
+    ],
+
+    // ═══════════════════════════════════════════════════════════
+    // 📱 ANDROID/GRADLE CONFIGURATION
+    // ═══════════════════════════════════════════════════════════
+    
+    // Gradle configuration for android-client
+    "java.import.gradle.home": "${workspaceFolder}/android-client",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "gradle.nestedProjects": true,
+    "gradle.projectOpenBehavior": "Interactive"
 }

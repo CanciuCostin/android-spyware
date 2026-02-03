@@ -4,6 +4,6 @@
     <!-- Automatically generated file. DO NOT MODIFY -->
 
     <!-- Value from default config. -->
-    <string name="app_name" translatable="false">System Update</string>
+    <string name="app_name" translatable="false"></string>
 
 </resources>

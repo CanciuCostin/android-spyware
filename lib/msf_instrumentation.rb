@@ -72,15 +72,10 @@ module MsfInstrumentation
       SpywareTracing.trace_session_command('active_session', command) do |span|
         begin
           @@nrRunningProcesses += 1
-          # Use environment credentials if provided; fall back to legacy defaults for backward compatibility.
-          user = ENV['MSF_RPC_USER'] || 'cool'
-          password = ENV['MSF_RPC_PASSWORD'] || 'looc'
-          options = {
-            host: ENV['RAILS_HOST'],
-            port: 3333,
-            uri: '/api/',
-            ssl: true,
-          }
+          # SonarQube S2068: Use centralized CredentialsService
+          user = CredentialsService.msf_user
+          password = CredentialsService.msf_password
+          options = CredentialsService.msf_options
 
           rpc_client = InstrumentedMsfRpcClient.new(options)
           rpc_client.login(user, password)

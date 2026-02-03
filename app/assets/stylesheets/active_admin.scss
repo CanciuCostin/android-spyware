@@ -4,9 +4,6 @@
 // `app/assets/stylesheets/active_admin/mixins/_variables.scss` in the
 // Active Admin source.
 //
-// For example, to change the sidebar width:
-// $sidebar-width: 242px;
-
 // Active Admin's got SASS!
 // HACKER THEME COLOR PALETTE
 @import url("https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800");
@@ -34,10 +31,14 @@ $skinBlackLight: $hacker-bg-panel !important;
 $textGray: $hacker-text-secondary !important;
 
 .header#header {
-  height: calc(100% - 52px);
   border-radius: 15px;
   margin-top: 0.1%;
   border-right: 1px solid $hacker-border;
+  width: 13% !important;
+  height: 100% !important;
+  overflow-x: hidden;
+  transition: 0.6s;
+  z-index: 100000;
 }
 
 .right_row {
@@ -71,14 +72,6 @@ $textGray: $hacker-text-secondary !important;
 @import "timeline";
 @import "switcher";
 @import "sliders";
-
-.header#header {
-  width: 13% !important;
-  height: 100% !important;
-  overflow-x: hidden;
-  transition: 0.6s;
-  z-index: 100000;
-}
 
 .lEoFR {
   left: 50%;
@@ -122,7 +115,6 @@ $textGray: $hacker-text-secondary !important;
 }
 
 .jYpagw {
-  transition: 2s;
   height: 100%;
   margin-right: 1rem;
   cursor: pointer;
@@ -140,6 +132,7 @@ svg:not(:root) {
 
 #title_bar {
   width: 97% !important;
+  border-bottom: 1px solid #2b3553 !important;
 }
 
 html #title_bar {
@@ -158,27 +151,21 @@ html #title_bar {
   text-align: left !important;
 }
 
-.header#header {
-  // background: linear-gradient(0deg, #ba54f5, #e14eca);
-  background: $hacker-bg-panel;
-  border-bottom: 1px solid $hacker-accent;
-}
+
 
 html .panel>h3,
 html .sidebar_section.panel>h3 {
   background: #27293d;
+  border-bottom: 1px solid #2b3553;
+  border-bottom-style: solid;
 }
 
 .header#header .header-item.tabs#tabs li a {
   padding: 7px 20px;
   color: hsla(0, 0%, 100%, 0.8) !important;
   font-size: 10px;
-  line-height: 23px;
+  line-height: 33px;
   font-weight: 400;
-}
-
-#title_bar {
-  border-bottom: 1px solid #2b3553 !important;
 }
 
 html #footer {
@@ -197,12 +184,6 @@ html #footer {
 .panel_contents table tr.odd td {
   background: $hacker-bg-dark !important;
   color: $hacker-text-primary !important;
-}
-
-html .panel>h3,
-html .sidebar_section.panel>h3 {
-  border-bottom: 1px solid #2b3553;
-  border-bottom-style: solid;
 }
 
 .section,
@@ -229,6 +210,8 @@ html .sidebar_section.panel>h3 {
 
 body {
   color: white !important;
+  font-family: Poppins, sans-serif !important;
+  font-weight: 300;
 }
 
 .phoneSvg {
@@ -255,13 +238,6 @@ svg:hover {
   fill: #00b9ce !important;
 }
 
-a.button:not(.disabled):hover,
-a:link.button:not(.disabled):hover,
-a:visited.button:not(.disabled):hover,
-input[type="submit"]:not(.disabled):hover,
-input[type="button"]:not(.disabled):hover,
-button:not(.disabled):hover {}
-
 html #footer:hover {
   background: rgba(39, 41, 61, 0.2) !important;
 }
@@ -281,11 +257,14 @@ html #header ul.tabs>li.current>a {
 
 .breadcrumb {
   background-color: rgba(39, 41, 61, 0.1) !important;
+  margin-bottom: 12px !important;
+  padding: unset !important;
+  font-weight: 400;
 }
 
 .btn-secondary {
   color: #fff;
-  background-color: red !important;
+  background-color: #c62828 !important;
   border-color: #6b6c75 !important;
 }
 
@@ -307,10 +286,9 @@ html #header ul.tabs>li.current>a {
 
 svg.count_icon {
   transform-box: fill-box;
-  animation-timing-function: cubic-bezier(0.73, 1.46, 0.95, 0.85);
   transform-origin: 55% 50%;
   -moz-transform-origin: 55% 50%;
-  animation: flip_left 3.6s forwards;
+  animation: flip_left 3.6s forwards cubic-bezier(0.73, 1.46, 0.95, 0.85);
 }
 
 svg.count_icon:hover {
@@ -399,10 +377,12 @@ svg.count_icon:hover {
 
 .tab-content {
   border: none;
+  padding-top: 0 !important;
 }
 
 .column {
   background: #27293d;
+  border-radius: 5px;
 }
 
 h1.count,
@@ -472,11 +452,6 @@ h4.category {
   position: relative;
 }
 
-.breadcrumb {
-  margin-bottom: 12px !important;
-  padding: unset !important;
-}
-
 #header #tabs {
   overflow: hidden;
 }
@@ -525,10 +500,6 @@ h4.category {
   font-size: x-large;
 }
 
-.column {
-  border-radius: 5px;
-}
-
 html table.index_table tr.odd td,
 html table.index_table tr.even td,
 html table.index_table th {
@@ -536,18 +507,18 @@ html table.index_table th {
 }
 
 html table.index_table td,
-tml table.index_table td a,
+html table.index_table td a,
 html table.index_table td a:link,
 html table.index_table td a:visited {
   color: #6b6c75 !important;
+  font-family: Poppins, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 35px;
 }
 
 .menu_item.current {
   background: #673ab7 !important;
-}
-
-.tab-content {
-  padding-top: 0 !important;
 }
 
 .smartphone-icon:hover {
@@ -579,11 +550,15 @@ body.index.admin_apk_payloads #wrapper #active_admin_content #main_content_wrapp
 
 html table.index_table {
   border: none;
+  font-family: Poppins, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: hsla(0, 0%, 100%, 0.7) !important;
 }
 
 table.index_table th.sorted-asc,
 table.index_table th.sorted-desc {
-  background-color: none;
+  background-color: #27293d;
   background-image: none;
 }
 
@@ -595,29 +570,7 @@ table.index_table td {
 
 html table.index_table th {
   border: none !important;
-}
-
-body {
-  font-family: Poppins, sans-serif !important;
-  font-weight: 300;
-}
-
-html table.index_table {
-  font-family: Poppins, "sans-serif";
-  font-weight: 400;
-  font-size: 14px;
   color: hsla(0, 0%, 100%, 0.7) !important;
-}
-
-html table.index_table td,
-tml table.index_table td a,
-html table.index_table td a:link,
-html table.index_table td a:visited {
-  font-family: Poppins, "sans-serif";
-  font-weight: 400;
-  font-size: 14px;
-  color: hsla(0, 0%, 100%, 0.7) !important;
-  line-height: 35px;
 }
 
 html table.index_table th a,
@@ -633,15 +586,6 @@ table.index_table th {
 body.index.admin_pictures,
 body.index.admin_apk_payloads {
   overflow-x: hidden;
-}
-
-#title_bar h2,
-.breadcrumb {
-  font-weight: 400;
-}
-
-html table.index_table th {
-  color: hsla(0, 0%, 100%, 0.7) !important;
 }
 
 div.bloc {
@@ -660,7 +604,7 @@ html form fieldset.buttons li.cancel a,
 html form fieldset.actions li.cancel a,
 html form.filter_form a.clear_filters_btn {
   font-size: 0.875rem !important;
-  line-height: 1.35em !important;
+  line-height: 1.35em;
   font-weight: 600 !important;
   font-style: normal !important;
   text-shadow: none !important;
@@ -714,13 +658,13 @@ button:not(.disabled):hover {
   font-size: 10px;
 }
 
-table.index_table th.sorted-asc,
-table.index_table th.sorted-desc {
-  background-color: #27293d;
-}
-
 html form fieldset.inputs {
-  background: #27293d;
+  top: 20px;
+  border-radius: 30px;
+  border: 0.0625rem solid #e3e3e3;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+  background: transparent;
 }
 
 body.new form input[type="text"],
@@ -748,11 +692,10 @@ html body.active_admin.logged_out.new form input[type="password"] {
 
 html .panel_contents table th,
 html .attributes_table table th,
-html .attributes_table table th,
 html .attributes_table table td {
   text-shadow: none;
   font-weight: 400;
-  font-family: Poppins, "sans-serif";
+  font-family: Poppins, sans-serif;
   line-height: 35px;
   color: rgba(255, 255, 255, 0.7) !important;
   font-size: 14px;
@@ -767,7 +710,7 @@ html .attributes_table table td {
 .title_bar#title_bar .action_items span.action_item>a,
 .title_bar#title_bar .action_items span.action_item>.dropdown_menu>a {
   font-size: 0.875rem !important;
-  line-height: 1.35em !important;
+  line-height: 1.35em;
   font-weight: 600 !important;
   font-style: normal !important;
   text-shadow: none !important;
@@ -785,19 +728,6 @@ html .attributes_table table td {
   border: none !important;
   display: table-cell !important;
   vertical-align: middle !important;
-}
-
-.header#header .header-item.tabs#tabs li a {
-  line-height: 33px;
-}
-
-html form fieldset.inputs {
-  top: 20px;
-  border-radius: 30px;
-  border: 0.0625rem solid #e3e3e3;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: none;
-  background: transparent;
 }
 
 html form fieldset.inputs input {
@@ -835,6 +765,10 @@ select {
   border: 0 !important;
   background: #343a43;
   background-image: none;
+  flex: 1;
+  padding: 0 0.5em;
+  color: #fff;
+  cursor: pointer;
 }
 
 /* Remove IE arrow */
@@ -851,13 +785,6 @@ select::-ms-expand {
   line-height: 3;
   overflow: hidden;
   border-radius: 0.25em;
-}
-
-select {
-  flex: 1;
-  padding: 0 0.5em;
-  color: #fff;
-  cursor: pointer;
 }
 
 /* Arrow */
@@ -878,4 +805,341 @@ select {
 /* Transition */
 .selectt:hover::after {
   color: #f39c12;
+}
+
+/* ========================================
+   MODERN DASHBOARD STYLES (Beast Mode)
+   ======================================== */
+
+/* Metric Cards with Gradients */
+.metric-card {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+  color: #ffffff !important;
+  padding: 20px !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  margin-bottom: 20px !important;
+}
+
+.metric-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+}
+
+.metric-card.secondary {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  opacity: 0.95 !important;
+}
+
+.metric-card h3 {
+  color: white !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  opacity: 0.9 !important;
+  margin-bottom: 10px !important;
+}
+
+.metric-value {
+  font-size: 48px !important;
+  font-weight: bold !important;
+  margin-bottom: 10px !important;
+  line-height: 1 !important;
+}
+
+.big-number {
+  display: inline-block !important;
+  animation: countUp 0.5s ease-out !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.big-number.connected {
+  color: #4ade80 !important;
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.5) !important;
+}
+
+.metric-value .total {
+  font-size: 24px !important;
+  opacity: 0.7 !important;
+  font-weight: normal !important;
+}
+
+.metric-label {
+  font-size: 13px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  opacity: 0.9 !important;
+  font-weight: 400 !important;
+}
+
+/* Activity Feed Styling */
+.activity-feed {
+  background: $hacker-bg-panel !important;
+  border: 1px solid $hacker-border !important;
+  border-radius: 12px !important;
+}
+
+.activity-feed table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+.activity-feed table td {
+  padding: 12px 15px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  vertical-align: middle !important;
+}
+
+.activity-feed table tr:last-child td {
+  border-bottom: none !important;
+}
+
+.activity-feed table tr:hover {
+  background: rgba(102, 126, 234, 0.1) !important;
+  transition: background 0.2s ease !important;
+}
+
+.activity-type {
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: $hacker-accent-secondary !important;
+}
+
+.device-name {
+  color: #667eea !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+}
+
+.activity-details {
+  color: $hacker-text-secondary !important;
+  font-size: 12px !important;
+  font-family: 'Courier New', monospace !important;
+}
+
+.time-ago {
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-style: italic !important;
+}
+
+/* Device List Styling */
+.device-list {
+  background: $hacker-bg-panel !important;
+  border: 1px solid $hacker-border !important;
+  border-radius: 12px !important;
+}
+
+.device-list table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+.device-list table td {
+  padding: 15px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  vertical-align: middle !important;
+}
+
+.device-list table tr:hover {
+  background: rgba(102, 126, 234, 0.08) !important;
+}
+
+.device-info {
+  line-height: 1.6 !important;
+}
+
+.device-info strong {
+  color: $hacker-text-primary !important;
+  font-size: 14px !important;
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+
+.os-badge {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%) !important;
+  color: #4f46e5 !important;
+  padding: 3px 10px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.status-online {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+  color: #15803d !important;
+  padding: 6px 14px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.2) !important;
+}
+
+.button.mini {
+  padding: 6px 14px !important;
+  font-size: 12px !important;
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.button.mini:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+}
+
+/* Quick Actions Panel */
+.quick-actions {
+  background: $hacker-bg-panel !important;
+  border: 1px solid $hacker-border !important;
+  border-radius: 12px !important;
+  padding: 25px !important;
+}
+
+.quick-actions h3 {
+  margin-bottom: 20px !important;
+}
+
+.action-buttons {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  justify-content: center !important;
+}
+
+.button.large {
+  padding: 14px 28px !important;
+  font-size: 14px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  width: auto !important;
+  height: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.button.large:hover {
+  transform: translateY(-3px) scale(1.05) !important;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+}
+
+.button.primary {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.button.primary:hover {
+  background: linear-gradient(135deg, #7c8ef5 0%, #8a5bb5 100%) !important;
+}
+
+/* Placeholder Text */
+.placeholder-text {
+  text-align: center !important;
+  color: #94a3b8 !important;
+  padding: 40px 20px !important;
+  font-style: italic !important;
+  font-size: 14px !important;
+}
+
+/* Count Up Animation */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse Animation for Online Status */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.status-online::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #16a34a;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .metric-value {
+    font-size: 36px !important;
+  }
+
+  .action-buttons {
+    flex-direction: column !important;
+  }
+
+  .button.large {
+    width: 100% !important;
+  }
+}
+
+/* Panel Improvements for New Design */
+.panel.metric-card .panel_contents {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.panel.activity-feed .panel_contents,
+.panel.device-list .panel_contents,
+.panel.quick-actions .panel_contents {
+  background: transparent !important;
+  padding: 15px !important;
+}
+
+/* Override table backgrounds for new panels */
+.activity-feed .panel_contents table tr.even td,
+.activity-feed .panel_contents table tr.odd td,
+.device-list .panel_contents table tr.even td,
+.device-list .panel_contents table tr.odd td {
+  background: transparent !important;
+}
+
+/* Title Bar Enhancements */
+#title_bar h2 {
+  font-size: 28px !important;
+  font-weight: 600 !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Smooth Transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease !important;
 }

