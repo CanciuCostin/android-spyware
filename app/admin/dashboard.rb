@@ -222,132 +222,130 @@ ActiveAdmin.register_page "Dashboard" do
     end
     
     # CSS Styles for modern dashboard
-    style do
-      text %{
-        .metric-card {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border: none;
-          border-radius: 12px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-          color: white;
-          padding: 20px;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .metric-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .metric-card.secondary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          opacity: 0.9;
-        }
-        
-        .metric-value {
-          font-size: 48px;
-          font-weight: bold;
-          margin-bottom: 10px;
-        }
-        
-        .big-number {
-          display: inline-block;
-          animation: countUp 0.5s ease-out;
-        }
-        
-        .big-number.connected {
-          color: #4ade80;
-        }
-        
-        .metric-value .total {
-          font-size: 24px;
-          opacity: 0.7;
-        }
-        
-        .metric-label {
-          font-size: 14px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          opacity: 0.9;
-        }
-        
-        .activity-feed table {
-          width: 100%;
-        }
-        
-        .activity-type {
-          font-weight: bold;
-        }
-        
-        .device-name {
-          color: #667eea;
-          font-weight: 500;
-        }
-        
-        .time-ago {
-          color: #64748b;
-          font-size: 0.9em;
-        }
-        
-        .device-list table {
-          width: 100%;
-        }
-        
-        .device-info {
-          line-height: 1.6;
-        }
-        
-        .os-badge {
-          background: #e0e7ff;
-          color: #4f46e5;
-          padding: 2px 8px;
-          border-radius: 4px;
-          font-size: 0.8em;
-        }
-        
-        .status-online {
-          background: #dcfce7;
-          color: #16a34a;
-          padding: 4px 12px;
-          border-radius: 6px;
-          font-weight: 500;
-        }
-        
-        .button.mini {
-          padding: 4px 12px;
-          font-size: 0.85em;
-        }
-        
-        .quick-actions .action-buttons {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 12px;
-          justify-content: center;
-        }
-        
-        .button.large {
-          padding: 12px 24px;
-          font-size: 1em;
-          border-radius: 8px;
-        }
-        
-        .button.primary {
-          background: #667eea;
-          color: white;
-        }
-        
-        .placeholder-text {
-          text-align: center;
-          color: #94a3b8;
-          padding: 40px 20px;
-          font-style: italic;
-        }
-        
-        @keyframes countUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+    text_node helpers.style_tag <<~CSS
+      .metric-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+        padding: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
-    end
+
+      .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      }
+
+      .metric-card.secondary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        opacity: 0.9;
+      }
+
+      .metric-value {
+        font-size: 48px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .big-number {
+        display: inline-block;
+        animation: countUp 0.5s ease-out;
+      }
+
+      .big-number.connected {
+        color: #4ade80;
+      }
+
+      .metric-value .total {
+        font-size: 24px;
+        opacity: 0.7;
+      }
+
+      .metric-label {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+      }
+
+      .activity-feed table {
+        width: 100%;
+      }
+
+      .activity-type {
+        font-weight: bold;
+      }
+
+      .device-name {
+        color: #667eea;
+        font-weight: 500;
+      }
+
+      .time-ago {
+        color: #64748b;
+        font-size: 0.9em;
+      }
+
+      .device-list table {
+        width: 100%;
+      }
+
+      .device-info {
+        line-height: 1.6;
+      }
+
+      .os-badge {
+        background: #e0e7ff;
+        color: #4f46e5;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+      }
+
+      .status-online {
+        background: #dcfce7;
+        color: #16a34a;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-weight: 500;
+      }
+
+      .button.mini {
+        padding: 4px 12px;
+        font-size: 0.85em;
+      }
+
+      .quick-actions .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+      }
+
+      .button.large {
+        padding: 12px 24px;
+        font-size: 1em;
+        border-radius: 8px;
+      }
+
+      .button.primary {
+        background: #667eea;
+        color: white;
+      }
+
+      .placeholder-text {
+        text-align: center;
+        color: #94a3b8;
+        padding: 40px 20px;
+        font-style: italic;
+      }
+
+      @keyframes countUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    CSS
   end
 end
