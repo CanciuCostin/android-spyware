@@ -36,3 +36,6 @@ yarn-debug.log*
 
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md
+
+.gemini/
+gha-creds-*.json
