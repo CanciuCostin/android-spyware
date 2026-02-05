@@ -1,3 +1,27 @@
+require 'rack/attack'
+
+class Rack::Attack
+  # Throttle API requests per IP
+  throttle('req/ip', limit: (ENV['RATE_LIMIT_PER_IP'].presence || 120).to_i, period: 1.minute) do |req|
+    req.ip if req.path.start_with?('/api')
+  end
+
+  # Throttle API requests per device
+  throttle('req/device', limit: (ENV['RATE_LIMIT_PER_DEVICE'].presence || 90).to_i, period: 1.minute) do |req|
+    req.get_header('HTTP_X_DEVICE_ID') if req.path.start_with?('/api')
+  end
+
+  # Custom response for throttled requests
+  self.throttled_response = lambda do |_env|
+    [
+      429,
+      { 'Content-Type' => 'application/json' },
+      [{ error: 'Rate limit exceeded' }.to_json]
+    ]
+  end
+end
+
+Rails.application.config.middleware.use Rack::Attack
 class Rack::Attack
   # Use memory store to mitigate distributed attacks
   Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new

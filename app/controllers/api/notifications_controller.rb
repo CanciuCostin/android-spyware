@@ -69,6 +69,7 @@ module Api
       return unless base64_data.present?
       
       binary_data = Base64.decode64(base64_data)
+      return unless reject_oversize!(binary_data.bytesize, "notification #{media_type}")
       mime_type = detect_mime_type(binary_data)
       
       notification.notification_media.create!(

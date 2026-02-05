@@ -2,9 +2,9 @@ class ApkInstallation < ApplicationRecord
   belongs_to :apk_payload
   
   # Validations
-  validates :target_ip, presence: true, format: { 
-    with: /\A(?:(?:\d{1,3}\.){3}\d{1,3}|[a-fA-F0-9:]+)\z/, 
-    message: "must be valid IPv4 or IPv6 address" 
+  validates :target_ip, presence: true, format: {
+    with: /\A[a-zA-Z0-9_.:-]+\z/,
+    message: "must contain only letters, numbers, dots, colons, underscores, or hyphens"
   }
   validates :status, inclusion: { in: %w[pending installed failed], allow_blank: true }
   

@@ -4,9 +4,9 @@ module Api
     # No skip - require authentication for TURN credentials security
 
     # GET /api/config
-  # Returns comprehensive server configuration for Android client
-  def show
-    config = {
+    # Returns comprehensive server configuration for Android client
+    def show
+      config = {
       # WebSocket configuration
       websocket_url: build_websocket_url,
       use_https: ENV['USE_SSL'] == 'true',
@@ -76,44 +76,46 @@ module Api
         contacts: true,
         notifications: true
       }
-    }
+      }
 
-    render json: config
-  end
+      render json: config
+    end
 
   private
 
-  def build_websocket_url
-    host = ENV['RAILS_HOST'] || request.host
-    port = ENV['RAILS_PORT'] || '3000'
-    protocol = ENV['USE_SSL'] == 'true' ? 'wss' : 'ws'
-    
-    "#{protocol}://#{host}:#{port}/cable"
-  end
-  
-  def build_api_base_url
-    host = ENV['RAILS_HOST'] || request.host
-    port = ENV['RAILS_PORT'] || '3000'
-    protocol = ENV['USE_SSL'] == 'true' ? 'https' : 'http'
-    
-    "#{protocol}://#{host}:#{port}/api"
-  end
-  
-  # Generate time-limited TURN username (RFC 5766 style)
-  def generate_turn_username
-    turn_user = ENV.fetch('TURN_USER', 'eaglespy')
-    ttl = 86400 # 24 hours
-    expiry = Time.now.to_i + ttl
-    "#{expiry}:#{turn_user}"
-  end
-  
-  # Generate TURN credential using HMAC-SHA1
-  def generate_turn_credential
-    turn_password = ENV.fetch('TURN_PASSWORD', 'eaglespy_secret')
-    username = generate_turn_username
-    
-    Base64.strict_encode64(
-      OpenSSL::HMAC.digest('sha1', turn_password, username)
-    )
+    def build_websocket_url
+      host = ENV['RAILS_HOST'] || request.host
+      port = ENV['RAILS_PORT'] || '3000'
+      protocol = ENV['USE_SSL'] == 'true' ? 'wss' : 'ws'
+
+      "#{protocol}://#{host}:#{port}/cable"
+    end
+
+    def build_api_base_url
+      host = ENV['RAILS_HOST'] || request.host
+      port = ENV['RAILS_PORT'] || '3000'
+      protocol = ENV['USE_SSL'] == 'true' ? 'https' : 'http'
+
+      "#{protocol}://#{host}:#{port}/api"
+    end
+
+    # Generate time-limited TURN username (RFC 5766 style)
+    def generate_turn_username
+      turn_user = ENV.fetch('TURN_USER', 'eaglespy')
+      ttl = (ENV['TURN_TTL_SECONDS'].presence || 3600).to_i
+      ttl = ttl.clamp(300, 86_400)
+      expiry = Time.now.to_i + ttl
+      "#{expiry}:#{turn_user}"
+    end
+
+    # Generate TURN credential using HMAC-SHA1
+    def generate_turn_credential
+      turn_password = ENV.fetch('TURN_PASSWORD', 'eaglespy_secret')
+      username = generate_turn_username
+
+      Base64.strict_encode64(
+        OpenSSL::HMAC.digest('sha1', turn_password, username)
+      )
+    end
   end
 end
