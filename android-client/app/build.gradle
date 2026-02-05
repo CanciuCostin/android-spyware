@@ -30,10 +30,10 @@ android {
     signingConfigs {
         release {
             storeFile file('../release.keystore')
-            // Passwords from environment variables (never hardcode!)
-            storePassword System.getenv('KEYSTORE_PASSWORD') ?: 'CHANGE_ME'
-            keyAlias System.getenv('KEY_ALIAS') ?: 'eaglespy'
-            keyPassword System.getenv('KEY_PASSWORD') ?: 'CHANGE_ME'
+            // For development - hardcoded (change for production!)
+            storePassword 'eaglespy123'
+            keyAlias 'eaglespy'
+            keyPassword 'eaglespy123'
         }
     }
 

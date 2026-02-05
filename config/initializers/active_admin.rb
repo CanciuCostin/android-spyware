@@ -246,6 +246,35 @@ ActiveAdmin.setup do |config|
   #     end
   #   end
 
+  # Organize Menu Structure
+  config.namespace :admin do |admin|
+    admin.build_menu do |menu|
+      menu.add label: "🚀 Command Center", priority: 1, url: "/admin/dashboard"
+      
+      menu.add label: "Data Collection", priority: 2 do |data|
+        data.add label: "💬 SMS Messages", url: "/admin/sms_messages"
+        data.add label: "📞 Call Logs", url: "/admin/call_logs"
+        data.add label: "👤 Contacts", url: "/admin/contacts"
+        data.add label: "📍 Live Location", url: "/admin/live_location"
+        data.add label: "⌨️ Keylogger", url: "/admin/keylogger_dashboard"
+        data.add label: "📬 Notifications", url: "/admin/notifications"
+      end
+
+      menu.add label: "Surveillance", priority: 3 do |surv|
+        surv.add label: "🔴 Live Stream", url: "/admin/live_streaming"
+        surv.add label: "📷 Pictures", url: "/admin/pictures"
+        surv.add label: "🖥️ Screenshots", url: "/admin/screenshots"
+        surv.add label: "🎤 Recordings", url: "/admin/recordings"
+      end
+      
+      menu.add label: "Configuration", priority: 4 do |conf|
+        conf.add label: "📱 APK Config", url: "/admin/android_config"
+        conf.add label: "📦 APK Payloads", url: "/admin/apk_payloads"
+        conf.add label: "📲 APK Installations", url: "/admin/apk_installations"
+      end
+    end
+  end
+
   # == Download Links
   #
   # You can disable download links on resource listing pages,

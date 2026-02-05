@@ -61,10 +61,19 @@ module Api
         Time.current.strftime('%Y-%m-%d %H:%M:%S')
       end
 
+      # Strong parameters with explicit type casting for security
+      lat_value = params[:latitude].to_f
+      long_value = params[:longitude].to_f
+      
+      # Validate coordinate ranges
+      unless lat_value.between?(-90, 90) && long_value.between?(-180, 180)
+        return render json: { error: 'Invalid coordinates' }, status: :unprocessable_entity
+      end
+
       GeoLocation.create!(
         smartphone: smartphone,
-        lat: params[:latitude],
-        long: params[:longitude],
+        latitude: lat_value,
+        longitude: long_value,
         date: formatted_time
       )
 

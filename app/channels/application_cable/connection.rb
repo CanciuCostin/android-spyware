@@ -23,7 +23,8 @@ module ApplicationCable
         reject_unauthorized_connection
       end
       
-      if device_token.blank? || device_token != expected_token
+      # Security: Use constant-time comparison to prevent timing attacks
+      if device_token.blank? || !ActiveSupport::SecurityUtils.secure_compare(device_token, expected_token)
         logger.warn "ActionCable auth failed: Invalid or missing token"
         raise ActiveRecord::RecordNotFound
       end

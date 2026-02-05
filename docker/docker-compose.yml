@@ -13,7 +13,8 @@ services:
       - "8080:3000"
     volumes:
       - ../:/app/android-spyware
-      - //var/run/docker.sock://var/run/docker.sock
+      # SECURITY: Docker socket mount removed - container escape risk
+      # - //var/run/docker.sock://var/run/docker.sock
     working_dir: /app/android-spyware
     entrypoint: >
       sh -c "rm -f tmp/pids/server.pid && 
@@ -76,7 +77,9 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}"
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
   coturn:
     image: coturn/coturn:latest
     container_name: coturn

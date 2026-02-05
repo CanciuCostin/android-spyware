@@ -1,6 +1,160 @@
-div.columns:nth-child(3) > div.column > div.panel > div.panel_contents {
-  width: auto;
+/* Dashboard Styles - Merged from inline CSS */
+.empty-state {
+  text-align: center;
+  padding: 50px;
+  color: #8b949e;
 }
+
+.apk-link {
+  font-family: monospace;
+  background: #161b22;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.device-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.device-card {
+  background: linear-gradient(145deg, #1e1e2f, #27293d);
+  border: 1px solid #30363d;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.2s;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  
+  .panel_contents {
+    padding: 0 !important;
+  }
+}
+
+.device-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid #30363d;
+}
+
+.device-icon {
+  font-size: 40px;
+  margin-right: 15px;
+  background: rgba(255,255,255,0.1);
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.device-details h3 {
+  margin: 0 0 5px 0;
+  color: white;
+  font-size: 18px;
+}
+
+.device-os {
+  display: block;
+  color: #8b949e;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.control-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: #30363d; /* Gap color */
+}
+
+.control-btn {
+  background: #27293d;
+  color: #c9d1d9;
+  text-decoration: none;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  border: none;
+  height: 100px;
+  
+  &:hover {
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .label {
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  /* Specific Button Colors on Hover */
+  &.camera:hover { background: #f5576c; } /* Red/Pink */
+  &.video:hover { background: #f093fb; } /* Purple */
+  &.audio:hover { background: #4facfe; } /* Blue */
+  &.location:hover { background: #43e97b; } /* Green */
+  &.keylogs:hover { background: #ff9a9e; } /* Peach/Pink */
+  &.sms:hover { background: #ffecd2; color: #333 !important; } /* Light Orange */
+}
+
+/* Stats Panel */
+.stats-panel {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  
+  .panel_contents {
+    padding: 0 !important;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  background: #27293d;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid #30363d;
+  
+  h3 {
+    font-size: 32px;
+    margin: 0;
+    color: #fff;
+  }
+  
+  p {
+    margin: 5px 0 0;
+    color: #8b949e;
+    font-size: 14px;
+  }
+}
+
+/* Legacy styles below - to be cleaned up */
 
 div.columns:nth-child(3) > div.column:first-child > div.panel {
   margin-bottom: 0;

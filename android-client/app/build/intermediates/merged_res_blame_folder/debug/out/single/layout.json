@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.google.android.systemservice.app-mergeDebugResources-40:/layout/activity_main.xml",
+        "source": "com.google.android.systemservice.app-main-43:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-mergeDebugResources-40:/layout/activity_setup_wizard.xml",
+        "source": "com.google.android.systemservice.app-main-43:/layout/activity_setup_wizard.xml"
+    }
+]

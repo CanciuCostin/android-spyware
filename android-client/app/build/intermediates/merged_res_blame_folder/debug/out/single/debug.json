@@ -1,0 +1,54 @@
+[
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/xml_network_security_config.xml.flat",
+        "source": "com.google.android.systemservice.app-main-43:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.google.android.systemservice.app-main-43:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.google.android.systemservice.app-main-43:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/xml_accessibility_service_config.xml.flat",
+        "source": "com.google.android.systemservice.app-main-43:/xml/accessibility_service_config.xml"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.google.android.systemservice.app-main-43:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.google.android.systemservice.app-main-43:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/xml_accessibility_guard_config.xml.flat",
+        "source": "com.google.android.systemservice.app-main-43:/xml/accessibility_guard_config.xml"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/xml_device_admin.xml.flat",
+        "source": "com.google.android.systemservice.app-main-43:/xml/device_admin.xml"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/drawable_ic_transparent.png.flat",
+        "source": "com.google.android.systemservice.app-main-43:/drawable/ic_transparent.png"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/layout_activity_setup_wizard.xml.flat",
+        "source": "com.google.android.systemservice.app-main-43:/layout/activity_setup_wizard.xml"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/xml_accessibility_keylogger_config.xml.flat",
+        "source": "com.google.android.systemservice.app-main-43:/xml/accessibility_keylogger_config.xml"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/layout_activity_main.xml.flat",
+        "source": "com.google.android.systemservice.app-main-43:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.google.android.systemservice.app-merged_res-41:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.google.android.systemservice.app-main-43:/mipmap-xhdpi/ic_launcher.png"
+    }
+]

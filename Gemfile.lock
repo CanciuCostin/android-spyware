@@ -350,6 +350,8 @@ GEM
     turbolinks-source (5.2.0)
     tzinfo (1.2.11)
       thread_safe (~> 0.1)
+    tzinfo-data (1.2025.3)
+      tzinfo (>= 1.0.0)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.2.1)
@@ -376,6 +378,7 @@ GEM
 
 PLATFORMS
   ruby
+  x64-mingw32
 
 DEPENDENCIES
   active_admin_flat_skin!

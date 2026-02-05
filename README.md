@@ -26,22 +26,23 @@
 ## 🚀 V5 Modernization Update (2026)
 This project has been heavily refactored and modernized. Key improvements:
 
-*   **Cyberpunk Dark UI**: Complete re-skin of ActiveAdmin with a hacker-themed palette.
-*   **Live Audio Streaming**: New HTML5 audio player for recordings.
-*   **Map Visualization**: Google Maps integration for device tracking.
-*   **Security**: Externalized credentials to `.env`, Basic Auth Rate Limiting (Rack Attack).
+*   **Security Hardening**: Fixed critical vulnerabilities (SQL injection, path traversal, default credentials).
+*   **Command Center**: Redesigned dashboard for faster access to core actions.
+*   **Live Audio/Video**: Improved WebRTC streaming with TURN server support.
+*   **Keylogger 2.0**: Persistent storage, sensitive field detection, and advanced analytics.
+*   **Map Visualization**: Real-time Google Maps integration with path tracking.
 *   **Docker Optimization**: 50% smaller images using multi-stage builds.
-*   **Observability**: OpenTelemetry & Jaeger tracing integrated.
 
 ### Quick Start (V5)
 1.  Copy environment variables: `cp .env.example .env`
-2.  Edit `.env` with your API keys and credentials.
+2.  **CRITICAL**: Generate secure credentials! See `docs/SECURITY_SETUP.md`.
 3.  Build and Run:
     ```sh
     docker-compose build
     docker-compose up -d
     ```
-4.  Access Admin UI at `http://localhost:3000/admin`.
+4.  Access Admin UI at `http://localhost:8080/admin`.
+    Default user: `admin@eaglespy.local` (Check .env for password)
 
 
 ## Support The Project

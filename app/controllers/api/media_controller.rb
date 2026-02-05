@@ -1,5 +1,20 @@
 module Api
   class MediaController < Api::BaseController
+    # Security: Helper to validate and secure file paths
+    def secure_filepath(base_dir, filename)
+      # Clean the filename from any directory traversal attempts
+      safe_filename = File.basename(filename)
+      full_path = Rails.root.join(base_dir, safe_filename).cleanpath
+      
+      # Ensure the path is within the intended directory
+      base_path = Rails.root.join(base_dir).cleanpath
+      unless full_path.to_s.start_with?(base_path.to_s)
+        raise SecurityError, "Path traversal attempt detected: #{filename}"
+      end
+      
+      full_path
+    end
+
     def upload_photo
       device_id = params[:device_id] || request.headers['X-Device-ID']
       return render json: { error: 'Missing device_id' }, status: :bad_request if device_id.blank?
@@ -23,7 +38,7 @@ module Api
         return unless reject_oversize!(params[:file].size, 'photo upload')
         
         filename = "photo_#{sanitize_device_id(device_id)}_#{Time.now.to_i}_#{SecureRandom.uuid}#{ext}"
-        filepath = Rails.root.join('files', 'dumps', 'photos', filename)
+        filepath = secure_filepath('files/dumps/photos', filename)
         FileUtils.mkdir_p(File.dirname(filepath))
         File.open(filepath, 'wb') { |f| f.write(params[:file].read) }
         
@@ -37,7 +52,7 @@ module Api
         decoded = Base64.decode64(base64_data)
         return unless reject_oversize!(decoded.bytesize, 'photo upload')
         filename = "photo_#{sanitize_device_id(device_id)}_#{Time.now.to_i}_#{SecureRandom.uuid}.jpg"
-        filepath = Rails.root.join('files', 'dumps', 'photos', filename)
+        filepath = secure_filepath('files/dumps/photos', filename)
         FileUtils.mkdir_p(File.dirname(filepath))
         File.open(filepath, 'wb') { |f| f.write(decoded) }
         
@@ -78,7 +93,7 @@ module Api
         return unless reject_oversize!(params[:file].size, 'audio upload')
         
         filename = "audio_#{sanitize_device_id(device_id)}_#{Time.now.to_i}_#{SecureRandom.uuid}#{ext}"
-        filepath = Rails.root.join('files', 'dumps', 'audio', filename)
+        filepath = secure_filepath('files/dumps/audio', filename)
         FileUtils.mkdir_p(File.dirname(filepath))
         File.open(filepath, 'wb') { |f| f.write(params[:file].read) }
         
@@ -93,7 +108,7 @@ module Api
         decoded = Base64.decode64(base64_data)
         return unless reject_oversize!(decoded.bytesize, 'audio upload')
         filename = "audio_#{sanitize_device_id(device_id)}_#{Time.now.to_i}_#{SecureRandom.uuid}.mp3"
-        filepath = Rails.root.join('files', 'dumps', 'audio', filename)
+        filepath = secure_filepath('files/dumps/audio', filename)
         FileUtils.mkdir_p(File.dirname(filepath))
         File.open(filepath, 'wb') { |f| f.write(decoded) }
         

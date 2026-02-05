@@ -35,8 +35,8 @@
 
   <!-- Pressing on an unselected display will select it. So we use values for selected (checked) container color here. -->
   <item android:alpha="@dimen/m3_comp_time_picker_time_selector_pressed_state_layer_opacity"
-        android:color="?attr/colorOnPrimaryContainer"
-        android:state_pressed="true"/>  <!-- TODO(b/247609386) Use token when value is updated as is. -->
+        android:color="@macro/m3_comp_time_picker_time_selector_unselected_pressed_state_layer_color"
+        android:state_pressed="true"/>
   <item android:alpha="@dimen/m3_comp_time_picker_time_selector_focus_state_layer_opacity"
         android:color="@macro/m3_comp_time_picker_time_selector_unselected_focus_state_layer_color"
         android:state_focused="true"/>

@@ -80,5 +80,5 @@ production:
   <<: *default
   database: android_spyware_production
   username: postgres
+  password: <%= ENV['ANDROIDSPYWARE_DATABASE_PASSWORD'] %>
   host: <%= ENV['ANDROIDSPYWARE_DATABASE_HOST'] %>
-#<%= ENV['ANDROIDSPYWARE_DATABASE_PASSWORD'] %>
