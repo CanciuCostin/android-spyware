@@ -1,6 +1,5 @@
 module Api
-  class NotificationsController < ApplicationController
-    skip_before_action :verify_authenticity_token
+  class NotificationsController < Api::BaseController
     
     # POST /api/notifications
     def receive

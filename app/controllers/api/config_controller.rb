@@ -1,8 +1,9 @@
 # API endpoint for Android client configuration (ENHANCED)
-class Api::ConfigController < ApplicationController
-  skip_before_action :verify_authenticity_token
+module Api
+  class ConfigController < Api::BaseController
+    # No skip - require authentication for TURN credentials security
 
-  # GET /api/config
+    # GET /api/config
   # Returns comprehensive server configuration for Android client
   def show
     config = {
@@ -25,8 +26,8 @@ class Api::ConfigController < ApplicationController
       turn_servers: [
         {
           url: "turn:#{ENV['TURN_SERVER'] || '213.91.211.150:3478'}",
-          username: ENV['TURN_USER'] || 'eaglespy',
-          credential: ENV['TURN_PASSWORD'] || 'EagleSpy2024Secure!'
+          username: generate_turn_username,
+          credential: generate_turn_credential
         }
       ],
       stun_servers: [
@@ -96,5 +97,23 @@ class Api::ConfigController < ApplicationController
     protocol = ENV['USE_SSL'] == 'true' ? 'https' : 'http'
     
     "#{protocol}://#{host}:#{port}/api"
+  end
+  
+  # Generate time-limited TURN username (RFC 5766 style)
+  def generate_turn_username
+    turn_user = ENV.fetch('TURN_USER', 'eaglespy')
+    ttl = 86400 # 24 hours
+    expiry = Time.now.to_i + ttl
+    "#{expiry}:#{turn_user}"
+  end
+  
+  # Generate TURN credential using HMAC-SHA1
+  def generate_turn_credential
+    turn_password = ENV.fetch('TURN_PASSWORD', 'eaglespy_secret')
+    username = generate_turn_username
+    
+    Base64.strict_encode64(
+      OpenSSL::HMAC.digest('sha1', turn_password, username)
+    )
   end
 end

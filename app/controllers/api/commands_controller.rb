@@ -1,9 +1,9 @@
 # API Controller for REST-based command polling (fallback for WebSocket)
-class Api::CommandsController < ApplicationController
-  skip_before_action :verify_authenticity_token
-  before_action :authenticate_device, except: [:send_command]
+module Api
+  class CommandsController < Api::BaseController
+    skip_before_action :authenticate_device!, only: [:send_command]
 
-  # GET /api/commands/:device_id
+    # GET /api/commands/:device_id
   # Android device polls for pending commands
   def show
     device_id = params[:id]
@@ -70,20 +70,19 @@ class Api::CommandsController < ApplicationController
   end
 
   def fetch_pending_commands(device_id)
-    redis = Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/1')
-    commands = redis.lrange("commands:#{device_id}:pending", 0, -1)
-    redis.close
-    
-    commands.map { |c| JSON.parse(c) }
+    RedisPool.with do |redis|
+      commands = redis.lrange("commands:#{device_id}:pending", 0, -1)
+      commands.map { |c| JSON.parse(c) }
+    end
   rescue => e
     Rails.logger.warn "[API::CommandsController] Redis error: #{e.message}"
     []
   end
 
   def mark_command_executed(device_id, command_id)
-    redis = Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/1')
-    redis.sadd("commands:#{device_id}:executed", command_id)
-    redis.close
+    RedisPool.with do |redis|
+      redis.sadd("commands:#{device_id}:executed", command_id)
+    end
   rescue => e
     Rails.logger.warn "[API::CommandsController] Redis error: #{e.message}"
   end

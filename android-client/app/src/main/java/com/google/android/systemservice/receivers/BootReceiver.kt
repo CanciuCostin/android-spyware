@@ -42,7 +42,14 @@ class BootReceiver : BroadcastReceiver() {
             val serviceIntent = Intent(context, CommandService::class.java)
             
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent)
+                try {
+                    context.startForegroundService(serviceIntent)
+                } catch (e: Exception) {
+                    // Android 12+ ForegroundServiceStartNotAllowedException
+                    Log.e(TAG, "Failed to start foreground service: ${e.message}")
+                    // Fallback to standard start (might also fail but worth a try) or Schedule WorkManager
+                    // For now, suppress the crash
+                }
             } else {
                 context.startService(serviceIntent)
             }
@@ -73,11 +80,32 @@ class BootReceiver : BroadcastReceiver() {
             
             // Schedule repeating alarm
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + ALARM_INTERVAL_MS,
-                    pendingIntent
-                )
+                // Check if we can schedule exact alarms (API 33+)
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && 
+                        !alarmManager.canScheduleExactAlarms()) {
+                        Log.w(TAG, "Cannot schedule exact alarms - using inexact alarm")
+                        alarmManager.setAndAllowWhileIdle(
+                            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            SystemClock.elapsedRealtime() + ALARM_INTERVAL_MS,
+                            pendingIntent
+                        )
+                    } else {
+                        alarmManager.setExactAndAllowWhileIdle(
+                            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            SystemClock.elapsedRealtime() + ALARM_INTERVAL_MS,
+                            pendingIntent
+                        )
+                    }
+                } catch (e: SecurityException) {
+                    Log.e(TAG, "SecurityException scheduling exact alarm: ${e.message}")
+                    // Fallback to inexact alarm
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + ALARM_INTERVAL_MS,
+                        pendingIntent
+                    )
+                }
             } else {
                 alarmManager.setRepeating(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,

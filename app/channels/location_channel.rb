@@ -17,8 +17,8 @@ class LocationChannel < ApplicationCable::Channel
     smartphone = Smartphone.find_by(id: device_id)
     if smartphone
       GeoLocation.create!(
-        lat: data['lat'],
-        long: data['lng'],
+        latitude: data['lat'],
+        longitude: data['lng'],
         date: Time.current.strftime("%Y-%m-%d %H:%M:%S"),
         smartphone_id: smartphone.id
       )
@@ -33,6 +33,10 @@ class LocationChannel < ApplicationCable::Channel
         lat: data['lat'],
         lng: data['lng'],
         accuracy: data['accuracy'],
+  rescue StandardError => e
+    Rails.logger.error "[LocationChannel] Error updating location: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+  end
         speed: data['speed'],
         bearing: data['bearing'],
         timestamp: Time.current.to_i

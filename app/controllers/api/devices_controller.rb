@@ -1,23 +1,22 @@
 # API Controller for device status queries
-class Api::DevicesController < ApplicationController
-  skip_before_action :verify_authenticity_token
+module Api
+  class DevicesController < Api::BaseController
 
   # GET /api/devices/online
   # Returns list of currently connected devices
   def online
-    redis = Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/1')
-    device_ids = redis.smembers('online_devices')
-    
-    devices = device_ids.map do |device_id|
-      last_seen = redis.get("device:#{device_id}:last_seen")
-      {
-        device_id: device_id,
-        last_seen: last_seen ? Time.at(last_seen.to_i) : nil,
-        online: true
-      }
+    devices = RedisPool.with do |redis|
+      device_ids = redis.smembers('online_devices')
+      
+      device_ids.map do |device_id|
+        last_seen = redis.get("device:#{device_id}:last_seen")
+        {
+          device_id: device_id,
+          last_seen: last_seen ? Time.at(last_seen.to_i) : nil,
+          online: true
+        }
+      end
     end
-    
-    redis.close
     
     render json: { devices: devices, count: devices.size }
   rescue => e

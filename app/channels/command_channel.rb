@@ -38,6 +38,9 @@ class CommandChannel < ApplicationCable::Channel
     else
       Rails.logger.warn "[CommandChannel] Unknown message type: #{message_type}"
     end
+  rescue StandardError => e
+    Rails.logger.error "[CommandChannel] Error processing message: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
   end
 
   # Process device info response
@@ -131,18 +134,18 @@ class CommandChannel < ApplicationCable::Channel
   private
 
   def register_device_online
-    redis = Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/1')
-    redis.sadd('online_devices', @device_id)
-    redis.set("device:#{@device_id}:last_seen", Time.current.to_i)
-    redis.close
+    RedisPool.with do |redis|
+      redis.sadd('online_devices', @device_id)
+      redis.set("device:#{@device_id}:last_seen", Time.current.to_i)
+    end
   rescue => e
     Rails.logger.warn "[CommandChannel] Redis error: #{e.message}"
   end
 
   def register_device_offline
-    redis = Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/1')
-    redis.srem('online_devices', @device_id)
-    redis.close
+    RedisPool.with do |redis|
+      redis.srem('online_devices', @device_id)
+    end
   rescue => e
     Rails.logger.warn "[CommandChannel] Redis error: #{e.message}"
   end
