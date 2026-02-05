@@ -8,5 +8,7 @@ test:
 
 production:
   adapter: redis
-  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
+  # Redis URL with optional password: redis://:password@localhost:6379/1
+  # For security, always use REDIS_URL environment variable in production
+  url: <%= ENV.fetch("REDIS_URL") { raise "REDIS_URL must be set in production" } %>
   channel_prefix: androidspyware_production

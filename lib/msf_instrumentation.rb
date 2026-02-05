@@ -70,7 +70,8 @@ module MsfInstrumentation
 
   module ApplicationControllerMixin
     def start_msf_process_traced(command)
-      SpywareTracing.trace_session_command('active_session', command) do |span|
+      redacted_command = command.gsub(/(password|token|key|secret)=[^&\s]*/i, '\1=[REDACTED]')
+      SpywareTracing.trace_session_command('active_session', redacted_command) do |span|
         begin
           increment_running_processes
           Timeout.timeout((ENV['MSF_TIMEOUT_SECONDS'].presence || 20).to_i) do

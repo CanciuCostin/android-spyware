@@ -8,29 +8,20 @@ class ApplicationController < ActionController::Base
   # SonarQube Fix: Use instance variables with memoization instead of class variables
   # Rule S1121 - Class variables create thread-safety issues
   class << self
-    attr_accessor :adb_target, :adb_connected, :msf_connected,
-                  :cpu_usage, :memory_usage, :storage,
-                  :nr_finished_processes, :nr_running_processes,
-                  :sound_mode, :adb_started, :ip_address,
-                  :operating_system, :is_rooted, :battery_level, :local_hour
-  end
+    %i[adb_target adb_connected msf_connected
+       cpu_usage memory_usage storage
+       nr_finished_processes nr_running_processes
+       sound_mode adb_started ip_address
+       operating_system is_rooted battery_level local_hour].each do |var|
+      define_method(var) do
+        Rails.cache.read("eaglespy:global:#{var}")
+      end
 
-  # Initialize defaults
-  self.adb_target = nil
-  self.adb_connected = false
-  self.msf_connected = false
-  self.cpu_usage = 0
-  self.memory_usage = 0
-  self.storage = 0
-  self.nr_finished_processes = 0
-  self.nr_running_processes = 0
-  self.sound_mode = 2
-  self.adb_started = false
-  self.ip_address = "Unknown"
-  self.operating_system = "Unknown"
-  self.is_rooted = "Unknown"
-  self.battery_level = "Unknown"
-  self.local_hour = "Unknown"
+      define_method("#{var}=") do |value|
+        Rails.cache.write("eaglespy:global:#{var}", value)
+      end
+    end
+  end
 
   # SonarQube Fix: Use centralized services instead of duplicated code
   def get_active_session_id(_smartphone = nil)
@@ -108,8 +99,26 @@ class ApplicationController < ActionController::Base
 
   def check_adb_connection
     self.class.adb_target = Rails.configuration.spyware_config["target_ip"]
+    adb_host = CredentialsService.adb_host
     
-    adb_devices = `adb -H #{CredentialsService.adb_host} devices`.split("\n")
+    # Validate ADB_HOST to prevent command injection
+    unless adb_host =~ /\A[a-zA-Z0-9.\-]+\z/
+      Rails.logger.error("[ApplicationController] Invalid ADB_HOST: #{adb_host}")
+      self.class.adb_connected = false
+      return
+    end
+    
+    # Use Open3 for safe command execution
+    require 'open3'
+    stdout, stderr, status = Open3.capture3('adb', '-H', adb_host, 'devices')
+    
+    unless status.success?
+      Rails.logger.error("[ApplicationController] ADB devices command failed: #{stderr}")
+      self.class.adb_connected = false
+      return
+    end
+    
+    adb_devices = stdout.split("\n")
     target = self.class.adb_target
     
     connected = if target == "usb"

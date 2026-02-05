@@ -47,9 +47,12 @@ class CommandChannel < ApplicationCable::Channel
   def process_device_info(payload)
     smartphone = find_or_create_smartphone
     
+    name_val = payload['model'] || "Device #{@device_id[0..7]}"
+    os_val = "Android #{payload['android_version']}"
+
     smartphone.update(
-      name: payload['model'] || "Device #{@device_id[0..7]}",
-      operating_system: "Android #{payload['android_version']}",
+      name: name_val.to_s.truncate(255),
+      operating_system: os_val.to_s.truncate(100),
       is_rooted: payload['is_rooted'] || false
     )
     
@@ -72,9 +75,12 @@ class CommandChannel < ApplicationCable::Channel
   def device_info(data)
     smartphone = Smartphone.find_by(device_id: @device_id)
     if smartphone
+      name_val = data['model']
+      os_val = "Android #{data['os_version']}"
+
       smartphone.update(
-        name: data['model'],
-        operating_system: "Android #{data['os_version']}",
+        name: name_val.to_s.truncate(255),
+        operating_system: os_val.to_s.truncate(100),
         is_rooted: data['is_rooted'] || false,
         last_seen_at: Time.current
       )

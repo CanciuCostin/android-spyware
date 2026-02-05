@@ -33,15 +33,14 @@ class LocationChannel < ApplicationCable::Channel
         lat: data['lat'],
         lng: data['lng'],
         accuracy: data['accuracy'],
-  rescue StandardError => e
-    Rails.logger.error "[LocationChannel] Error updating location: #{e.message}"
-    Rails.logger.error e.backtrace.join("\n")
-  end
         speed: data['speed'],
         bearing: data['bearing'],
         timestamp: Time.current.to_i
       }
     )
+  rescue StandardError => e
+    Rails.logger.error "[LocationChannel] Error updating location: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
   end
 
   # Admin subscribes to watch a device's location

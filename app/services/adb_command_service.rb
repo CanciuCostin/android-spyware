@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'shellwords'
+require 'open3'
 
 # Secure ADB command execution with command injection prevention
 # SonarQube Rule: S2076 - Command injection prevention
@@ -22,18 +23,18 @@ class AdbCommandService
   # SonarQube: Command injection prevented via sanitization
   def shell(command)
     validate_command!(command)
-    execute("shell #{Shellwords.escape(command)}")
+    execute('shell', command)
   end
 
   # Execute raw ADB command (internal use only)
-  def execute(adb_command)
-    full_command = build_adb_command(adb_command)
+  def execute(*args)
+    full_command = build_adb_command_array(args)
     Rails.logger.debug("Executing ADB: #{full_command}")
     
-    result = `#{full_command}`
-    raise CommandError, "ADB command failed" unless $?.success?
+    stdout, stderr, status = Open3.capture3(*full_command)
+    raise CommandError, "ADB command failed: #{stderr}" unless status.success?
     
-    result
+    stdout
   rescue StandardError => e
     Rails.logger.error("ADB command failed: #{e.message}")
     raise CommandError, e.message
@@ -41,16 +42,12 @@ class AdbCommandService
 
   # Safe file pull
   def pull(remote_path, local_path)
-    sanitized_remote = Shellwords.escape(remote_path)
-    sanitized_local = Shellwords.escape(local_path)
-    execute("pull #{sanitized_remote} #{sanitized_local}")
+    execute('pull', remote_path, local_path)
   end
 
   # Safe file push
   def push(local_path, remote_path)
-    sanitized_local = Shellwords.escape(local_path)
-    sanitized_remote = Shellwords.escape(remote_path)
-    execute("push #{sanitized_local} #{sanitized_remote}")
+    execute('push', local_path, remote_path)
   end
 
   # Get device property safely
@@ -130,10 +127,10 @@ class AdbCommandService
     end
   end
 
-  def build_adb_command(adb_command)
-    base = "adb -H #{Shellwords.escape(@adb_host)}"
-    base += " -s #{Shellwords.escape(@target)}" unless @target == 'usb'
-    "#{base} #{adb_command}"
+  def build_adb_command_array(args)
+    cmd = ['adb', '-H', @adb_host]
+    cmd += ['-s', @target] unless @target == 'usb'
+    cmd + args
   end
 
   def parse_cpu_stat

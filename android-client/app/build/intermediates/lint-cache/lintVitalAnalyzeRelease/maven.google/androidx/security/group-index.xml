@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<androidx.security>
+  <security-app-authenticator versions="1.0.0-alpha01,1.0.0-alpha02,1.0.0-alpha03,1.0.0-beta01,1.0.0-rc01,1.0.0"/>
+  <security-app-authenticator-testing versions="1.0.0-alpha01,1.0.0-alpha02,1.0.0-beta01,1.0.0-rc01,1.0.0"/>
+  <security-crypto versions="1.0.0-alpha01,1.0.0-alpha02,1.0.0-beta01,1.0.0-rc01,1.0.0-rc02,1.0.0-rc03,1.0.0-rc04,1.0.0,1.1.0-alpha01,1.1.0-alpha02,1.1.0-alpha03,1.1.0-alpha04,1.1.0-alpha05,1.1.0-alpha06,1.1.0-alpha07,1.1.0-beta01,1.1.0"/>
+  <security-crypto-ktx versions="1.1.0-alpha02,1.1.0-alpha03,1.1.0-alpha04,1.1.0-alpha05,1.1.0-alpha06,1.1.0-alpha07,1.1.0-beta01,1.1.0"/>
+  <security-identity-credential versions="1.0.0-alpha01,1.0.0-alpha02,1.0.0-alpha03"/>
+  <security-state versions="1.0.0-alpha01,1.0.0-alpha02,1.0.0-alpha03,1.0.0-alpha04,1.0.0-alpha05,1.0.0-beta01"/>
+  <security-state-provider versions="1.0.0-alpha01"/>
+</androidx.security>

@@ -152,7 +152,8 @@ Devise.setup do |config|
 
   # ==> Configuration for :rememberable
   # The time the user will be remembered without asking for credentials again.
-  # config.remember_for = 2.weeks
+  # Security: Limit remember_me to 1 week instead of indefinite
+  config.remember_for = 1.week
 
   # Invalidates all the remember me tokens when the user signs out.
   config.expire_all_remember_me_on_sign_out = true
@@ -176,7 +177,8 @@ Devise.setup do |config|
   # ==> Configuration for :timeoutable
   # The time you want to timeout the user session without activity. After this
   # time the user will be asked for credentials again. Default is 30 minutes.
-  # config.timeout_in = 30.minutes
+  # Security: Enable session timeout (8 hours for admin panel)
+  config.timeout_in = 8.hours
 
   # ==> Configuration for :lockable
   # Defines which strategy will be used to lock an account.

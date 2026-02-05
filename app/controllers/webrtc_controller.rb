@@ -1,13 +1,14 @@
 # WebRTC Configuration Controller
 class WebrtcController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:turn_credentials]
+  before_action :authenticate_admin_user!, only: [:turn_credentials]
+  skip_before_action :verify_authenticity_token, only: [:signal]
 
   # GET /webrtc/turn_credentials
-  # Returns TURN server credentials for NAT traversal
+  # Returns TURN server credentials for NAT traversal (Admin only)
   def turn_credentials
     turn_server = ENV.fetch('TURN_SERVER', 'turn:localhost:3478')
-    turn_user = ENV.fetch('TURN_USER', 'eaglespy')
-    turn_password = ENV.fetch('TURN_PASSWORD', 'eaglespy_secret')
+    turn_user = ENV.fetch('TURN_USER', 'turnuser')
+    turn_password = ENV.fetch('TURN_PASSWORD', 'turnpassword')
 
     # Generate time-limited credentials (TURN REST API style)
     ttl = 86400 # 24 hours

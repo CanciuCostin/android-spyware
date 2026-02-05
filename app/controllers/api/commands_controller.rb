@@ -1,6 +1,7 @@
 # API Controller for REST-based command polling (fallback for WebSocket)
 module Api
   class CommandsController < Api::BaseController
+    before_action :authenticate_admin_user!, only: [:send_command]
     skip_before_action :authenticate_device!, only: [:send_command]
 
     # GET /api/commands/:device_id

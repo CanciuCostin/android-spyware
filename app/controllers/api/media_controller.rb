@@ -11,6 +11,14 @@ module Api
         ext = File.extname(params[:file].original_filename).downcase rescue '.jpg'
         allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
         ext = '.jpg' unless allowed_extensions.include?(ext)
+        
+        # Validate MIME type for security
+        content_type = params[:file].content_type.to_s.downcase
+        allowed_mimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp']
+        unless allowed_mimes.include?(content_type)
+          Rails.logger.warn("[MediaController] Rejected photo upload with invalid MIME: #{content_type}")
+          return render json: { error: 'Invalid file type' }, status: :unprocessable_entity
+        end
 
         return unless reject_oversize!(params[:file].size, 'photo upload')
         
@@ -58,6 +66,14 @@ module Api
         ext = File.extname(params[:file].original_filename).downcase rescue '.mp3'
         allowed_extensions = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac']
         ext = '.mp3' unless allowed_extensions.include?(ext)
+        
+        # Validate MIME type for security
+        content_type = params[:file].content_type.to_s.downcase
+        allowed_mimes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/mp4', 'audio/aac', 'audio/flac', 'audio/x-m4a']
+        unless allowed_mimes.include?(content_type)
+          Rails.logger.warn("[MediaController] Rejected audio upload with invalid MIME: #{content_type}")
+          return render json: { error: 'Invalid file type' }, status: :unprocessable_entity
+        end
 
         return unless reject_oversize!(params[:file].size, 'audio upload')
         

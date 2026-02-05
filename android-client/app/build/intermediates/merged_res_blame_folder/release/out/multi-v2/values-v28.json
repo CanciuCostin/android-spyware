@@ -1,0 +1,47 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.google.android.systemservice.app-mergeReleaseResources-39:/values-v28/values-v28.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\venci\\.gradle\\caches\\transforms-3\\42349fcab7a5a6a21b6eefeb34a9888a\\transformed\\appcompat-1.6.1\\res\\values-v28\\values-v28.xml",
+                    "from": {
+                        "startLines": "2,3,4,8",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,130,217,397",
+                        "endLines": "2,3,7,11",
+                        "endColumns": "74,86,12,12",
+                        "endOffsets": "125,212,392,584"
+                    },
+                    "to": {
+                        "startLines": "14,15,16,20",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "1142,1217,1304,1484",
+                        "endLines": "14,15,19,23",
+                        "endColumns": "74,86,12,12",
+                        "endOffsets": "1212,1299,1479,1671"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\venci\\.gradle\\caches\\transforms-3\\84114cdc67145947aeae5617e585aba8\\transformed\\material-1.11.0\\res\\values-v28\\values-v28.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,153,249,344,442,530,618,706,794,881,968,1055,1142",
+                        "endLines": "2,3,4,5,6,7,8,9,10,11,12,13,17",
+                        "endColumns": "97,95,94,97,87,87,87,87,86,86,86,86,10",
+                        "endOffsets": "148,244,339,437,525,613,701,789,876,963,1050,1137,1424"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,24",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,153,249,344,442,530,618,706,794,881,968,1055,1676",
+                        "endLines": "2,3,4,5,6,7,8,9,10,11,12,13,27",
+                        "endColumns": "97,95,94,97,87,87,87,87,86,86,86,86,10",
+                        "endOffsets": "148,244,339,437,525,613,701,789,876,963,1050,1137,1958"
+                    }
+                }
+            ]
+        }
+    ]
+}

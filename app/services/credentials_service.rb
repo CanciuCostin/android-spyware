@@ -5,13 +5,12 @@
 class CredentialsService
   class << self
     def msf_user
-      ENV.fetch('MSF_RPC_USER', 'msf_user')
+      ENV.fetch('MSF_USER', 'msf')
     end
 
     def msf_password
-      ENV.fetch('MSF_RPC_PASSWORD') do
-        Rails.logger.warn('MSF_RPC_PASSWORD not set! Using insecure default.')
-        'change_me_in_production'
+      ENV.fetch('MSF_PASS') do
+        raise 'MSF_PASS environment variable is not set! Security risk.'
       end
     end
 

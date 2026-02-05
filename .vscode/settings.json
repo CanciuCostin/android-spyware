@@ -8,6 +8,9 @@
     },
     "java:S1119": {
       "level": "off"
+    },
+    "secrets:S2068": {
+      "level": "off"
     }
   },
   "sonarlint.pathToNodeExecutable": "node",
@@ -15,7 +18,9 @@
     "**/build/**",
     "**/generated/**",
     "**/.gradle/**",
-    "**/intermediates/**"
+    "**/intermediates/**",
+    "**/.env",
+    "**/.env.*"
   ],
   "github.copilot.enable": {
     "plaintext": true,
@@ -55,5 +60,12 @@
   "chat.tools.terminal.blockDetectedFileWrites": "all",
   "chatgpt.commentCodeLensEnabled": true,
   "chatgpt.openOnStartup": false,
-  "chatgpt.runCodexInWindowsSubsystemForLinux": true
+  "chatgpt.runCodexInWindowsSubsystemForLinux": true,
+  "sonarlint.connectedMode.project": {
+    "connectionId": "amazon322",
+    "projectKey": "amazon322_ai_calorie_tracker"
+  },
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.shellIntegration.showWelcome": false
 }

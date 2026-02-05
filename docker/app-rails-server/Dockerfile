@@ -35,8 +35,8 @@ RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list \
     && sed -i '/buster-updates/d' /etc/apt/sources.list \
     && apt-get update -qq \
     && apt-get install -y --no-install-recommends \
+        libpq-dev \
         nodejs \
-        docker.io \
         postgresql-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

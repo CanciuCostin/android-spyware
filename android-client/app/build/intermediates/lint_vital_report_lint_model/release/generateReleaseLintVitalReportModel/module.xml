@@ -1,0 +1,18 @@
+<lint-module
+    format="1"
+    dir="E:\EagleSpy V5\android-client\app"
+    name=":app"
+    type="APP"
+    maven="EagleSpy:app:"
+    agpVersion="8.2.2"
+    buildFolder="build"
+    bootClassPath="C:\Users\venci\AppData\Local\Android\Sdk\platforms\android-34\android.jar;C:\Users\venci\AppData\Local\Android\Sdk\build-tools\34.0.0\core-lambda-stubs.jar"
+    javaSourceLevel="17"
+    compileTarget="android-34">
+  <lintOptions
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true"/>
+  <variant name="release"/>
+</lint-module>

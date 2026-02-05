@@ -1,5 +1,6 @@
 class SmartphonesController < InheritedResources::Base
-  @@isWebcamRecordOn = false
+  include CommandSender
+  # Thread-safe recording state managed via Smartphone.is_recording column
 
   def dump_sysinfo
     begin
@@ -57,6 +58,8 @@ class SmartphonesController < InheritedResources::Base
         render "webcam_record", locals: { commandOutput: commandOutput, fileName: @fileNameHtml }
       }
     end
+  end
+
   # Audio mode now handled by set_audio_mode below (uses ActionCable)
   
   def dump_wifi_info

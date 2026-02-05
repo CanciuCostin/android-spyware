@@ -19,7 +19,7 @@ module Api
         )
       elsif params[:data].present?
         payload = params[:data].to_json
-        return unless reject_oversize?(payload.bytesize, 'call logs upload')
+        return unless reject_oversize!(payload.bytesize, 'call logs upload')
         filename = "calls_#{sanitize_device_id(device_id)}_#{Time.now.to_i}.json"
         filepath = Rails.root.join('files', 'dumps', 'calls', filename)
         FileUtils.mkdir_p(File.dirname(filepath))
