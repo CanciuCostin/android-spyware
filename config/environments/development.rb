@@ -55,7 +55,19 @@ Rails.application.configure do
 
   # Allow Action Cable connections from external devices (e.g., Android client)
   config.action_cable.disable_request_forgery_protection = true
-  config.action_cable.allowed_request_origins = [/^http:\/\/.*/, /^https:\/\/.*/, /^ws:\/\/.*/, /^wss:\/\/.*/]
+  # SECURITY: Restrict origins to known hosts instead of allowing all
+  # In production, use specific domains; in development, allow localhost and common LAN IPs
+  config.action_cable.allowed_request_origins = [
+    /^http:\/\/localhost(:\d+)?$/,
+    /^http:\/\/127\.0\.0\.1(:\d+)?$/,
+    /^http:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/,
+    /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/,
+    /^ws:\/\/localhost(:\d+)?$/,
+    /^ws:\/\/127\.0\.0\.1(:\d+)?$/,
+    /^ws:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/,
+    /^ws:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/,
+    Rails.application.config.action_cable.url
+  ].compact
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true

@@ -68,6 +68,14 @@ module Api
     def save_media(notification, media_type, base64_data)
       return unless base64_data.present?
       
+      # SECURITY: Validate base64 length BEFORE decoding to prevent memory exhaustion
+      # Max 5MB encoded = ~3.75MB decoded (base64 is ~4/3 ratio)
+      max_base64_size = 5 * 1024 * 1024  # 5MB encoded
+      if base64_data.bytesize > max_base64_size
+        Rails.logger.warn "Rejected oversized base64 for #{media_type}: #{base64_data.bytesize} bytes"
+        return
+      end
+      
       binary_data = Base64.decode64(base64_data)
       return unless reject_oversize!(binary_data.bytesize, "notification #{media_type}")
       mime_type = detect_mime_type(binary_data)

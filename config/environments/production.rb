@@ -46,10 +46,18 @@ Rails.application.configure do
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  # Enable when SSL is configured - RECOMMENDED for production
+  config.force_ssl = ENV['USE_SSL'] == 'true'
 
-  # Allow all hosts (needed for VPS/domain deployment)
-  config.hosts.clear
+  # SECURITY: Only clear hosts if explicitly allowed via environment variable
+  # In production, prefer setting specific allowed hosts
+  if ENV['ALLOW_ALL_HOSTS'] == 'true'
+    config.hosts.clear
+  else
+    # Add your production domain(s) here
+    config.hosts << ENV['RAILS_HOST'] if ENV['RAILS_HOST'].present?
+    config.hosts << 'localhost'
+  end
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.

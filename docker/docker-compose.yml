@@ -56,7 +56,10 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
+      # SECURITY: Use password authentication instead of trust
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
   metasploit:
     container_name: kali_container
     image: costincanciu/android-spyware-msf:latest
@@ -82,7 +85,7 @@ services:
       - "3490:3478/udp"
     environment:
       TURN_USER: ${TURN_USER:-eaglespy}
-      TURN_PASSWORD: ${TURN_PASSWORD:-EagleSpy2024Secure!}
+      TURN_PASSWORD: ${TURN_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
     command: >
       -n
       --log-file=stdout
@@ -90,9 +93,9 @@ services:
       --max-port=49200
       --fingerprint
       --lt-cred-mech
-      --user=${TURN_USER:-eaglespy}:${TURN_PASSWORD:-EagleSpy2024Secure!}
-      --realm=213.91.211.150
-      --external-ip=213.91.211.150
+      --user=${TURN_USER:-eaglespy}:${TURN_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      --realm=${RAILS_HOST:-localhost}
+      --external-ip=${RAILS_HOST:-127.0.0.1}
       --listening-ip=0.0.0.0
       --no-stun
 volumes:

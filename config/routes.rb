@@ -105,7 +105,6 @@ Rails.application.routes.draw do
       post :dump_localtime
       post :uninstall_app
       post :install_app
-      post :uninstall_app
       post :list_apps
       post :open_app
       post :wake_lock
@@ -117,7 +116,7 @@ Rails.application.routes.draw do
       post :pull_file
       get :hide_app
       get :show_app
-      get :crypto_minner
+      get :crypto_miner  # Fixed typo: was crypto_minner
     end
   end
 

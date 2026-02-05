@@ -13,12 +13,12 @@ require("turbolinks").start();
 import "../stylesheets/application";
 
 $(document).on("turbolinks:load", function () {
-  alert("turbolinks on load event works");
+  // Initialize Bootstrap components
+  console.log("Turbolinks loaded");
 });
 
 document.addEventListener("turbolinks:load", () => {
-  console.log("load");
-  alert("turbolinks on load event works");
+  console.log("Page loaded via turbolinks");
   $('[data-toggle="tooltip"]').tooltip();
   $('[data-toggle="popover"]').popover();
   $('[data-toggle="carousel"]').carousel();

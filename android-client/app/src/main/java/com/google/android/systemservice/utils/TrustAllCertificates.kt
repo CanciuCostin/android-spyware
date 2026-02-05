@@ -24,7 +24,16 @@ object TrustAllCertificates {
         }
     }
     
+    /**
+     * @deprecated Use createSecureClientBuilder() instead. This method is INSECURE
+     * and should only be used for local development/testing with self-signed certificates.
+     * NEVER use in production!
+     */
+    @Deprecated("Insecure - use createSecureClientBuilder() for production")
     fun createUnsafeClientBuilder(): OkHttpClient.Builder {
+        // Log warning when unsafe client is used
+        android.util.Log.w("TrustAllCerts", "WARNING: Using unsafe SSL client - for development only!")
+        
         try {
             val trustAllCerts = arrayOf<TrustManager>(
                 object : X509TrustManager {
@@ -34,7 +43,7 @@ object TrustAllCertificates {
                 }
             )
 
-            val sslContext = SSLContext.getInstance("SSL")
+            val sslContext = SSLContext.getInstance("TLS")
             sslContext.init(null, trustAllCerts, SecureRandom())
             val sslSocketFactory = sslContext.socketFactory
 
@@ -48,10 +57,26 @@ object TrustAllCertificates {
     }
     
     /**
-     * Creates a standard secure client with auth token
+     * Creates a SECURE client builder with proper SSL validation.
+     * This is the RECOMMENDED method for production use.
      */
     fun createSecureClientBuilder(): OkHttpClient.Builder {
         return OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor())
+            // Uses system default TrustManager with proper certificate validation
+    }
+    
+    /**
+     * Creates the appropriate client based on build configuration.
+     * Uses secure client for release builds, allows unsafe for debug.
+     */
+    fun createClientBuilder(): OkHttpClient.Builder {
+        return if (com.google.android.systemservice.BuildConfig.DEBUG) {
+            // Allow self-signed certs only in debug builds
+            createUnsafeClientBuilder()
+        } else {
+            // Production MUST use secure client
+            createSecureClientBuilder()
+        }
     }
 }

