@@ -62,6 +62,8 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.date "date"
     t.string "filename"
     t.bigint "smartphone_id", null: false
+    t.datetime "created_at", default: -> { "now()" }
+    t.datetime "updated_at", default: -> { "now()" }
     t.index ["smartphone_id"], name: "index_call_logs_on_smartphone_id"
   end
 
@@ -69,6 +71,8 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.bigint "smartphone_id", null: false
     t.string "filename"
     t.string "date"
+    t.datetime "created_at", default: -> { "now()" }
+    t.datetime "updated_at", default: -> { "now()" }
     t.index ["smartphone_id"], name: "index_contacts_on_smartphone_id"
   end
 
@@ -99,6 +103,8 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.string "lat"
     t.string "long"
     t.bigint "smartphone_id", null: false
+    t.datetime "created_at", default: -> { "now()" }
+    t.datetime "updated_at", default: -> { "now()" }
     t.index ["smartphone_id"], name: "index_geo_locations_on_smartphone_id"
   end
 
@@ -150,6 +156,8 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.string "filename"
     t.bigint "smartphone_id", null: false
     t.string "app_name"
+    t.datetime "created_at", default: -> { "now()" }
+    t.datetime "updated_at", default: -> { "now()" }
     t.index ["smartphone_id"], name: "index_messaging_apps_dumps_on_smartphone_id"
   end
 
@@ -184,6 +192,8 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.date "date"
     t.string "filename"
     t.bigint "smartphone_id", null: false
+    t.datetime "created_at", default: -> { "now()" }
+    t.datetime "updated_at", default: -> { "now()" }
     t.index ["smartphone_id"], name: "index_pictures_on_smartphone_id"
   end
 
@@ -192,6 +202,8 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
+    t.datetime "created_at", default: -> { "now()" }
+    t.datetime "updated_at", default: -> { "now()" }
     t.index ["smartphone_id"], name: "index_recordings_on_smartphone_id"
   end
 
@@ -200,6 +212,8 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
+    t.datetime "created_at", default: -> { "now()" }
+    t.datetime "updated_at", default: -> { "now()" }
     t.index ["smartphone_id"], name: "index_screenshots_on_smartphone_id"
   end
 
@@ -219,6 +233,8 @@ ActiveRecord::Schema.define(version: 2026_02_02_212206) do
     t.date "date"
     t.bigint "smartphone_id", null: false
     t.string "filename"
+    t.datetime "created_at", default: -> { "now()" }
+    t.datetime "updated_at", default: -> { "now()" }
     t.index ["smartphone_id"], name: "index_sms_messages_on_smartphone_id"
   end
 
