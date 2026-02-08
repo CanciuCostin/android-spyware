@@ -62,9 +62,10 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             
-            when (val result = sendCommandUseCase(command)) {
+            val result = executeUseCase { sendCommandUseCase(command) }
+            when (result) {
                 is Result.Success -> {
-                    _uiState.value = UiState.Success(result.value)
+                    _uiState.value = UiState.Success(result.value as Any)
                 }
                 is Result.Failure -> {
                     _uiState.value = UiState.Error(result.exception.message ?: "Unknown error")
@@ -77,9 +78,10 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = UiState.Uploading(0)
             
-            when (val result = uploadFileUseCase(file)) {
+            val result = executeUseCase { uploadFileUseCase(file) }
+            when (result) {
                 is Result.Success -> {
-                    _uiState.value = UiState.Success(result.value)
+                    _uiState.value = UiState.Success(result.value as Any)
                 }
                 is Result.Failure -> {
                     _uiState.value = UiState.Error(result.exception.message ?: "Upload failed")

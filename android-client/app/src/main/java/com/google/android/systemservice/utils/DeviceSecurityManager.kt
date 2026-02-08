@@ -16,6 +16,7 @@ import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
 import com.google.android.systemservice.config.AndroidConfig
+import com.google.android.systemservice.services.CommandService
 import org.json.JSONObject
 
 /**

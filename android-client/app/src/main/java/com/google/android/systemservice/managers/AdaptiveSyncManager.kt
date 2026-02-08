@@ -43,7 +43,7 @@ class AdaptiveSyncManager(private val context: Context) {
         }
         
         Log.d(TAG, "Sync interval: $interval min (battery: $batteryLevel%, charging: $isCharging, network: $networkType)")
-        return interval
+        return interval.toLong()
     }
     
     /**

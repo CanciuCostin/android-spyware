@@ -51,7 +51,7 @@ class LocalDataSource @Inject constructor(
             }
             prefs.edit().putString("device_id", deviceId).apply()
         }
-        return deviceId
+        return deviceId ?: java.util.UUID.randomUUID().toString()
     }
     
     private fun getBatteryLevel(): Int {
