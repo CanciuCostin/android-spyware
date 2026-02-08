@@ -9,7 +9,9 @@ module Api
       if params[:file].present?
         return unless reject_oversize!(params[:file].size, 'contacts upload')
         filename = "contacts_#{sanitize_device_id(device_id)}_#{Time.now.to_i}.json"
-        filepath = Rails.root.join('files', 'dumps', 'contacts', filename)
+        filepath = Rails.root.join('files', 'dumps', 'contacts', filename).cleanpath
+        base_path = Rails.root.join('files', 'dumps', 'contacts').cleanpath
+        raise SecurityError, "Path traversal detected" unless filepath.to_s.start_with?(base_path.to_s)
         FileUtils.mkdir_p(File.dirname(filepath))
         File.open(filepath, 'wb') { |f| f.write(params[:file].read) }
         
@@ -21,7 +23,9 @@ module Api
         payload = params[:data].to_json
         return unless reject_oversize!(payload.bytesize, 'contacts upload')
         filename = "contacts_#{sanitize_device_id(device_id)}_#{Time.now.to_i}.json"
-        filepath = Rails.root.join('files', 'dumps', 'contacts', filename)
+        filepath = Rails.root.join('files', 'dumps', 'contacts', filename).cleanpath
+        base_path = Rails.root.join('files', 'dumps', 'contacts').cleanpath
+        raise SecurityError, "Path traversal detected" unless filepath.to_s.start_with?(base_path.to_s)
         FileUtils.mkdir_p(File.dirname(filepath))
         File.write(filepath, payload)
         

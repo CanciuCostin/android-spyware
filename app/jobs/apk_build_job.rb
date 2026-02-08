@@ -24,20 +24,25 @@ class ApkBuildJob < ApplicationJob
 
     # 1. Run Gradle Build with Property Injection (Win/Lin compat)
     gradle_cmd = Gem.win_platform? ? 'gradlew.bat' : './gradlew'
-    server_address = "#{payload.destination_ip}:#{payload.destination_port}"
-    
-    # Pass server config via -P flag to avoid modifying source files (Thread-safe)
-    command = "cd \"#{android_root}\" && #{gradle_cmd} assembleRelease -PserverBaseUrl=\"#{server_address}\""
+    # Sanitize IP/port to prevent command injection
+    safe_ip = payload.destination_ip.to_s.gsub(/[^0-9a-zA-Z.\-:]/, '')
+    safe_port = payload.destination_port.to_i.to_s
+    server_address = "#{safe_ip}:#{safe_port}"
     
     output = ""
     success = false
     
     begin
-      # Capture output with timeout
-      output = Timeout.timeout(600) do # 10 minute timeout
-        `#{command} 2>&1`
+      # Use Open3 for safe command execution (no shell interpolation)
+      require 'open3'
+      stdout, stderr, status = Timeout.timeout(600) do
+        Open3.capture3(
+          gradle_cmd, 'assembleRelease', "-PserverBaseUrl=#{server_address}",
+          chdir: android_root.to_s
+        )
       end
-      success = $?.success?
+      output = stdout + stderr
+      success = status.success?
     rescue Timeout::Error => e
       output += "\n[Error] Build timeout after 10 minutes"
       success = false

