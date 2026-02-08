@@ -234,8 +234,14 @@ body.sidebar-collapsed .header#header .header-item.tabs#tabs li:hover::after {
 
 @import "active_admin_flat_skin";
 @import "timeline";
+
+// ─── Modern Dashboard System ───
+@import "modern_variables";
+@import "responsive";
+@import "loading_states";
+@import "dark_mode";
+@import "ui_polish";
 @import "dashboard";
-// Removed: @import "switcher"; @import "sliders"; - deprecated remote page styles
 
 /* Legacy sidebar button styles removed — using .sidebar-toggle now */
 

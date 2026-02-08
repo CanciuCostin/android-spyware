@@ -1,0 +1,28 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Audit Log Details #<%= @audit_log.id %></h3>
+          <div class="card-tools">
+            <%= link_to "← Back", audit_logs_path, class: "btn btn-sm btn-secondary" %>
+          </div>
+        </div>
+        <div class="card-body">
+          <table class="table table-bordered">
+            <tr><th>ID</th><td><%= @audit_log.id %></td></tr>
+            <tr><th>Timestamp</th><td><%= @audit_log.created_at %></td></tr>
+            <tr><th>Admin User</th><td><%= @audit_log.admin_user&.email || 'System' %></td></tr>
+            <tr><th>Action</th><td><%= @audit_log.action %></td></tr>
+            <tr><th>Resource</th><td><%= @audit_log.auditable_type %> #<%= @audit_log.auditable_id %></td></tr>
+            <tr><th>IP Address</th><td><%= @audit_log.ip_address %></td></tr>
+          </table>
+          <h5>Changes</h5>
+          <pre><%= JSON.pretty_generate(@audit_log.changes) %></pre>
+          <h5>Metadata</h5>
+          <pre><%= JSON.pretty_generate(@audit_log.metadata) %></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

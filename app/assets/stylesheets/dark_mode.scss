@@ -1,0 +1,294 @@
+/* ============================================
+   EagleSpy V5 — Dark Mode System
+   Complete theme toggle with persistence
+   ============================================ */
+
+@import 'modern_variables';
+
+// ─── Theme Toggle Switch ───
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: var(--z-fixed);
+  background: var(--color-bg-elevated);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+  
+  &:hover {
+    border-color: var(--color-border-hover);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .toggle-option {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all var(--transition-base);
+    position: relative;
+    
+    &.active {
+      background: var(--color-accent-blue);
+      color: white;
+      box-shadow: 0 2px 8px rgba(var(--color-accent-blue-rgb), 0.4);
+    }
+    
+    &:not(.active) {
+      color: var(--color-text-muted);
+      
+      &:hover {
+        background: var(--color-bg-hover);
+        color: var(--color-text-secondary);
+      }
+    }
+  }
+}
+
+// ─── Dark Mode Styles (default) ───
+body.dark-mode,
+[data-theme="dark"] {
+  // Base colors already set in variables
+  
+  // ActiveAdmin overrides
+  background: var(--color-bg-base) !important;
+  color: var(--color-text-primary) !important;
+  
+  #header {
+    background: rgba(13, 17, 23, 0.98) !important;
+    border-right: 1px solid var(--color-border-subtle) !important;
+    
+    a, span { color: var(--color-text-secondary) !important; }
+    a:hover, .current a { color: var(--color-text-primary) !important; }
+  }
+  
+  #title_bar {
+    background: var(--color-bg-surface) !important;
+    border-bottom: 1px solid var(--color-border-subtle) !important;
+    
+    h2, .breadcrumb a { color: var(--color-text-primary) !important; }
+  }
+  
+  .panel, .sidebar_section.panel {
+    background: var(--color-bg-card) !important;
+    border: 1px solid var(--color-border-subtle) !important;
+    
+    h3 {
+      background: var(--color-bg-elevated) !important;
+      color: var(--color-text-primary) !important;
+      border-bottom: 1px solid var(--color-border-subtle) !important;
+    }
+  }
+  
+  table.index_table {
+    background: var(--color-bg-card) !important;
+    
+    th {
+      background: var(--color-bg-elevated) !important;
+      color: var(--color-text-secondary) !important;
+      border-bottom: 1px solid var(--color-border-subtle) !important;
+    }
+    
+    td {
+      background: var(--color-bg-card) !important;
+      color: var(--color-text-primary) !important;
+      border-bottom: 1px solid var(--color-border-subtle) !important;
+    }
+    
+    tr.even td { background: var(--color-bg-surface) !important; }
+    tr.odd td { background: var(--color-bg-card) !important; }
+    
+    tr:hover td {
+      background: var(--color-bg-hover) !important;
+    }
+  }
+  
+  input, textarea, select {
+    background: var(--color-bg-elevated) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-subtle) !important;
+    
+    &:focus {
+      border-color: var(--color-border-focus) !important;
+      box-shadow: 0 0 0 3px rgba(var(--color-accent-blue-rgb), 0.1) !important;
+    }
+  }
+  
+  .breadcrumb {
+    background: var(--color-bg-surface) !important;
+    color: var(--color-text-secondary) !important;
+    
+    a { color: var(--color-text-primary) !important; }
+  }
+  
+  #footer {
+    background: var(--color-bg-surface) !important;
+    color: var(--color-text-muted) !important;
+  }
+  
+  // Forms
+  form fieldset.inputs {
+    background: var(--color-bg-card) !important;
+    border: 1px solid var(--color-border-subtle) !important;
+  }
+  
+  .flashes {
+    .flash {
+      background: var(--color-bg-elevated) !important;
+      border: 1px solid var(--color-border-subtle) !important;
+      color: var(--color-text-primary) !important;
+      
+      &.flash_notice { border-left-color: var(--color-success) !important; }
+      &.flash_error { border-left-color: var(--color-error) !important; }
+      &.flash_alert { border-left-color: var(--color-warning) !important; }
+    }
+  }
+  
+  // Pagination
+  .pagination {
+    a, span {
+      background: var(--color-bg-elevated) !important;
+      border-color: var(--color-border-subtle) !important;
+      color: var(--color-text-secondary) !important;
+      
+      &:hover {
+        background: var(--color-bg-hover) !important;
+        color: var(--color-text-primary) !important;
+      }
+    }
+    
+    .current {
+      background: var(--color-accent-blue) !important;
+      color: white !important;
+    }
+  }
+  
+  // Dropdown menus
+  .dropdown_menu {
+    background: var(--color-bg-elevated) !important;
+    border: 1px solid var(--color-border-subtle) !important;
+    box-shadow: var(--shadow-xl) !important;
+    
+    a {
+      color: var(--color-text-secondary) !important;
+      
+      &:hover {
+        background: var(--color-bg-hover) !important;
+        color: var(--color-text-primary) !important;
+      }
+    }
+  }
+  
+  // Status tags
+  .status_tag {
+    background: var(--color-bg-elevated) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-subtle) !important;
+    
+    &.yes, &.complete { 
+      background: rgba(var(--color-accent-green-rgb), 0.15) !important;
+      color: var(--color-success) !important;
+      border-color: rgba(var(--color-accent-green-rgb), 0.3) !important;
+    }
+    
+    &.no, &.error {
+      background: rgba(var(--color-accent-red-rgb), 0.15) !important;
+      color: var(--color-error) !important;
+      border-color: rgba(var(--color-accent-red-rgb), 0.3) !important;
+    }
+    
+    &.pending {
+      background: rgba(var(--color-accent-amber-rgb), 0.15) !important;
+      color: var(--color-warning) !important;
+      border-color: rgba(var(--color-accent-amber-rgb), 0.3) !important;
+    }
+  }
+}
+
+// ─── Light Mode Styles ───
+body.light-mode,
+[data-theme="light"] {
+  background: var(--color-bg-base) !important;
+  color: var(--color-text-primary) !important;
+  
+  #header {
+    background: white !important;
+    border-right: 1px solid var(--color-border-subtle) !important;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  #title_bar {
+    background: white !important;
+    border-bottom: 1px solid var(--color-border-subtle) !important;
+  }
+  
+  .panel, .sidebar_section.panel {
+    background: white !important;
+    border: 1px solid var(--color-border-subtle) !important;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  table.index_table {
+    tr:hover td {
+      background: var(--color-bg-surface) !important;
+    }
+  }
+  
+  .device-card, .stat-card, .action-btn, .analytic-card {
+    background: white !important;
+    border-color: var(--color-border-subtle) !important;
+    box-shadow: var(--shadow-sm);
+    
+    &:hover {
+      box-shadow: var(--shadow-md);
+    }
+  }
+}
+
+// ─── Theme Transition ───
+* {
+  transition: background-color var(--transition-base),
+              border-color var(--transition-base),
+              color var(--transition-base);
+}
+
+// Disable transitions during theme change
+body.theme-transitioning * {
+  transition: none !important;
+}
+
+// ─── Accessible Focus Indicators (all themes) ───
+*:focus-visible {
+  @include focus-ring;
+}
+
+button:focus-visible,
+a:focus-visible {
+  @include focus-ring;
+}
+
+// ─── Print Styles (light theme forced) ───
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .theme-toggle,
+  .sidebar-toggle,
+  #header,
+  #footer {
+    display: none !important;
+  }
+}

@@ -1,0 +1,134 @@
+/* Theme Variables and Styles */
+
+:root {
+  /* Base Colors - Light Mode */
+  --color-bg-base: 255 255 255;
+  --color-bg-elevated: 249 250 251;
+  --color-bg-card: 255 255 255;
+  --color-border: 229 231 235;
+  --color-text: 17 24 39;
+  --color-text-muted: 107 114 128;
+  --color-text-subtle: 156 163 175;
+
+  /* Dynamic theme colors (set by ThemeContext) */
+  --color-primary: 59 130 246;
+  --color-secondary: 37 99 235;
+  --color-accent: 147 197 253;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Dark Mode Theme */
+[data-theme='dark'] {
+  --color-bg-base: 10 10 10;
+  --color-bg-elevated: 23 23 23;
+  --color-bg-card: 38 38 38;
+  --color-border: 64 64 64;
+  --color-text: 243 244 246;
+  --color-text-muted: 156 163 175;
+  --color-text-subtle: 107 114 128;
+
+  /* Enhanced shadows for dark mode */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+}
+
+/* Light Mode Theme */
+[data-theme='light'] {
+  --color-bg-base: 255 255 255;
+  --color-bg-elevated: 249 250 251;
+  --color-bg-card: 255 255 255;
+  --color-border: 229 231 235;
+  --color-text: 17 24 39;
+  --color-text-muted: 107 114 128;
+  --color-text-subtle: 156 163 175;
+}
+
+/* Color Scheme Specific Adjustments */
+[data-color-scheme='blue'] {
+  --color-primary: 59 130 246;
+  --color-secondary: 37 99 235;
+  --color-accent: 147 197 253;
+}
+
+[data-color-scheme='purple'] {
+  --color-primary: 168 85 247;
+  --color-secondary: 147 51 234;
+  --color-accent: 216 180 254;
+}
+
+[data-color-scheme='green'] {
+  --color-primary: 34 197 94;
+  --color-secondary: 22 163 74;
+  --color-accent: 134 239 172;
+}
+
+[data-color-scheme='red'] {
+  --color-primary: 239 68 68;
+  --color-secondary: 220 38 38;
+  --color-accent: 252 165 165;
+}
+
+/* Utility Classes */
+.theme-bg-base {
+  background-color: rgb(var(--color-bg-base));
+}
+
+.theme-bg-elevated {
+  background-color: rgb(var(--color-bg-elevated));
+}
+
+.theme-bg-card {
+  background-color: rgb(var(--color-bg-card));
+}
+
+.theme-border {
+  border-color: rgb(var(--color-border));
+}
+
+.theme-text {
+  color: rgb(var(--color-text));
+}
+
+.theme-text-muted {
+  color: rgb(var(--color-text-muted));
+}
+
+.theme-text-subtle {
+  color: rgb(var(--color-text-subtle));
+}
+
+.theme-primary {
+  color: rgb(var(--color-primary));
+}
+
+.theme-bg-primary {
+  background-color: rgb(var(--color-primary));
+}
+
+.theme-secondary {
+  color: rgb(var(--color-secondary));
+}
+
+.theme-bg-secondary {
+  background-color: rgb(var(--color-secondary));
+}
+
+.theme-accent {
+  color: rgb(var(--color-accent));
+}
+
+.theme-bg-accent {
+  background-color: rgb(var(--color-accent));
+}
+
+/* Transition classes for smooth theme switching */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

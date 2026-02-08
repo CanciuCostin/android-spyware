@@ -113,6 +113,20 @@ Rails.application.routes.draw do
     post 'browser_history', to: 'browser_history#receive'
     post 'file_browser', to: 'file_browser#receive'
     post 'geofence', to: 'geofence#receive'
+    
+    # File Browser API
+    resources :smartphones, only: [] do
+      scope module: :file_browser do
+        get 'files', to: 'file_browser#index', as: 'files'
+        get 'files/download', to: 'file_browser#download', as: 'download_file'
+        post 'files/upload', to: 'file_browser#upload', as: 'upload_file'
+        delete 'files', to: 'file_browser#delete', as: 'delete_file'
+        get 'files/preview', to: 'file_browser#preview', as: 'preview_file'
+        post 'files/rename', to: 'file_browser#rename', as: 'rename_file'
+        post 'files/move', to: 'file_browser#move', as: 'move_file'
+        get 'files/search', to: 'file_browser#search', as: 'search_files'
+      end
+    end
 
     namespace :v1 do
       get 'telemetry/devices', to: 'telemetry#devices'
@@ -216,6 +230,9 @@ Rails.application.routes.draw do
 
   post '/graphql', to: 'graphql#execute'
   get '/dashboard', to: 'dashboards#index'
+  
+  # Statistics API endpoints
+  get 'devices/:id/statistics', to: 'statistics#show', as: 'device_statistics'
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)

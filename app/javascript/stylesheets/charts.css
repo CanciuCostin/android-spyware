@@ -1,0 +1,360 @@
+/* Data Visualization Styles */
+
+.chart-container {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.chart-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chart-export-btn {
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chart-export-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.chart-canvas-wrapper {
+  position: relative;
+  height: 300px;
+}
+
+.chart-canvas-wrapper.large {
+  height: 400px;
+}
+
+.chart-canvas-wrapper.heatmap {
+  height: 500px;
+}
+
+/* Date Range Selector */
+.date-range-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.date-range-btn {
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.date-range-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.date-range-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.custom-date-picker {
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 200px;
+}
+
+/* Stats Grid */
+.stats-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-overview-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-overview-label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-overview-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.stat-overview-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+/* Chart Grid Layout */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+.chart-container.full-width {
+  grid-column: span 12;
+}
+
+.chart-container.half-width {
+  grid-column: span 6;
+}
+
+.chart-container.third-width {
+  grid-column: span 4;
+}
+
+@media (max-width: 1024px) {
+  .chart-container.half-width {
+    grid-column: span 12;
+  }
+  
+  .chart-container.third-width {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 640px) {
+  .chart-container.third-width {
+    grid-column: span 12;
+  }
+}
+
+/* Loading State */
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.chart-loading::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* No Data State */
+.chart-no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #9ca3af;
+}
+
+.chart-no-data-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.chart-no-data-text {
+  font-size: 14px;
+}
+
+/* Heatmap Container */
+#location-heatmap {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Tooltip Customization */
+.chartjs-tooltip {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  color: white;
+  padding: 12px;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* Export Menu */
+.export-dropdown {
+  position: relative;
+}
+
+.export-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  min-width: 120px;
+  z-index: 10;
+  display: none;
+}
+
+.export-dropdown.active .export-menu {
+  display: block;
+}
+
+.export-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.export-menu-item:hover {
+  background: #f3f4f6;
+}
+
+/* Real-time indicator */
+.realtime-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #ecfdf5;
+  border: 1px solid #10b981;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #065f46;
+}
+
+.realtime-indicator::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Chart drill-down */
+.chart-drilldown-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.chart-drilldown-modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.chart-drilldown-content {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.9);
+  transition: transform 0.3s;
+}
+
+.chart-drilldown-modal.active .chart-drilldown-content {
+  transform: scale(1);
+}
+
+.chart-drilldown-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 32px;
+  text-align: center;
+  transition: background 0.2s;
+}
+
+.chart-drilldown-close:hover {
+  background: #e5e7eb;
+}
