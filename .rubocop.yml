@@ -1,0 +1,16 @@
+require:
+  - rubocop-rails
+  - rubocop-performance
+
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+  Exclude:
+    - "bin/**/*"
+    - "node_modules/**/*"
+    - "db/schema.rb"
+    - "log/**/*"
+    - "tmp/**/*"
+
+Rails:
+  Enabled: true

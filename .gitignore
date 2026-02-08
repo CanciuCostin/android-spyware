@@ -42,3 +42,40 @@ yarn-debug.log*
 
 .gemini/
 gha-creds-*.json
+
+# Build artifacts
+android-client/app/build/
+android-client/.gradle/
+*.apk
+*.class
+
+# IDE & Editor
+*.code-workspace
+.mcp-debug-tools/
+
+# Environment
+.env.ai
+
+# Temp files
+NUL
+temp_prefs.xml
+*.log
+
+# Vendor
+vendor/gems/
+
+# Archives
+*.tar.gz
+
+# Memory bank (Copilot)
+memory-bank/
+copilot-fleet-scaffold/
+
+# Frontend build
+frontend/dist/
+
+# Static analysis
+static-analysis.datadog.yml
+
+# Data dumps (user data)
+files/dumps/
