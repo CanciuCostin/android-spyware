@@ -1,0 +1,26 @@
+name: Docker Build
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Rails image
+        run: docker build -f docker/app-rails-server/Dockerfile -t eaglespy-rails .
+      - name: Smoke test Rails image
+        run: docker run --rm eaglespy-rails rails --version
+      - name: Build Metasploit image
+        run: docker build -f docker/metasploit-server/Dockerfile -t eaglespy-msf docker
+      - name: Smoke test Metasploit image
+        run: docker run --rm eaglespy-msf msfconsole --version
+      - name: Build Postgres image
+        run: docker build -f docker/postgres-db-server/Dockerfile -t eaglespy-postgres docker/postgres-db-server
+      - name: Smoke test Postgres image
+        run: docker run --rm eaglespy-postgres postgres --version

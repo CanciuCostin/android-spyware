@@ -1,0 +1,57 @@
+name: Android Build
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
+      ANDROID_HOME: ${{ runner.temp }}/android-sdk
+      GRADLE_USER_HOME: ${{ runner.temp }}/.gradle
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 34
+          components: |
+            platform-tools
+            platforms;android-34
+            build-tools;34.0.0
+          sdk-dir: ${{ env.ANDROID_SDK_ROOT }}
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android-client/.gradle
+          key: gradle-${{ runner.os }}-${{ hashFiles('android-client/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+      - name: Build release APK and AAB
+        run: |
+          cd android-client
+          chmod +x gradlew
+          ./gradlew assembleRelease bundleRelease --no-daemon
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: android-client/app/build/outputs/apk/release/app-release.apk
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: android-client/app/build/outputs/bundle/release/app-release.aab
