@@ -33,6 +33,74 @@ This project has been heavily refactored and modernized. Key improvements:
 *   **Map Visualization**: Real-time Google Maps integration with path tracking.
 *   **Docker Optimization**: 50% smaller images using multi-stage builds.
 
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        EagleSpy V5 Architecture                     │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  Android Device              Rails Backend           Admin Browser   │
+│  ┌──────────┐     WebSocket  ┌──────────────┐  HTTP  ┌──────────┐  │
+│  │ APK      │◄──────────────►│ ActionCable  │◄──────►│ Dashboard│  │
+│  │ Client   │  CommandChannel│ Channels     │        │ (Admin)  │  │
+│  └────┬─────┘                ├──────────────┤        └────┬─────┘  │
+│       │                      │ REST API     │             │        │
+│       │  REST (uploads)      │ /api/*       │◄────────────┘        │
+│       │─────────────────────►│              │                      │
+│       │                      ├──────────────┤                      │
+│       │                      │ Services     │                      │
+│       │  WebRTC (P2P media)  │ - Response   │                      │
+│       │◄─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─►│
+│       │                      │   Processor  │                      │
+│       │                      │ - Command    │                      │
+│       │                      │   Sender     │                      │
+│       │                      │ - Heartbeat  │                      │
+│       │                      │   Monitor    │                      │
+│       │                      └──────┬───────┘                      │
+│       │                             │                              │
+│       │                     ┌───────┴───────┐                      │
+│       │                     │  PostgreSQL   │                      │
+│       │                     │  Redis        │                      │
+│       │                     │  Metasploit   │                      │
+│       │                     │  coturn(TURN) │                      │
+│       │                     │  Jaeger       │                      │
+│       │                     └───────────────┘                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+## API Overview
+
+| Category         | Endpoints                           | Auth              |
+|------------------|-------------------------------------|-------------------|
+| Health           | `/health`, `/health/ready`, `/live` | None              |
+| Device Config    | `/api/config`                       | Device Token      |
+| Commands         | `/api/commands/{id}/*`              | Device Token      |
+| Data Ingestion   | `/api/sms`, `/api/contacts`, etc.   | Device Token      |
+| Keylogger        | `/api/keylogger/*`                  | Device Token/Session |
+| File Browser     | `/api/smartphones/{id}/files/*`     | Session Cookie    |
+| File Transfers   | `/file_transfers/*`                 | Session Cookie    |
+| WebRTC           | `/webrtc/*`                         | Session Cookie    |
+| Telemetry        | `/api/v1/telemetry/*`               | Session Cookie    |
+| GraphQL          | `/graphql`                          | Session Cookie    |
+
+Full API docs: [`docs/api/README.md`](docs/api/README.md) |
+OpenAPI spec: [`docs/api/openapi.yaml`](docs/api/openapi.yaml)
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [API Guide](docs/api/README.md) | REST, WebSocket, and GraphQL API reference |
+| [OpenAPI Spec](docs/api/openapi.yaml) | Machine-readable API specification |
+| [Architecture Decision Records](docs/adr/) | Design decisions and rationale |
+| [Deployment Runbook](docs/runbooks/deployment.md) | Step-by-step deployment guide |
+| [Incident Response](docs/runbooks/incident-response.md) | What to do when things break |
+| [Database Maintenance](docs/runbooks/database-maintenance.md) | Backup, restore, migrations |
+| [Scaling Guide](docs/runbooks/scaling.md) | How to scale services |
+| [Troubleshooting](docs/runbooks/troubleshooting.md) | Common issues and solutions |
+| [Security Setup](docs/SECURITY_SETUP.md) | Credential generation and hardening |
+
 ### Quick Start (V5)
 1.  Copy environment variables: `cp .env.example .env`
 2.  **CRITICAL**: Generate secure credentials! See `docs/SECURITY_SETUP.md`.

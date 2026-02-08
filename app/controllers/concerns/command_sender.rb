@@ -1,3 +1,17 @@
+# Concern mixed into controllers that need to dispatch commands to Android devices.
+#
+# Async command flow:
+#   1. send_command_async creates a PendingCommand record (status: pending).
+#   2. The command is broadcast via ActionCable to "commands_<device_id>".
+#   3. The Android client receives the command, executes it, and sends a response
+#      back through CommandChannel, which is picked up by ResponseProcessor.
+#   4. ResponseProcessor marks the PendingCommand as completed/failed.
+#
+# Synchronous convenience:
+#   send_command_and_wait combines send + a blocking poll loop that reloads the
+#   PendingCommand from the database every 0.5 s until it reaches a terminal
+#   state or times out. This is suitable for short-lived commands (< 30 s) but
+#   will block the controller thread — do not use for long-running operations.
 module CommandSender
   extend ActiveSupport::Concern
   
@@ -51,6 +65,9 @@ module CommandSender
     pending_command
   end
   
+  # Blocking poll loop. We use DB polling (reload) instead of ActionCable
+  # subscription because controllers need a synchronous return value and
+  # ActionCable callbacks execute on a different thread/connection.
   def wait_for_response(pending_command, timeout: 30.seconds)
     start_time = Time.current
     

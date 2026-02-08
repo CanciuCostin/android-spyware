@@ -12,7 +12,9 @@ module Androidspyware
     config.load_defaults 6.0
     config.autoload_paths << Rails.root.join("app", "graphql")
     config.autoload_paths << Rails.root.join("app", "middleware")
+    config.autoload_paths << Rails.root.join("app", "validators")
     config.middleware.use Rack::Attack
+    config.middleware.use InputSanitizationMiddleware
     config.middleware.use AuditMiddleware
     config.middleware.use SecurityHeaders
     config.middleware.use ConsentEnforcement

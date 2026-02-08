@@ -1,5 +1,18 @@
-# WebRTC Signaling Channel for Admin-Device communication
-# Handles SDP offers/answers and ICE candidates
+# WebRTC Signaling Channel — pure relay between Admin browser and Android device.
+#
+# Signaling flow (WebRTC establishment):
+#   1. Admin calls start_stream → broadcasted to device stream.
+#   2. Device captures camera/mic, creates SDP offer → relayed to admin stream.
+#   3. Admin creates SDP answer → relayed to device stream.
+#   4. Both sides exchange ICE candidates via ice_candidate → routed by target param.
+#   5. Once ICE completes, media flows peer-to-peer (bypasses this server entirely).
+#
+# Stream topology:
+#   - Admin subscribes to: "signaling_admin_<device_id>"  (receives offers + ICE from device)
+#   - Device subscribes to: "signaling_device_<device_id>" (receives answers + ICE from admin)
+#
+# Security note: SDP and ICE candidate payloads are passed through unvalidated
+# because they contain opaque WebRTC protocol data. Only device_id is sanitized.
 class SignalingChannel < ApplicationCable::Channel
   def subscribed
     @device_id = sanitize_device_id(params[:device_id])
@@ -59,7 +72,10 @@ class SignalingChannel < ApplicationCable::Channel
     )
   end
 
-  # Exchange ICE candidates
+  # Exchange ICE candidates for NAT traversal.
+  # When 'target' is not specified, we infer the recipient from the sender's role:
+  #   - Admin sends ICE → target defaults to 'device'
+  #   - Device sends ICE → target defaults to 'admin'
   def ice_candidate(data)
     candidate = data['candidate']
     device_id = data['device_id'] || @device_id

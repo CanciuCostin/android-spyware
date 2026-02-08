@@ -113,6 +113,14 @@ Rails.application.routes.draw do
     post 'browser_history', to: 'browser_history#receive'
     post 'file_browser', to: 'file_browser#receive'
     post 'geofence', to: 'geofence#receive'
+
+    # Geofence Management
+    scope 'devices/:device_id' do
+      resources :geofences, controller: 'geofence', only: [:index, :create, :destroy]
+      get 'location_history', to: 'geofence#location_history'
+      get 'location_heatmap', to: 'geofence#location_heatmap'
+      get 'geofence_events', to: 'geofence#events'
+    end
     
     # File Browser API
     resources :smartphones, only: [] do
