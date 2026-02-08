@@ -2,6 +2,11 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useMediaStore, MediaItem } from '../../stores/mediaStore';
 import './VideoGallery.css';
 
+const csrfHeaders = () => ({
+  'Content-Type': 'application/json',
+  'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+});
+
 interface VideoGalleryProps {
   deviceId: string;
 }
@@ -121,7 +126,7 @@ export const VideoGallery: React.FC<VideoGalleryProps> = ({ deviceId }) => {
     try {
       await fetch(`/api/devices/${deviceId}/videos/bulk-delete`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: csrfHeaders(),
         body: JSON.stringify({ ids: Array.from(selectedItems) }),
       });
       deleteItems(Array.from(selectedItems));
@@ -138,7 +143,7 @@ export const VideoGallery: React.FC<VideoGalleryProps> = ({ deviceId }) => {
     try {
       const response = await fetch(`/api/devices/${deviceId}/videos/bulk-download`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: csrfHeaders(),
         body: JSON.stringify({ ids: Array.from(selectedItems) }),
       });
 

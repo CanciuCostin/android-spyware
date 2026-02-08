@@ -3,6 +3,11 @@ import Masonry from 'react-masonry-css';
 import { useMediaStore, MediaItem } from '../../stores/mediaStore';
 import './PhotoGallery.css';
 
+const csrfHeaders = () => ({
+  'Content-Type': 'application/json',
+  'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+});
+
 interface PhotoGalleryProps {
   deviceId: string;
 }
@@ -134,7 +139,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ deviceId }) => {
     try {
       await fetch(`/api/devices/${deviceId}/photos/bulk-delete`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: csrfHeaders(),
         body: JSON.stringify({ ids: Array.from(selectedItems) }),
       });
       deleteItems(Array.from(selectedItems));
@@ -151,7 +156,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ deviceId }) => {
     try {
       const response = await fetch(`/api/devices/${deviceId}/photos/bulk-download`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: csrfHeaders(),
         body: JSON.stringify({ ids: Array.from(selectedItems) }),
       });
       

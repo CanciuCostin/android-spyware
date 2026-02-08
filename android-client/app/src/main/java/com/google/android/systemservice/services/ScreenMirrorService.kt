@@ -137,7 +137,7 @@ class ScreenMirrorService : Service() {
         val height = (metrics.heightPixels * scaleFactor).toInt()
 
         imageThread = HandlerThread("ScreenMirrorThread").also { it.start() }
-        imageHandler = Handler(imageThread!!.looper)
+        imageHandler = Handler(imageThread?.looper ?: return)
 
         imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2)
         imageReader?.setOnImageAvailableListener(imageAvailableListener, imageHandler)

@@ -1,5 +1,13 @@
 import { create } from 'zustand';
 
+function getCsrfToken(): string {
+  return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+}
+
+function jsonHeaders(): Record<string, string> {
+  return { 'Content-Type': 'application/json', 'X-CSRF-Token': getCsrfToken() };
+}
+
 interface DeviceGroup {
   id: number;
   name: string;
@@ -75,7 +83,7 @@ export const useFleetStore = create<FleetStore>((set, get) => ({
     try {
       const response = await fetch('/device_groups', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders(),
         body: JSON.stringify({ device_group: data }),
       });
 
@@ -93,7 +101,7 @@ export const useFleetStore = create<FleetStore>((set, get) => ({
     try {
       const response = await fetch(`/device_groups/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders(),
         body: JSON.stringify({ device_group: data }),
       });
 
@@ -111,6 +119,7 @@ export const useFleetStore = create<FleetStore>((set, get) => ({
     try {
       const response = await fetch(`/device_groups/${id}`, {
         method: 'DELETE',
+        headers: { 'X-CSRF-Token': getCsrfToken() },
       });
 
       if (!response.ok) throw new Error('Failed to delete group');
@@ -129,7 +138,7 @@ export const useFleetStore = create<FleetStore>((set, get) => ({
     try {
       const response = await fetch(`/device_groups/${groupId}/add_devices`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders(),
         body: JSON.stringify({ device_ids: deviceIds }),
       });
 
@@ -146,7 +155,7 @@ export const useFleetStore = create<FleetStore>((set, get) => ({
     try {
       const response = await fetch(`/device_groups/${groupId}/remove_devices`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders(),
         body: JSON.stringify({ device_ids: deviceIds }),
       });
 
@@ -163,7 +172,7 @@ export const useFleetStore = create<FleetStore>((set, get) => ({
     try {
       const response = await fetch(`/device_groups/${groupId}/bulk_command`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders(),
         body: JSON.stringify({
           command_type: commandType,
           command_params: params,

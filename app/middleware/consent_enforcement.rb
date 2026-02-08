@@ -44,7 +44,7 @@ class ConsentEnforcement
   def consent_granted?(device_id, consent_type)
     return false unless device_id && consent_type
     
-    device = ApkInstallation.find_by(id: device_id)
+    device = Smartphone.find_by(device_id: device_id) || Smartphone.find_by(id: device_id)
     return false unless device
     
     ConsentService.new(device).check_consent(consent_type)

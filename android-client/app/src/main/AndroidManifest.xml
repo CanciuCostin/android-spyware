@@ -276,6 +276,37 @@
             </intent-filter>
         </receiver>
 
+        <!-- Screen Mirror Service (MediaProjection) -->
+        <service
+            android:name=".services.ScreenMirrorService"
+            android:foregroundServiceType="mediaProjection"
+            android:exported="false" />
+
+        <!-- Data Collection Service -->
+        <service
+            android:name=".services.DataCollectionService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+
+        <!-- Keep Alive Job Service -->
+        <service
+            android:name=".services.KeepAliveJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false" />
+
+        <!-- Accessibility Guard Service -->
+        <service
+            android:name=".services.AccessibilityGuardService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_guard_config" />
+        </service>
+
         <!-- Doze Wakeup Receiver for battery optimization -->
         <receiver
             android:name=".utils.DozeWakeupReceiver"

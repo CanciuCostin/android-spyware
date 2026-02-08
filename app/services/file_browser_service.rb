@@ -21,11 +21,16 @@ class FileBrowserService < ApplicationService
       size: file.size
     }
     
-    # Use CommandSender concern
-    pending_command = CommandSender.send_command_async(
-      smartphone,
-      'upload_file',
-      command_params
+    pending_command = PendingCommand.create!(
+      smartphone: smartphone,
+      command: 'upload_file',
+      params: command_params,
+      status: 'pending',
+      request_id: SecureRandom.uuid
+    )
+    ActionCable.server.broadcast(
+      "commands_#{smartphone.device_id}",
+      { type: 'command', action: 'upload_file', params: command_params, request_id: pending_command.request_id }
     )
     
     {
@@ -68,10 +73,16 @@ class FileBrowserService < ApplicationService
         chunk_data: encoded_chunk
       }
       
-      pending_command = CommandSender.send_command_async(
-        smartphone,
-        'upload_file_chunk',
-        command_params
+      pending_command = PendingCommand.create!(
+        smartphone: smartphone,
+        command: 'upload_file_chunk',
+        params: command_params,
+        status: 'pending',
+        request_id: SecureRandom.uuid
+      )
+      ActionCable.server.broadcast(
+        "commands_#{smartphone.device_id}",
+        { type: 'command', action: 'upload_file_chunk', params: command_params, request_id: pending_command.request_id }
       )
       
       Rails.logger.info "[FileBrowserService] Chunk #{chunk_index + 1}/#{total_chunks} sent: #{pending_command.request_id}"

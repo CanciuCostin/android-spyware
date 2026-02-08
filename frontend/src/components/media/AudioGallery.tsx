@@ -3,6 +3,11 @@ import { useMediaStore, MediaItem } from '../../stores/mediaStore';
 import { AudioPlayer } from './AudioPlayer';
 import './AudioGallery.css';
 
+const csrfHeaders = () => ({
+  'Content-Type': 'application/json',
+  'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+});
+
 interface AudioGalleryProps {
   deviceId: string;
 }
@@ -118,7 +123,7 @@ export const AudioGallery: React.FC<AudioGalleryProps> = ({ deviceId }) => {
     try {
       await fetch(`/api/devices/${deviceId}/audios/bulk-delete`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: csrfHeaders(),
         body: JSON.stringify({ ids: Array.from(selectedItems) }),
       });
       deleteItems(Array.from(selectedItems));
@@ -135,7 +140,7 @@ export const AudioGallery: React.FC<AudioGalleryProps> = ({ deviceId }) => {
     try {
       const response = await fetch(`/api/devices/${deviceId}/audios/bulk-download`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: csrfHeaders(),
         body: JSON.stringify({ ids: Array.from(selectedItems) }),
       });
 

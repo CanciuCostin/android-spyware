@@ -2,6 +2,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FaFolder, FaFile, FaDownload, FaTrash, FaEdit, FaSearch, FaUpload, FaEye } from 'react-icons/fa';
 
+function getCsrfToken(): string {
+  return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+}
+
 interface FileEntry {
   name: string;
   path: string;
@@ -115,7 +119,7 @@ const FileBrowser: React.FC<FileBrowserProps> = ({ deviceId, onError }) => {
     try {
       const response = await fetch(
         `/api/smartphones/${deviceId}/files?path=${encodeURIComponent(file.path)}`,
-        { method: 'DELETE' }
+        { method: 'DELETE', headers: { 'X-CSRF-Token': getCsrfToken() } }
       );
       
       if (!response.ok) {
@@ -164,6 +168,7 @@ const FileBrowser: React.FC<FileBrowserProps> = ({ deviceId, onError }) => {
         `/api/smartphones/${deviceId}/files/upload`,
         {
           method: 'POST',
+          headers: { 'X-CSRF-Token': getCsrfToken() },
           body: formData
         }
       );

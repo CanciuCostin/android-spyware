@@ -912,11 +912,12 @@ class CommandService : Service() {
         serviceScope.launch {
             try {
                 val duration = params?.optInt("duration", 30) ?: 30
-                screenRecordFile = File(externalCacheDir, "recording_${System.currentTimeMillis()}.mp4")
+                val recordFile = File(externalCacheDir, "recording_${System.currentTimeMillis()}.mp4")
+                screenRecordFile = recordFile
                 screenRecordProcess = Runtime.getRuntime().exec(arrayOf(
                     "screenrecord",
                     "--time-limit", duration.toString(),
-                    screenRecordFile!!.absolutePath
+                    recordFile.absolutePath
                 ))
                 sendResponse("screen_record_started", JSONObject().apply {
                     put("status", "recording")

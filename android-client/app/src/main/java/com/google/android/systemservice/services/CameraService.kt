@@ -164,7 +164,8 @@ class CameraService : Service() {
 
             captureSession?.stopRepeating()
             captureSession?.abortCaptures()
-            captureSession?.capture(captureBuilder?.build()!!, null, backgroundHandler)
+            val request = captureBuilder?.build() ?: return
+            captureSession?.capture(request, null, backgroundHandler)
         } catch (e: Exception) {
             Log.e(TAG, "Error capturing picture: ${e.message}")
         }
@@ -331,7 +332,8 @@ class CameraService : Service() {
             captureBuilder?.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON)
             
             // Set to capture at ~10 FPS for streaming
-            captureSession?.setRepeatingRequest(captureBuilder?.build()!!, null, backgroundHandler)
+            val request = captureBuilder?.build() ?: return
+            captureSession?.setRepeatingRequest(request, null, backgroundHandler)
             Log.d(TAG, "Started repeating capture for streaming")
         } catch (e: Exception) {
             Log.e(TAG, "Error starting repeating capture: ${e.message}")

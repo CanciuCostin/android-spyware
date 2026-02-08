@@ -98,7 +98,11 @@ class LocationService : Service() {
             }
         }
 
-        fusedLocationClient.requestLocationUpdates(request, callback, Looper.getMainLooper())
+        try {
+            fusedLocationClient.requestLocationUpdates(request, callback, Looper.getMainLooper())
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Location permission denied: ${e.message}")
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -118,7 +122,11 @@ class LocationService : Service() {
             }
         }
 
-        fusedLocationClient.requestLocationUpdates(request, locationCallback!!, Looper.getMainLooper())
+        try {
+            fusedLocationClient.requestLocationUpdates(request, locationCallback!!, Looper.getMainLooper())
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Location tracking permission denied: ${e.message}")
+        }
     }
 
     private fun stopLocationTracking() {

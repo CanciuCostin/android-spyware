@@ -80,6 +80,24 @@ function subscribeToDeviceStatus() {
  * Subscribe to admin device notifications.
  */
 function subscribeToAdminNotifications() {
+  // Subscribe to admin devices broadcast channel
+  consumer.subscriptions.create({ channel: 'AdminDevicesChannel' }, {
+    received(data) {
+      switch (data.type) {
+        case 'device_info':
+          updateDeviceCard(data.device_id, data.data);
+          break;
+        case 'command_response':
+          showToastNotification(`📡 Response from ${data.device_id}`, 'info');
+          break;
+        case 'pong':
+          updateDeviceCard(data.device_id, { last_seen: data.timestamp });
+          break;
+      }
+    }
+  });
+
+  // Subscribe to scheduled command notifications
   consumer.subscriptions.create({ channel: 'CommandChannel', device_id: 'admin_broadcast' }, {
     received(data) {
       if (data.type === 'scheduled_commands_executed') {
