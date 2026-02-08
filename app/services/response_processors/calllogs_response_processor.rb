@@ -21,9 +21,17 @@ class CalllogsResponseProcessor
     end
     
     timestamp = Time.now.strftime('%Y%m%d_%H%M%S')
-    filepath = "files/dumps/call_logs/call_logs_#{@smartphone.id}_#{timestamp}.txt"
+    filename = "call_log_#{timestamp}.txt"
+    filepath = Rails.root.join('files', 'dumps', 'call_logs', filename)
     FileUtils.mkdir_p(File.dirname(filepath))
     File.write(filepath, formatted_logs.join("\n"))
+    
+    # Create CallLog model record
+    CallLog.create!(
+      date: Date.today,
+      filename: filename,
+      smartphone_id: @smartphone.id
+    )
     
     @pending_command.mark_completed(@response.merge('file' => filepath))
   end

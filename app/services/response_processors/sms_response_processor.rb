@@ -4,13 +4,45 @@ class SmsResponseProcessor
     @response = response
     @smartphone = pending_command.smartphone
   end
-  
+
   def process
     sms_messages = @response['sms_messages'] || []
-    timestamp = Time.now.strftime('%Y%m%d_%H%M%S')
-    filepath = \"files/dumps/sms/sms_#{@smartphone.id}_#{timestamp}.txt\"
-    FileUtils.mkdir_p(File.dirname(filepath))
-    File.write(filepath, sms_messages.to_json)
-    @pending_command.mark_completed(@response.merge('file' => filepath))
+    timestamp = Time.current.strftime("%Y-%m-%d_%H--%M--%S")
+    filename = "sms_dump_#{timestamp}.txt"
+    
+    file_path = Rails.root.join('files', 'dumps', 'sms', filename)
+    FileUtils.mkdir_p(File.dirname(file_path))
+    
+    content = sms_messages.map do |message|
+      sender = message['sender'] || 'Unknown'
+      body = message['body'] || ''
+      date = format_date(message['date'])
+      message_type = message['type'] == 1 ? 'Received' : 'Sent'
+      "#{message_type} from: #{sender}\nTime: #{date}\nMessage: #{body}\n\n"
+    end.join
+    
+    File.write(file_path, content)
+    
+    SmsMessage.create!(
+      date: timestamp.gsub("_", " ").gsub("--", ":"),
+      filename: filename,
+      smartphone_id: @smartphone.id
+    )
+    
+    @pending_command.mark_completed(@response)
+  end
+  
+  private
+  
+  def format_date(timestamp)
+    return 'Unknown' if timestamp.blank?
+    
+    begin
+      # Handle millisecond timestamps
+      time = Time.at(timestamp / 1000.0)
+      time.strftime('%Y-%m-%d %H:%M:%S')
+    rescue
+      'Unknown'
+    end
   end
 end
