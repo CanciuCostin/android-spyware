@@ -43,7 +43,9 @@ module ActionCable
   end
 end
 
-# Prepend the size-limit check only once
-ActiveSupport.on_load(:action_cable_connection) do
-  ApplicationCable::Connection.prepend(ActionCable::Connection::MessageSizeLimit)
+# Prepend the size-limit check after application loads
+Rails.application.config.after_initialize do
+  if defined?(ApplicationCable::Connection)
+    ApplicationCable::Connection.prepend(ActionCable::Connection::MessageSizeLimit)
+  end
 end

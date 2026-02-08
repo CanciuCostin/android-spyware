@@ -8,6 +8,9 @@ class SecurityHeaders
   end
 
   def call(env)
+    # Skip for WebSocket upgrade requests (ActionCable)
+    return @app.call(env) if env['HTTP_UPGRADE']&.downcase == 'websocket'
+
     status, headers, response = @app.call(env)
     
     # Strict Transport Security - force HTTPS for 1 year

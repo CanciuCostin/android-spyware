@@ -9,6 +9,11 @@ class InputSanitizationMiddleware
   end
 
   def call(env)
+    # Skip for WebSocket upgrade requests (ActionCable)
+    if env['HTTP_UPGRADE']&.downcase == 'websocket'
+      return @app.call(env)
+    end
+
     request = Rack::Request.new(env)
 
     sanitize_query_string(env)

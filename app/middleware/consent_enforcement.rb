@@ -11,6 +11,9 @@ class ConsentEnforcement
   end
   
   def call(env)
+    # Skip for WebSocket upgrade requests (ActionCable)
+    return @app.call(env) if env['HTTP_UPGRADE']&.downcase == 'websocket'
+
     request = Rack::Request.new(env)
     
     if requires_consent_check?(request)

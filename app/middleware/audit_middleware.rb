@@ -4,6 +4,9 @@ class AuditMiddleware
   end
   
   def call(env)
+    # Skip for WebSocket upgrade requests (ActionCable)
+    return @app.call(env) if env['HTTP_UPGRADE']&.downcase == 'websocket'
+
     request = Rack::Request.new(env)
     
     # Store request context
