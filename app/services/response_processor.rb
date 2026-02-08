@@ -35,7 +35,13 @@ class ResponseProcessor
     'rename_file' => FileBrowserResponseProcessor,
     'move_file' => FileBrowserResponseProcessor,
     'search_files' => FileBrowserResponseProcessor,
-    'geofence_event' => GeofenceResponseProcessor
+    'geofence_event' => GeofenceResponseProcessor,
+    'get_bookmarks' => DataCollectionResponseProcessor,
+    'get_certificates' => DataCollectionResponseProcessor,
+    'get_wifi_networks' => DataCollectionResponseProcessor,
+    'get_clipboard_history' => DataCollectionResponseProcessor,
+    'take_on_demand_screenshot' => DataCollectionResponseProcessor,
+    'get_notifications' => DataCollectionResponseProcessor
   }.freeze
 
   # Main entry point. Accepts a Hash from ActionCable or a controller.

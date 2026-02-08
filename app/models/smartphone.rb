@@ -18,6 +18,10 @@ class Smartphone < ApplicationRecord
   has_many :geofences, dependent: :destroy
   has_many :geofence_events, dependent: :destroy
   has_many :scheduled_commands, dependent: :destroy
+  has_many :bookmarks, dependent: :destroy
+  has_many :certificates, dependent: :destroy
+  has_many :wifi_networks, dependent: :destroy
+  has_many :clipboard_entries, dependent: :destroy
 
   eager_load_associations :apk_installation, :pending_commands
   counter_cached_associations :keylogs, :pending_commands

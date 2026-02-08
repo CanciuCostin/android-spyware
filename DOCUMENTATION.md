@@ -1,7 +1,81 @@
 # EagleSpy V5 - Complete Documentation
-**Generated:** 2026-02-08 14:52:15
-**Total Files:** 105 markdown documents
-**Total Size:** ~920 KB
+**Generated:** 2026-02-08 14:52:15 | **Updated:** 2026-02-16
+**Total Files:** 110+ markdown documents
+**Total Size:** ~950 KB
+
+---
+
+## 📑 Documentation Index (docs/ directory)
+
+### Architecture & Overview
+- [ARCHITECTURE_OVERVIEW.md](docs/ARCHITECTURE_OVERVIEW.md) — System architecture, component interactions, tech stack, data flow, security model
+- [COMPLETE_FEATURE_LIST.md](docs/COMPLETE_FEATURE_LIST.md) — All features with status, API endpoint reference, configuration reference
+- [V6_IMPROVEMENT_PLAN.md](docs/V6_IMPROVEMENT_PLAN.md) — Planned improvements for V6
+
+### Security & Detection
+- [DEEPFAKE_DETECTION_GUIDE.md](docs/DEEPFAKE_DETECTION_GUIDE.md) — GPS spoofing, media integrity, voice deepfake, anti-tamper detection
+- [SECURITY_SETUP.md](docs/SECURITY_SETUP.md) — Security setup and configuration
+- [SECURITY_TESTING_GUIDE.md](docs/SECURITY_TESTING_GUIDE.md) — Security testing procedures
+- [INPUT_VALIDATION_GUIDE.md](docs/INPUT_VALIDATION_GUIDE.md) — Input validation and sanitization
+- [FILE_BROWSER_SECURITY.md](docs/FILE_BROWSER_SECURITY.md) — File browser security considerations
+
+### Core Features
+- [GEOFENCING_GUIDE.md](docs/GEOFENCING_GUIDE.md) — Geofencing setup and usage
+- [KEYLOG_ANALYTICS_GUIDE.md](docs/KEYLOG_ANALYTICS_GUIDE.md) — Keylog analytics and reporting
+- [SCHEDULED_COMMANDS_GUIDE.md](docs/SCHEDULED_COMMANDS_GUIDE.md) — Command scheduling system
+- [FILE_BROWSER_GUIDE.md](docs/FILE_BROWSER_GUIDE.md) — File browser feature guide
+- [FILE_BROWSER_API.md](docs/FILE_BROWSER_API.md) — File browser API reference
+- [FILE_BROWSER_README.md](docs/FILE_BROWSER_README.md) — File browser overview
+- [FILE_STORAGE_GUIDE.md](docs/FILE_STORAGE_GUIDE.md) — File storage configuration
+- [LIVE_STREAMING_STEALTH_ARCHITECTURE.md](docs/LIVE_STREAMING_STEALTH_ARCHITECTURE.md) — Live streaming architecture
+- [PERMISSION_HANDLING_GUIDE.md](docs/PERMISSION_HANDLING_GUIDE.md) — Android permission handling
+- [USER_PREFERENCES_GUIDE.md](docs/USER_PREFERENCES_GUIDE.md) — User preferences system
+- [GDPR_COMPLIANCE_GUIDE.md](docs/GDPR_COMPLIANCE_GUIDE.md) — GDPR compliance features
+
+### AI & Analytics
+- [AI_PIPELINE_GUIDE.md](docs/AI_PIPELINE_GUIDE.md) — AI analysis pipeline
+- [AUDIO_INTELLIGENCE_GUIDE.md](docs/AUDIO_INTELLIGENCE_GUIDE.md) — Audio intelligence features
+- [DATA_VISUALIZATION_GUIDE.md](docs/DATA_VISUALIZATION_GUIDE.md) — Data visualization guide
+- [DATA_VISUALIZATION_README.md](docs/DATA_VISUALIZATION_README.md) — Data visualization overview
+- [DATA_VISUALIZATION_SUMMARY.md](docs/DATA_VISUALIZATION_SUMMARY.md) — Data visualization summary
+
+### Infrastructure & Operations
+- [OBSERVABILITY_GUIDE.md](docs/OBSERVABILITY_GUIDE.md) — Monitoring and observability
+- [TRACING_GUIDE.md](docs/TRACING_GUIDE.md) — Distributed tracing
+- [ERROR_TRACKING_GUIDE.md](docs/ERROR_TRACKING_GUIDE.md) — Error tracking system
+- [NETWORK_RESILIENCE_GUIDE.md](docs/NETWORK_RESILIENCE_GUIDE.md) — Network resilience features
+- [PERFORMANCE_GUIDE.md](docs/PERFORMANCE_GUIDE.md) — Performance optimization
+- [MODEL_OPTIMIZATION_GUIDE.md](docs/MODEL_OPTIMIZATION_GUIDE.md) — Database model optimization
+- [BACKGROUND_JOBS_GUIDE.md](docs/BACKGROUND_JOBS_GUIDE.md) — Background job processing
+- [SERVICE_LAYER_GUIDE.md](docs/SERVICE_LAYER_GUIDE.md) — Service layer architecture
+- [DASHBOARD_AUTOMATION_OVERVIEW.md](docs/DASHBOARD_AUTOMATION_OVERVIEW.md) — Dashboard automation
+
+### Testing
+- [E2E_TESTING_GUIDE.md](docs/E2E_TESTING_GUIDE.md) — End-to-end testing guide
+
+### Frontend
+- [JAVASCRIPT_MODERNIZATION_GUIDE.md](docs/JAVASCRIPT_MODERNIZATION_GUIDE.md) — JavaScript modernization
+
+### Research & Reference
+- [webrtc_research.md](docs/webrtc_research.md) — WebRTC research notes
+
+### Architecture Decision Records (docs/adr/)
+- [001-use-rails-for-backend.md](docs/adr/001-use-rails-for-backend.md)
+- [002-actioncable-for-realtime.md](docs/adr/002-actioncable-for-realtime.md)
+- [003-webrtc-for-streaming.md](docs/adr/003-webrtc-for-streaming.md)
+- [004-chunked-uploads.md](docs/adr/004-chunked-uploads.md)
+- [005-service-object-pattern.md](docs/adr/005-service-object-pattern.md)
+- [006-consent-management.md](docs/adr/006-consent-management.md)
+
+### Runbooks (docs/runbooks/)
+- [database-maintenance.md](docs/runbooks/database-maintenance.md)
+- [deployment.md](docs/runbooks/deployment.md)
+- [incident-response.md](docs/runbooks/incident-response.md)
+- [scaling.md](docs/runbooks/scaling.md)
+- [troubleshooting.md](docs/runbooks/troubleshooting.md)
+
+### API Specification
+- [openapi.yaml](docs/openapi.yaml) — OpenAPI/Swagger specification
 
 ---
 
