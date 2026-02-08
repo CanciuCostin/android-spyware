@@ -7,6 +7,7 @@ class AdminUser < ApplicationRecord
          :recoverable, :rememberable, :validatable
   
   has_many :audit_logs, dependent: :restrict_with_error
+  has_one :user_preference, dependent: :destroy
   
   # Track login/logout for audit trail
   after_commit :audit_login, on: :update, if: :saved_change_to_last_sign_in_at?

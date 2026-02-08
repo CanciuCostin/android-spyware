@@ -126,6 +126,16 @@ Rails.application.routes.draw do
       get 'keylog_analytics/export', to: 'keylog_analytics#export'
     end
 
+    # Scheduled Commands
+    scope 'devices/:device_id' do
+      resources :scheduled_commands, only: [:index, :show, :create, :update, :destroy] do
+        member do
+          post :toggle
+          get :executions
+        end
+      end
+    end
+
     # Geofence Management
     scope 'devices/:device_id' do
       resources :geofences, controller: 'geofence', only: [:index, :create, :destroy]
@@ -155,6 +165,19 @@ Rails.application.routes.draw do
       get 'retention_policy', to: 'gdpr#show_retention_policy'
       put 'retention_policy', to: 'gdpr#update_retention_policy'
       get 'privacy_policy', to: 'gdpr#privacy_policy'
+    end
+
+    # Error Tracking API
+    resources :errors, only: [:index, :show] do
+      member do
+        put :resolve
+        put :ignore
+      end
+    end
+
+    # User Preferences API
+    resource :preferences, only: [:show, :update, :destroy] do
+      get '/', action: :index, on: :collection
     end
 
     namespace :v1 do

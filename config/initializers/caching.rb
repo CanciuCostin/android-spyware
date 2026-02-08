@@ -34,4 +34,16 @@ Rails.application.configure do
   if Rails.env.development?
     config.action_controller.perform_caching = Rails.root.join('tmp', 'caching-dev.txt').exist?
   end
+
+  # Warm cache on boot in production (non-blocking)
+  config.after_initialize do
+    if Rails.env.production?
+      Thread.new do
+        sleep 5 # let app finish booting
+        CacheService.warm!
+      rescue StandardError => e
+        Rails.logger.error "[Caching] Cache warm on boot failed: #{e.message}"
+      end
+    end
+  end
 end

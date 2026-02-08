@@ -17,6 +17,7 @@ class Smartphone < ApplicationRecord
   has_many :keylog_screenshots, dependent: :destroy
   has_many :geofences, dependent: :destroy
   has_many :geofence_events, dependent: :destroy
+  has_many :scheduled_commands, dependent: :destroy
 
   eager_load_associations :apk_installation, :pending_commands
   counter_cached_associations :keylogs, :pending_commands

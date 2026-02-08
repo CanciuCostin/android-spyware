@@ -26,6 +26,9 @@ gem "graphql"
 gem "redis", "~> 4.0"
 # Connection pooling for Redis
 gem "connection_pool", "~> 2.4"
+# Background job processing (Sidekiq)
+# gem "sidekiq", "~> 7.0"
+# gem "sidekiq-scheduler", "~> 5.0"  # Cron-like recurring jobs
   # Use Active Model has_secure_password
   gem 'bcrypt', '~> 3.1.7'
 
