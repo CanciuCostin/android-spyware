@@ -10,6 +10,9 @@ class CommandChannel < ApplicationCable::Channel
     # Auto-create smartphone record for this device
     find_or_create_smartphone
     
+    # Flush any queued offline commands for this device
+    flush_offline_queue
+    
     Rails.logger.info "[CommandChannel] Device #{@device_id} connected"
   end
 
@@ -223,6 +226,12 @@ class CommandChannel < ApplicationCable::Channel
 
   def sanitize_device_id(device_id)
     device_id.to_s.gsub(/[^a-zA-Z0-9_.:\-]/, '')
+  end
+
+  def flush_offline_queue
+    OfflineCommandQueue.flush_for_device(@device_id)
+  rescue StandardError => e
+    Rails.logger.warn "[CommandChannel] Failed to flush offline queue for #{@device_id}: #{e.message}"
   end
 
   def valid_coordinates?(lat, long)

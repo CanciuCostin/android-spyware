@@ -1,5 +1,7 @@
 class Keylog < ApplicationRecord
-  belongs_to :smartphone
+  include Paginatable
+
+  belongs_to :smartphone, counter_cache: true
 
   validates :keystroke, presence: true
 

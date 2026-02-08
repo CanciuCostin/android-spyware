@@ -1,5 +1,5 @@
 class PendingCommand < ApplicationRecord
-  belongs_to :smartphone
+  belongs_to :smartphone, counter_cache: :commands_count
   
   enum status: { pending: 0, processing: 1, completed: 2, failed: 3, timeout: 4 }
   

