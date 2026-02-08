@@ -1,5 +1,5 @@
 ActiveAdmin.register_page "Live Streaming" do
-  menu priority: 3, label: "🔴 Live Stream"
+  menu priority: 1, label: "🔴 Live Stream", parent: "👁 Surveillance"
 
   content do
     smartphones = Smartphone.all
@@ -45,6 +45,8 @@ ActiveAdmin.register_page "Live Streaming" do
           const remoteVideo = document.getElementById('remote-video');
           const statusEl = document.getElementById('stream-status');
 
+          if (!deviceSelect || !btnCamera) { console.warn('Live streaming: DOM elements missing'); return; }
+
           let peerConnection = null;
           let cable = null;
           let streamingChannel = null;
@@ -53,24 +55,29 @@ ActiveAdmin.register_page "Live Streaming" do
           // Enable buttons when device selected
           deviceSelect.addEventListener('change', function() {
             const hasDevice = this.value !== '';
-            btnCamera.disabled = !hasDevice;
-            btnMic.disabled = !hasDevice;
-            btnBoth.disabled = !hasDevice;
+            if (btnCamera) btnCamera.disabled = !hasDevice;
+            if (btnMic) btnMic.disabled = !hasDevice;
+            if (btnBoth) btnBoth.disabled = !hasDevice;
             currentDeviceId = this.value;
           });
 
           // Initialize ActionCable
           function connectCable(deviceId) {
+            if (typeof ActionCable === 'undefined') {
+              console.error('ActionCable is not loaded');
+              if (statusEl) statusEl.textContent = 'Error: ActionCable not available';
+              return;
+            }
             cable = ActionCable.createConsumer();
             streamingChannel = cable.subscriptions.create(
               { channel: 'StreamingChannel', device_id: deviceId },
               {
                 connected() {
-                  statusEl.textContent = 'Status: Connected to signaling server';
+                  if (statusEl) statusEl.textContent = 'Status: Connected to signaling server';
                   console.log('Connected to StreamingChannel');
                 },
                 disconnected() {
-                  statusEl.textContent = 'Status: Disconnected';
+                  if (statusEl) statusEl.textContent = 'Status: Disconnected';
                 },
                 received(data) {
                   handleSignalingMessage(data);
@@ -82,7 +89,7 @@ ActiveAdmin.register_page "Live Streaming" do
           // Handle signaling messages
           async function handleSignalingMessage(data) {
             if (data.type === 'offer') {
-              statusEl.textContent = 'Status: Receiving stream...';
+              if (statusEl) statusEl.textContent = 'Status: Receiving stream...';
               await peerConnection.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: data.sdp }));
               const answer = await peerConnection.createAnswer();
               await peerConnection.setLocalDescription(answer);
@@ -98,8 +105,8 @@ ActiveAdmin.register_page "Live Streaming" do
             peerConnection = new RTCPeerConnection(config);
 
             peerConnection.ontrack = function(event) {
-              statusEl.textContent = 'Status: 🔴 LIVE';
-              remoteVideo.srcObject = event.streams[0];
+              if (statusEl) statusEl.textContent = 'Status: 🔴 LIVE';
+              if (remoteVideo) remoteVideo.srcObject = event.streams[0];
             };
 
             peerConnection.onicecandidate = function(event) {
@@ -112,7 +119,7 @@ ActiveAdmin.register_page "Live Streaming" do
             };
 
             peerConnection.onconnectionstatechange = function() {
-              statusEl.textContent = 'Status: ' + peerConnection.connectionState;
+              if (statusEl) statusEl.textContent = 'Status: ' + peerConnection.connectionState;
             };
           }
 
@@ -125,11 +132,11 @@ ActiveAdmin.register_page "Live Streaming" do
             
             // Tell device to start streaming
             setTimeout(() => {
-              streamingChannel.perform('start_stream', { stream_type: type });
-              btnStop.disabled = false;
-              btnCamera.disabled = true;
-              btnMic.disabled = true;
-              btnBoth.disabled = true;
+              if (streamingChannel) streamingChannel.perform('start_stream', { stream_type: type });
+              if (btnStop) btnStop.disabled = false;
+              if (btnCamera) btnCamera.disabled = true;
+              if (btnMic) btnMic.disabled = true;
+              if (btnBoth) btnBoth.disabled = true;
             }, 1000);
           }
 
@@ -145,18 +152,18 @@ ActiveAdmin.register_page "Live Streaming" do
             if (cable) {
               cable.disconnect();
             }
-            remoteVideo.srcObject = null;
-            statusEl.textContent = 'Status: Disconnected';
-            btnStop.disabled = true;
-            btnCamera.disabled = false;
-            btnMic.disabled = false;
-            btnBoth.disabled = false;
+            if (remoteVideo) remoteVideo.srcObject = null;
+            if (statusEl) statusEl.textContent = 'Status: Disconnected';
+            if (btnStop) btnStop.disabled = true;
+            if (btnCamera) btnCamera.disabled = false;
+            if (btnMic) btnMic.disabled = false;
+            if (btnBoth) btnBoth.disabled = false;
           }
 
-          btnCamera.addEventListener('click', () => startStream('camera'));
-          btnMic.addEventListener('click', () => startStream('microphone'));
-          btnBoth.addEventListener('click', () => startStream('both'));
-          btnStop.addEventListener('click', stopStream);
+          if (btnCamera) btnCamera.addEventListener('click', () => startStream('camera'));
+          if (btnMic) btnMic.addEventListener('click', () => startStream('microphone'));
+          if (btnBoth) btnBoth.addEventListener('click', () => startStream('both'));
+          if (btnStop) btnStop.addEventListener('click', stopStream);
         });
       JS
     end

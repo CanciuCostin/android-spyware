@@ -1,5 +1,5 @@
 ActiveAdmin.register ApkPayload do
-  menu priority: 3, label: "Generate APK"
+  menu priority: 1, label: "⚙️ Generate APK", parent: "📦 APK"
 
   form title: "Generate a malware APK" do |f|
     inputs do

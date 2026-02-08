@@ -4,6 +4,8 @@ require "open3"
 require "shellwords"
 
 class MessagingAppsDumpsController < InheritedResources::Base
+  include CommandSender
+
   def export_database(filePath)
     begin
       db = SQLite3::Database.open "files/dumps/whatsapp/msgstore.db"
@@ -175,38 +177,22 @@ class MessagingAppsDumpsController < InheritedResources::Base
 
   def export_whatsapp_database
     begin
-      downloadTimeout = params[:copy_timeout].to_i
-      fileName = params[:filename].to_s
       @smartphone = Smartphone.find(params[:smartphone_id])
-      currentTime = DateTime.now
-      currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-      @fileName = fileName.empty? ?
-        "whatsapp_dump_" + currentTimeFormat + ".txt" :
-        fileName + ".txt"
-      fullPath = "files/dumps/whatsapp/" + @fileName
-      export_database(fullPath)
-      commandOutput = ["Done"]
-      isOperationSuccessful = false
-      1.upto(downloadTimeout) do |n|
-        if File.file?(fullPath)
-          newDump = MessagingAppsDump.new(:date => currentTimeFormat.gsub("_", " ").gsub("--", ":"),
-                                          :app_name => "WhatsApp",
-                                          :filename => @fileName,
-                                          :smartphone_id => @smartphone.id)
-          newDump.save!
-          isOperationSuccessful = true
-          break
-        end
-      end
-      commandOutput = ["Operation Failed"] if not isOperationSuccessful
-    rescue
-      commandOutput = "Operation Failed"
+      
+      # Send command asynchronously via ActionCable
+      # WhatsAppResponseProcessor will handle saving the messages
+      pending_command = send_command_async(@smartphone, 'dump_whatsapp_messages', {})
+      
+      commandOutput = ["WhatsApp message extraction initiated..."]
+    rescue => e
+      Rails.logger.error("Error dumping WhatsApp messages: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
         render "export_whatsapp_database",
-               :locals => { :commandOutput => commandOutput,
-                            :fileName => @fileName }
+               :locals => { :commandOutput => commandOutput }
       }
     end
   end

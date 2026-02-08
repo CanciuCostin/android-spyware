@@ -61,13 +61,13 @@ Only port `80` (or `443`) and `3478` (TURN) should be exposed to the internet.
 
 ## 4. SSL/TLS Enforcement
 
-In production, you MUST use SSL/TLS to protect:
+In production, SSL/TLS is enforced by Rails (see `config/environments/production.rb`) to protect:
 1. Admin login credentials
 2. Device authentication tokens
 3. Keylog data in transit
 4. Live video/audio streams
 
-Set `USE_SSL=true` in your `.env` file and configure a reverse proxy (Nginx/Traefik) with valid certificates.
+Rails forces TLS presence with HSTS, secure cookies, and preload headers. Ensure your reverse proxy terminates TLS and the PROXY sets `X-Forwarded-Proto` when running behind load balancers.
 
 ## 5. Rate Limiting
 
@@ -77,6 +77,12 @@ Default limits:
 - Login attempts: 5 per minute per IP
 - API requests: 300 per 5 minutes per IP
 
-## 6. Audit Logs
+## 6. Secrets & Credential Rotation
+
+- Remove `.env` from the repository (`.env` is now ignored).
+- Store secrets in a protected location (Vault, GitHub Secrets, Key Vault) and inject them at deploy time.
+- Rotate `SECRET_KEY_BASE`, `ADMIN_PASSWORD`, `DEVICE_AUTH_TOKEN`, and your TURN/MSF secrets any time you suspect exposure.
+
+## 7. Audit Logs
 
 Check `log/production.log` and `log/security.log` regularly for suspicious activity.

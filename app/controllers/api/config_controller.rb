@@ -85,7 +85,7 @@ module Api
 
     def build_websocket_url
       host = ENV['RAILS_HOST'] || request.host
-      port = ENV['RAILS_PORT'] || '3000'
+      port = ENV['RAILS_PORT'] || '4444'
       protocol = ENV['USE_SSL'] == 'true' ? 'wss' : 'ws'
 
       "#{protocol}://#{host}:#{port}/cable"
@@ -93,7 +93,7 @@ module Api
 
     def build_api_base_url
       host = ENV['RAILS_HOST'] || request.host
-      port = ENV['RAILS_PORT'] || '3000'
+      port = ENV['RAILS_PORT'] || '4444'
       protocol = ENV['USE_SSL'] == 'true' ? 'https' : 'http'
 
       "#{protocol}://#{host}:#{port}/api"

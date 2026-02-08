@@ -1,4 +1,5 @@
 ActiveAdmin.register GeoLocation do
+  menu parent: "📦 Data", priority: 8, label: "📍 Locations"
 
   permit_params :date, :lat, :long, :smartphone_id
 

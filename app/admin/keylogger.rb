@@ -1,5 +1,5 @@
 ActiveAdmin.register_page "Keylogger" do
-  menu priority: 5, label: proc { "🔑 Keylogger" }
+  menu false  # Hidden - use Keylogger Dashboard instead
 
   content title: "Keylogger Dashboard" do
     render partial: 'admin/keylogger/dashboard'

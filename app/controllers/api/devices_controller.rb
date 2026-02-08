@@ -1,6 +1,9 @@
 # API Controller for device status queries
 module Api
   class DevicesController < Api::BaseController
+    include ErrorHandler
+    include ResponseFormatter
+    
     # GET /api/devices/online
     # Returns list of currently connected devices
     def online
@@ -17,10 +20,41 @@ module Api
         end
       end
 
-      render json: { devices: devices, count: devices.size }
+      render_success({ devices: devices, count: devices.size })
     rescue StandardError => e
       Rails.logger.warn "[API::DevicesController] Redis error: #{e.message}"
-      render json: { devices: [], count: 0 }
+      render_error('Failed to fetch online devices', details: e.message)
+    end
+    
+    # GET /api/devices/:id
+    def show
+      device = Smartphone.find(params[:id])
+      render_success(device, serializer: DeviceSerializer, include: [:statistics])
+    end
+    
+    # POST /api/devices/:id/commands
+    def send_command
+      device = Smartphone.find(params[:id])
+      result = DeviceCommandService.call(device, params[:command], command_params)
+      
+      if result.success?
+        render_accepted(
+          { 
+            command_id: result.value.id,
+            request_id: result.value.request_id,
+            status: result.value.status
+          },
+          message: 'Command sent successfully'
+        )
+      else
+        render_error(result.error, status: :unprocessable_entity)
+      end
+    end
+    
+    private
+    
+    def command_params
+      params.permit(:duration, :quality, :filename, :options, :camera_id)
     end
   end
 end

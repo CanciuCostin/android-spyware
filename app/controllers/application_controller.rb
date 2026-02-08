@@ -1,9 +1,6 @@
-require "msfrpc-client"
 require "date"
-require_relative "../../lib/msf_instrumentation"
 
 class ApplicationController < ActionController::Base
-  include MsfInstrumentation::ApplicationControllerMixin
   
   # SonarQube Fix: Use instance variables with memoization instead of class variables
   # Rule S1121 - Class variables create thread-safety issues
@@ -31,17 +28,12 @@ class ApplicationController < ActionController::Base
     nil
   end
 
-  # Wrapping legacy helpers with traced implementations
-  def start_msf_process(command)
-    start_msf_process_traced(command)
-  end
-
   # SonarQube Fix: Use secure AdbCommandService instead of raw shell
   def run_adb_command(command)
     adb_service.shell(command.to_s.gsub('shell ', ''))
   rescue AdbCommandService::CommandError => e
     Rails.logger.error("ADB command failed: #{e.message}")
-    run_adb_command_traced(command)
+    "Operation Failed: #{e.message}"
   end
 
   # SonarQube Fix: Use MsfRpcService - no hardcoded credentials

@@ -1,0 +1,18 @@
+[data-controller="dashboard"] .card {
+  border-radius: 0.6rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-controller="dashboard"] .list-group-item {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease;
+}
+
+[data-controller="dashboard"] .list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+[data-controller="dashboard"] .progress {
+  background-color: rgba(0, 0, 0, 0.08);
+}

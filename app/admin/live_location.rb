@@ -1,5 +1,5 @@
 ActiveAdmin.register_page "Live Location" do
-  menu priority: 4, label: "📍 Live Location"
+  menu priority: 2, label: "📍 Live Location", parent: "👁 Surveillance"
 
   content do
     smartphones = Smartphone.all
@@ -58,6 +58,8 @@ ActiveAdmin.register_page "Live Location" do
           const btnStart = document.getElementById('btn-start-tracking');
           const btnStop = document.getElementById('btn-stop-tracking');
           
+          if (!deviceSelect) { console.warn('Live location: DOM elements missing'); return; }
+          
           let map = null;
           let marker = null;
           let pathLine = null;
@@ -110,6 +112,10 @@ ActiveAdmin.register_page "Live Location" do
           function startTracking() {
             if (!currentDeviceId) return;
 
+            if (typeof ActionCable === 'undefined') {
+              console.error('ActionCable is not loaded');
+              return;
+            }
             cable = ActionCable.createConsumer();
             locationChannel = cable.subscriptions.create(
               { channel: 'LocationChannel', device_id: currentDeviceId },
@@ -126,8 +132,8 @@ ActiveAdmin.register_page "Live Location" do
               }
             );
 
-            btnStart.disabled = true;
-            btnStop.disabled = false;
+            if (btnStart) btnStart.disabled = true;
+            if (btnStop) btnStop.disabled = false;
           }
 
           function stopTracking() {
@@ -137,36 +143,45 @@ ActiveAdmin.register_page "Live Location" do
             if (cable) {
               cable.disconnect();
             }
-            btnStart.disabled = false;
-            btnStop.disabled = true;
+            if (btnStart) btnStart.disabled = false;
+            if (btnStop) btnStop.disabled = true;
           }
 
           function updateLocation(data) {
             const pos = { lat: parseFloat(data.lat), lng: parseFloat(data.lng) };
             
             // Update marker
-            marker.setPosition(pos);
-            map.panTo(pos);
+            if (marker) marker.setPosition(pos);
+            if (map) map.panTo(pos);
 
             // Update path
             pathCoords.push(pos);
-            pathLine.setPath(pathCoords);
+            if (pathLine) pathLine.setPath(pathCoords);
 
-            // Update info panel
-            document.getElementById('loc-lat').textContent = data.lat;
-            document.getElementById('loc-lng').textContent = data.lng;
-            document.getElementById('loc-accuracy').textContent = (data.accuracy || 'N/A') + ' m';
-            document.getElementById('loc-speed').textContent = (data.speed || 'N/A') + ' m/s';
-            document.getElementById('loc-timestamp').textContent = new Date(data.timestamp * 1000).toLocaleString();
+            // Update info panel (safe)
+            var el;
+            el = document.getElementById('loc-lat'); if (el) el.textContent = data.lat;
+            el = document.getElementById('loc-lng'); if (el) el.textContent = data.lng;
+            el = document.getElementById('loc-accuracy'); if (el) el.textContent = (data.accuracy || 'N/A') + ' m';
+            el = document.getElementById('loc-speed'); if (el) el.textContent = (data.speed || 'N/A') + ' m/s';
+            el = document.getElementById('loc-timestamp'); if (el) el.textContent = new Date(data.timestamp * 1000).toLocaleString();
           }
 
-          btnStart.addEventListener('click', startTracking);
-          btnStop.addEventListener('click', stopTracking);
+          if (btnStart) btnStart.addEventListener('click', startTracking);
+          if (btnStop) btnStop.addEventListener('click', stopTracking);
         });
       JS
     end
 
     # Load Google Maps API
-    script src: "https://maps.googleapis.com/maps/api/js?key=#{ENV.fetch('MAPS_API_KEY', '')}&callback=initLiveMap", async: true, defer: true
+    maps_key = ENV.fetch('MAPS_API_KEY', '')
+    if maps_key.present?
+      script src: "https://maps.googleapis.com/maps/api/js?key=#{maps_key}&callback=initLiveMap", async: true, defer: true
+    else
+      div class: "empty-state" do
+        h2 "⚠️ Google Maps API Key Not Configured"
+        para "Set MAPS_API_KEY environment variable in docker-compose.yml"
+      end
+    end
   end
 end

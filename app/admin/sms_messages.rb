@@ -1,4 +1,5 @@
 ActiveAdmin.register SmsMessage do
+  menu parent: "📦 Data", priority: 4, label: "💬 SMS"
   permit_params :date, :source, :destination, :content, :smartphone_id, :filename
 
   includes :smartphone

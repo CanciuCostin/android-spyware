@@ -47,17 +47,42 @@ Rails.application.configure do
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # Enable when SSL is configured - RECOMMENDED for production
-  config.force_ssl = ENV['USE_SSL'] == 'true'
+  # Force SSL, enable strict transport security, and secure cookies.
+  config.force_ssl = ENV.fetch('FORCE_SSL', 'true') == 'true'
+  config.ssl_options = {
+    hsts: {
+      expires: 31536000, # 1 year in seconds
+      subdomains: true,
+      preload: true
+    },
+    secure_cookies: true,
+    redirect: {
+      exclude: ->(request) { 
+        # Don't redirect health checks or monitoring endpoints
+        request.path =~ /\/(health|metrics|status)$/
+      }
+    }
+  }
+  config.require_master_key = true
 
-  # SECURITY: Only clear hosts if explicitly allowed via environment variable
-  # In production, prefer setting specific allowed hosts
-  if ENV['ALLOW_ALL_HOSTS'] == 'true'
+
+  allowed_hosts = []
+  allowed_hosts << ENV['RAILS_HOST']
+  allowed_hosts << ENV['PRODUCTION_HOST']
+  allowed_hosts << ENV['ADMIN_HOST']
+  allowed_hosts << 'localhost'
+  unless ENV['ALLOW_ALL_HOSTS'] == 'true'
     config.hosts.clear
-  else
-    # Add your production domain(s) here
-    config.hosts << ENV['RAILS_HOST'] if ENV['RAILS_HOST'].present?
-    config.hosts << 'localhost'
+    allowed_hosts.each do |host|
+      config.hosts << host if host.present?
+    end
   end
+
+  config.action_dispatch.default_headers.merge!(
+    'X-Frame-Options' => 'DENY',
+    'X-Content-Type-Options' => 'nosniff',
+    'Referrer-Policy' => 'strict-origin-when-cross-origin'
+  )
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.

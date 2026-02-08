@@ -53,7 +53,6 @@ class PicturesController < InheritedResources::Base
       format.js {
         render "take_picture", locals: { commandOutput: commandOutput, fileName: @fileName }
       }
-      }
     end
   end
 

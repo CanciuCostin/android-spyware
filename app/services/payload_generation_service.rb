@@ -8,7 +8,6 @@ require 'shellwords'
 # - S108: Proper error handling
 # - S1192: DRY - no duplicated strings
 class PayloadGenerationService
-  include MsfInstrumentation::ApplicationControllerMixin
 
   class GenerationError < StandardError; end
 

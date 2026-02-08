@@ -1,4 +1,5 @@
 ActiveAdmin.register CallLog do
+  menu parent: "📦 Data", priority: 2, label: "📞 Call Logs"
 	permit_params :filename,
 								:smartphone_id,
 								:date,

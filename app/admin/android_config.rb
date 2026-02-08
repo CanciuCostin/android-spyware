@@ -1,14 +1,14 @@
 ActiveAdmin.register_page "Android Config" do
-  menu priority: 4, label: "📱 APK Config"
+  menu priority: 3, label: "📱 APK Config", parent: "📦 APK"
 
   content do
     # Get current config from settings or defaults
     config = {
       server_url: ENV['RAILS_HOST'] || '213.91.211.150',
-      server_port: ENV['RAILS_PORT'] || '3000',
+      server_port: ENV['RAILS_PORT'] || '4444',
       turn_server: ENV['TURN_SERVER'] || '213.91.211.150:3478',
       turn_user: ENV['TURN_USER'] || 'eaglespy',
-      turn_password: ENV['TURN_PASSWORD'] || 'EagleSpy2024Secure!',
+      turn_password: ENV['TURN_PASSWORD'] || 'eaglespy_secret',
       use_ssl: ENV['USE_SSL'] == 'true'
     }
 
@@ -60,36 +60,38 @@ ActiveAdmin.register_page "Android Config" do
       raw <<-JS
         document.addEventListener('DOMContentLoaded', function() {
           const resultsEl = document.getElementById('test-results');
+          const wsBtn = document.getElementById('test-ws-btn');
+          const turnBtn = document.getElementById('test-turn-btn');
           
-          document.getElementById('test-ws-btn').addEventListener('click', function() {
-            resultsEl.innerHTML = '🔄 Testing WebSocket connection...';
+          if (wsBtn) wsBtn.addEventListener('click', function() {
+            if (resultsEl) resultsEl.innerHTML = '🔄 Testing WebSocket connection...';
             
-            const wsUrl = '#{config[:use_ssl] ? 'wss' : 'ws'}://#{config[:server_url]}:#{config[:server_port]}/cable';
+            const wsUrl = '#{config[:use_ssl] ? 'wss' : 'ws'}://#{ERB::Util.json_escape(config[:server_url])}:#{ERB::Util.json_escape(config[:server_port])}/cable';
             const ws = new WebSocket(wsUrl);
             
             ws.onopen = function() {
-              resultsEl.innerHTML = '<span style="color: #3fb950;">✅ WebSocket connected successfully!</span><br>URL: ' + wsUrl;
+              if (resultsEl) resultsEl.innerHTML = '<span style="color: #3fb950;">✅ WebSocket connected successfully!</span><br>URL: ' + wsUrl;
               ws.close();
             };
             
             ws.onerror = function(err) {
-              resultsEl.innerHTML = '<span style="color: #f85149;">❌ WebSocket connection failed</span><br>URL: ' + wsUrl + '<br>Check if server is running and port is open.';
+              if (resultsEl) resultsEl.innerHTML = '<span style="color: #f85149;">❌ WebSocket connection failed</span><br>URL: ' + wsUrl + '<br>Check if server is running and port is open.';
             };
             
             setTimeout(function() {
               if (ws.readyState !== WebSocket.OPEN && ws.readyState !== WebSocket.CLOSED) {
                 ws.close();
-                resultsEl.innerHTML = '<span style="color: #f85149;">❌ Connection timeout</span>';
+                if (resultsEl) resultsEl.innerHTML = '<span style="color: #f85149;">❌ Connection timeout</span>';
               }
             }, 5000);
           });
           
-          document.getElementById('test-turn-btn').addEventListener('click', function() {
-            resultsEl.innerHTML = '🔄 Testing TURN server...';
+          if (turnBtn) turnBtn.addEventListener('click', function() {
+            if (resultsEl) resultsEl.innerHTML = '🔄 Testing TURN server...';
             
             const config = {
               iceServers: [
-                { urls: 'turn:#{config[:turn_server]}', username: '#{config[:turn_user]}', credential: '#{config[:turn_password]}' }
+                { urls: 'turn:#{ERB::Util.json_escape(config[:turn_server])}', username: '#{ERB::Util.json_escape(config[:turn_user])}', credential: '#{ERB::Util.json_escape(config[:turn_password])}' }
               ]
             };
             
@@ -99,7 +101,7 @@ ActiveAdmin.register_page "Android Config" do
             pc.onicecandidate = function(e) {
               if (e.candidate && e.candidate.candidate.indexOf('relay') > -1) {
                 turnWorks = true;
-                resultsEl.innerHTML = '<span style="color: #3fb950;">✅ TURN server working!</span><br>Relay candidate received.';
+                if (resultsEl) resultsEl.innerHTML = '<span style="color: #3fb950;">✅ TURN server working!</span><br>Relay candidate received.';
                 pc.close();
               }
             };
@@ -109,7 +111,7 @@ ActiveAdmin.register_page "Android Config" do
             
             setTimeout(function() {
               if (!turnWorks) {
-                resultsEl.innerHTML = '<span style="color: #d29922;">⚠️ TURN server may not be reachable</span><br>No relay candidates received. Check firewall and ports.';
+                if (resultsEl) resultsEl.innerHTML = '<span style="color: #d29922;">⚠️ TURN server may not be reachable</span><br>No relay candidates received. Check firewall and ports.';
                 pc.close();
               }
             }, 5000);

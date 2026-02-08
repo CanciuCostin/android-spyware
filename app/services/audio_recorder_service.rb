@@ -5,7 +5,6 @@
 # - S108: Proper error handling
 # - S1192: DRY - no duplicated strings
 class AudioRecorderService
-  include MsfInstrumentation::ApplicationControllerMixin
 
   class RecordingError < StandardError; end
 

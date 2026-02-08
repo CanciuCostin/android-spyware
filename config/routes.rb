@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  # Health Check Endpoints (for Docker/K8s)
+  get '/health', to: 'health#index'
+  get '/health/ready', to: 'health#ready'
+  get '/health/live', to: 'health#live'
+
   # Audit Trail System
   resources :audit_logs, only: [:index, :show] do
     collection do
@@ -40,6 +45,15 @@ Rails.application.routes.draw do
 
   resources :apk_installations do
     resources :tags, controller: :device_tags, only: [:index, :create, :destroy]
+    
+    # Consent Management routes
+    resources :consents, only: [:index] do
+      collection do
+        post :grant
+        post :revoke
+        get :export
+      end
+    end
     
     # App Control Panel routes
     get 'apps', to: 'app_control#index'

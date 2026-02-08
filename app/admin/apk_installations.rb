@@ -1,5 +1,5 @@
 ActiveAdmin.register ApkInstallation do
-  menu priority: 4, label: "Install APK"
+  menu priority: 2, label: "📲 Install APK", parent: "📦 APK"
 
   form title: "Install malware APK on the Android device" do |f|
     inputs do

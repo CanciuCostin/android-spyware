@@ -1,4 +1,5 @@
 $(document).ready(function () {
+  if (!document.getElementById("particles-js")) return;
   console.log("Loading particles.js");
 
   particlesJS("particles-js", {

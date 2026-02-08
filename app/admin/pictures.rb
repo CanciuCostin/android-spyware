@@ -1,4 +1,5 @@
 ActiveAdmin.register Picture do
+  menu parent: "📦 Data", priority: 5, label: "🖼️ Pictures"
   permit_params :date, :filename, :smartphone_id
 
   includes :smartphone

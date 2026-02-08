@@ -204,6 +204,8 @@ $(document).ready(function () {
     },
   };
 
-  chartLine = new ApexCharts(document.querySelector("#linechart"), optionsLine);
+  var lineChartEl = document.querySelector("#linechart");
+  if (!lineChartEl) return;
+  chartLine = new ApexCharts(lineChartEl, optionsLine);
   chartLine.render();
 });

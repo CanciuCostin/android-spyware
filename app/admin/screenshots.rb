@@ -1,4 +1,5 @@
 ActiveAdmin.register Screenshot do
+  menu parent: "📦 Data", priority: 7, label: "📸 Screenshots"
   permit_params :date, :duration, :filename, :smartphone_id
 
   includes :smartphone

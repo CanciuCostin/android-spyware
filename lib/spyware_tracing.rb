@@ -1,16 +1,24 @@
 # frozen_string_literal: true
 
-require 'opentelemetry/sdk'
-require 'opentelemetry/exporter/jaeger'
-require 'opentelemetry/instrumentation/rack'
-require 'opentelemetry/instrumentation/rails'
-require 'opentelemetry/instrumentation/http_client'
+begin
+  require 'opentelemetry/sdk'
+  require 'opentelemetry/exporter/jaeger'
+  require 'opentelemetry/instrumentation/rack'
+  require 'opentelemetry/instrumentation/rails'
+  require 'opentelemetry/instrumentation/http_client'
+rescue LoadError
+  # Tracing disabled
+end
+
+require 'ostruct'
 
 module SpywareTracing
   class << self
     attr_reader :tracer
 
     def initialize_tracing(environment: 'development')
+      return unless defined?(OpenTelemetry::SDK)
+
       # Configure OpenTelemetry
       OpenTelemetry::SDK.configure do |c|
         c.service_name = 'android-spyware'
@@ -42,7 +50,11 @@ module SpywareTracing
     end
 
     def with_span(name, attributes = {}, &block)
-      @tracer.in_span(name, attributes: attributes, &block)
+      if @tracer
+        @tracer.in_span(name, attributes: attributes, &block)
+      else
+        yield(OpenStruct.new) if block_given?
+      end
     end
 
     def trace_msf_operation(operation_name, payload_details = {})

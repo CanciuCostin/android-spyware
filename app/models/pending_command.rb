@@ -3,8 +3,7 @@ class PendingCommand < ApplicationRecord
   
   enum status: { pending: 0, processing: 1, completed: 2, failed: 3, timeout: 4 }
   
-  serialize :params, JSON
-  serialize :response_data, JSON
+  # params and response_data are native json columns — no serialize needed
   
   validates :request_id, presence: true, uniqueness: true
   validates :command, presence: true
