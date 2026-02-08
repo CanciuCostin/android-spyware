@@ -121,7 +121,6 @@ GEM
       rexml
     crass (1.0.6)
     csv (3.3.5)
-    date (3.5.1)
     devise (4.9.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -129,6 +128,7 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.6.2)
+    digest (3.2.1)
     docile (1.4.1)
     erubi (1.13.1)
     execjs (2.10.0)
@@ -195,15 +195,15 @@ GEM
     matrix (0.4.3)
     method_source (1.1.0)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.9)
     minitar (1.1.0)
     minitest (5.27.0)
     msfrpc-client (1.1.2)
       msgpack (~> 1)
     msgpack (1.8.0)
-    net-imap (0.5.13)
-      date
+    net-imap (0.2.5)
+      digest
       net-protocol
+      strscan
     net-pop (0.1.2)
       net-protocol
     net-protocol (0.2.2)
@@ -211,9 +211,6 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.5)
-    nokogiri (1.18.10)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.18.10-x64-mingw-ucrt)
       racc (~> 1.4)
     opentelemetry-api (1.7.0)
@@ -365,9 +362,8 @@ GEM
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
-    sqlite3 (2.8.1)
-      mini_portile2 (~> 2.8.0)
     sqlite3 (2.8.1-x64-mingw-ucrt)
+    strscan (3.1.7)
     thor (1.5.0)
     tilt (2.7.0)
     timeout (0.6.0)
@@ -410,7 +406,6 @@ GEM
     zeitwerk (2.6.18)
 
 PLATFORMS
-  ruby
   x64-mingw-ucrt
 
 DEPENDENCIES
@@ -434,6 +429,7 @@ DEPENDENCIES
   mimemagic!
   minitar
   msfrpc-client
+  net-imap (~> 0.2.0)
   opentelemetry-api
   opentelemetry-instrumentation-http_client
   opentelemetry-instrumentation-rack

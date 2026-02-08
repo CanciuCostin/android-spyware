@@ -3,11 +3,7 @@
 
 require 'request_store'
 
-# Configure RequestStore
-RequestStore.configure do |config|
-  # Use thread-local storage (default)
-  # This ensures audit context is properly isolated per request
-end
+# RequestStore uses thread-local storage by default, no configuration needed
 
 # Hook into ApplicationController to set current admin user
 Rails.application.config.to_prepare do

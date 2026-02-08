@@ -1,4 +1,6 @@
 class AddPerformanceIndexes < ActiveRecord::Migration[6.0]
+  disable_ddl_transaction!
+
   def up
     say_with_time "Adding performance indexes for high-volume tables..." do
       
@@ -16,13 +18,11 @@ class AddPerformanceIndexes < ActiveRecord::Migration[6.0]
                   algorithm: :concurrently
       end
       
-      # Partial index for recent keylogs (last 7 days - most queried)
+      # Partial index for recent keylogs - uses created_at column directly
       unless index_exists?(:keylogs, :created_at, name: 'idx_keylogs_recent')
-        execute <<-SQL
-          CREATE INDEX CONCURRENTLY idx_keylogs_recent 
-          ON keylogs (created_at DESC) 
-          WHERE created_at > (NOW() - INTERVAL '7 days');
-        SQL
+        add_index :keylogs, :created_at, order: { created_at: :desc },
+                  name: 'idx_keylogs_recent',
+                  algorithm: :concurrently
       end
       
       # Keylog screenshots optimization
@@ -80,13 +80,11 @@ class AddPerformanceIndexes < ActiveRecord::Migration[6.0]
                   algorithm: :concurrently
       end
       
-      # Partial index for active (pending/processing) commands only
+      # Index for active (pending/processing) commands
       unless index_exists?(:pending_commands, :created_at, name: 'idx_commands_active')
-        execute <<-SQL
-          CREATE INDEX CONCURRENTLY idx_commands_active 
-          ON pending_commands (created_at DESC, smartphone_id) 
-          WHERE status IN (0, 1);
-        SQL
+        add_index :pending_commands, [:status, :created_at, :smartphone_id],
+                  name: 'idx_commands_active',
+                  algorithm: :concurrently
       end
       
       # Pictures/Photos optimization

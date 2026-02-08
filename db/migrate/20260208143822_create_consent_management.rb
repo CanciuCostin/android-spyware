@@ -42,7 +42,6 @@ class CreateConsentManagement < ActiveRecord::Migration[6.0]
       t.datetime :acknowledged_at
       t.timestamps
       
-      t.index :device_id
       t.index :disclosure_type
     end
   end

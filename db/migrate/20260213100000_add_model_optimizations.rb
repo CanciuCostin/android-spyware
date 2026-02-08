@@ -1,4 +1,6 @@
 class AddModelOptimizations < ActiveRecord::Migration[6.0]
+  disable_ddl_transaction!
+
   def up
     say_with_time "Adding counter_cache columns to smartphones..." do
       unless column_exists?(:smartphones, :keylogs_count)
@@ -67,13 +69,12 @@ class AddModelOptimizations < ActiveRecord::Migration[6.0]
     end
 
     say_with_time "Adding partial indexes for active devices..." do
-      # Partial index: only smartphones with recent keylogs
+      # Index for active device keylogs lookups
       unless index_exists?(:keylogs, :smartphone_id, name: 'idx_keylogs_active_devices')
-        execute <<-SQL
-          CREATE INDEX CONCURRENTLY idx_keylogs_active_devices
-          ON keylogs (smartphone_id, created_at DESC)
-          WHERE created_at > (NOW() - INTERVAL '24 hours');
-        SQL
+        add_index :keylogs, [:smartphone_id, :created_at],
+                  order: { created_at: :desc },
+                  name: 'idx_keylogs_active_devices',
+                  algorithm: :concurrently
       end
 
       # Partial index: pending commands awaiting response

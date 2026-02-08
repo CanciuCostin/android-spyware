@@ -11,6 +11,9 @@ gem "pg", "~> 1.5"
 gem "ffi"
 gem "concurrent-ruby"
 gem "logger", "~> 1.5.0"  # Must match Ruby 3.1 default; >= 1.6 breaks Rails 6.1
+gem "net-imap", "~> 0.2.0" # Pin to avoid date gem dependency (0.5+ requires date gem, which is broken on Windows)
+# NOTE: Do NOT add 'gem "date"' — gem versions of date have broken native ext on Windows Ruby 3.1.
+# The default date 3.2.2 bundled with Ruby works fine.
 # Use Puma as the app server (Docker only, WEBrick for Windows dev)
 gem "puma", ">= 5.0", install_if: -> { !Gem.win_platform? }
 gem "webrick", install_if: -> { Gem.win_platform? }

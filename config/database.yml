@@ -25,8 +25,9 @@ development:
   <<: *default
   database: android_spyware_development
   username: <%= ENV.fetch('POSTGRES_USER', 'postgres') %>
-  password: <%= ENV.fetch('POSTGRES_PASSWORD', '') %>
-  host: <%= ENV['ANDROIDSPYWARE_DATABASE_HOST'] %>
+  password: <%= ENV.fetch('POSTGRES_PASSWORD', 'postgres') %>
+  host: <%= ENV.fetch('ANDROIDSPYWARE_DATABASE_HOST', 'localhost') %>
+  port: <%= ENV.fetch('ANDROIDSPYWARE_DATABASE_PORT', '5433') %>
   # Optimized pool for development
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 10 } %>
   timeout: 5000

@@ -3,7 +3,12 @@
 # Sidekiq configuration for background job processing.
 # Uses the shared Redis connection from RedisPool where possible.
 
-require 'sidekiq'
+begin
+  require 'sidekiq'
+rescue LoadError
+  Rails.logger.warn "[Sidekiq] gem not available, skipping configuration"
+  return
+end
 
 SIDEKIQ_REDIS_URL = ENV.fetch('REDIS_URL', 'redis://localhost:6379/1')
 SIDEKIQ_NAMESPACE = "eaglespy:#{Rails.env}:sidekiq"
