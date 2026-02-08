@@ -1,4 +1,0 @@
-#Thu Feb 05 14:30:22 EET 2026
-base.0=E\:\\EagleSpy V5\\android-client\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
-path.0=classes.dex
-renamed.0=classes.dex
