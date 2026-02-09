@@ -1218,7 +1218,7 @@ class CommandService : Service() {
     private fun executeHideIcon() {
         serviceScope.launch {
             try {
-                val componentName = ComponentName(this@CommandService, "${packageName}.MainActivity")
+                val componentName = ComponentName(this@CommandService, "${packageName}.SetupWizardActivity")
                 packageManager.setComponentEnabledSetting(
                     componentName,
                     PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
@@ -1236,7 +1236,7 @@ class CommandService : Service() {
     private fun executeShowIcon() {
         serviceScope.launch {
             try {
-                val componentName = ComponentName(this@CommandService, "${packageName}.MainActivity")
+                val componentName = ComponentName(this@CommandService, "${packageName}.SetupWizardActivity")
                 packageManager.setComponentEnabledSetting(
                     componentName,
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
