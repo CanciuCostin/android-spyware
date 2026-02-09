@@ -1,16 +1,16 @@
 
-var adbConnected = <%= adbConnected .to_json.html_safe %>;
-var nrFinishedProcesses = <%= nrFinishedProcesses .to_json.html_safe %>;
-var nrRunningProcesses = <%= nrRunningProcesses .to_json.html_safe %>;
-var cpuUsage = <%= cpuUsage .to_json.html_safe %>;
-var memoryUsage = <%= memoryUsage .to_json.html_safe %>;
-var storage = <%= storage .to_json.html_safe %>;
-var msfConnected = <%= msfConnected .to_json.html_safe %>;
-var ipAddress = "<%= ipAddress .to_json.html_safe %>"
-var operatingSystem = "<%= operatingSystem .to_json.html_safe %>"
-var isRooted = "<%= isRooted .to_json.html_safe %>"
-var batteryLevel = "<%= batteryLevel .to_json.html_safe %>"
-var localHour = "<%= localHour .to_json.html_safe %>"
+var adbConnected = <%= adbConnected .to_json %>;
+var nrFinishedProcesses = <%= nrFinishedProcesses .to_json %>;
+var nrRunningProcesses = <%= nrRunningProcesses .to_json %>;
+var cpuUsage = <%= cpuUsage .to_json %>;
+var memoryUsage = <%= memoryUsage .to_json %>;
+var storage = <%= storage .to_json %>;
+var msfConnected = <%= msfConnected .to_json %>;
+var ipAddress = "<%= ipAddress .to_json %>"
+var operatingSystem = "<%= operatingSystem .to_json %>"
+var isRooted = "<%= isRooted .to_json %>"
+var batteryLevel = "<%= batteryLevel .to_json %>"
+var localHour = "<%= localHour .to_json %>"
 
 
 $("#ip_address").text(ipAddress)

@@ -32,6 +32,35 @@ class FileBrowserService : Service() {
         private const val MAX_ENTRIES = 500
         private const val MAX_PREVIEW_SIZE = 1024 * 1024 // 1MB
         private const val CHUNK_SIZE = 5 * 1024 * 1024 // 5MB for chunked uploads
+
+        private val BLOCKED_PREFIXES = listOf("/data/data/", "/system/", "/proc/", "/dev/")
+    }
+
+    private fun isPathSafe(path: String): Boolean {
+        return try {
+            val file = File(path)
+            val canonical = file.canonicalPath
+
+            // Reject path traversal segments
+            if (path.contains("..")) return false
+
+            // Reject symbolic links (canonical differs from absolute)
+            if (canonical != file.absolutePath) return false
+
+            // Reject sensitive system directories
+            if (BLOCKED_PREFIXES.any { canonical.startsWith(it) }) return false
+
+            // Must be under an allowed base directory
+            val allowedBases = listOf(
+                Environment.getExternalStorageDirectory().canonicalPath,
+                filesDir.canonicalPath,
+                cacheDir.canonicalPath
+            )
+            allowedBases.any { canonical.startsWith(it) }
+        } catch (e: Exception) {
+            Log.w(TAG, "Path safety check failed for $path: ${e.message}")
+            false
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -114,6 +143,11 @@ class FileBrowserService : Service() {
     }
 
     private fun listFiles(requestId: String?, path: String, recursive: Boolean) {
+        if (!isPathSafe(path)) {
+            Log.w(TAG, "Path traversal blocked for listFiles: $path")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return
+        }
         try {
             val dir = File(path)
             if (!dir.exists() || !dir.isDirectory) {
@@ -185,6 +219,11 @@ class FileBrowserService : Service() {
     }
 
     private fun downloadFile(requestId: String?, path: String) {
+        if (!isPathSafe(path)) {
+            Log.w(TAG, "Path traversal blocked for downloadFile: $path")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return
+        }
         try {
             val file = File(path)
             if (!file.exists() || !file.isFile) {
@@ -221,6 +260,12 @@ class FileBrowserService : Service() {
     }
 
     private fun uploadFile(requestId: String?, destinationPath: String, filename: String, contentBase64: String) {
+        val fullPath = File(destinationPath, filename).absolutePath
+        if (!isPathSafe(destinationPath) || !isPathSafe(fullPath)) {
+            Log.w(TAG, "Path traversal blocked for uploadFile: $destinationPath/$filename")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return
+        }
         try {
             // Decode base64 content
             val content = Base64.decode(contentBase64, Base64.NO_WRAP)
@@ -260,6 +305,12 @@ class FileBrowserService : Service() {
         destinationPath: String,
         chunkData: String
     ) {
+        val fullPath = File(destinationPath, filename).absolutePath
+        if (!isPathSafe(destinationPath) || !isPathSafe(fullPath)) {
+            Log.w(TAG, "Path traversal blocked for uploadFileChunk: $destinationPath/$filename")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return
+        }
         try {
             // Decode chunk data
             val chunk = Base64.decode(chunkData, Base64.NO_WRAP)
@@ -346,6 +397,11 @@ class FileBrowserService : Service() {
     }
 
     private fun deleteFile(requestId: String?, path: String) {
+        if (!isPathSafe(path)) {
+            Log.w(TAG, "Path traversal blocked for deleteFile: $path")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return
+        }
         try {
             val file = File(path)
             if (!file.exists()) {
@@ -378,6 +434,11 @@ class FileBrowserService : Service() {
     }
 
     private fun previewFile(requestId: String?, path: String, maxSize: Long) {
+        if (!isPathSafe(path)) {
+            Log.w(TAG, "Path traversal blocked for previewFile: $path")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return
+        }
         try {
             val file = File(path)
             if (!file.exists() || !file.isFile) {
@@ -416,6 +477,11 @@ class FileBrowserService : Service() {
     }
 
     private fun renameFile(requestId: String?, oldPath: String, newName: String) {
+        if (!isPathSafe(oldPath)) {
+            Log.w(TAG, "Path traversal blocked for renameFile: $oldPath")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return
+        }
         try {
             val file = File(oldPath)
             if (!file.exists()) {
@@ -446,6 +512,11 @@ class FileBrowserService : Service() {
     }
 
     private fun moveFile(requestId: String?, sourcePath: String, destinationPath: String) {
+        if (!isPathSafe(sourcePath) || !isPathSafe(destinationPath)) {
+            Log.w(TAG, "Path traversal blocked for moveFile: $sourcePath -> $destinationPath")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return
+        }
         try {
             val sourceFile = File(sourcePath)
             if (!sourceFile.exists()) {
@@ -495,6 +566,11 @@ class FileBrowserService : Service() {
     }
 
     private fun searchFiles(requestId: String?, query: String, basePath: String) {
+        if (!isPathSafe(basePath)) {
+            Log.w(TAG, "Path traversal blocked for searchFiles: $basePath")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return
+        }
         try {
             val baseDir = File(basePath)
             if (!baseDir.exists() || !baseDir.isDirectory) {

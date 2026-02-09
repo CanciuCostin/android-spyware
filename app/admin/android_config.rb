@@ -6,9 +6,9 @@ ActiveAdmin.register_page "Android Config" do
     config = {
       server_url: ENV['RAILS_HOST'] || '213.91.211.150',
       server_port: ENV['RAILS_PORT'] || '4444',
-      turn_server: ENV['TURN_SERVER'] || '213.91.211.150:3478',
-      turn_user: ENV['TURN_USER'] || 'eaglespy',
-      turn_password: ENV['TURN_PASSWORD'] || 'eaglespy_secret',
+      turn_server: ENV['TURN_SERVER'] || 'localhost:3478',
+      turn_user: ENV['TURN_USER'] || 'default_user',
+      turn_password: ENV['TURN_PASSWORD'] || 'default_pass',
       use_ssl: ENV['USE_SSL'] == 'true'
     }
 

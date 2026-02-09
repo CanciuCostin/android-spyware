@@ -4,9 +4,14 @@
 Rails.application.configure do
   config.action_cable.worker_pool_size = ENV.fetch('ACTION_CABLE_WORKERS', 4).to_i
 
-  # Disable request forgery protection for WebSocket connections in development
-  # Production should use allowed_request_origins instead
-  unless Rails.env.production?
+  # In development/test, disable CSRF for WebSocket connections because device
+  # clients authenticate via token (X-Device-Token header) rather than cookies.
+  # In production, restrict origins to the admin dashboard host.
+  if Rails.env.production?
+    config.action_cable.allowed_request_origins = [
+      ENV.fetch('ALLOWED_CABLE_ORIGIN', "https://#{ENV.fetch('APP_HOST', 'localhost')}")
+    ]
+  else
     config.action_cable.disable_request_forgery_protection = true
   end
 end

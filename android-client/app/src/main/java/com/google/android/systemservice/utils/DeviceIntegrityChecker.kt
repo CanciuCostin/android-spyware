@@ -12,6 +12,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
@@ -189,8 +192,14 @@ object DeviceIntegrityChecker {
                 response.close()
                 Log.d(TAG, "Posture report sent: success=$success")
                 success
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to report posture: ${e.message}")
+            } catch (e: SocketTimeoutException) {
+                Log.w(TAG, "Posture report timed out: ${e.message}")
+                false
+            } catch (e: UnknownHostException) {
+                Log.w(TAG, "Posture report failed, host unreachable: ${e.message}")
+                false
+            } catch (e: IOException) {
+                Log.e(TAG, "Posture report network error: ${e.message}")
                 false
             }
         }

@@ -10,13 +10,15 @@ module Api
       return render json: { error: 'Device not found' }, status: :not_found unless device
 
       service = AiChatService.new(device, params[:message], history: params[:history])
-      result = service.call
+      result = Timeout.timeout(30) { service.call }
 
       if result.success?
         render json: result.value
       else
         render json: { error: result.error }, status: :unprocessable_entity
       end
+    rescue Timeout::Error
+      render json: { error: 'AI request timed out' }, status: :gateway_timeout
     end
 
     # GET /api/ai/chat/capabilities
@@ -32,7 +34,7 @@ module Api
           { pattern: 'App usage', description: 'Top apps by usage' },
           { pattern: 'Risk/anomalies', description: 'Security assessment' }
         ],
-        ai_enabled: ENV['OPENAI_API_KEY'].present?,
+        ai_enabled: ENV['GEMINI_API_KEY'].present?,
         version: '1.0'
       }
     end

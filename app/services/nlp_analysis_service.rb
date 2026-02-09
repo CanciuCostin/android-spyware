@@ -27,7 +27,7 @@ class NlpAnalysisService < ApplicationService
   def initialize(text, options = {})
     @text = text.to_s
     @options = options
-    @api_key = ENV['OPENAI_API_KEY']
+    @api_key = ENV['GEMINI_API_KEY']
   end
 
   def call
@@ -213,18 +213,18 @@ class NlpAnalysisService < ApplicationService
     @text.scan(/[.!?]+/).size.clamp(1, Float::INFINITY)
   end
 
-  # --- AI-powered methods (require OPENAI_API_KEY) ---
+  # --- AI-powered methods (require GEMINI_API_KEY) ---
 
   def ai_extract_entities
     prompt = "Extract named entities (people, places, organizations, dates) from this text. Return JSON with keys: people, places, organizations, dates.\n\nText: #{@text.truncate(2000)}"
-    result = call_openai_simple(prompt)
+    result = call_gemini_simple(prompt)
     parsed = JSON.parse(result, symbolize_names: true) rescue nil
     parsed || pattern_extract_entities
   end
 
   def ai_sentiment_analysis
     prompt = "Analyze the sentiment of this text. Return JSON: {score: -1.0 to 1.0, label: positive/negative/neutral, explanation: string}\n\nText: #{@text.truncate(2000)}"
-    result = call_openai_simple(prompt)
+    result = call_gemini_simple(prompt)
     parsed = JSON.parse(result, symbolize_names: true) rescue nil
     if parsed && parsed[:score]
       parsed[:method] = 'ai'
@@ -234,24 +234,22 @@ class NlpAnalysisService < ApplicationService
     end
   end
 
-  def call_openai_simple(prompt)
-    uri = URI('https://api.openai.com/v1/chat/completions')
+  def call_gemini_simple(prompt)
+    model = ENV.fetch('GEMINI_MODEL', 'gemini-2.0-flash')
+    uri = URI("https://generativelanguage.googleapis.com/v1beta/models/#{model}:generateContent?key=#{@api_key}")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.open_timeout = 10
     http.read_timeout = 30
 
     request = Net::HTTP::Post.new(uri)
-    request['Authorization'] = "Bearer #{@api_key}"
     request['Content-Type'] = 'application/json'
     request.body = {
-      model: ENV.fetch('OPENAI_MODEL', 'gpt-4o-mini'),
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.1,
-      max_tokens: 500
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 500 }
     }.to_json
 
     response = http.request(request)
-    JSON.parse(response.body).dig('choices', 0, 'message', 'content') || ''
+    JSON.parse(response.body).dig('candidates', 0, 'content', 'parts', 0, 'text') || ''
   end
 end

@@ -214,10 +214,8 @@ class ResilientWebSocket {
       // Check if we missed the last pong (allow 2x heartbeat interval)
       if (this.lastPongAt && (Date.now() - this.lastPongAt > this.heartbeatInterval * 2.5)) {
         this.stats.pongsMissed++
-        console.warn('[ResilientWS] Missed pong, connection may be stale')
 
         if (this.stats.pongsMissed >= 3) {
-          console.warn('[ResilientWS] Too many missed pongs, forcing reconnect')
           this._forceReconnect()
           return
         }
@@ -249,9 +247,7 @@ class ResilientWebSocket {
       this.backoffMax
     )
 
-    console.log(`[ResilientWS] Reconnecting in ${delay}ms (attempt ${this.retryCount + 1})`)
-
-    this.reconnectTimer = setTimeout(() => {
+    this.reconnectTimer= setTimeout(() => {
       this.retryCount++
       this._setState(ConnectionState.CONNECTING)
 
@@ -287,7 +283,6 @@ class ResilientWebSocket {
 
   _enqueue(data) {
     if (this.messageQueue.length >= this.maxQueueSize) {
-      console.warn('[ResilientWS] Message queue full, dropping oldest message')
       this.messageQueue.shift()
     }
 
@@ -302,9 +297,7 @@ class ResilientWebSocket {
   _replayQueue() {
     if (this.messageQueue.length === 0) return
 
-    console.log(`[ResilientWS] Replaying ${this.messageQueue.length} queued messages`)
-
-    const queue = [...this.messageQueue]
+    const queue= [...this.messageQueue]
     this.messageQueue = []
 
     queue.forEach(({ data }) => {

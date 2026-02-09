@@ -7,11 +7,11 @@ ActiveAdmin.register_page "Image Recognition" do
     # API status
     div class: "api-status" do
       google_ok = ENV['GOOGLE_VISION_API_KEY'].present?
-      openai_ok = ENV['OPENAI_API_KEY'].present?
+      gemini_ok = ENV['GEMINI_API_KEY'].present?
       span "API Status: "
       span google_ok ? "✅ Google Vision" : "❌ Google Vision", class: google_ok ? "status-ok" : "status-off"
       span " | "
-      span openai_ok ? "✅ OpenAI Vision" : "❌ OpenAI Vision", class: openai_ok ? "status-ok" : "status-off"
+      span gemini_ok ? "✅ Gemini Vision" : "❌ Gemini Vision", class: gemini_ok ? "status-ok" : "status-off"
       span " | ✅ EXIF Metadata (always available)"
     end
 

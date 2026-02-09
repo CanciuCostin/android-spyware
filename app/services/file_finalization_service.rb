@@ -53,7 +53,7 @@ class FileFinalizationService < ApplicationService
     ext = File.extname(@safe_filename).downcase
     if dangerous_extensions.include?(ext)
       Rails.logger.warn("[FileFinalization] Blocked dangerous file: #{@safe_filename}")
-      return { success: false, error: "File type not allowed: #{ext}" }
+      raise ArgumentError, "File type not allowed: #{ext}"
     end
 
     @dest_path = File.join(dest_dir, @safe_filename)

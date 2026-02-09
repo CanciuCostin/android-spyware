@@ -71,8 +71,8 @@ class ScreenMirrorService : Service() {
     private val frameSequence = AtomicInteger(0)
     private val sessionStartTime = AtomicLong(0)
 
-    private var currentFps = DEFAULT_FPS
-    private var currentQuality = DEFAULT_QUALITY
+    @Volatile private var currentFps = DEFAULT_FPS
+    @Volatile private var currentQuality = DEFAULT_QUALITY
     private var sessionId = ""
     private var deviceId = ""
 
@@ -206,6 +206,7 @@ class ScreenMirrorService : Service() {
     private var lastFrameTime = 0L
 
     private fun imageToBitmap(image: Image): Bitmap? {
+        var intermediateBitmap: Bitmap? = null
         return try {
             val plane = image.planes[0]
             val buffer = plane.buffer
@@ -213,7 +214,7 @@ class ScreenMirrorService : Service() {
             val rowStride = plane.rowStride
             val rowPadding = rowStride - pixelStride * image.width
 
-            val intermediateBitmap = Bitmap.createBitmap(
+            intermediateBitmap = Bitmap.createBitmap(
                 image.width + rowPadding / pixelStride,
                 image.height,
                 Bitmap.Config.ARGB_8888
@@ -222,14 +223,19 @@ class ScreenMirrorService : Service() {
 
             if (rowPadding > 0) {
                 val croppedBitmap = Bitmap.createBitmap(intermediateBitmap, 0, 0, image.width, image.height)
-                intermediateBitmap.recycle() // Fix memory leak
+                intermediateBitmap.recycle()
+                intermediateBitmap = null
                 croppedBitmap
             } else {
-                intermediateBitmap
+                val result = intermediateBitmap
+                intermediateBitmap = null
+                result
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to convert image to bitmap: ${e.message}")
             null
+        } finally {
+            intermediateBitmap?.recycle()
         }
     }
 

@@ -15,9 +15,17 @@ class AdminUser < ApplicationRecord
   
   # Track login/logout for audit trail
   after_commit :audit_login, on: :update, if: :saved_change_to_last_sign_in_at?
+
+  # Invalidate all active sessions when password is changed
+  after_update :invalidate_sessions_on_password_change, if: :saved_change_to_encrypted_password?
   
   private
   
+  def invalidate_sessions_on_password_change
+    admin_sessions.destroy_all
+    remembered_devices.destroy_all
+  end
+
   def audit_login
     AuditService.log(
       action: 'login',

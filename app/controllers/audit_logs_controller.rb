@@ -17,9 +17,9 @@ class AuditLogsController < ApplicationController
     @audit_logs = @audit_logs.where(auditable_type: params[:auditable_type]) if params[:auditable_type].present?
     
     if params[:start_date].present? && params[:end_date].present?
-      start_date = Date.parse(params[:start_date])
-      end_date = Date.parse(params[:end_date])
-      @audit_logs = @audit_logs.where(created_at: start_date.beginning_of_day..end_date.end_of_day)
+      start_date = safe_parse_date(params[:start_date])
+      end_date = safe_parse_date(params[:end_date])
+      @audit_logs = @audit_logs.where(created_at: start_date.beginning_of_day..end_date.end_of_day) if start_date && end_date
     end
     
     respond_to do |format|
@@ -46,9 +46,9 @@ class AuditLogsController < ApplicationController
     @audit_logs = @audit_logs.where(auditable_type: params[:auditable_type]) if params[:auditable_type].present?
     
     if params[:start_date].present? && params[:end_date].present?
-      start_date = Date.parse(params[:start_date])
-      end_date = Date.parse(params[:end_date])
-      @audit_logs = @audit_logs.where(created_at: start_date.beginning_of_day..end_date.end_of_day)
+      start_date = safe_parse_date(params[:start_date])
+      end_date = safe_parse_date(params[:end_date])
+      @audit_logs = @audit_logs.where(created_at: start_date.beginning_of_day..end_date.end_of_day) if start_date && end_date
     end
     
     @audit_logs = @audit_logs.order(created_at: :desc)
@@ -71,8 +71,8 @@ class AuditLogsController < ApplicationController
   
   # GET /audit_logs/stats
   def stats
-    start_date = params[:start_date] ? Date.parse(params[:start_date]) : 30.days.ago
-    end_date = params[:end_date] ? Date.parse(params[:end_date]) : Date.today
+    start_date = params[:start_date] ? safe_parse_date(params[:start_date], 30.days.ago) : 30.days.ago
+    end_date = params[:end_date] ? safe_parse_date(params[:end_date], Date.today) : Date.today
     
     logs = AuditLog.where(created_at: start_date.beginning_of_day..end_date.end_of_day)
     
@@ -91,6 +91,12 @@ class AuditLogsController < ApplicationController
   
   private
   
+  def safe_parse_date(str, default = nil)
+    Date.parse(str.to_s)
+  rescue ArgumentError, TypeError
+    default
+  end
+
   def set_audit_log
     @audit_log = AuditLog.find(params[:id])
   end

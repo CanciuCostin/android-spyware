@@ -48,7 +48,10 @@ class ResponseProcessor
   # The payload may be wrapped in 'payload' or 'data' keys depending on
   # whether it comes from CommandChannel, the REST ack endpoint, or a
   # direct WebSocket message — hence the triple fallback extraction.
-  def self.process(data)
+  #
+  # +device_id+ — the authenticated device_id of the responding device.
+  # Used to verify the response belongs to the device the command was sent to.
+  def self.process(data, device_id: nil)
     return unless data.is_a?(Hash)
     
     # Normalize: devices may wrap the payload under different keys
@@ -67,6 +70,14 @@ class ResponseProcessor
     # Look up PendingCommand using request_id
     pending_command = PendingCommand.find_by(request_id: request_id)
     return Rails.logger.warn("[ResponseProcessor] PendingCommand not found for request_id: #{request_id}") unless pending_command
+
+    # Cross-device verification: ensure the responding device owns this command
+    if device_id.present? && pending_command.smartphone&.device_id != device_id
+      Rails.logger.warn("[ResponseProcessor] Cross-device response blocked: device '#{device_id}' " \
+                        "attempted to complete command for device '#{pending_command.smartphone&.device_id}' " \
+                        "(request_id: #{request_id})")
+      return
+    end
     
     # Idempotency guard: skip if already completed/failed/timed-out (race between ActionCable and HTTP paths)
     unless pending_command.pending? || pending_command.processing?

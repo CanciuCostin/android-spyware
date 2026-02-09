@@ -1,6 +1,7 @@
 # Live Location Updates Channel
 class LocationChannel < ApplicationCable::Channel
   def subscribed
+    reject unless current_user_type == :admin
     stream_from "location_#{params[:device_id]}"
     Rails.logger.info "[LocationChannel] Subscribed to device #{params[:device_id]}"
   end

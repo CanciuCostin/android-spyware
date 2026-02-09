@@ -17,11 +17,14 @@ class SignalingChannel < ApplicationCable::Channel
   def subscribed
     @device_id = sanitize_device_id(params[:device_id])
     @is_admin = connection.current_user_type == :admin
-    
-    # Admin subscribes to device-specific signaling channel
-    # Device stream: "signaling_device_#{device_id}"
-    # Admin stream: "signaling_admin_#{device_id}"
-    
+
+    # Verify the device actually exists
+    unless Smartphone.find_by(device_id: @device_id)
+      Rails.logger.warn "[SignalingChannel] Rejected: device #{@device_id} not found"
+      reject
+      return
+    end
+
     if @is_admin
       stream_from "signaling_admin_#{@device_id}"
       Rails.logger.info "[SignalingChannel] Admin subscribed to device #{@device_id}"
@@ -42,7 +45,7 @@ class SignalingChannel < ApplicationCable::Channel
   # Receive SDP offer from Android device (to Admin)
   def offer(data)
     sdp = data['sdp']
-    device_id = data['device_id'] || @device_id
+    device_id = enforce_device_id(data['device_id'])
 
     Rails.logger.info "[SignalingChannel] Received offer from device #{device_id}"
 
@@ -59,7 +62,7 @@ class SignalingChannel < ApplicationCable::Channel
   # Receive SDP answer from Admin browser (to Device)
   def answer(data)
     sdp = data['sdp']
-    device_id = data['device_id'] || @device_id
+    device_id = enforce_device_id(data['device_id'])
 
     Rails.logger.info "[SignalingChannel] Received answer for device #{device_id}"
 
@@ -78,7 +81,7 @@ class SignalingChannel < ApplicationCable::Channel
   #   - Device sends ICE → target defaults to 'admin'
   def ice_candidate(data)
     candidate = data['candidate']
-    device_id = data['device_id'] || @device_id
+    device_id = enforce_device_id(data['device_id'])
     target = data['target'] || (@is_admin ? 'device' : 'admin')
 
     Rails.logger.info "[SignalingChannel] Received ICE candidate for device #{device_id}, target: #{target}"
@@ -97,7 +100,7 @@ class SignalingChannel < ApplicationCable::Channel
 
   # Admin initiates WebRTC stream request
   def start_stream(data)
-    device_id = data['device_id'] || @device_id
+    device_id = enforce_device_id(data['device_id'])
     stream_type = data['stream_type'] || 'camera'
 
     Rails.logger.info "[SignalingChannel] Admin requesting stream (#{stream_type}) from device #{device_id}"
@@ -113,7 +116,7 @@ class SignalingChannel < ApplicationCable::Channel
 
   # Admin stops the stream
   def stop_stream(data)
-    device_id = data['device_id'] || @device_id
+    device_id = enforce_device_id(data['device_id'])
 
     Rails.logger.info "[SignalingChannel] Admin stopping stream for device #{device_id}"
 
@@ -126,6 +129,15 @@ class SignalingChannel < ApplicationCable::Channel
   end
 
   private
+
+  # Prevent device_id spoofing: always use the subscribed device_id.
+  # If a caller sends a different device_id, log a warning and fall back.
+  def enforce_device_id(requested_id)
+    if requested_id.present? && sanitize_device_id(requested_id) != @device_id
+      Rails.logger.warn "[SignalingChannel] Blocked device_id mismatch: requested=#{requested_id}, subscribed=#{@device_id}"
+    end
+    @device_id
+  end
 
   def sanitize_device_id(device_id)
     device_id.to_s.gsub(/[^a-zA-Z0-9_.:\-]/, '')

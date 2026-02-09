@@ -14,6 +14,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import timber.log.Timber
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 /**
  * Centralized runtime permission manager.
@@ -227,8 +230,12 @@ object PermissionManager {
                     Timber.w("Failed to report permissions: HTTP ${response.code}")
                 }
                 response.close()
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to report permission status")
+            } catch (e: SocketTimeoutException) {
+                Timber.w(e, "Permission status report timed out")
+            } catch (e: UnknownHostException) {
+                Timber.w(e, "Permission status report failed, host unreachable")
+            } catch (e: IOException) {
+                Timber.e(e, "Permission status report network error")
             }
         }
     }

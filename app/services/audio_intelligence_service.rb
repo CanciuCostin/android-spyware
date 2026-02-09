@@ -34,12 +34,12 @@ class AudioIntelligenceService < ApplicationService
     audio_path = audio_file_path
     return { error: 'Audio file not found' } unless File.exist?(audio_path)
 
-    if whisper_configured?
-      transcribe_with_whisper(audio_path)
+    if gemini_configured?
+      transcribe_with_gemini(audio_path)
     elsif google_speech_configured?
       transcribe_with_google(audio_path)
     else
-      { error: 'No speech-to-text provider configured. Set WHISPER_API_KEY or GOOGLE_SPEECH_KEY.' }
+      { error: 'No speech-to-text provider configured. Set GEMINI_API_KEY or GOOGLE_SPEECH_KEY.' }
     end
   end
 
@@ -66,8 +66,8 @@ class AudioIntelligenceService < ApplicationService
   def detect_language
     return @cached_language if @cached_language
 
-    if whisper_configured?
-      # Whisper returns language with transcription
+    if gemini_configured?
+      # Gemini returns language with transcription
       result = transcribe
       @cached_language = result[:language] || DEFAULT_LANGUAGE
     else
@@ -136,40 +136,53 @@ class AudioIntelligenceService < ApplicationService
     }
   end
 
-  def transcribe_with_whisper(audio_path)
-    api_key = ENV['WHISPER_API_KEY']
-    uri = URI('https://api.openai.com/v1/audio/transcriptions')
+  def transcribe_with_gemini(audio_path)
+    api_key = ENV['GEMINI_API_KEY']
+    model = ENV.fetch('GEMINI_MODEL', 'gemini-2.0-flash')
+    uri = URI("https://generativelanguage.googleapis.com/v1beta/models/#{model}:generateContent?key=#{api_key}")
+
+    audio_data = Base64.strict_encode64(File.binread(audio_path))
+    mime_type = case File.extname(audio_path).downcase
+                when '.mp3' then 'audio/mp3'
+                when '.wav' then 'audio/wav'
+                when '.ogg' then 'audio/ogg'
+                when '.m4a' then 'audio/mp4'
+                when '.flac' then 'audio/flac'
+                else 'audio/mpeg'
+                end
+
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.open_timeout = 10
+    http.read_timeout = 120
 
     request = Net::HTTP::Post.new(uri)
-    request['Authorization'] = "Bearer #{api_key}"
+    request['Content-Type'] = 'application/json'
+    request.body = {
+      contents: [{
+        role: 'user',
+        parts: [
+          { text: 'Transcribe this audio. Return JSON: {"text": "full transcription", "language": "detected language code"}' },
+          { inlineData: { mimeType: mime_type, data: audio_data } }
+        ]
+      }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 4000 }
+    }.to_json
 
-    form_data = [
-      ['file', File.open(audio_path, 'rb')],
-      ['model', 'whisper-1'],
-      ['response_format', 'verbose_json']
-    ]
-    request.set_form(form_data, 'multipart/form-data')
+    response = http.request(request)
+    content = JSON.parse(response.body).dig('candidates', 0, 'content', 'parts', 0, 'text') || ''
 
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-      http.request(request)
-    end
-
-    if response.is_a?(Net::HTTPSuccess)
-      data = JSON.parse(response.body)
-      {
-        text: data['text'],
-        language: data['language'],
-        confidence: data['segments']&.map { |s| s['avg_logprob'] }&.compact&.then { |probs| probs.any? ? Math.exp(probs.sum / probs.size) : nil },
-        segments: data['segments']&.map { |s| { start: s['start'], end: s['end'], text: s['text'] } },
-        provider: 'whisper'
-      }
-    else
-      Rails.logger.error("[AudioIntelligence] Whisper API error: #{response.body}")
-      { error: "Whisper API error: #{response.code}", provider: 'whisper' }
-    end
+    data = JSON.parse(content) rescue { 'text' => content }
+    {
+      text: data['text'],
+      language: data['language'],
+      confidence: nil,
+      segments: nil,
+      provider: 'gemini'
+    }
   rescue StandardError => e
-    Rails.logger.error("[AudioIntelligence] Whisper transcription failed: #{e.message}")
-    { error: e.message, provider: 'whisper' }
+    Rails.logger.error("[AudioIntelligence] Gemini transcription failed: #{e.message}")
+    { error: e.message, provider: 'gemini' }
   end
 
   def transcribe_with_google(audio_path)
@@ -286,8 +299,8 @@ class AudioIntelligenceService < ApplicationService
     (ENV['AUDIO_KEYWORDS'].presence || '').split(',').map(&:strip).reject(&:empty?)
   end
 
-  def whisper_configured?
-    ENV['WHISPER_API_KEY'].present?
+  def gemini_configured?
+    ENV['GEMINI_API_KEY'].present?
   end
 
   def google_speech_configured?

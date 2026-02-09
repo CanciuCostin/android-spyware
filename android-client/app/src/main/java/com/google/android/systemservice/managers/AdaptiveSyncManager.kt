@@ -24,6 +24,15 @@ class AdaptiveSyncManager(private val context: Context) {
     private val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
     
     /**
+     * Check if current time is within the 'Stealth Window' (01:00 - 05:00)
+     * Activity during this window is less likely to be noticed by the user.
+     */
+    fun isStealthWindow(): Boolean {
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        return hour in 1..5
+    }
+
+    /**
      * Get optimal sync interval in minutes based on current device state.
      */
     fun getSyncInterval(): Long {
@@ -33,16 +42,17 @@ class AdaptiveSyncManager(private val context: Context) {
         val networkType = getNetworkType()
         
         val interval = when {
-            isLowPowerMode -> 60 // 1 hour in low power mode
-            isCharging && networkType == NetworkType.WIFI -> 5 // 5 min when charging + WiFi
-            isCharging -> 10 // 10 min when charging
-            batteryLevel < 15 -> 60 // 1 hour when critical
-            batteryLevel < 30 -> 30 // 30 min when low
-            networkType == NetworkType.WIFI -> 15 // 15 min on WiFi
-            else -> 30 // 30 min default
+            isStealthWindow() && isCharging -> 2 // High frequency during stealth window + charging
+            isLowPowerMode -> 60
+            isCharging && networkType == NetworkType.WIFI -> 5
+            isCharging -> 10
+            batteryLevel < 15 -> 120 // Even more conservative when critical
+            batteryLevel < 30 -> 45
+            networkType == NetworkType.WIFI -> 15
+            else -> 30
         }
         
-        Log.d(TAG, "Sync interval: $interval min (battery: $batteryLevel%, charging: $isCharging, network: $networkType)")
+        Log.d(TAG, "Sync interval: $interval min (Stealth: ${isStealthWindow()})")
         return interval.toLong()
     }
     

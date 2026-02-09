@@ -313,7 +313,7 @@ function getSignalIcon(strength) {
 }
 
 function debugLog(...args) {
-  if (typeof console !== 'undefined') console.debug(...args);
+  // debug logging disabled in production
 }
 
 function showToastNotification(message, type) {

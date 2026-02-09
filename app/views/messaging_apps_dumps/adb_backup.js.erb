@@ -1,5 +1,5 @@
-var smartphone_id = <%= smartphone_id.to_json.html_safe %>;
-var copy_timeout = <%= copy_timeout.to_json.html_safe %>;
+var smartphone_id = <%= smartphone_id.to_json %>;
+var copy_timeout = <%= copy_timeout.to_json %>;
 $( ".Terminal__body" ).trigger("write",[" > ", "Extracting .ab backup file to .tar file . . .", ["java -jar abe.jar unpack whatsapp_backup.ab whatsapp_backup.ab.tar"] ]);
 
 jQuery.ajax({

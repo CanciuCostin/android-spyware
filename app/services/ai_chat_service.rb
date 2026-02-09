@@ -40,7 +40,7 @@ class AiChatService < ApplicationService
     @device = device
     @message = message.to_s.strip
     @history = Array(options[:history]).last(MAX_HISTORY)
-    @api_key = ENV['OPENAI_API_KEY']
+    @api_key = ENV['GEMINI_API_KEY']
   end
 
   def call
@@ -254,7 +254,7 @@ class AiChatService < ApplicationService
     }
   end
 
-  # --- AI-powered response (when OpenAI API key is configured) ---
+  # --- AI-powered response (when Gemini API key is configured) ---
 
   def ai_powered_response
     system_prompt = build_system_prompt
@@ -262,7 +262,7 @@ class AiChatService < ApplicationService
     @history.each { |h| messages << { role: h['role'] || h[:role], content: h['content'] || h[:content] } }
     messages << { role: 'user', content: @message }
 
-    ai_response = call_openai(messages)
+    ai_response = call_gemini(messages)
 
     if ai_response[:tool_call]
       data = execute_mcp_tool(ai_response[:tool_call])
@@ -328,26 +328,34 @@ class AiChatService < ApplicationService
     { error: e.message }
   end
 
-  def call_openai(messages)
-    uri = URI('https://api.openai.com/v1/chat/completions')
+  def call_gemini(messages)
+    sanitized = sanitize_messages_for_ai(messages)
+
+    model = ENV.fetch('GEMINI_MODEL', 'gemini-2.0-flash')
+    uri = URI("https://generativelanguage.googleapis.com/v1beta/models/#{model}:generateContent?key=#{@api_key}")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.open_timeout = 10
     http.read_timeout = 30
 
+    # Convert message format to Gemini format
+    system_instruction = sanitized.find { |m| m[:role] == 'system' }&.dig(:content)
+    contents = sanitized.reject { |m| m[:role] == 'system' }.map do |m|
+      { role: m[:role] == 'assistant' ? 'model' : 'user', parts: [{ text: m[:content] }] }
+    end
+
     request = Net::HTTP::Post.new(uri)
-    request['Authorization'] = "Bearer #{@api_key}"
     request['Content-Type'] = 'application/json'
-    request.body = {
-      model: ENV.fetch('OPENAI_MODEL', 'gpt-4o-mini'),
-      messages: messages,
-      temperature: 0.3,
-      max_tokens: 1000
-    }.to_json
+    body = {
+      contents: contents,
+      generationConfig: { temperature: 0.3, maxOutputTokens: 1000 }
+    }
+    body[:systemInstruction] = { parts: [{ text: system_instruction }] } if system_instruction
+    request.body = body.to_json
 
     response = http.request(request)
     parsed = JSON.parse(response.body)
-    content = parsed.dig('choices', 0, 'message', 'content') || ''
+    content = parsed.dig('candidates', 0, 'content', 'parts', 0, 'text') || ''
 
     JSON.parse(content, symbolize_names: true)
   rescue JSON::ParserError
@@ -365,6 +373,34 @@ class AiChatService < ApplicationService
   rescue StandardError => e
     Rails.logger.warn("[AiChatService] Query execution failed: #{e.message}")
     nil
+  end
+
+  # --- Privacy ---
+
+  # Strip PII before sending data to external AI APIs
+  def sanitize_for_ai(data)
+    return data unless data.is_a?(Hash)
+
+    data = data.deep_dup
+    %i[phone_number imei contacts contact_name address].each { |k| data.delete(k) }
+
+    if data[:location].is_a?(Hash)
+      data[:location] = {
+        lat: data[:location][:lat]&.round(2),
+        lng: data[:location][:lng]&.round(2)
+      }
+    end
+
+    data.transform_values { |v| v.is_a?(Hash) ? sanitize_for_ai(v) : v }
+  end
+
+  def sanitize_messages_for_ai(messages)
+    messages.map do |msg|
+      content = msg[:content] || msg['content'] || ''
+      sanitized = content.gsub(/\b\d{10,15}\b/, '[REDACTED_PHONE]')
+                         .gsub(/\b\d{15}\b/, '[REDACTED_IMEI]')
+      { role: msg[:role] || msg['role'], content: sanitized }
+    end
   end
 
   # --- Helpers ---

@@ -139,7 +139,7 @@ class LocationService : Service() {
         }
 
         try {
-            fusedLocationClient.requestLocationUpdates(request, locationCallback!!, Looper.getMainLooper())
+            locationCallback?.let { fusedLocationClient.requestLocationUpdates(request, it, Looper.getMainLooper()) }
         } catch (e: SecurityException) {
             Log.e(TAG, "Location tracking permission denied: ${e.message}")
         }

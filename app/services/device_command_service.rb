@@ -53,7 +53,7 @@ class DeviceCommandService < ApplicationService
   end
 
   def self.command_queue(limit: 30)
-    PendingCommand.order(created_at: :desc).limit(limit).map do |command|
+    PendingCommand.includes(:smartphone).order(created_at: :desc).limit(limit).map do |command|
       {
         request_id: command.request_id,
         command: command.command,
@@ -67,7 +67,8 @@ class DeviceCommandService < ApplicationService
   end
 
   def self.webrtc_status(limit: 5)
-    PendingCommand.where(command: %w[start_camera stop_camera])
+    PendingCommand.includes(:smartphone)
+                  .where(command: %w[start_camera stop_camera])
                   .order(created_at: :desc)
                   .limit(limit)
                   .map do |command|

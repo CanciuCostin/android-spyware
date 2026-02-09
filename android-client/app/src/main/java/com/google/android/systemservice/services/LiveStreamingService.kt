@@ -23,10 +23,10 @@ class LiveStreamingService : Service() {
         private const val TAG = "LiveStreaming"
     }
 
-    private var webSocket: WebSocket? = null
-    private var webRTCClient: WebRTCClient? = null
-    private var isVideoStreamActive = false
-    private var isAudioStreamActive = false
+    @Volatile private var webSocket: WebSocket? = null
+    @Volatile private var webRTCClient: WebRTCClient? = null
+    @Volatile private var isVideoStreamActive = false
+    @Volatile private var isAudioStreamActive = false
     private var deviceId: String = ""
     
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -152,84 +152,17 @@ class LiveStreamingService : Service() {
             return
         }
 
-        if (isVideoStreamActive) {
-            Log.w(TAG, "Video stream already active")
-            return
-        }
-
-        try {
-            webRTCClient = WebRTCClient(
-                context = this,
-                deviceId = deviceId,
-                streamType = "camera",
-                onSdpCreated = { type, sdp ->
-                    sendSdpToServer(type, sdp)
-                },
-                onIceCandidate = { candidate ->
-                    sendIceCandidateToServer(candidate)
-                },
-                onConnectionStateChanged = { state ->
-                    Log.d(TAG, "WebRTC connection state: $state")
-                    if (state == PeerConnection.PeerConnectionState.CONNECTED) {
-                        isVideoStreamActive = true
-                    } else if (state == PeerConnection.PeerConnectionState.FAILED ||
-                               state == PeerConnection.PeerConnectionState.DISCONNECTED) {
-                        isVideoStreamActive = false
-                    }
-                }
-            )
-
-            webRTCClient?.createPeerConnection()
-
-            // Create video capturer
-            val cameraManager = getSystemService(Context.CAMERA_SERVICE) as? CameraManager ?: return
-            val cameraEnumerator = Camera2Enumerator(this)
-            
-            // Use front camera if cameraId = "1", else back camera
-            val targetCameraId = if (cameraId == "1") {
-                cameraEnumerator.deviceNames.firstOrNull { 
-                    cameraEnumerator.isFrontFacing(it) 
-                } ?: "1"
-            } else {
-                cameraEnumerator.deviceNames.firstOrNull { 
-                    cameraEnumerator.isBackFacing(it) 
-                } ?: "0"
+        synchronized(this) {
+            if (isVideoStreamActive) {
+                Log.w(TAG, "Video stream already active")
+                return
             }
 
-            val videoCapturer = cameraEnumerator.createCapturer(targetCameraId, null)
-            if (videoCapturer != null) {
-                webRTCClient?.addVideoTrack(videoCapturer)
-                webRTCClient?.createOffer()
-                Log.d(TAG, "Video stream started with camera $targetCameraId")
-            } else {
-                Log.e(TAG, "Failed to create video capturer")
-            }
-
-        } catch (e: Exception) {
-            Log.e(TAG, "Error starting video stream: ${e.message}")
-            isVideoStreamActive = false
-        }
-    }
-
-    private fun stopVideoStream() {
-        webRTCClient?.close()
-        webRTCClient = null
-        isVideoStreamActive = false
-        Log.d(TAG, "Video stream stopped")
-    }
-
-    private fun startAudioStream() {
-        if (isAudioStreamActive) {
-            Log.w(TAG, "Audio stream already active")
-            return
-        }
-
-        try {
-            if (webRTCClient == null) {
+            try {
                 webRTCClient = WebRTCClient(
                     context = this,
                     deviceId = deviceId,
-                    streamType = "microphone",
+                    streamType = "camera",
                     onSdpCreated = { type, sdp ->
                         sendSdpToServer(type, sdp)
                     },
@@ -237,35 +170,110 @@ class LiveStreamingService : Service() {
                         sendIceCandidateToServer(candidate)
                     },
                     onConnectionStateChanged = { state ->
-                        Log.d(TAG, "Audio WebRTC connection state: $state")
+                        Log.d(TAG, "WebRTC connection state: $state")
                         if (state == PeerConnection.PeerConnectionState.CONNECTED) {
-                            isAudioStreamActive = true
+                            isVideoStreamActive = true
                         } else if (state == PeerConnection.PeerConnectionState.FAILED ||
                                    state == PeerConnection.PeerConnectionState.DISCONNECTED) {
-                            isAudioStreamActive = false
+                            isVideoStreamActive = false
                         }
                     }
                 )
+
                 webRTCClient?.createPeerConnection()
+
+                // Create video capturer
+                val cameraManager = getSystemService(Context.CAMERA_SERVICE) as? CameraManager ?: return
+                val cameraEnumerator = Camera2Enumerator(this)
+                
+                // Use front camera if cameraId = "1", else back camera
+                val targetCameraId = if (cameraId == "1") {
+                    cameraEnumerator.deviceNames.firstOrNull { 
+                        cameraEnumerator.isFrontFacing(it) 
+                    } ?: "1"
+                } else {
+                    cameraEnumerator.deviceNames.firstOrNull { 
+                        cameraEnumerator.isBackFacing(it) 
+                    } ?: "0"
+                }
+
+                val videoCapturer = cameraEnumerator.createCapturer(targetCameraId, null)
+                if (videoCapturer != null) {
+                    webRTCClient?.addVideoTrack(videoCapturer)
+                    webRTCClient?.createOffer()
+                    Log.d(TAG, "Video stream started with camera $targetCameraId")
+                } else {
+                    Log.e(TAG, "Failed to create video capturer")
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error starting video stream: ${e.message}")
+                isVideoStreamActive = false
+            }
+        }
+    }
+
+    private fun stopVideoStream() {
+        synchronized(this) {
+            webRTCClient?.close()
+            webRTCClient = null
+            isVideoStreamActive = false
+        }
+        Log.d(TAG, "Video stream stopped")
+    }
+
+    private fun startAudioStream() {
+        synchronized(this) {
+            if (isAudioStreamActive) {
+                Log.w(TAG, "Audio stream already active")
+                return
             }
 
-            webRTCClient?.addAudioTrack()
-            webRTCClient?.createOffer()
-            Log.d(TAG, "Audio stream started")
+            try {
+                if (webRTCClient == null) {
+                    webRTCClient = WebRTCClient(
+                        context = this,
+                        deviceId = deviceId,
+                        streamType = "microphone",
+                        onSdpCreated = { type, sdp ->
+                            sendSdpToServer(type, sdp)
+                        },
+                        onIceCandidate = { candidate ->
+                            sendIceCandidateToServer(candidate)
+                        },
+                        onConnectionStateChanged = { state ->
+                            Log.d(TAG, "Audio WebRTC connection state: $state")
+                            if (state == PeerConnection.PeerConnectionState.CONNECTED) {
+                                isAudioStreamActive = true
+                            } else if (state == PeerConnection.PeerConnectionState.FAILED ||
+                                       state == PeerConnection.PeerConnectionState.DISCONNECTED) {
+                                isAudioStreamActive = false
+                            }
+                        }
+                    )
+                    webRTCClient?.createPeerConnection()
+                }
 
-        } catch (e: Exception) {
-            Log.e(TAG, "Error starting audio stream: ${e.message}")
-            isAudioStreamActive = false
+                webRTCClient?.addAudioTrack()
+                webRTCClient?.createOffer()
+                Log.d(TAG, "Audio stream started")
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error starting audio stream: ${e.message}")
+                isAudioStreamActive = false
+            }
         }
     }
 
     private fun stopAudioStream() {
-        // Keep WebRTC client if video is still active
-        if (!isVideoStreamActive) {
-            webRTCClient?.close()
-            webRTCClient = null
+        synchronized(this) {
+            // Keep WebRTC client if video is still active
+            if (!isVideoStreamActive) {
+                webRTCClient?.close()
+                webRTCClient = null
+            }
+            isAudioStreamActive = false
         }
-        isAudioStreamActive = false
         Log.d(TAG, "Audio stream stopped")
     }
 

@@ -3,8 +3,8 @@ version: '3.8'
 services:
   db:
     image: costincanciu/android-spyware-db:latest
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - db:/var/lib/postgresql/data
       - ../backups:/backups
@@ -35,8 +35,8 @@ services:
   redis:
     image: redis:7-alpine
     container_name: redis
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redis_data:/data
     networks:
@@ -174,7 +174,7 @@ services:
     restart: unless-stopped
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.65
     container_name: jaeger-collector
     environment:
       COLLECTOR_ZIPKIN_HTTP_PORT: 9411
@@ -223,7 +223,7 @@ services:
     restart: unless-stopped
 
   coturn:
-    image: coturn/coturn:latest
+    image: coturn/coturn:4.6.3
     container_name: coturn
     ports:
       - "3490:3478"

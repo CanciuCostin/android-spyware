@@ -76,7 +76,6 @@ $(document).ready(function () {
       baseval += 300000;
       i++;
     }
-    console.log(series);
     return series;
   }
 

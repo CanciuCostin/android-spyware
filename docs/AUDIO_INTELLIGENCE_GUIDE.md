@@ -123,15 +123,16 @@ rails db:migrate
 
 ## Speech-to-Text Providers
 
-### OpenAI Whisper (Recommended)
+### Google Gemini (Recommended)
 
-Set `WHISPER_API_KEY` in your environment:
+Set `GEMINI_API_KEY` in your environment:
 
 ```env
-WHISPER_API_KEY=sk-your-openai-api-key
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-2.0-flash  # optional, defaults to gemini-2.0-flash
 ```
 
-Features: Automatic language detection, word-level timestamps, high accuracy.
+Features: Automatic language detection, high accuracy, multimodal audio understanding.
 
 ### Google Cloud Speech-to-Text
 
@@ -172,7 +173,8 @@ import AudioIntelligence from './components/AudioIntelligence';
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `WHISPER_API_KEY` | OpenAI API key for Whisper STT | One of these |
+| `GEMINI_API_KEY` | Google Gemini API key for audio transcription | One of these |
+| `GEMINI_MODEL` | Gemini model to use (default: gemini-2.0-flash) | No |
 | `GOOGLE_SPEECH_KEY` | Google Cloud Speech API key | is required |
 | `AUDIO_KEYWORDS` | Default keywords to spot (comma-separated) | No |
 

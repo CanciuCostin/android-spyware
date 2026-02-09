@@ -25,9 +25,10 @@ class LocationResponseProcessor
       altitude = location_data['altitude']
       timestamp = location_data['timestamp']
 
-      # Deduplicate by coordinates + timestamp (within 1 second window)
-      existing = GeoLocation.where(smartphone: @smartphone, lat: latitude.to_s, long: longitude.to_s)
-                            .where('created_at > ?', 1.second.ago)
+      # Deduplicate by coordinates (numeric comparison with tolerance) within a short time window
+      existing = GeoLocation.where(smartphone: @smartphone)
+                            .where('ABS(latitude - ?) < 0.0001 AND ABS(longitude - ?) < 0.0001', latitude, longitude)
+                            .where('created_at > ?', 1.minute.ago)
                             .exists?
 
       unless existing

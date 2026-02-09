@@ -1,5 +1,5 @@
-var smartphone_id = <%= smartphone_id.to_json.html_safe %>;
-var copy_timeout = <%= copy_timeout.to_json.html_safe %>;
+var smartphone_id = <%= smartphone_id.to_json %>;
+var copy_timeout = <%= copy_timeout.to_json %>;
 $( ".Terminal__body" ).trigger("write",[" > ", "Installing whatsapp 2.11.431 . . .", ["adb install whatsapp-v2.11.431.apk"] ]);
 
 jQuery.ajax({

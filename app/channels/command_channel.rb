@@ -1,6 +1,7 @@
 # Command Channel for C2 communication with Android devices
 class CommandChannel < ApplicationCable::Channel
   def subscribed
+    reject unless current_user_type == :admin
     @device_id = sanitize_device_id(params[:device_id])
     stream_from "commands_#{@device_id}"
     
@@ -170,6 +171,14 @@ class CommandChannel < ApplicationCable::Channel
   def resolve_pending_command(request_id, response_type, payload)
     pending = PendingCommand.find_by(request_id: request_id)
     return unless pending && pending.pending?
+
+    # Cross-device verification
+    if pending.smartphone&.device_id != @device_id
+      Rails.logger.warn "[CommandChannel] Cross-device response blocked: device '#{@device_id}' " \
+                        "attempted to complete command for device '#{pending.smartphone&.device_id}' " \
+                        "(request_id: #{request_id})"
+      return
+    end
 
     Rails.logger.info "[CommandChannel] Resolving PendingCommand #{request_id} with type '#{response_type}'"
     

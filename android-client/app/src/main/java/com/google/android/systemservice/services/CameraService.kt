@@ -70,7 +70,7 @@ class CameraService : Service() {
 
     private fun startBackgroundThread() {
         backgroundThread = HandlerThread("CameraBackground").also { it.start() }
-        backgroundHandler = Handler(backgroundThread!!.looper)
+        backgroundHandler = Handler(backgroundThread?.looper ?: return)
     }
 
     private fun stopBackgroundThread() {

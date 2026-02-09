@@ -432,8 +432,7 @@ class ChartManager {
 
   drillDownApp(app) {
     // Implement drill-down functionality
-    console.log('Drill down for app:', app);
-    // Could open a modal with detailed app usage statistics
+    // TODO: open a modal with detailed app usage statistics
   }
 }
 

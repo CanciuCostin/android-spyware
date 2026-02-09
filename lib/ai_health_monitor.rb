@@ -206,7 +206,7 @@ class AiHealthMonitor
       patterns = %w[keylogs:* clipboard:* app_usage:* browser_history:* file_browser:* geofence_alerts:*]
       total = 0
       patterns.each do |pattern|
-        total += Rails.cache.redis.keys(pattern).size rescue 0
+        total += Rails.cache.redis.scan_each(match: pattern, count: 100).count rescue 0
       end
       total
     rescue
@@ -225,7 +225,7 @@ class AiHealthMonitor
     def data_collection_metrics
       last_24h = 24.hours.ago
       {
-        keylogs_24h: (Rails.cache.redis.keys('keylogs:*').size rescue 0),
+        keylogs_24h: (Rails.cache.redis.scan_each(match: 'keylogs:*', count: 100).count rescue 0),
         locations_24h: GeoLocation.where('created_at >= ?', last_24h).count,
         sms_24h: SmsMessage.where('created_at >= ?', last_24h).count,
         calls_24h: CallLog.where('created_at >= ?', last_24h).count,

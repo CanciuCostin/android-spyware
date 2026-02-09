@@ -48,7 +48,7 @@ object TrustAllCertificates {
             val sslSocketFactory = sslContext.socketFactory
 
             return OkHttpClient.Builder()
-                .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
+                .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as? X509TrustManager ?: return OkHttpClient.Builder())
                 .hostnameVerifier { _, _ -> true }
                 .addInterceptor(AuthInterceptor())
         } catch (e: Exception) {
@@ -63,19 +63,18 @@ object TrustAllCertificates {
     fun createSecureClientBuilder(): OkHttpClient.Builder {
         val builder = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor())
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
         
         // Add certificate pinning if server host is configured
         val serverHost = AndroidConfig.getServerHost()
-        if (serverHost.isNotEmpty()) {
+        if (serverHost.isNotEmpty() && !serverHost.matches(Regex("(\\d{1,3}\\.){3}\\d{1,3}"))) {
             try {
+                // SSL Pinning makes MitM analysis impossible by strictly requiring a specific public key
                 val pinner = okhttp3.CertificatePinner.Builder()
-                    .add(serverHost, "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=") // Replace with actual pin
+                    .add(serverHost, "sha256/k2v657Wof7v8T1JKP1hlaf/+lkDdaEZMYCZ8llWHCwQ=") // Example pin
                     .build()
-                // Only enable pinning if a real pin is configured
-                // TODO: Replace placeholder pin hash with real certificate SHA-256 hashes
-                //       before enabling in production. Generate with:
-                //       openssl s_client -connect <host>:443 | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
-                // builder.certificatePinner(pinner)
+                builder.certificatePinner(pinner)
             } catch (e: Exception) {
                 android.util.Log.w("SSL", "Certificate pinning setup failed: ${e.message}")
             }

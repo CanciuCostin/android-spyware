@@ -1,6 +1,6 @@
 console.log("<%= commandOutput %>")
 console.log("<%= fileName %>")
-var commandOutput = <%= commandOutput.to_json.html_safe %>;
+var commandOutput = <%= commandOutput.to_json %>;
 console.log(commandOutput)
 $( ".Terminal__body" ).trigger("write",[" msf > ", "Status Check:", commandOutput ]);
 

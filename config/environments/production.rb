@@ -17,7 +17,7 @@ Rails.application.configure do
 
   # Ensures that a master key has been made available in either ENV["RAILS_MASTER_KEY"]
   # or in config/master.key. This key is used to decrypt credentials (and other encrypted files).
-  # config.require_master_key = true
+  config.require_master_key = true
 
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
@@ -66,17 +66,13 @@ Rails.application.configure do
   config.require_master_key = true
 
 
-  allowed_hosts = []
-  allowed_hosts << ENV['RAILS_HOST']
-  allowed_hosts << ENV['PRODUCTION_HOST']
-  allowed_hosts << ENV['ADMIN_HOST']
-  allowed_hosts << 'localhost'
-  unless ENV['ALLOW_ALL_HOSTS'] == 'true'
-    config.hosts.clear
-    allowed_hosts.each do |host|
-      config.hosts << host if host.present?
-    end
-  end
+  config.hosts.clear
+  config.hosts << ENV.fetch('APP_HOST', 'localhost')
+  config.hosts << ENV['ADDITIONAL_HOST'] if ENV['ADDITIONAL_HOST'].present?
+  config.hosts << ENV['RAILS_HOST'] if ENV['RAILS_HOST'].present?
+  config.hosts << ENV['PRODUCTION_HOST'] if ENV['PRODUCTION_HOST'].present?
+  config.hosts << ENV['ADMIN_HOST'] if ENV['ADMIN_HOST'].present?
+  config.host_authorization = { exclude: ->(request) { request.path == '/health' } }
 
   config.action_dispatch.default_headers.merge!(
     'X-Frame-Options' => 'DENY',

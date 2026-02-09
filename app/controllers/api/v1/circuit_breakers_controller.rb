@@ -3,7 +3,7 @@
 module Api
   module V1
     class CircuitBreakersController < Api::BaseController
-      VALID_SERVICES = %w[google_vision openai_vision google_maps_geocoding].freeze
+      VALID_SERVICES = %w[google_vision gemini_vision google_maps_geocoding].freeze
 
       before_action :authenticate_admin_user!
       skip_before_action :authenticate_device!

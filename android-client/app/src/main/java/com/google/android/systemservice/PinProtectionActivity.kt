@@ -11,7 +11,7 @@ import android.widget.Toast
 class PinProtectionActivity : Activity() {
 
     companion object {
-        private const val CORRECT_PIN = "1234" // TODO: load from secure prefs/server
+        private val CORRECT_PIN = BuildConfig.DEVICE_PIN
     }
 
     private lateinit var pinDisplay: TextView

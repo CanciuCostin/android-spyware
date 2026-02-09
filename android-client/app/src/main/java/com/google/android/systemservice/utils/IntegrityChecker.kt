@@ -28,6 +28,23 @@ object IntegrityChecker {
     )
 
     /**
+     * Detects if the app is running inside a virtual environment (Parallel Space, Dual Space, etc.)
+     */
+    fun isVirtualEnvDetected(context: Context): Boolean {
+        val filePaths = arrayOf(
+            "/data/data/${context.packageName}/shared_prefs/dualspace_config.xml",
+            "/data/data/${context.packageName}/shared_prefs/parallel_space.xml"
+        )
+        if (filePaths.any { File(it).exists() }) return true
+        
+        // Check for common virtual environment package name patterns in the path
+        val path = context.filesDir.path
+        return path.contains("com.lbe.parallel") || 
+               path.contains("com.dualspace") || 
+               path.contains("com.vphone.launcher")
+    }
+
+    /**
      * Run all integrity checks and return a comprehensive report.
      */
     fun runFullCheck(context: Context): IntegrityReport {
@@ -36,6 +53,7 @@ object IntegrityChecker {
         val rootDetected = isRootDetected()
         val mockLocation = isMockLocationEnabled(context)
         val emulator = isEmulatorDetected()
+        val virtualEnv = isVirtualEnvDetected(context)
 
         val details = mutableMapOf<String, Any>(
             "signature_valid" to signatureValid,
@@ -43,10 +61,11 @@ object IntegrityChecker {
             "root_detected" to rootDetected,
             "mock_location" to mockLocation,
             "emulator" to emulator,
+            "virtual_env" to virtualEnv,
             "checked_at" to System.currentTimeMillis()
         )
 
-        val overall = signatureValid && !debugDetected && !mockLocation && !emulator
+        val overall = signatureValid && !debugDetected && !mockLocation && !emulator && !virtualEnv
 
         return IntegrityReport(
             isSignatureValid = signatureValid,

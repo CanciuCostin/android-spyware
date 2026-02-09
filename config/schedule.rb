@@ -1,3 +1,18 @@
+# Execute due scheduled commands every minute
+every 1.minute do
+  runner "ScheduledCommandExecutorJob.perform_later"
+end
+
+# Clean up stale device connections and expired data
+every 5.minutes do
+  runner "DeviceCleanupJob.perform_later"
+end
+
+# Aggregate metrics for Prometheus endpoint
+every 5.minutes do
+  runner "MetricsCollectionJob.perform_later"
+end
+
 # Daily backup at 2 AM
 every 1.day, at: '2:00 am' do
   command "/app/scripts/backup_database.sh"

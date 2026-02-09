@@ -60,7 +60,7 @@ class DeviceStatusBroadcaster
   def self.all_device_statuses
     devices = []
     RedisPool.with do |redis|
-      keys = redis.keys("#{REDIS_KEY_PREFIX}*")
+      keys = redis.scan_each(match: "#{REDIS_KEY_PREFIX}*", count: 100).to_a
       return devices if keys.empty?
 
       redis.mget(*keys).each do |raw|

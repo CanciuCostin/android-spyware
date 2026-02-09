@@ -3,9 +3,9 @@ require 'json'
 require 'uri'
 
 # AI-powered analysis service for user behavior and collected data.
-# Supports Google Gemini and OpenAI GPT APIs.
+# Uses Google Gemini API.
 class AiAnalyzer
-  PROVIDERS = %w[gemini openai].freeze
+  PROVIDERS = %w[gemini].freeze
   MAX_CONTEXT_CHARS = 30_000
 
   class << self
@@ -16,7 +16,6 @@ class AiAnalyzer
     def configured?
       case provider
       when 'gemini' then ENV['GEMINI_API_KEY'].present?
-      when 'openai' then ENV['OPENAI_API_KEY'].present?
       else false
       end
     end
@@ -191,7 +190,6 @@ class AiAnalyzer
 
       case provider
       when 'gemini' then gemini_request(prompt, system)
-      when 'openai' then openai_request(prompt, system)
       else { error: "Unknown AI provider: #{provider}" }
       end
     rescue StandardError => e
@@ -223,36 +221,6 @@ class AiAnalyzer
 
       if parsed['candidates']&.first
         parsed['candidates'].first.dig('content', 'parts', 0, 'text') || 'No response generated'
-      else
-        { error: parsed['error']&.dig('message') || 'Empty AI response' }
-      end
-    end
-
-    def openai_request(prompt, system)
-      api_key = ENV['OPENAI_API_KEY']
-      uri = URI('https://api.openai.com/v1/chat/completions')
-
-      messages = []
-      messages << { role: 'system', content: system } if system.present?
-      messages << { role: 'user', content: prompt }
-
-      body = {
-        model: 'gpt-4o-mini',
-        messages: messages,
-        temperature: 0.3,
-        max_tokens: 4096
-      }.to_json
-
-      headers = {
-        'Content-Type' => 'application/json',
-        'Authorization' => "Bearer #{api_key}"
-      }
-
-      response = http_post(uri, body, headers)
-      parsed = JSON.parse(response.body)
-
-      if parsed['choices']&.first
-        parsed['choices'].first.dig('message', 'content') || 'No response generated'
       else
         { error: parsed['error']&.dig('message') || 'Empty AI response' }
       end

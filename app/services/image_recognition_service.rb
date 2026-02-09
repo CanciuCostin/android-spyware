@@ -7,7 +7,7 @@ class ImageRecognitionService < ApplicationService
     @image_path = image_path_or_data
     @options = options
     @google_api_key = ENV['GOOGLE_VISION_API_KEY']
-    @openai_api_key = ENV['OPENAI_API_KEY']
+    @gemini_api_key = ENV['GEMINI_API_KEY']
   end
 
   def call
@@ -29,8 +29,8 @@ class ImageRecognitionService < ApplicationService
   def extract_text
     if @google_api_key.present?
       google_vision_ocr
-    elsif @openai_api_key.present?
-      openai_vision_ocr
+    elsif @gemini_api_key.present?
+      gemini_vision_ocr
     else
       stub_ocr
     end
@@ -55,8 +55,8 @@ class ImageRecognitionService < ApplicationService
   def detect_objects
     if @google_api_key.present?
       google_vision_objects
-    elsif @openai_api_key.present?
-      openai_describe_image
+    elsif @gemini_api_key.present?
+      gemini_describe_image
     else
       stub_object_detection
     end
@@ -192,57 +192,57 @@ class ImageRecognitionService < ApplicationService
     { 'responses' => [{ 'error' => { 'message' => e.message } }] }
   end
 
-  # --- OpenAI Vision implementations ---
+  # --- Gemini Vision implementations ---
 
-  def openai_vision_ocr
+  def gemini_vision_ocr
     prompt = 'Extract all text visible in this image. Return only the extracted text, nothing else.'
-    result = call_openai_vision(prompt)
-    { text: result, method: 'openai_vision' }
+    result = call_gemini_vision(prompt)
+    { text: result, method: 'gemini_vision' }
   end
 
-  def openai_describe_image
+  def gemini_describe_image
     prompt = 'List all objects you can identify in this image. Return JSON array: [{"name": "object", "confidence": 0.0-1.0}]'
-    result = call_openai_vision(prompt)
+    result = call_gemini_vision(prompt)
     parsed = JSON.parse(result) rescue nil
 
     if parsed.is_a?(Array)
-      { count: parsed.size, objects: parsed, method: 'openai_vision' }
+      { count: parsed.size, objects: parsed, method: 'gemini_vision' }
     else
-      { description: result, method: 'openai_vision' }
+      { description: result, method: 'gemini_vision' }
     end
   end
 
-  def call_openai_vision(prompt)
-    CircuitBreaker.for('openai_vision').call do
-      image_url = if File.exist?(@image_path.to_s)
-                    "data:#{detect_mime_type};base64,#{Base64.strict_encode64(File.binread(@image_path))}"
-                  else
-                    @image_path.to_s
-                  end
+  def call_gemini_vision(prompt)
+    CircuitBreaker.for('gemini_vision').call do
+      image_data = if File.exist?(@image_path.to_s)
+                     Base64.strict_encode64(File.binread(@image_path))
+                   else
+                     Base64.strict_encode64(@image_path.to_s)
+                   end
 
-      uri = URI('https://api.openai.com/v1/chat/completions')
+      mime_type = detect_mime_type || 'image/jpeg'
+      model = ENV.fetch('GEMINI_VISION_MODEL', 'gemini-2.0-flash')
+      uri = URI("https://generativelanguage.googleapis.com/v1beta/models/#{model}:generateContent?key=#{@gemini_api_key}")
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.open_timeout = 10
       http.read_timeout = 60
 
       request = Net::HTTP::Post.new(uri)
-      request['Authorization'] = "Bearer #{@openai_api_key}"
       request['Content-Type'] = 'application/json'
       request.body = {
-        model: ENV.fetch('OPENAI_VISION_MODEL', 'gpt-4o-mini'),
-        messages: [{
+        contents: [{
           role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            { type: 'image_url', image_url: { url: image_url } }
+          parts: [
+            { text: prompt },
+            { inlineData: { mimeType: mime_type, data: image_data } }
           ]
         }],
-        max_tokens: 1000
+        generationConfig: { maxOutputTokens: 1000 }
       }.to_json
 
       response = http.request(request)
-      JSON.parse(response.body).dig('choices', 0, 'message', 'content') || ''
+      JSON.parse(response.body).dig('candidates', 0, 'content', 'parts', 0, 'text') || ''
     end
   rescue CircuitBreaker::CircuitOpenError => e
     "Service Temporarily Unavailable: #{e.message}"
@@ -254,7 +254,7 @@ class ImageRecognitionService < ApplicationService
     {
       text: nil,
       method: 'stub',
-      note: 'Configure GOOGLE_VISION_API_KEY or OPENAI_API_KEY for OCR. EXIF metadata extraction works without API keys.'
+      note: 'Configure GOOGLE_VISION_API_KEY or GEMINI_API_KEY for OCR. EXIF metadata extraction works without API keys.'
     }
   end
 
@@ -272,7 +272,7 @@ class ImageRecognitionService < ApplicationService
       count: 0,
       objects: [],
       method: 'stub',
-      note: 'Configure GOOGLE_VISION_API_KEY or OPENAI_API_KEY for object detection.'
+      note: 'Configure GOOGLE_VISION_API_KEY or GEMINI_API_KEY for object detection.'
     }
   end
 

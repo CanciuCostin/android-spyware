@@ -52,9 +52,26 @@ ActiveAdmin.register Keylog do
       redirect_to admin_root_path, alert: "Unauthorized"
       return
     end
-    Keylog.delete_all
-    AuditLog.create(admin_user: current_admin_user, action: 'clear_all_keylogs', auditable_type: 'Keylog') rescue nil
-    redirect_to collection_path, notice: "All keylogs cleared!"
+
+    if params[:smartphone_id].present?
+      smartphone = Smartphone.find(params[:smartphone_id])
+      count = smartphone.keylogs.count
+      smartphone.keylogs.delete_all
+      notice = "Keylogs for #{smartphone.name} cleared (#{count})!"
+    else
+      count = Keylog.count
+      Keylog.delete_all
+      notice = "All keylogs cleared (#{count})!"
+    end
+
+    AuditLog.create!(
+      admin_user: current_admin_user,
+      action: 'delete',
+      auditable_type: 'Keylog',
+      metadata: { count: count, smartphone_id: params[:smartphone_id] }
+    )
+
+    redirect_to collection_path, notice: notice
   end
 
   action_item :clear_all, only: :index do

@@ -39,7 +39,6 @@ export async function load() {
       return preferences;
     }
   } catch (e) {
-    console.warn('[PreferenceManager] Server fetch failed, using local cache', e);
   }
 
   // Fallback to localStorage
@@ -49,7 +48,6 @@ export async function load() {
       preferences = JSON.parse(cached);
     }
   } catch (e) {
-    console.warn('[PreferenceManager] localStorage parse failed', e);
     preferences = {};
   }
 
@@ -211,7 +209,6 @@ async function syncToServer(prefs) {
       body: JSON.stringify({ preferences: prefs })
     });
   } catch (e) {
-    console.warn('[PreferenceManager] Server sync failed', e);
   }
 }
 

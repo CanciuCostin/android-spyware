@@ -43,7 +43,8 @@ object CryptoHelper {
             return keyGenerator.generateKey()
         }
         
-        val entry = keyStore.getEntry(KEY_ALIAS, null) as KeyStore.SecretKeyEntry
+        val entry = keyStore.getEntry(KEY_ALIAS, null) as? KeyStore.SecretKeyEntry
+            ?: throw IllegalStateException("Key entry not found or wrong type for alias: $KEY_ALIAS")
         return entry.secretKey
     }
 

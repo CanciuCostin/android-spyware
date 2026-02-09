@@ -1,4 +1,4 @@
-var commandOutput = <%= commandOutput.to_json.html_safe %>;
+var commandOutput = <%= commandOutput.to_json %>;
 $( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
 
 if (commandOutput[0] != "Operation Failed" && commandOutput[0] != "Control+Z"){

@@ -76,14 +76,27 @@ class WatchdogService : Service() {
 
     private fun isServiceRunning(className: String): Boolean {
         val manager = getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager ?: return false
-        @Suppress("DEPRECATION")
-        return manager.getRunningServices(Integer.MAX_VALUE)
-            .any { it.service.className == className }
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            @Suppress("DEPRECATION")
+            manager.getRunningServices(Integer.MAX_VALUE)
+                .any { it.service.className == className }
+        } else {
+            // API 26+: getRunningServices is deprecated; check via running app processes
+            manager.runningAppProcesses?.any { processInfo ->
+                processInfo.processName == packageName &&
+                    processInfo.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE
+            } ?: false
+        }
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         handler.removeCallbacks(watchdogRunnable)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
         
         // Use AlarmManager for aggressive self-restart
         val intent = Intent(this, WatchdogService::class.java)
@@ -99,5 +112,6 @@ class WatchdogService : Service() {
         )
         
         Log.d(TAG, "Watchdog scheduled self-restart in 5s")
+        super.onDestroy()
     }
 }

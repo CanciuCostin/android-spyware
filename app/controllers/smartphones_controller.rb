@@ -508,14 +508,14 @@ class SmartphonesController < InheritedResources::Base
       
       # SECURITY: Validate path to prevent directory traversal attacks
       if app_path.present?
-        # Normalize and validate path
-        normalized_path = File.expand_path(app_path)
+        # Canonicalize with symlink resolution to prevent traversal
+        resolved_path = File.realpath(File.expand_path(app_path)) rescue nil
         allowed_dirs = [
           Rails.root.join('files', 'payloads').to_s,
           Rails.root.join('tools').to_s
         ]
         
-        unless allowed_dirs.any? { |dir| normalized_path.start_with?(dir) }
+        unless resolved_path && allowed_dirs.any? { |dir| resolved_path.start_with?(dir) }
           commandOutput = ["Error: Invalid file path - access denied"]
           respond_to do |format|
             format.js { render "install_app", locals: { commandOutput: commandOutput } }
@@ -523,8 +523,8 @@ class SmartphonesController < InheritedResources::Base
           return
         end
         
-        if File.exist?(normalized_path) && File.file?(normalized_path)
-          apk_data = File.read(normalized_path)
+        if File.file?(resolved_path)
+          apk_data = File.read(resolved_path)
           apk_base64 = Base64.strict_encode64(apk_data)
         
           pending_command = send_command_and_wait(@smartphone, 'install_apk', { apk_base64: apk_base64 }, timeout: 60.seconds)

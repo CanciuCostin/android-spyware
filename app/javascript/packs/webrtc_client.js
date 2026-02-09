@@ -80,7 +80,6 @@ class WebRTCClient {
 
   async startStream() {
     if (this.isStreaming) {
-      console.warn('[WebRTC] Stream already started');
       return;
     }
 
@@ -262,7 +261,6 @@ class WebRTCClient {
 
   async handleIceCandidate(message) {
     if (!this.peerConnection) {
-      console.warn('[WebRTC] No peer connection, ignoring ICE candidate');
       return;
     }
 
