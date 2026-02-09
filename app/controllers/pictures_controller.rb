@@ -6,7 +6,7 @@ class PicturesController < InheritedResources::Base
       @smartphone = Smartphone.find(params[:smartphone_id])
       currentTime = DateTime.now
       currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-      fileName = params[:filename].to_s
+      fileName = File.basename(params[:filename].to_s).gsub(/[^0-9a-zA-Z._-]/, '')
       camera = params[:back_camera] == "true" ? "0" : "1" # 0=back, 1=front
       @fileName = fileName.empty? ? "webcam_snap_#{currentTimeFormat}.jpeg" : "#{fileName}.jpeg"
       

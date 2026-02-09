@@ -114,4 +114,5 @@ module Api
     rescue StandardError
       false
     end
+  end
 end

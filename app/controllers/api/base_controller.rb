@@ -103,5 +103,23 @@ module Api
     rescue StandardError
       false
     end
+
+    # Security: Helper to validate and secure file paths
+    def secure_filepath(base_dir, filename)
+      # Clean the filename from any directory traversal attempts
+      # Use strictly alphanumeric + common safe chars
+      safe_filename = File.basename(filename).gsub(/[^a-zA-Z0-9_.\-]/, '')
+      
+      base_path = Rails.root.join(base_dir).cleanpath
+      full_path = base_path.join(safe_filename).cleanpath
+      
+      # Ensure the path is strictly within the intended directory
+      unless full_path.to_s.start_with?(base_path.to_s)
+        Rails.logger.error("SECURITY ALERT: Path traversal attempt: #{filename}")
+        raise SecurityError, "Insecure file path detected"
+      end
+      
+      full_path
+    end
   end
 end

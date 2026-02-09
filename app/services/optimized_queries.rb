@@ -180,25 +180,39 @@ class OptimizedQueries
 
     # Analyze query performance using EXPLAIN ANALYZE
     def analyze_query(sql)
-      result = ActiveRecord::Base.connection.execute("EXPLAIN ANALYZE #{sql}")
+      # Security: EXPLAIN ANALYZE executes the query.
+      # Ensure it only starts with SELECT and doesn't contain multiple statements.
+      query = sql.to_s.strip
+      unless query.upcase.start_with?('SELECT')
+        return [{ "QUERY PLAN" => "Error: Only SELECT queries are allowed for analysis." }]
+      end
+
+      # Remove semicolons to prevent command stacking
+      safe_sql = query.gsub(';', '')
+      
+      # Use quote to safely handle the string if we were to interpolate, 
+      # but here we are interpolating the whole query into EXPLAIN.
+      # Best we can do is ensure it's a single SELECT.
+      result = ActiveRecord::Base.connection.execute("EXPLAIN ANALYZE #{safe_sql}")
       result.to_a
+    rescue => e
+      [{ "QUERY PLAN" => "Error: #{e.message}" }]
     end
     
     # Get slow queries from pg_stat_statements (requires extension)
     def slow_queries(min_duration_ms: 1000, limit: 20)
-      ActiveRecord::Base.connection.execute(<<-SQL)
-        SELECT 
-          query,
-          calls,
-          total_exec_time,
-          mean_exec_time,
-          max_exec_time,
-          rows
+      # Use parameterized query to prevent injection
+      sql = <<~SQL
+        SELECT query, calls, total_exec_time, mean_exec_time, max_exec_time, rows
         FROM pg_stat_statements
-        WHERE mean_exec_time > #{min_duration_ms}
+        WHERE mean_exec_time > ?
         ORDER BY mean_exec_time DESC
-        LIMIT #{limit};
+        LIMIT ?
       SQL
+      
+      # sanitize_sql_array is the safest way to parameterize raw SQL in Rails
+      query = ActiveRecord::Base.send(:sanitize_sql_array, [sql, min_duration_ms.to_i, limit.to_i])
+      ActiveRecord::Base.connection.execute(query)
     rescue ActiveRecord::StatementInvalid => e
       if e.message.include?('does not exist')
         Rails.logger.warn "pg_stat_statements extension not installed"

@@ -37,7 +37,7 @@ class MessagingAppsDumpsController < InheritedResources::Base
       format.js {
         render "uninstall_whatsapp_for_downgrade",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -53,7 +53,7 @@ class MessagingAppsDumpsController < InheritedResources::Base
       format.js {
         render "install_old_apk",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -74,7 +74,7 @@ class MessagingAppsDumpsController < InheritedResources::Base
       format.js {
         render "adb_backup",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -106,7 +106,7 @@ class MessagingAppsDumpsController < InheritedResources::Base
       format.js {
         render "extract_backup",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -121,7 +121,7 @@ class MessagingAppsDumpsController < InheritedResources::Base
       format.js {
         render "untar_backup",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -137,7 +137,7 @@ class MessagingAppsDumpsController < InheritedResources::Base
       format.js {
         render "pull_whatsapp_db",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -170,14 +170,15 @@ class MessagingAppsDumpsController < InheritedResources::Base
       format.js {
         render "decrypt_whatsapp_database",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
 
   def export_whatsapp_database
     begin
-      @smartphone = Smartphone.find(params[:smartphone_id])
+      safe_id = params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '')
+      @smartphone = Smartphone.find(safe_id)
       
       # Send command asynchronously via ActionCable
       # WhatsAppResponseProcessor will handle saving the messages
@@ -192,7 +193,7 @@ class MessagingAppsDumpsController < InheritedResources::Base
     respond_to do |format|
       format.js {
         render "export_whatsapp_database",
-               :locals => { :commandOutput => commandOutput }
+               :locals => { :commandOutput => commandOutput.map { |s| ActionController::Base.helpers.sanitize(s) } }
       }
     end
   end

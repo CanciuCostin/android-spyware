@@ -6,7 +6,7 @@ class ContactsController < InheritedResources::Base
       @smartphone = Smartphone.find(params[:smartphone_id])
       currentTime = DateTime.now
       currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-      fileName = params[:filename].to_s
+      fileName = File.basename(params[:filename].to_s).gsub(/[^0-9a-zA-Z._-]/, '')
       @fileName = fileName.empty? ? "contacts_dump_#{currentTimeFormat}.txt" : "#{fileName}.txt"
       
       # Send command via ActionCable and wait for response

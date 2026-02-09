@@ -4,6 +4,7 @@ export { ActivityFeed } from './ActivityFeed';
 export { SystemHealth } from './SystemHealth';
 export { QuickActions } from './QuickActions';
 export { DashboardActivityChart } from './DashboardActivityChart';
+export { AiAssistant } from './AiAssistant';
 
 export type { MetricsGridProps } from './MetricsGrid';
 export type { DeviceGridProps } from './DeviceGrid';

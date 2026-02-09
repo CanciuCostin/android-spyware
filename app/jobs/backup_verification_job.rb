@@ -33,7 +33,7 @@ class BackupVerificationJob < ApplicationJob
     return false if File.size(file) < 1000
     
     # Full check: pg_restore --list
-    system("pg_restore --list #{file} > /dev/null 2>&1")
+    system("pg_restore", "--list", file.to_s, out: File::NULL, err: File::NULL)
   end
   
   def alert_no_backup

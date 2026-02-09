@@ -17,18 +17,31 @@ class AlertService
       next unless rule.evaluate(@device, @event_data)
       
       alert = create_alert(rule)
-      alerts_created << alert if alert
+      if alert
+        alerts_created << alert
+        broadcast_alert(alert)
+      end
     end
-    
+
     Rails.logger.info "AlertService: Created #{alerts_created.count} alert(s) for event #{@event_type}"
     alerts_created
-  rescue => e
-    Rails.logger.error "AlertService error: #{e.message}"
-    Rails.logger.error e.backtrace.join("\n")
-    []
   end
-  
+
   private
+
+  def broadcast_alert(alert)
+    ActionCable.server.broadcast(
+      "alerts_channel",
+      {
+        id: alert.id,
+        severity: alert.severity,
+        title: alert.title,
+        message: alert.message,
+        device_id: @device&.id,
+        triggered_at: alert.triggered_at
+      }
+    )
+  end
   
   def create_alert(rule)
     Alert.create!(

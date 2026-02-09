@@ -32,10 +32,9 @@ android {
     signingConfigs {
         release {
             storeFile file('../release.keystore')
-            // For development - hardcoded (change for production!)
-            storePassword 'eaglespy123'
-            keyAlias 'eaglespy'
-            keyPassword 'eaglespy123'
+            storePassword System.getenv('RELEASE_STORE_PASSWORD') ?: project.findProperty('RELEASE_STORE_PASSWORD') ?: 'eaglespy_dev_pass'
+            keyAlias System.getenv('RELEASE_KEY_ALIAS') ?: project.findProperty('RELEASE_KEY_ALIAS') ?: 'eaglespy'
+            keyPassword System.getenv('RELEASE_KEY_PASSWORD') ?: project.findProperty('RELEASE_KEY_PASSWORD') ?: 'eaglespy_dev_pass'
         }
     }
 

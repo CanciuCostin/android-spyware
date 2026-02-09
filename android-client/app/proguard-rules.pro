@@ -82,15 +82,15 @@
 -keepattributes RuntimeVisible*Annotations
 -keepattributes RuntimeInvisible*Annotations
 
-# === REMOVE LOGGING ===
--assumenosideeffects class android.util.Log {
-    public static *** d(...);
-    public static *** v(...);
-    public static *** i(...);
-    public static *** w(...);
-    public static *** e(...);
-    public static *** wtf(...);
-}
+# === REMOVE LOGGING (temporarily disabled for debugging) ===
+# -assumenosideeffects class android.util.Log {
+#     public static *** d(...);
+#     public static *** v(...);
+#     public static *** i(...);
+#     public static *** w(...);
+#     public static *** e(...);
+#     public static *** wtf(...);
+# }
 
 # === REMOVE KOTLIN METADATA ===
 -dontwarn kotlin.**

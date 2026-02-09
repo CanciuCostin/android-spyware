@@ -4,7 +4,7 @@ class SmartphonesController < InheritedResources::Base
 
   def dump_sysinfo
     begin
-      smartphone_id = params[:smartphone_id]
+      smartphone_id = params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '')
       smartphone = Smartphone.find(smartphone_id)
       
       # Send command via ActionCable to Android app
@@ -26,14 +26,15 @@ class SmartphonesController < InheritedResources::Base
     respond_to do |format|
       format.js {
         render "dump_sysinfo",
-               :locals => { :commandOutput => commandOutput }
+               :locals => { :commandOutput => commandOutput.map { |s| ActionController::Base.helpers.sanitize(s) } }
       }
     end
   end
 
   def webcam_record
     begin
-      @smartphone = Smartphone.find(params[:smartphone_id])
+      safe_id = params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '')
+      @smartphone = Smartphone.find(safe_id)
       camera_id = params[:back_camera] == "true" ? "0" : "1"
       
       if !@smartphone.is_recording
@@ -55,7 +56,10 @@ class SmartphonesController < InheritedResources::Base
     
     respond_to do |format|
       format.js {
-        render "webcam_record", locals: { commandOutput: commandOutput, fileName: @fileNameHtml }
+        render "webcam_record", locals: { 
+          commandOutput: commandOutput.map { |s| ActionController::Base.helpers.sanitize(s) }, 
+          fileName: ActionController::Base.helpers.sanitize(@fileNameHtml.to_s) 
+        }
       }
     end
   end
@@ -64,7 +68,8 @@ class SmartphonesController < InheritedResources::Base
   
   def dump_wifi_info
     begin
-      @smartphone = Smartphone.find(params[:smartphone_id])
+      safe_id = params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '')
+      @smartphone = Smartphone.find(safe_id)
 
       # Send async command to get WiFi info
       pending_command = send_command_async(
@@ -82,7 +87,7 @@ class SmartphonesController < InheritedResources::Base
 
     respond_to do |format|
       format.js {
-        render "dump_wifi_info", locals: { commandOutput: commandOutput }
+        render "dump_wifi_info", locals: { commandOutput: commandOutput.map { |s| ActionController::Base.helpers.sanitize(s) } }
       }
     end
   end

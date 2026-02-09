@@ -38,7 +38,7 @@ module Api
           file_path: params[:file_path],
           file_size: params[:file_size],
           mime_type: params[:mime_type],
-          exif_data: params[:exif_data]&.permit!&.to_h
+          exif_data: params[:exif_data].is_a?(Hash) ? params[:exif_data].slice(:make, :model, :software, :date_time, :gps_latitude, :gps_longitude) : {}
         }
       )
 

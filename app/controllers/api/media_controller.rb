@@ -1,30 +1,15 @@
 module Api
   class MediaController < Api::BaseController
-    # Security: Helper to validate and secure file paths
-    def secure_filepath(base_dir, filename)
-      # Clean the filename from any directory traversal attempts
-      safe_filename = File.basename(filename)
-      full_path = Rails.root.join(base_dir, safe_filename).cleanpath
-      
-      # Ensure the path is within the intended directory
-      base_path = Rails.root.join(base_dir).cleanpath
-      unless full_path.to_s.start_with?(base_path.to_s)
-        raise SecurityError, "Path traversal attempt detected: #{filename}"
-      end
-      
-      full_path
-    end
-
     def upload_photo
-      device_id = params[:device_id] || request.headers['X-Device-ID']
-      return render json: { error: 'Missing device_id' }, status: :bad_request if device_id.blank?
+      device_id = InputValidator.sanitize_device_id(params[:device_id] || request.headers['X-Device-ID'])
+      return render json: { error: 'Invalid or missing device_id' }, status: :bad_request if device_id.blank?
       
       smartphone = find_or_create_smartphone(device_id)
       
       if params[:file].present?
-        # Validate file extension
-        ext = File.extname(params[:file].original_filename).downcase rescue '.jpg'
-        allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
+        # Validate file extension strictly
+        ext = File.extname(params[:file].original_filename).downcase
+        allowed_extensions = ['.jpg', '.jpeg', '.png']
         ext = '.jpg' unless allowed_extensions.include?(ext)
         
         # Validate MIME type for security

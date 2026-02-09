@@ -139,7 +139,7 @@ class CommandService : Service() {
 
     private fun connectWebSocket() {
         try {
-            client = TrustAllCertificates.createUnsafeClientBuilder()
+            client = TrustAllCertificates.createClientBuilder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(0, TimeUnit.MILLISECONDS) // No read timeout for WS
                 .writeTimeout(30, TimeUnit.SECONDS)

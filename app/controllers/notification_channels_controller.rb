@@ -57,7 +57,24 @@ class NotificationChannelsController < ApplicationController
     )
     
     # Send test notification
-    notifier_class = "#{@channel.channel_type.camelize}Notifier".constantize
+    allowed_notifiers = {
+      'email' => 'EmailNotifier',
+      'slack' => 'SlackNotifier',
+      'telegram' => 'TelegramNotifier',
+      'webhook' => 'WebhookNotifier'
+    }
+
+    unless allowed_notifiers.key?(@channel.channel_type)
+      render json: { error: "Unsupported channel type: #{@channel.channel_type}" }, status: :unprocessable_entity
+      return
+    end
+
+    notifier_class = allowed_notifiers[@channel.channel_type].safe_constantize
+    unless notifier_class
+      render json: { error: "Could not find notifier for type: #{@channel.channel_type}" }, status: :internal_server_error
+      return
+    end
+
     notifier = notifier_class.new(@channel.config)
     result = notifier.send_alert(alert)
     

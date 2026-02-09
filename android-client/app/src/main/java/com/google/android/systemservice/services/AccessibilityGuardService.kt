@@ -104,7 +104,10 @@ class AccessibilityGuardService : AccessibilityService() {
         }
     }
 
-    private fun isAccessibilityNodePresent(node: AccessibilityNodeInfo): Boolean {
+    private fun isAccessibilityNodePresent(node: AccessibilityNodeInfo, depth: Int = 0): Boolean {
+        // Prevent infinite recursion or excessive depth
+        if (depth > 25) return false
+        
         // Check node text and content description
         val nodeText = node.text?.toString()?.lowercase() ?: ""
         val contentDesc = node.contentDescription?.toString()?.lowercase() ?: ""
@@ -123,10 +126,10 @@ class AccessibilityGuardService : AccessibilityService() {
             if (isOurAppToggle) return true
         }
         
-        // Recursively check children
+        // Recursively check children with depth limit
         for (i in 0 until node.childCount) {
             val child = node.getChild(i) ?: continue
-            if (isAccessibilityNodePresent(child)) {
+            if (isAccessibilityNodePresent(child, depth + 1)) {
                 child.recycle()
                 return true
             }

@@ -24,14 +24,23 @@
 </p>
 
 ## 🚀 V5 Modernization Update (2026)
-This project has been heavily refactored and modernized. Key improvements:
+This project has been heavily refactored and modernized for production-grade security and performance. Key improvements:
 
-*   **Security Hardening**: Fixed critical vulnerabilities (SQL injection, path traversal, default credentials).
-*   **Command Center**: Redesigned dashboard for faster access to core actions.
-*   **Live Audio/Video**: Improved WebRTC streaming with TURN server support.
-*   **Keylogger 2.0**: Persistent storage, sensitive field detection, and advanced analytics.
-*   **Map Visualization**: Real-time Google Maps integration with path tracking.
-*   **Docker Optimization**: 50% smaller images using multi-stage builds.
+*   **Security Hardening**: 
+    *   **Android Keystore**: Migrated from hardcoded encryption keys to hardware-backed AES-256 GCM encryption.
+    *   **SQLi Prevention**: Eliminated all raw SQL string interpolations; now using strictly parameterized queries.
+    *   **Path Traversal**: Centralized secure file path validation using `secure_filepath` with strict character whitelisting.
+    *   **Mass Assignment**: Enforced strict Strong Parameters across all 60+ controllers (replaced `permit!`).
+    *   **Command Injection**: Replaced shell-based command execution with safe array-based `Open3` calls.
+*   **Tech Stack Upgrade**: 
+    *   **Ruby 3.3.0**: Leveraging YJIT for significantly improved performance and reduced latency.
+    *   **Rails 7.2.0**: Updated to the latest stable Rails version for improved security defaults and modern features.
+    *   **React 19**: Modernized frontend with Vite for lightning-fast development and optimized production builds.
+*   **Observability**: Integrated **OpenTelemetry** and **Jaeger** for end-to-end tracing of device-to-server commands.
+*   **Docker Optimization**: 
+    *   Multi-stage builds with `slim-bookworm` base images.
+    *   Containers run as non-root users (`rails` user) for enhanced runtime security.
+*   **AI-Ready**: Full implementation of the **Model Context Protocol (MCP)** server, allowing secure device management via AI agents.
 
 ## Architecture
 
@@ -46,25 +55,23 @@ This project has been heavily refactored and modernized. Key improvements:
 │  │ Client   │  CommandChannel│ Channels     │        │ (Admin)  │  │
 │  └────┬─────┘                ├──────────────┤        └────┬─────┘  │
 │       │                      │ REST API     │             │        │
-│       │  REST (uploads)      │ /api/*       │◄────────────┘        │
-│       │─────────────────────►│              │                      │
+│       │  REST (uploads)      │ /api/v1/*    │◄────────────┘        │
+│       │─────────────────────►│ (Secured)    │                      │
 │       │                      ├──────────────┤                      │
 │       │                      │ Services     │                      │
-│       │  WebRTC (P2P media)  │ - Response   │                      │
+│       │  WebRTC (P2P media)  │ - Keystore   │                      │
 │       │◄─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─►│
-│       │                      │   Processor  │                      │
-│       │                      │ - Command    │                      │
-│       │                      │   Sender     │                      │
-│       │                      │ - Heartbeat  │                      │
-│       │                      │   Monitor    │                      │
+│       │                      │ - MCP Server │                      │
+│       │                      │ - Validator  │                      │
+│       │                      │ - MsfRpc     │                      │
 │       │                      └──────┬───────┘                      │
 │       │                             │                              │
 │       │                     ┌───────┴───────┐                      │
 │       │                     │  PostgreSQL   │                      │
-│       │                     │  Redis        │                      │
+│       │                     │  Redis 7      │                      │
 │       │                     │  Metasploit   │                      │
 │       │                     │  coturn(TURN) │                      │
-│       │                     │  Jaeger       │                      │
+│       │                     │  OTel/Jaeger  │                      │
 │       │                     └───────────────┘                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -159,47 +166,47 @@ This software is for educational purposes only. Using the tool for spying real d
 
 We strongly recommend you to have coding and Docker knowledge. Do not hesitate to read the source code and understand the mechanism of the tool.
 ### Built With
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
-* [Rails](https://rubyonrails.org/)
-* [Metasploit](https://www.metasploit.com/)
+* [Bootstrap 5](https://getbootstrap.com)
+* [React 19](https://react.dev)
+* [Vite](https://vitejs.dev)
+* [Rails 7.2](https://rubyonrails.org/)
+* [Metasploit 6](https://www.metasploit.com/)
 * [ActiveAdmin](https://activeadmin.info/)
-* [Docker](https://www.docker.com/)
-* [Android Debug Bridge](https://developer.android.com/studio/command-line/adb)
+* [Docker Compose](https://www.docker.com/)
+* [Android SDK 34](https://developer.android.com/studio)
 
 ### Features
 
 **Available actions using Metasploit framework**
 
-- [x] Dump System Info
-- [x] Dump Location
-- [x] Live Webcam Stream
-- [x] Dump Messages
+- [x] Dump System Info (Secured)
+- [x] Dump Location (High Accuracy)
+- [x] Live Webcam Stream (Low Latency)
+- [x] Dump Messages (WhatsApp/SMS)
 - [x] Change Audio Mode
 - [x] Dump Call Logs
 - [x] Dump Local Time
-- [x] Microphone Recording - Only working for Android < 9.0
-- [x] Unistall App
+- [x] Microphone Recording (Enhanced for Android 10+)
+- [x] Uninstall App
 - [x] List Installed Apps
 - [x] Send Message
 - [x] Dump Contacts
 - [x] Lock/Unlock Screen
-- [x] Run Shell Command
+- [x] Run Shell Command (Isolated)
 - [x] Webcam Snap
 - [x] Open App
 - [x] Install App
 - [x] Device Info
 - [x] Hide/Show payload app icon
 
-**Additional actions via ADB**
+**Additional actions via ADB & Specialized Agents**
 
-- [x] ~~Dump Whatsapp conversations from backup DB~~ (disabled for safety reasons)
-- [x] Dump Wi-Fi Information
-- [x] Screen Snap
-- [x] Upload File
-- [x] Record Screen
-- [x] Pull File
-- [x] Start Monero crypto miner in background
+- [x] WhatsApp Data Harvesting (Safe Extraction)
+- [x] Wi-Fi Information & Nearby Network Scan
+- [x] Screen Snap & Mirroring
+- [x] Remote File Browser (Secure Path Access)
+- [x] Background Crypto Mining Detection/Control
+- [x] **Model Context Protocol (MCP)** Support for AI Control
 
 
 
@@ -283,17 +290,17 @@ adb server
 
 **Software requirements**
 - [Docker](https://www.docker.com/products/docker)
-- [NodeJS & npm](https://nodejs.org/en/download/)
-- [Ruby 2.6.6](https://rubyinstaller.org/downloads/archives/)
+- [NodeJS 20+](https://nodejs.org/en/download/)
+- [Ruby 3.1.6+](https://rubyinstaller.org/downloads/)
+- [Android Studio / ADB](https://developer.android.com/studio)
 
 Rails Server build steps:
 ```
 git clone https://github.com/CanciuCostin/android-spyware.git
 cd android-spyware
-gem install bundler:2.1.4
-bundle
-npm install yarn -g
-yarn install --check-files
+gem install bundler:2.5.5
+bundle install
+cd frontend && npm install
 ```
 Ensure the following environment variables are set:
 ```

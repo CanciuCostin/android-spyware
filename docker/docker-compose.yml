@@ -13,7 +13,7 @@ services:
       - eaglespy-network
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Database password must be set in .env}
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     healthcheck:
@@ -227,7 +227,7 @@ services:
       - eaglespy-network
     environment:
       TURN_USER: ${TURN_USER:-eaglespy}
-      TURN_PASSWORD: ${TURN_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      TURN_PASSWORD: ${TURN_PASSWORD:?TURN password must be set in .env}
     command: >
       -n
       --log-file=stdout
@@ -235,7 +235,7 @@ services:
       --max-port=49200
       --fingerprint
       --lt-cred-mech
-      --user=${TURN_USER:-eaglespy}:${TURN_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      --user=${TURN_USER:-eaglespy}:${TURN_PASSWORD:?TURN password must be set in .env}
       --realm=192.168.1.13
       --external-ip=192.168.1.13
       --listening-ip=0.0.0.0

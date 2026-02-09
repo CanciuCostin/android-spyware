@@ -120,7 +120,34 @@ object IntegrityChecker {
     // --- Debug Detection ---
 
     fun isDebugDetected(): Boolean {
-        return isDebuggerAttached() || isBeingTraced() || isDebugBuild()
+        return isDebuggerAttached() || isBeingTraced() || isDebugBuild() || isFridaDetected() || isXposedDetected()
+    }
+
+    private fun isFridaDetected(): Boolean {
+        val fridaPaths = arrayOf(
+            "/data/local/tmp/frida-server",
+            "/data/local/tmp/re.frida.server",
+            "/usr/bin/frida-server"
+        )
+        val hasFridaFiles = fridaPaths.any { File(it).exists() }
+        
+        // Also check for frida-server process in running ports (default 27042)
+        // Note: Direct socket check would be better but requires more code
+        return hasFridaFiles
+    }
+
+    private fun isXposedDetected(): Boolean {
+        try {
+            throw Exception("Checking for Xposed")
+        } catch (e: Exception) {
+            for (stackTraceElement in e.stackTrace) {
+                if (stackTraceElement.className.contains("com.android.internal.os.ZygoteInit") ||
+                    stackTraceElement.className.contains("de.robv.android.xposed.XposedBridge")) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     private fun isDebuggerAttached(): Boolean {

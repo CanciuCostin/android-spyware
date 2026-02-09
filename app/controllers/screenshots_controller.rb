@@ -6,7 +6,7 @@ class ScreenshotsController < InheritedResources::Base
       @smartphone = Smartphone.find(params[:smartphone_id])
       currentTime = DateTime.now
       currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-      fileName = params[:filename].to_s
+      fileName = File.basename(params[:filename].to_s).gsub(/[^0-9a-zA-Z._-]/, '')
       @fileName = fileName.empty? ? "screen_snap_#{currentTimeFormat}.png" : "#{fileName}.png"
       
       # Send take_screenshot command via ActionCable
@@ -48,7 +48,7 @@ class ScreenshotsController < InheritedResources::Base
     begin
       @smartphone = Smartphone.find(params[:smartphone_id])
       duration = params[:time].present? ? params[:time].to_i : 30
-      fileName = params[:filename].to_s
+      fileName = File.basename(params[:filename].to_s).gsub(/[^0-9a-zA-Z._-]/, '')
       currentTime = DateTime.now
       currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
       @fileName = fileName.empty? ? "screen_record_#{currentTimeFormat}.mp4" : "#{fileName}.mp4"

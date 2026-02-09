@@ -12,6 +12,7 @@ import {
   ActivityFeed,
   SystemHealth,
   QuickActions,
+  AiAssistant,
 } from '../../components/dashboard';
 import type { Device } from '../../types/api';
 import { DeviceStatus } from '../../types/api';
@@ -24,6 +25,7 @@ export function Dashboard() {
   const { isConnected } = useWebSocket();
   const { notify } = useNotification();
   const [activeSessions, setActiveSessions] = useState(0);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | undefined>();
 
   useEffect(() => {
     setBreadcrumbs([{ label: 'Dashboard' }]);
@@ -57,6 +59,7 @@ export function Dashboard() {
 
   // Handle device click
   const handleDeviceClick = (device: Device) => {
+    setSelectedDeviceId(device.id);
     notify.info(`Viewing device: ${device.name}`);
   };
 
@@ -130,6 +133,9 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* AI Assistant */}
+      <AiAssistant deviceId={selectedDeviceId} />
+
       {/* Header */}
       <FadeIn>
         <div>
