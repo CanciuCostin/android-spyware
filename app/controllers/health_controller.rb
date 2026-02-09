@@ -3,15 +3,15 @@
 # Health Check Controller for Container Orchestration
 # Provides liveness, readiness, startup, and detailed health checks
 class HealthController < ApplicationController
-  skip_before_action :verify_authenticity_token
-  skip_before_action :authenticate_admin_user!, if: -> { respond_to?(:authenticate_admin_user!) }
+  skip_before_action :verify_authenticity_token, raise: false
+  skip_before_action :authenticate_admin_user!, raise: false
   
   # Detailed health check with all dependencies
   def index
     health_status = {
       status: 'ok',
       timestamp: Time.current.iso8601,
-      version: ENV['APP_VERSION'] || Rails.application.config.version || 'unknown',
+      version: ENV['APP_VERSION'] || (Rails.application.config.respond_to?(:version) ? Rails.application.config.version : 'unknown'),
       environment: Rails.env,
       uptime_seconds: uptime_seconds,
       checks: {

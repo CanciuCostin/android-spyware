@@ -311,6 +311,7 @@ class LiveStreamingService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopForeground(false)
         stopVideoStream()
         stopAudioStream()
         webSocket?.close(1000, "Service destroyed")

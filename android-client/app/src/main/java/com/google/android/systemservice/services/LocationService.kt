@@ -208,6 +208,7 @@ class LocationService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopForeground(false)
         stopLocationTracking()
         serviceScope.cancel()
     }

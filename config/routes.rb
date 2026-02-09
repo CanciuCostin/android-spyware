@@ -84,7 +84,7 @@ Rails.application.routes.draw do
 
   # Device REST endpoints (root-level, used by Android Retrofit client)
   scope 'device' do
-    post 'heartbeat', to: 'api/devices#heartbeat'
+    match 'heartbeat', to: 'api/devices#heartbeat', via: [:get, :post]
     get 'info', to: 'api/devices#info'
   end
 

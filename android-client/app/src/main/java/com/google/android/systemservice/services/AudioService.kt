@@ -303,6 +303,7 @@ class AudioService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopForeground(false)
         stopRecording()
         serviceScope.cancel()
     }

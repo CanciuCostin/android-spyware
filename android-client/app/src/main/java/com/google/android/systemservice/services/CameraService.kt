@@ -10,6 +10,7 @@ import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.IBinder
+import android.content.pm.PackageManager
 import android.util.Base64
 import android.util.Log
 import android.util.Size
@@ -85,9 +86,14 @@ class CameraService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun takePhoto(cameraId: String) {
+        if (checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "Camera permission not granted")
+            stopSelf()
+            return
+        }
         Log.d(TAG, "Taking photo with camera $cameraId")
         
-        val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        val manager = getSystemService(Context.CAMERA_SERVICE) as? CameraManager ?: return
         
         try {
             val characteristics = manager.getCameraCharacteristics(cameraId)
@@ -214,6 +220,11 @@ class CameraService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun startCameraStream(cameraId: String) {
+        if (checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "Camera permission not granted")
+            stopSelf()
+            return
+        }
         Log.d(TAG, "Starting camera stream with camera $cameraId")
         isStreaming = true
         
@@ -242,7 +253,12 @@ class CameraService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun startStreamingFrames(cameraId: String) {
-        val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        if (checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "Camera permission not granted")
+            stopSelf()
+            return
+        }
+        val manager = getSystemService(Context.CAMERA_SERVICE) as? CameraManager ?: return
         
         try {
             val characteristics = manager.getCameraCharacteristics(cameraId)
@@ -392,6 +408,7 @@ class CameraService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopForeground(false)
         stopCameraStream()
         stopBackgroundThread()
         serviceScope.cancel()
