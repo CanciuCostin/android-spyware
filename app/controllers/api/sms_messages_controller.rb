@@ -1,8 +1,8 @@
 module Api
   class SmsMessagesController < Api::BaseController
     def upload_dump
-      device_id = params[:device_id] || request.headers['X-Device-ID']
-      return render json: { error: 'Missing device_id' }, status: :bad_request if device_id.blank?
+      device_id = extract_device_id
+      return unless device_id
       
       smartphone = find_or_create_smartphone(device_id)
       
@@ -37,7 +37,7 @@ module Api
 
       # Save file to disk
       filename = "sms_#{sanitize_device_id(device_id)}_#{Time.now.to_i}.json"
-      filepath = Rails.root.join('files', 'dumps', 'sms', filename)
+      filepath = secure_filepath('files/dumps/sms', filename)
       
       begin
         FileUtils.mkdir_p(File.dirname(filepath))
