@@ -19,7 +19,7 @@ ActiveAdmin.register GeoLocation do
   end
 
   collection_action :map, method: :get do
-    @geo_locations = GeoLocation.all
+    @geo_locations = GeoLocation.includes(:smartphone).order(created_at: :desc).limit(1000)
     render 'admin/geo_locations/map'
   end
 end

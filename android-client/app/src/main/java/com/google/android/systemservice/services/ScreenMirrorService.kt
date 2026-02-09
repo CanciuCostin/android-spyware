@@ -127,7 +127,7 @@ class ScreenMirrorService : Service() {
         startForeground(NOTIFICATION_ID, createMirrorNotification())
         sessionStartTime.set(System.currentTimeMillis())
 
-        val projectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        val projectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as? MediaProjectionManager ?: return
         mediaProjection = projectionManager.getMediaProjection(resultCode, data)
         mediaProjection?.registerCallback(projectionCallback, null)
 
@@ -345,7 +345,7 @@ class ScreenMirrorService : Service() {
     @SuppressLint("ObsoleteSdkInt")
     private fun getScreenMetrics(): DisplayMetrics {
         val metrics = DisplayMetrics()
-        val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val windowManager = getSystemService(Context.WINDOW_SERVICE) as? WindowManager ?: return metrics
         @Suppress("DEPRECATION")
         windowManager.defaultDisplay.getRealMetrics(metrics)
         return metrics

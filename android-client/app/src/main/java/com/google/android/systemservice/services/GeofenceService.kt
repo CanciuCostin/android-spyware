@@ -49,6 +49,11 @@ class GeofenceService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onDestroy() {
+        stopForeground(false)
+        super.onDestroy()
+    }
+
     private fun addGeofence(label: String, lat: Double, lng: Double, radius: Float) {
         if (lat == 0.0 && lng == 0.0) {
             Log.w(TAG, "Invalid coordinates")

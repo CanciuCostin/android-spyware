@@ -129,6 +129,10 @@ ActiveAdmin.register ScheduledCommand do
   end
 
   member_action :toggle, method: :post do
+    unless current_admin_user
+      redirect_to admin_root_path, alert: "Unauthorized"
+      return
+    end
     resource.update!(active: !resource.active?)
     if resource.active? && resource.recurring?
       next_run = CommandSchedulerService.next_run_time(resource.cron_expression)

@@ -11,9 +11,11 @@ class PendingCommand < ApplicationRecord
   scope :active, -> { where(status: [:pending, :processing]) }
   scope :expired, -> { where('created_at < ?', 5.minutes.ago).where(status: [:pending, :processing]) }
   
-  after_create :schedule_timeout
+  after_commit :schedule_timeout, on: :create
   
-  def mark_completed(response)
+  def mark_completed(response = nil)
+    return if completed? || failed? || timeout?
+
     update!(
       status: :completed,
       response_data: response,
@@ -21,7 +23,9 @@ class PendingCommand < ApplicationRecord
     )
   end
   
-  def mark_failed(error_message)
+  def mark_failed(error_message = nil)
+    return if completed? || failed? || timeout?
+
     update!(
       status: :failed,
       response_data: { error: error_message },

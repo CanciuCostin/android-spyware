@@ -98,7 +98,7 @@ class StorageCleanupService < ApplicationService
     root = Rails.application.config.x.storage.local_root.to_s
     if Gem.win_platform?
       drive = root[0..2]
-      output = `wmic logicaldisk where "DeviceID='#{drive[0..1]}'" get FreeSpace,Size /format:csv 2>NUL`.strip
+      output = IO.popen(['wmic', 'logicaldisk', 'where', "DeviceID='#{drive[0..1]}'", 'get', 'FreeSpace,Size', '/format:csv'], &:read).to_s.strip
       lines = output.split("\n").reject(&:blank?)
       if lines.size >= 2
         parts = lines.last.split(',')
@@ -110,7 +110,7 @@ class StorageCleanupService < ApplicationService
         { total: nil, used_percent: nil }
       end
     else
-      output = `df -B1 "#{root}" 2>/dev/null`.strip
+      output = IO.popen(['df', '-B1', root], &:read).to_s.strip
       lines = output.split("\n")
       if lines.size >= 2
         parts = lines.last.split

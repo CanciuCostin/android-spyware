@@ -14,6 +14,7 @@ const MAX_RECONNECT_ATTEMPTS = 10;
 
 let subscription = null;
 let reconnectAttempts = 0;
+let reconnectTimer = null;
 let connectionIndicator = null;
 
 /**
@@ -269,11 +270,11 @@ function scheduleReconnect() {
     return;
   }
   reconnectAttempts++;
+  if (reconnectTimer) clearTimeout(reconnectTimer);
   var delay = RECONNECT_DELAY_MS * Math.pow(1.5, reconnectAttempts - 1);
-  setTimeout(function() {
-    if (subscription) {
-      subscription.perform('request_refresh');
-    }
+  reconnectTimer = setTimeout(function() {
+    debugLog('[RealtimeDashboard] Attempting reconnect...');
+    subscribeToDeviceStatus();
   }, Math.min(delay, 30000));
 }
 
@@ -309,6 +310,10 @@ function getSignalIcon(strength) {
   if (strength >= -80) return '📶';
   if (strength >= -100) return '📡';
   return '📡';
+}
+
+function debugLog(...args) {
+  if (typeof console !== 'undefined') console.debug(...args);
 }
 
 function showToastNotification(message, type) {

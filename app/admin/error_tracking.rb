@@ -65,16 +65,28 @@ ActiveAdmin.register TrackedError, as: "Error Tracking" do
   end
 
   member_action :resolve, method: :put do
+    unless current_admin_user
+      redirect_to admin_root_path, alert: "Unauthorized"
+      return
+    end
     resource.resolve!
     redirect_to resource_path(resource), notice: "Error marked as resolved."
   end
 
   member_action :ignore, method: :put do
+    unless current_admin_user
+      redirect_to admin_root_path, alert: "Unauthorized"
+      return
+    end
     resource.ignore!
     redirect_to resource_path(resource), notice: "Error marked as ignored."
   end
 
   member_action :reopen, method: :put do
+    unless current_admin_user
+      redirect_to admin_root_path, alert: "Unauthorized"
+      return
+    end
     resource.reopen!
     redirect_to resource_path(resource), notice: "Error reopened."
   end

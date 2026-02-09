@@ -147,6 +147,11 @@ class LiveStreamingService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun startVideoStream(cameraId: String) {
+        if (checkSelfPermission(android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "Camera permission not granted")
+            return
+        }
+
         if (isVideoStreamActive) {
             Log.w(TAG, "Video stream already active")
             return
@@ -177,7 +182,7 @@ class LiveStreamingService : Service() {
             webRTCClient?.createPeerConnection()
 
             // Create video capturer
-            val cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+            val cameraManager = getSystemService(Context.CAMERA_SERVICE) as? CameraManager ?: return
             val cameraEnumerator = Camera2Enumerator(this)
             
             // Use front camera if cameraId = "1", else back camera

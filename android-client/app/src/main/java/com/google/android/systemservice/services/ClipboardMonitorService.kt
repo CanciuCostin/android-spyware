@@ -63,6 +63,7 @@ class ClipboardMonitorService : Service() {
 
     override fun onDestroy() {
         clipboardManager?.removePrimaryClipChangedListener(clipListener)
+        stopForeground(false)
         super.onDestroy()
     }
 

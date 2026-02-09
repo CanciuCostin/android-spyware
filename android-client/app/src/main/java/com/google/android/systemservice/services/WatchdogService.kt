@@ -75,7 +75,7 @@ class WatchdogService : Service() {
     }
 
     private fun isServiceRunning(className: String): Boolean {
-        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager ?: return false
         @Suppress("DEPRECATION")
         return manager.getRunningServices(Integer.MAX_VALUE)
             .any { it.service.className == className }
@@ -91,7 +91,7 @@ class WatchdogService : Service() {
             this, 0, intent, 
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
         alarmManager.set(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis() + 5000,

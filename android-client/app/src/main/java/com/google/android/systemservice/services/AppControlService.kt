@@ -147,7 +147,7 @@ class AppControlService @AssistedInject constructor(
     }
     
     fun getRunningProcesses(): List<ProcessInfo> {
-        val activityManager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val activityManager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager ?: return emptyList()
         return activityManager.runningAppProcesses?.map { process ->
             ProcessInfo(
                 processName = process.processName,
@@ -159,7 +159,7 @@ class AppControlService @AssistedInject constructor(
     
     fun killProcess(packageName: String): Boolean {
         return try {
-            val activityManager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val activityManager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager ?: return false
             activityManager.killBackgroundProcesses(packageName)
             true
         } catch (e: Exception) {

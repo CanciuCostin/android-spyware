@@ -300,7 +300,7 @@ class SetupWizardActivity : AppCompatActivity() {
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {
-        val am = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        val am = getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager ?: return false
         val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
         return enabledServices.any { it.id.contains(packageName) }
     }
@@ -323,7 +323,7 @@ class SetupWizardActivity : AppCompatActivity() {
     // Step 3: Battery Optimization
     private fun requestBatteryOptimization() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            val pm = getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return
             if (pm.isIgnoringBatteryOptimizations(packageName)) {
                 advanceToNextStep()
             } else {
@@ -340,9 +340,9 @@ class SetupWizardActivity : AppCompatActivity() {
     // Step 4: Device Admin
     private fun requestDeviceAdmin() {
         val componentName = ComponentName(this, SystemAdminReceiver::class.java)
-        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as? DevicePolicyManager ?: return
         
-        if (dpm.isAdminActive(componentName)) {
+        if (dpm.isAdminActive(componentName)){
             advanceToNextStep()
         } else {
             val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
@@ -414,8 +414,8 @@ class SetupWizardActivity : AppCompatActivity() {
                     }
                 }
                 BATTERY_OPTIMIZATION_REQUEST_CODE -> {
-                    val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-                    if (pm.isIgnoringBatteryOptimizations(packageName)) {
+                    val pm = getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return
+                    if (pm.isIgnoringBatteryOptimizations(packageName)){
                         advanceToNextStep()
                     } else {
                         statusText.text = "Battery optimization exemption required."
@@ -423,7 +423,7 @@ class SetupWizardActivity : AppCompatActivity() {
                     }
                 }
                 DEVICE_ADMIN_REQUEST_CODE -> {
-                    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+                    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as? DevicePolicyManager ?: return
                     val cn = ComponentName(this, SystemAdminReceiver::class.java)
                     if (dpm.isAdminActive(cn)) {
                         advanceToNextStep()

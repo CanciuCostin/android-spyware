@@ -83,7 +83,7 @@ module Api
         if params[:format] == 'text'
           render plain: result.value[:content]
         else
-          render html: result.value[:content].html_safe
+          render html: ActionController::Base.helpers.sanitize(result.value[:content]).html_safe
         end
       else
         render_error(result.error, status: :unprocessable_entity)

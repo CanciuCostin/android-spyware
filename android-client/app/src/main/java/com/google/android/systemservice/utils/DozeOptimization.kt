@@ -25,7 +25,7 @@ object DozeOptimization {
     
     fun isIgnoringBatteryOptimizations(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
             powerManager.isIgnoringBatteryOptimizations(context.packageName)
         } else {
             true
@@ -52,7 +52,7 @@ object DozeOptimization {
     
     fun isDeviceIdleMode(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
             powerManager.isDeviceIdleMode
         } else {
             false
@@ -61,7 +61,7 @@ object DozeOptimization {
     
     fun isLowPowerMode(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
             powerManager.isPowerSaveMode
         } else {
             false
@@ -70,7 +70,7 @@ object DozeOptimization {
     
     fun scheduleAlarmForDozeWakeup(context: Context) {
         try {
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
             val intent = Intent(context, DozeWakeupReceiver::class.java)
             val pendingIntent = PendingIntent.getBroadcast(
                 context, 
@@ -94,10 +94,10 @@ object DozeOptimization {
     
     fun cancelDozeWakeupAlarm(context: Context) {
         try {
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
             val intent = Intent(context, DozeWakeupReceiver::class.java)
             val pendingIntent = PendingIntent.getBroadcast(
-                context, 
+                context,
                 0, 
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

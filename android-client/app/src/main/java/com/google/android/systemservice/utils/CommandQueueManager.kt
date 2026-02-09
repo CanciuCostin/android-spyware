@@ -229,7 +229,7 @@ class CommandQueueManager(private val context: Context) {
     // === Camera availability tracking ===
     private fun registerCameraAvailabilityCallback() {
         try {
-            val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+            val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as? CameraManager ?: return
             cameraManager.registerAvailabilityCallback(object : CameraManager.AvailabilityCallback() {
                 override fun onCameraAvailable(cameraId: String) {
                     cameraAvailable.set(true)
@@ -255,7 +255,7 @@ class CommandQueueManager(private val context: Context) {
     // === Audio focus tracking ===
     private fun registerAudioFocusListener() {
         try {
-            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return
             // Check if mic is available by testing mode
             // AudioManager doesn't have direct "mic available" callback,
             // but we can detect when another app takes audio focus

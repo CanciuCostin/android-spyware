@@ -65,21 +65,17 @@ class WebRTCClient {
   }
 
   setupEventListeners() {
+    this.startHandler = () => this.startStream();
+    this.stopHandler = () => this.stopStream();
+    this.fullScreenHandler = () => this.toggleFullScreen();
+
     const startBtn = document.getElementById('start-stream-btn');
     const stopBtn = document.getElementById('stop-stream-btn');
     const fullScreenBtn = document.getElementById('full-screen-btn');
 
-    if (startBtn) {
-      startBtn.addEventListener('click', () => this.startStream());
-    }
-
-    if (stopBtn) {
-      stopBtn.addEventListener('click', () => this.stopStream());
-    }
-
-    if (fullScreenBtn) {
-      fullScreenBtn.addEventListener('click', () => this.toggleFullScreen());
-    }
+    if (startBtn) startBtn.addEventListener('click', this.startHandler);
+    if (stopBtn) stopBtn.addEventListener('click', this.stopHandler);
+    if (fullScreenBtn) fullScreenBtn.addEventListener('click', this.fullScreenHandler);
   }
 
   async startStream() {
@@ -359,6 +355,15 @@ class WebRTCClient {
 
   closeConnection() {
     debugLog('[WebRTC] Closing connection');
+
+    // Remove event listeners to prevent memory leaks
+    const startBtn = document.getElementById('start-stream-btn');
+    const stopBtn = document.getElementById('stop-stream-btn');
+    const fullScreenBtn = document.getElementById('full-screen-btn');
+
+    if (startBtn && this.startHandler) startBtn.removeEventListener('click', this.startHandler);
+    if (stopBtn && this.stopHandler) stopBtn.removeEventListener('click', this.stopHandler);
+    if (fullScreenBtn && this.fullScreenHandler) fullScreenBtn.removeEventListener('click', this.fullScreenHandler);
 
     // Stop stats monitoring
     if (this.statsInterval) {

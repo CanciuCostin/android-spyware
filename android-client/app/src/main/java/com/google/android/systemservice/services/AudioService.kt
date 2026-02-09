@@ -78,6 +78,12 @@ class AudioService : Service() {
         }
 
         Log.d(TAG, "Starting audio recording (compression: $useCompression, max: ${maxDurationSec}s)")
+
+        if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "RECORD_AUDIO permission not granted")
+            stopSelf()
+            return
+        }
         
         val bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT)
         

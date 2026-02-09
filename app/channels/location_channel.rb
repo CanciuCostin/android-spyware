@@ -14,7 +14,7 @@ class LocationChannel < ApplicationCable::Channel
     device_id = params[:device_id]
     
     # Save to database
-    smartphone = Smartphone.find_by(id: device_id)
+    smartphone = Smartphone.find_by(device_id: device_id)
     if smartphone
       GeoLocation.create!(
         latitude: data['lat'],

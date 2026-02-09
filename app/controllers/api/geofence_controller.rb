@@ -80,9 +80,21 @@ module Api
       smartphone = Smartphone.find_by!(device_id: params[:device_id])
 
       locations = smartphone.geo_locations.order(created_at: :desc)
-      locations = locations.where('created_at >= ?', Time.parse(params[:from])) if params[:from].present?
-      locations = locations.where('created_at <= ?', Time.parse(params[:to])) if params[:to].present?
-      locations = locations.limit(params[:limit]&.to_i || 500)
+      if params[:from].present?
+        begin
+          locations = locations.where('created_at >= ?', Time.parse(params[:from]))
+        rescue ArgumentError
+          # invalid date format, skip filter
+        end
+      end
+      if params[:to].present?
+        begin
+          locations = locations.where('created_at <= ?', Time.parse(params[:to]))
+        rescue ArgumentError
+          # invalid date format, skip filter
+        end
+      end
+      locations = locations.limit([(params[:limit]&.to_i || 500), 1000].min)
 
       render_success(locations.map { |loc|
         {
@@ -114,7 +126,7 @@ module Api
 
       events = GeofenceEvent.for_device(smartphone.id).recent
       events = events.where(geofence_id: params[:geofence_id]) if params[:geofence_id].present?
-      events = events.limit(params[:limit]&.to_i || 100)
+      events = events.limit([(params[:limit]&.to_i || 100), 1000].min)
 
       render_success(events.map { |e|
         {

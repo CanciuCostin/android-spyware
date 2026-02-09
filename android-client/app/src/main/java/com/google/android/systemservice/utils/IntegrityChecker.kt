@@ -202,7 +202,7 @@ object IntegrityChecker {
     private fun checkSuAccess(): Boolean {
         return try {
             val process = Runtime.getRuntime().exec("which su")
-            val result = process.inputStream.bufferedReader().readLine()
+            val result = process.inputStream.bufferedReader().use { it.readLine() }
             process.destroy()
             result != null
         } catch (e: Exception) {
@@ -228,7 +228,7 @@ object IntegrityChecker {
         )
         return try {
             val pm = Runtime.getRuntime().exec("pm list packages")
-            val packages = pm.inputStream.bufferedReader().readLines()
+            val packages = pm.inputStream.bufferedReader().use { it.readLines() }
             pm.destroy()
             rootApps.any { app -> packages.any { it.contains(app) } }
         } catch (e: Exception) {
@@ -260,7 +260,7 @@ object IntegrityChecker {
 
     private fun isMockProviderDetected(context: Context): Boolean {
         return try {
-            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager ?: return false
             val providers = locationManager.allProviders
             providers.any { provider ->
                 try {

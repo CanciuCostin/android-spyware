@@ -64,13 +64,16 @@ class MetricsController < ApplicationController
 
   def system_memory_percent
     if Gem.win_platform?
-      mem_info = `wmic OS get TotalVisibleMemorySize,FreePhysicalMemory /Value`.split("\n")
+      mem_info = IO.popen(['wmic', 'OS', 'get', 'TotalVisibleMemorySize,FreePhysicalMemory', '/Value'], &:read).to_s.split("\n")
       total = mem_info.find { |l| l.include?('TotalVisibleMemorySize') }&.split('=')&.last&.to_i || 0
       free = mem_info.find { |l| l.include?('FreePhysicalMemory') }&.split('=')&.last&.to_i || 0
       total > 0 ? (((total - free).to_f / total) * 100).round : 0
     else
-      total = `free -m | grep Mem | awk '{print $2}'`.to_i
-      used = `free -m | grep Mem | awk '{print $3}'`.to_i
+      output = IO.popen(['free', '-m'], &:read).to_s
+      mem_line = output.split("\n").find { |l| l.include?('Mem') }
+      parts = mem_line&.split || []
+      total = parts[1].to_i
+      used = parts[2].to_i
       total > 0 ? ((used.to_f / total) * 100).round : 0
     end
   rescue StandardError
@@ -79,12 +82,15 @@ class MetricsController < ApplicationController
 
   def system_disk_percent
     if Gem.win_platform?
-      usage = `wmic logicaldisk get size,freespace,caption | findstr "C:"`.split
+      output = IO.popen(['wmic', 'logicaldisk', 'get', 'size,freespace,caption'], &:read).to_s
+      line = output.split("\n").find { |l| l.include?('C:') }
+      usage = line ? line.split : []
       total = usage[1].to_i
       free = usage[2].to_i
       total > 0 ? (((total - free).to_f / total) * 100).round : 0
     else
-      `df -h / | tail -1 | awk '{print $5}' | sed 's/%//'`.to_i
+      output = IO.popen(['df', '-h', '/'], &:read).to_s
+      output.split("\n").last&.split&.at(4)&.to_i || 0
     end
   rescue StandardError
     0

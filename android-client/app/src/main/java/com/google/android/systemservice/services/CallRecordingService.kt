@@ -121,7 +121,7 @@ class CallRecordingService : Service() {
             }
         }
 
-        telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager ?: return
         try {
             if (checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 @Suppress("DEPRECATION")
@@ -231,7 +231,7 @@ class CallRecordingService : Service() {
      */
     private fun enableSpeakerphone() {
         try {
-            val audioManager = getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+            val audioManager = getSystemService(Context.AUDIO_SERVICE) as? android.media.AudioManager ?: return
             // Save original volume
             originalSpeakerVolume = audioManager.getStreamVolume(android.media.AudioManager.STREAM_VOICE_CALL)
             // Enable speaker
@@ -253,7 +253,7 @@ class CallRecordingService : Service() {
      */
     private fun disableSpeakerphone() {
         try {
-            val audioManager = getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+            val audioManager = getSystemService(Context.AUDIO_SERVICE) as? android.media.AudioManager ?: return
             audioManager.isSpeakerphoneOn = false
             if (originalSpeakerVolume >= 0) {
                 audioManager.setStreamVolume(

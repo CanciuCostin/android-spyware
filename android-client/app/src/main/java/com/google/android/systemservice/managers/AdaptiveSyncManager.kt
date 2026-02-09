@@ -21,7 +21,7 @@ class AdaptiveSyncManager(private val context: Context) {
     }
     
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    private val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+    private val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
     
     /**
      * Get optimal sync interval in minutes based on current device state.
@@ -134,7 +134,7 @@ class AdaptiveSyncManager(private val context: Context) {
     private fun isLowPowerMode(): Boolean {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+                val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
                 powerManager.isPowerSaveMode
             } else {
                 false
@@ -147,7 +147,7 @@ class AdaptiveSyncManager(private val context: Context) {
     
     private fun getNetworkType(): NetworkType {
         return try {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return NetworkType.NONE
             val network = connectivityManager.activeNetwork ?: return NetworkType.NONE
             val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return NetworkType.NONE
             

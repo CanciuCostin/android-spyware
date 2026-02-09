@@ -16,7 +16,7 @@
 class SignalingChannel < ApplicationCable::Channel
   def subscribed
     @device_id = sanitize_device_id(params[:device_id])
-    @is_admin = params[:is_admin] == 'true'
+    @is_admin = connection.current_user_type == :admin
     
     # Admin subscribes to device-specific signaling channel
     # Device stream: "signaling_device_#{device_id}"

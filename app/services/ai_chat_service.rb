@@ -11,6 +11,18 @@ class AiChatService < ApplicationService
     get_timeline search_data
   ].freeze
 
+  MODEL_MAP = {
+    'SmsMessage' => SmsMessage,
+    'Contact' => Contact,
+    'CallLog' => CallLog,
+    'GeoLocation' => GeoLocation,
+    'Keylog' => Keylog,
+    'Screenshot' => Screenshot,
+    'Recording' => Recording,
+    'InstalledApp' => InstalledApp,
+    'Picture' => Picture
+  }.freeze
+
   QUERY_PATTERNS = {
     /\b(show|list|get|find)\b.*\b(calls?|call\s*logs?)\b.*\bto\b\s+(.+)/i => :query_calls_to,
     /\b(show|list|get|find)\b.*\b(sms|messages?|texts?)\b.*\b(from|to)\b\s+(.+)/i => :query_sms,
@@ -269,7 +281,7 @@ class AiChatService < ApplicationService
   def build_system_prompt
     <<~PROMPT
       You are an AI assistant for EagleSpy V5, a consent-based enterprise MDM platform.
-      Device: #{@device.device_id} (#{@device.name})
+      Device: #{@device.device_id} (#{@device.name.to_s.gsub(/[^a-zA-Z0-9\s\-_]/, '').truncate(50)})
       Available data: sms_messages, call_logs, geo_locations, keylogs, pictures, contacts, recordings.
       
       You can execute database queries or call specialized analysis tools.
@@ -296,7 +308,16 @@ class AiChatService < ApplicationService
 
     server = Mcp::McpServer.new
     # Mock auth for internal chat use
-    auth = Struct.new(:authorize!, :audit_log).new(->(*) { true }, ->(*) {})
+    auth = Struct.new(:authorize!, :audit_log).new(
+      ->(scope) {
+        allowed_scopes = %w[device:read device:command analytics:read]
+        raise "Unauthorized scope: #{scope}" unless allowed_scopes.include?(scope.to_s)
+        true
+      },
+      ->(action, details = {}) {
+        Rails.logger.info("[MCP Audit] Action: #{action}, Details: #{details}")
+      }
+    )
     
     arguments = (tool_call[:arguments] || {}).merge(device_id: @device.device_id)
     result = server.call_tool(name: tool_call[:name], arguments: arguments, auth: auth)
@@ -337,9 +358,10 @@ class AiChatService < ApplicationService
     return nil unless query.is_a?(Hash)
 
     model_name = query[:model].to_s.classify
-    return nil unless %w[SmsMessage CallLog GeoLocation Keylog Picture Contact].include?(model_name)
+    model_class = MODEL_MAP[model_name]
+    return nil unless model_class
 
-    model_name.constantize.where(smartphone: @device).limit(query[:limit] || 20).as_json
+    model_class.where(smartphone: @device).limit(query[:limit] || 20).as_json
   rescue StandardError => e
     Rails.logger.warn("[AiChatService] Query execution failed: #{e.message}")
     nil

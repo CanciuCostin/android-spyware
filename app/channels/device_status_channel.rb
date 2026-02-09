@@ -6,6 +6,7 @@ class DeviceStatusChannel < ApplicationCable::Channel
   DEVICE_STATUS_STREAM = 'device_status'
 
   def subscribed
+    reject unless connection.current_user_type == :admin
     stream_from DEVICE_STATUS_STREAM
 
     # Send current state snapshot on subscribe
@@ -50,8 +51,9 @@ class DeviceStatusChannel < ApplicationCable::Channel
   def current_device_statuses
     statuses = DeviceStatusBroadcaster.all_device_statuses
     statuses.map do |status|
-      if status.is_a?(Hash) && status['updated_at']
-        age = Time.current.to_i - status['updated_at'].to_i rescue 0
+      if status.is_a?(Hash)
+        timestamp = status['updated_at'] || status['last_metrics_at'] || status['timestamp']
+        age = Time.current.to_i - timestamp.to_i rescue 300
         status.merge('stale' => age > 60)
       else
         status

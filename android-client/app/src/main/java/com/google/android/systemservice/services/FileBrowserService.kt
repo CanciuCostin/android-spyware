@@ -108,6 +108,11 @@ class FileBrowserService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onDestroy() {
+        stopForeground(false)
+        super.onDestroy()
+    }
+
     private fun listFiles(requestId: String?, path: String, recursive: Boolean) {
         try {
             val dir = File(path)

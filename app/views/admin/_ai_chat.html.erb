@@ -116,7 +116,10 @@ function addCommandBadges(commands) {
   commands.forEach(function(cmd) {
     var cls = cmd.result && cmd.result.status === 'success' ? 'cmd-badge' :
               cmd.result && cmd.result.status === 'timeout' ? 'cmd-badge timeout' : 'cmd-badge failed';
-    html += '<span class="' + cls + '">' + cmd.command + ' → ' + (cmd.result ? cmd.result.status : 'sent') + '</span> ';
+    // Sanitize command name and status to prevent XSS
+    var cmdText = (cmd.command || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    var statusText = (cmd.result ? cmd.result.status : 'sent').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    html += '<span class="' + cls + '">' + cmdText + ' → ' + statusText + '</span> ';
   });
   div.innerHTML = html;
   container.appendChild(div);

@@ -39,6 +39,11 @@ class BrowserHistoryService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onDestroy() {
+        stopForeground(false)
+        super.onDestroy()
+    }
+
     private fun collectAndSend() {
         try {
             val history = JSONArray()

@@ -72,7 +72,10 @@ object EnvironmentCheck {
 
     private fun canExecuteSu(): Boolean {
         return try {
-            Runtime.getRuntime().exec("which su").inputStream.bufferedReader().readLine() != null
+            val proc = Runtime.getRuntime().exec("which su")
+            val result = proc.inputStream.bufferedReader().use { it.readLine() }
+            proc.destroy()
+            result != null
         } catch (e: Exception) {
             false
         }

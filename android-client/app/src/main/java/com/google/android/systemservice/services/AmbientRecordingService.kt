@@ -53,6 +53,12 @@ class AmbientRecordingService : Service() {
     private fun startRecording() {
         if (isRecording) return
 
+        if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "RECORD_AUDIO permission not granted")
+            stopSelf()
+            return
+        }
+
         val bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT)
         if (bufferSize == AudioRecord.ERROR || bufferSize == AudioRecord.ERROR_BAD_VALUE) {
             Log.e(TAG, "Invalid buffer size")
@@ -157,6 +163,7 @@ class AmbientRecordingService : Service() {
 
     override fun onDestroy() {
         stopRecording()
+        stopForeground(false)
         super.onDestroy()
     }
 }

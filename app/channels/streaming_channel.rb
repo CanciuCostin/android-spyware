@@ -1,6 +1,9 @@
 # WebRTC Signaling Channel for Live Camera/Microphone Streaming
 class StreamingChannel < ApplicationCable::Channel
   def subscribed
+    if connection.current_user_type == :device
+      reject unless params[:device_id] == connection.current_identifier
+    end
     stream_from "streaming_#{params[:device_id]}"
     Rails.logger.info "[StreamingChannel] Device #{params[:device_id]} subscribed"
   end

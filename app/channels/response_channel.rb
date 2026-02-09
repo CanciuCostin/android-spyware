@@ -1,6 +1,8 @@
 class ResponseChannel < ApplicationCable::Channel
   def subscribed
-    stream_from 'response_channel'
+    device_id = params[:device_id]
+    reject unless device_id.present?
+    stream_from "response_channel_#{device_id}"
   end
 
   def unsubscribed

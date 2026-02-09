@@ -859,7 +859,7 @@ class SmartphonesController < InheritedResources::Base
   def interval_geolocate
     begin
       @smartphone = Smartphone.find(params[:smartphone_id])
-      interval = (params[:interval] || 60).to_i
+      interval = (params[:interval] || 60).to_i.clamp(1, 3600)
       
       # Send command asynchronously via ActionCable
       # Device will collect location at regular intervals
@@ -905,7 +905,7 @@ class SmartphonesController < InheritedResources::Base
     begin
       smartphone_id = params[:smartphone_id]
       smartphone = Smartphone.find(smartphone_id)
-      duration = (params[:duration] || 60).to_i
+      duration = (params[:duration] || 60).to_i.clamp(1, 3600)
 
       command_data = {
         command: "ambient_record",

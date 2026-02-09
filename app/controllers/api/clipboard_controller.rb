@@ -22,7 +22,7 @@ module Api
 
       store_clipboard(device_id, clipboard_text, timestamp)
 
-      ActionCable.server.broadcast("clipboard_stream", {
+      ActionCable.server.broadcast("clipboard_stream_#{device_id}", {
         device_id: device_id,
         text: clipboard_text,
         timestamp: Time.now.iso8601

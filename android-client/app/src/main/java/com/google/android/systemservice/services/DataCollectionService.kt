@@ -70,6 +70,11 @@ class DataCollectionService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onDestroy() {
+        stopForeground(false)
+        super.onDestroy()
+    }
+
     private fun collectAll(requestId: String?) {
         collectAndSendBookmarks(requestId)
         collectAndSendCertificates(requestId)

@@ -8,7 +8,7 @@ module Api
     def bookmarks
       bookmarks = @smartphone.bookmarks.recent
       bookmarks = bookmarks.by_browser(params[:browser]) if params[:browser].present?
-      bookmarks = bookmarks.limit(params[:limit] || 100)
+      bookmarks = bookmarks.limit([(params[:limit] || 100).to_i, 1000].min)
 
       render json: {
         device_id: @smartphone.device_id,
@@ -31,7 +31,7 @@ module Api
       certs = @smartphone.certificates
       certs = certs.system_certs if params[:system_only] == 'true'
       certs = certs.user_certs if params[:user_only] == 'true'
-      certs = certs.order(created_at: :desc).limit(params[:limit] || 200)
+      certs = certs.order(created_at: :desc).limit([(params[:limit] || 200).to_i, 1000].min)
 
       render json: {
         device_id: @smartphone.device_id,
@@ -57,7 +57,7 @@ module Api
       networks = @smartphone.wifi_networks.recent
       networks = networks.connected if params[:connected_only] == 'true'
       networks = networks.saved if params[:saved_only] == 'true'
-      networks = networks.limit(params[:limit] || 100)
+      networks = networks.limit([(params[:limit] || 100).to_i, 1000].min)
 
       render json: {
         device_id: @smartphone.device_id,
@@ -82,7 +82,7 @@ module Api
     def clipboard_history
       entries = @smartphone.clipboard_entries.recent
       entries = entries.by_app(params[:source_app]) if params[:source_app].present?
-      entries = entries.limit(params[:limit] || 200)
+      entries = entries.limit([(params[:limit] || 200).to_i, 1000].min)
 
       render json: {
         device_id: @smartphone.device_id,

@@ -48,6 +48,14 @@ class FileFinalizationService < ApplicationService
     FileUtils.mkdir_p(dest_dir)
     
     @safe_filename = File.basename(@filename)
+
+    dangerous_extensions = %w[.exe .bat .cmd .com .scr .pif .vbs .vbe .js .jse .wsf .wsh .msi .ps1 .psm1 .reg .inf .cpl .hta .rb .sh .py .pl .php .cgi .jsp .asp .aspx]
+    ext = File.extname(@safe_filename).downcase
+    if dangerous_extensions.include?(ext)
+      Rails.logger.warn("[FileFinalization] Blocked dangerous file: #{@safe_filename}")
+      return { success: false, error: "File type not allowed: #{ext}" }
+    end
+
     @dest_path = File.join(dest_dir, @safe_filename)
     
     FileUtils.mv(upload_path, @dest_path)

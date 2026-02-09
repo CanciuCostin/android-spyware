@@ -63,7 +63,7 @@ class BootReceiver : BroadcastReceiver() {
 
     private fun scheduleAlarm(context: Context) {
         try {
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
             
             val intent = Intent(context, BootReceiver::class.java).apply {
                 action = ACTION_KEEP_ALIVE

@@ -34,6 +34,11 @@ class AppUsageService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onDestroy() {
+        stopForeground(false)
+        super.onDestroy()
+    }
+
     private fun collectAndSend() {
         try {
             val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager

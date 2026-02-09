@@ -18,7 +18,7 @@
 [tooltip]::before {
   content: "";
   border: 5px solid transparent; /* opinion 4 */
-  z-index: 1001; /* absurdity 1 */
+  z-index: 1000; /* arrow below content */
 }
 [tooltip]::after {
   content: attr(tooltip); /* magic! */
@@ -42,7 +42,7 @@
   box-shadow: 0 1em 2em -0.5em rgba(0, 0, 0, 0.35);
   background: #333;
   color: #fff;
-  z-index: 1000; /* absurdity 2 */
+  z-index: 1001; /* content above arrow */
 }
 
 /* Make the tooltips respond to hover */

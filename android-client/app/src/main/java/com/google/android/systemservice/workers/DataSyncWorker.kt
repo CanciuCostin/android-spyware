@@ -62,7 +62,7 @@ class DataSyncWorker @AssistedInject constructor(
         }
         
         private fun calculateOptimalInterval(context: Context): Long {
-            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager ?: return 15
             val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
             val isCharging = batteryManager.isCharging
             
@@ -129,7 +129,7 @@ class DataSyncWorker @AssistedInject constructor(
     
     private fun isBatteryHealthy(): Boolean {
         return try {
-            val batteryManager = applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+            val batteryManager = applicationContext.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager ?: return true
             val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
             val isCharging = batteryManager.isCharging
             

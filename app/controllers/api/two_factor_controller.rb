@@ -12,7 +12,6 @@ module Api
 
       render json: {
         status: 'setup_started',
-        secret: result[:secret],
         provisioning_uri: result[:provisioning_uri],
         qr_code_data: result[:qr_code_data],
         message: 'Scan the QR code with your authenticator app, then verify with a code.'

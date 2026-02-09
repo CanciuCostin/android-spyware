@@ -87,7 +87,11 @@ const request = async (method, url, options = {}) => {
 
   const contentType = response.headers.get('content-type') || '';
   if (contentType.includes('application/json')) {
-    data = await response.json();
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = null;
+    }
   } else {
     data = await response.text();
   }

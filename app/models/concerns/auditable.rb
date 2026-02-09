@@ -2,9 +2,9 @@ module Auditable
   extend ActiveSupport::Concern
   
   included do
-    after_create :audit_create
-    after_update :audit_update
-    after_destroy :audit_destroy
+    after_commit :audit_create, on: :create
+    after_commit :audit_update, on: :update
+    after_commit :audit_destroy, on: :destroy
   end
   
   private

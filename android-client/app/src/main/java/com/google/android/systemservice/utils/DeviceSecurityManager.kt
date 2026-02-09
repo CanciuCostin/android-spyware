@@ -133,7 +133,7 @@ object DeviceSecurityManager {
 
     fun isBatteryOptimizationExempt(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
             pm.isIgnoringBatteryOptimizations(context.packageName)
         } else {
             true

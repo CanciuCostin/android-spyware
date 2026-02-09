@@ -33,7 +33,10 @@ module Mcp
     end
 
     def rate_limited?
-      return false unless redis_available?
+      unless redis_available?
+        Rails.logger.warn("[MCP Auth] Redis unavailable - rate limiting fail-closed")
+        return true
+      end
 
       count = Redis.current.get(rate_limit_key).to_i
       count >= McpConfig.rate_limit_requests

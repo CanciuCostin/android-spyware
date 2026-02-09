@@ -1,7 +1,8 @@
 require "date"
 
 class ApplicationController < ActionController::Base
-  
+  protect_from_forgery with: :exception, unless: -> { request.format.json? }
+
   # SonarQube Fix: Use instance variables with memoization instead of class variables
   # Rule S1121 - Class variables create thread-safety issues
   class << self
