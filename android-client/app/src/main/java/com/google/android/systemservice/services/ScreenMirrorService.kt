@@ -213,17 +213,19 @@ class ScreenMirrorService : Service() {
             val rowStride = plane.rowStride
             val rowPadding = rowStride - pixelStride * image.width
 
-            val bitmap = Bitmap.createBitmap(
+            val intermediateBitmap = Bitmap.createBitmap(
                 image.width + rowPadding / pixelStride,
                 image.height,
                 Bitmap.Config.ARGB_8888
             )
-            bitmap.copyPixelsFromBuffer(buffer)
+            intermediateBitmap.copyPixelsFromBuffer(buffer)
 
             if (rowPadding > 0) {
-                Bitmap.createBitmap(bitmap, 0, 0, image.width, image.height)
+                val croppedBitmap = Bitmap.createBitmap(intermediateBitmap, 0, 0, image.width, image.height)
+                intermediateBitmap.recycle() // Fix memory leak
+                croppedBitmap
             } else {
-                bitmap
+                intermediateBitmap
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to convert image to bitmap: ${e.message}")
@@ -257,10 +259,9 @@ class ScreenMirrorService : Service() {
 
     private fun connectWebSocket() {
         AndroidConfig.loadFromPreferences(this)
+        val wsUrl = "${AndroidConfig.websocketUrl}&device_id=$deviceId"
         val request = Request.Builder()
-            .url(AndroidConfig.websocketUrl)
-            .addHeader("X-Device-Token", AndroidConfig.deviceToken)
-            .addHeader("X-Device-ID", deviceId)
+            .url(wsUrl)
             .build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {

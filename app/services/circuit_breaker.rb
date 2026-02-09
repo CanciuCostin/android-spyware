@@ -93,10 +93,19 @@ class CircuitBreaker
   def try_half_open(&block)
     transition_to('half_open') unless state == 'half_open'
 
+    # Atomically increment and check the half_open call count to prevent
+    # multiple threads from executing simultaneously in half_open state.
+    call_count = RedisPool.with { |r| r.incr(half_open_calls_key) }
+    if call_count > @options[:half_open_max_calls]
+      raise CircuitOpenError.new(@service_name, time_until_retry)
+    end
+
     result = block.call
     record_success
     transition_to('closed')
     result
+  rescue CircuitOpenError
+    raise
   rescue StandardError => e
     record_failure
     transition_to('open')
@@ -130,6 +139,7 @@ class CircuitBreaker
 
       if new_state == 'open'
         redis.set(opened_at_key, Time.current.to_f)
+        redis.del(half_open_calls_key)
       elsif new_state == 'closed'
         redis.del(failure_count_key, opened_at_key, half_open_calls_key)
       end

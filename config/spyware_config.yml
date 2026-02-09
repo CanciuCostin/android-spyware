@@ -1,8 +1,8 @@
 default: &default
 #rails_ip: ip address to run rails server
-  rails_ip: localhost
+  rails_ip: 213.91.211.150
 #rails_port: port to run rails server
-  rails_port: 3000
+  rails_port: 4444
 #malware_ip: ip address for malware connection
   malware_ip: 0.0.0.0
 #malware_port: port for malware connection

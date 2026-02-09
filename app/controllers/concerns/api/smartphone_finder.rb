@@ -39,7 +39,7 @@ module Api
           apk_payload: payload,
           target_ip: safe_id
         ) do |i|
-          i.status = 'active'
+          i.status = 'installed'
         end
         
         Smartphone.create!(

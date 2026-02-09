@@ -83,7 +83,7 @@ gem "msfrpc-client", install_if: -> { !Gem.win_platform? }
 
 gem "minitar"
 
-gem "sqlite3"
+gem "sqlite3", "~> 1.4"
 
 # Tracing & Observability
 gem "opentelemetry-api"

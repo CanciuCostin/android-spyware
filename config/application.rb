@@ -42,6 +42,13 @@ module Androidspyware
 
     #config.force_ssl = true
 
+    # SECURITY: Mask sensitive parameters in logs
+    config.filter_parameters += [
+      :password, :password_confirmation, :token, :device_auth_token, 
+      :signature, :secret, :api_key, :credential, :otp_attempt,
+      :sms_body, :keystroke, :latitude, :longitude # Data privacy
+    ]
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading

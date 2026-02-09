@@ -69,12 +69,13 @@ module ApplicationCable
 
       # Use transaction with advisory lock to prevent race conditions
       ActiveRecord::Base.transaction do
-        # Acquire advisory lock based on device_id hash to serialize concurrent requests
-        lock_key = Zlib.crc32(device_id)
-        # Use select_value which is safer and cleaner than execute for single results
-        ActiveRecord::Base.connection.select_value(
-          ActiveRecord::Base.send(:sanitize_sql_array, ["SELECT pg_advisory_xact_lock(?)", lock_key])
-        )
+        # Acquire advisory lock for PostgreSQL only (SQLite uses implicit locking)
+        if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+          lock_key = Zlib.crc32(device_id)
+          ActiveRecord::Base.connection.select_value(
+            ActiveRecord::Base.send(:sanitize_sql_array, ["SELECT pg_advisory_xact_lock(?)", lock_key])
+          )
+        end
 
         # Check if smartphone already exists (another request might have created it)
         smartphone = Smartphone.find_by(device_id: device_id)

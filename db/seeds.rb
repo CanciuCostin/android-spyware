@@ -13,6 +13,6 @@ if password == 'password' && Rails.env.production?
 end
 
 AdminUser.create!(email: email, password: password, password_confirmation: password) if Rails.env.development?
-ApkPayload.create!(id: 9999, destination_ip: "192.168.100.2", destination_port: "4444", forwarding_ip: "", forwarding_port: "", created_at: "2021-03-14", updated_at: "2021-03-14", name: "APK Payload") if Rails.env.development?
+ApkPayload.create!(id: 9999, destination_ip: "192.168.100.2", destination_port: "4444", forwarding_ip: "", forwarding_port: "", created_at: "2021-03-14", updated_at: "2021-03-14", name: "APK_Payload") if Rails.env.development?
 ApkInstallation.create!(id: 9999, target_ip: "USB", status: "", apk_payload_id: 9999) if Rails.env.development?
-Smartphone.create!(id: 9999, operating_system: "Android", name: "Mock Smartphone", is_rooted: "false", is_app_hidden: "false", apk_installation_id: 9999, created_at: "2021-03-14", updated_at: "2021-03-14") if Rails.env.development?
+Smartphone.create!(id: 9999, operating_system: "Android", name: "Mock Smartphone", is_rooted: "false", is_app_hidden: "false", apk_installation_id: 9999, created_at: "2021-03-14", updated_at: "2021-03-14", device_id: "mock_device_id_123") if Rails.env.development?

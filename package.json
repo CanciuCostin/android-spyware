@@ -2,7 +2,10 @@
   "name": "androidspyware",
   "private": true,
   "scripts": {
-    "lint:js": "eslint --ext .js,.jsx app/javascript app/assets/javascripts config/webpack"
+    "lint:js": "eslint --ext .js,.jsx app/javascript app/assets/javascripts config/webpack",
+    "docs:validate": "npx @redocly/cli lint docs/api/openapi.yaml",
+    "docs:serve": "npx @redocly/cli preview-docs docs/api/openapi.yaml",
+    "docs:build": "npx @redocly/cli build-docs docs/api/openapi.yaml -o public/api-docs.html"
   },
   "dependencies": {
     "@rails/actioncable": "^6.0.0",

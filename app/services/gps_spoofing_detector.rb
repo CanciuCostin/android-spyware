@@ -55,8 +55,14 @@ class GpsSpoofingDetector < ApplicationService
       lat, lng
     )
 
-    time_diff_hours = (Time.current - previous[:recorded_at]).to_f / 3600
-    return alerts if time_diff_hours <= 0
+    time_diff_hours = if @location_data[:timestamp].present?
+                        # Use device provided timestamp (ms)
+                        (@location_data[:timestamp].to_f / 1000 - previous[:recorded_at].to_f) / 3600
+                      else
+                        (Time.current - previous[:recorded_at]).to_f / 3600
+                      end
+
+    return alerts if time_diff_hours <= 0.001 # Prevent division by zero or near-instant updates
 
     speed_kmh = distance_km / time_diff_hours
 

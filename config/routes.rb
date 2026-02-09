@@ -82,6 +82,12 @@ Rails.application.routes.draw do
   get 'webrtc/turn_credentials', to: 'webrtc#turn_credentials'
   post 'webrtc/signal', to: 'webrtc#signal'
 
+  # Device REST endpoints (root-level, used by Android Retrofit client)
+  scope 'device' do
+    post 'heartbeat', to: 'api/devices#heartbeat'
+    get 'info', to: 'api/devices#info'
+  end
+
   # REST API for Android devices (fallback for WebSocket)
   namespace :api do
     # MCP (Model Context Protocol) Server endpoints

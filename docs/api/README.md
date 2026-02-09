@@ -9,6 +9,16 @@ for real-time communication. The full OpenAPI 3.0 specification lives in
 
 ---
 
+## Documentation Tools
+
+We use OpenAPI 3.0 for machine-readable documentation. You can use the following scripts (from the project root) to maintain the spec:
+
+*   **Validate Specs**: `npm run docs:validate` — Checks `openapi.yaml` for syntax and logic errors.
+*   **Live Preview**: `npm run docs:serve` — Starts a local server at `http://localhost:8080` to preview the documentation.
+*   **Build Static HTML**: `npm run docs:build` — Generates a single-file HTML documentation in `public/api-docs.html`.
+
+---
+
 ## Authentication
 
 ### Device Authentication (`X-Device-Token`)

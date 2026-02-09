@@ -35,7 +35,9 @@ class ConsentEnforcement
   end
   
   def extract_device_id(request)
-    request.params['device_id'] || request.path.match(/devices\/(\d+)/)[1]
+    request.params['device_id'] || 
+      request.env['HTTP_X_DEVICE_ID'] || 
+      request.path.match(/devices\/([^\/]+)/)&.then { |m| m[1] }
   rescue
     nil
   end

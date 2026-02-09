@@ -22,29 +22,29 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.6.6'
+          ruby-version: '3.1.6'
           bundler-cache: true
       
       - name: Run Bundler Audit
         run: |
           gem install bundler-audit
-          bundler-audit check --update
+          bundle exec bundler-audit check --update
       
       - name: Run Brakeman (Rails Security Scanner)
         run: |
           gem install brakeman
-          brakeman -q -z --no-pager
+          bundle exec brakeman -q -z --no-pager
       
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
       
       - name: JavaScript Dependency Audit
         working-directory: ./frontend
-        run: npm audit --audit-level=moderate
+        run: npm audit --audit-level=high
   
   container-scan:
     runs-on: ubuntu-latest

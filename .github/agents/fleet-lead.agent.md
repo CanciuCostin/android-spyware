@@ -2,7 +2,7 @@
 name: Fleet Lead
 description: Координира работата: изясняване → план → имплементация → тестове → ревю → документация
 target: github-copilot
-tools: ["read", "search"]
+tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'agent', 'github/*', 'io.github.upstash/context7/*', 'microsoft/clarity-mcp-server/*', 'microsoft/markitdown/*', 'cweijan.vscode-database-client2/dbclient-getDatabases', 'cweijan.vscode-database-client2/dbclient-getTables', 'cweijan.vscode-database-client2/dbclient-executeQuery', 'memory', 'ms-vscode.vscode-websearchforcopilot/websearch', 'sonarsource.sonarlint-vscode/sonarqube_getPotentialSecurityIssues', 'sonarsource.sonarlint-vscode/sonarqube_excludeFiles', 'sonarsource.sonarlint-vscode/sonarqube_setUpConnectedMode', 'sonarsource.sonarlint-vscode/sonarqube_analyzeFile', 'todo']
 infer: true
 ---
 

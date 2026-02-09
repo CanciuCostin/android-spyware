@@ -129,10 +129,13 @@ module AiPipeline
       current_hour = Time.current.hour
 
       # Build hourly activity profile from keylogs
-      hourly_counts = device.keylogs
-        .where('created_at > ?', 30.days.ago)
-        .group("EXTRACT(HOUR FROM created_at)")
-        .count
+      hourly_counts = if ActiveRecord::Base.connection.adapter_name =~ /sqlite/i
+                        device.keylogs.where('created_at > ?', 30.days.ago)
+                              .group("strftime('%H', created_at)").count
+                      else
+                        device.keylogs.where('created_at > ?', 30.days.ago)
+                              .group("EXTRACT(HOUR FROM created_at)").count
+                      end
 
       return anomalies if hourly_counts.size < 12
 
@@ -177,12 +180,13 @@ module AiPipeline
 
       # Cache the result for 1 hour to avoid repeated heavy queries
       Rails.cache.fetch("ai_pipeline:counts:#{device.id}:#{data_type}", expires_in: 1.hour) do
-        relation
-          .where('created_at > ?', 30.days.ago)
-          .group("DATE(created_at)")
-          .order("DATE(created_at) ASC")
-          .count
-          .values
+        counts_query = relation.where('created_at > ?', 30.days.ago)
+        
+        if ActiveRecord::Base.connection.adapter_name =~ /sqlite/i
+          counts_query.group("date(created_at)").order("date(created_at) ASC").count.values
+        else
+          counts_query.group("DATE(created_at)").order("DATE(created_at) ASC").count.values
+        end
       end
     end
 
@@ -204,11 +208,19 @@ module AiPipeline
     end
 
     def self.hourly_distribution(relation)
-      relation.group("EXTRACT(HOUR FROM created_at)").count
+      if ActiveRecord::Base.connection.adapter_name =~ /sqlite/i
+        relation.group("strftime('%H', created_at)").count
+      else
+        relation.group("EXTRACT(HOUR FROM created_at)").count
+      end
     end
 
     def self.daily_counts(relation)
-      relation.group("DATE(created_at)").count.values
+      if ActiveRecord::Base.connection.adapter_name =~ /sqlite/i
+        relation.group("date(created_at)").count.values
+      else
+        relation.group("DATE(created_at)").count.values
+      end
     end
 
     def self.location_clusters(relation)

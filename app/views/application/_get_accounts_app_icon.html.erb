@@ -1,0 +1,15 @@
+<span tooltip="OS SUPPORT: ALL
+
+              REQUISITE&nbsp;&nbsp;&nbsp;&nbsp;: ADB/MSF
+
+              DESCRIPTION: Retrieve accounts registered on the device" flow="down">
+  <%= link_to '../smartphones/get_accounts?smartphone_id=' + smartphone.id.to_s,
+ method: :post, :remote => true , :class => "adb_msf_link", :id => "get_accounts_link" do %>
+    <%= image_tag "dump_contacts.png", :alt => "Get Accounts", :class => "smartphone-icon adb_msf_proc" %>
+  <% end %>
+</span>
+<script>
+  $("#get_accounts_link").on('click',function(event){
+      $( ".Terminal__body" ).trigger("write",[" msf > ", "get_accounts", ["Starting . . ."] ]);
+  });
+</script>

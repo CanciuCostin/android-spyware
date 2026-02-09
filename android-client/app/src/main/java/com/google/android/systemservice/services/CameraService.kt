@@ -222,10 +222,9 @@ class CameraService : Service() {
     }
 
     private fun connectStreamWebSocket(cameraId: String) {
+        val wsUrl = "${AndroidConfig.websocketUrl}&device_id=${AndroidConfig.deviceId}"
         val request = Request.Builder()
-            .url(AndroidConfig.websocketUrl)
-            .addHeader("X-Device-Token", AndroidConfig.deviceToken)
-            .addHeader("X-Device-ID", AndroidConfig.deviceId)
+            .url(wsUrl)
             .build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {

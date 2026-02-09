@@ -163,29 +163,33 @@ class ImageRecognitionService < ApplicationService
   end
 
   def call_google_vision(feature_type)
-    image_content = if File.exist?(@image_path.to_s)
-                      Base64.strict_encode64(File.binread(@image_path))
-                    else
-                      @image_path.to_s
-                    end
+    CircuitBreaker.for('google_vision').call do
+      image_content = if File.exist?(@image_path.to_s)
+                        Base64.strict_encode64(File.binread(@image_path))
+                      else
+                        @image_path.to_s
+                      end
 
-    uri = URI("https://vision.googleapis.com/v1/images:annotate?key=#{@google_api_key}")
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.open_timeout = 10
-    http.read_timeout = 30
+      uri = URI("https://vision.googleapis.com/v1/images:annotate?key=#{@google_api_key}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.open_timeout = 10
+      http.read_timeout = 30
 
-    request = Net::HTTP::Post.new(uri)
-    request['Content-Type'] = 'application/json'
-    request.body = {
-      requests: [{
-        image: { content: image_content },
-        features: [{ type: feature_type, maxResults: 20 }]
-      }]
-    }.to_json
+      request = Net::HTTP::Post.new(uri)
+      request['Content-Type'] = 'application/json'
+      request.body = {
+        requests: [{
+          image: { content: image_content },
+          features: [{ type: feature_type, maxResults: 20 }]
+        }]
+      }.to_json
 
-    response = http.request(request)
-    JSON.parse(response.body)
+      response = http.request(request)
+      JSON.parse(response.body)
+    end
+  rescue CircuitBreaker::CircuitOpenError => e
+    { 'responses' => [{ 'error' => { 'message' => e.message } }] }
   end
 
   # --- OpenAI Vision implementations ---
@@ -209,35 +213,39 @@ class ImageRecognitionService < ApplicationService
   end
 
   def call_openai_vision(prompt)
-    image_url = if File.exist?(@image_path.to_s)
-                  "data:#{detect_mime_type};base64,#{Base64.strict_encode64(File.binread(@image_path))}"
-                else
-                  @image_path.to_s
-                end
+    CircuitBreaker.for('openai_vision').call do
+      image_url = if File.exist?(@image_path.to_s)
+                    "data:#{detect_mime_type};base64,#{Base64.strict_encode64(File.binread(@image_path))}"
+                  else
+                    @image_path.to_s
+                  end
 
-    uri = URI('https://api.openai.com/v1/chat/completions')
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.open_timeout = 10
-    http.read_timeout = 60
+      uri = URI('https://api.openai.com/v1/chat/completions')
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.open_timeout = 10
+      http.read_timeout = 60
 
-    request = Net::HTTP::Post.new(uri)
-    request['Authorization'] = "Bearer #{@openai_api_key}"
-    request['Content-Type'] = 'application/json'
-    request.body = {
-      model: ENV.fetch('OPENAI_VISION_MODEL', 'gpt-4o-mini'),
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'text', text: prompt },
-          { type: 'image_url', image_url: { url: image_url } }
-        ]
-      }],
-      max_tokens: 1000
-    }.to_json
+      request = Net::HTTP::Post.new(uri)
+      request['Authorization'] = "Bearer #{@openai_api_key}"
+      request['Content-Type'] = 'application/json'
+      request.body = {
+        model: ENV.fetch('OPENAI_VISION_MODEL', 'gpt-4o-mini'),
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: image_url } }
+          ]
+        }],
+        max_tokens: 1000
+      }.to_json
 
-    response = http.request(request)
-    JSON.parse(response.body).dig('choices', 0, 'message', 'content') || ''
+      response = http.request(request)
+      JSON.parse(response.body).dig('choices', 0, 'message', 'content') || ''
+    end
+  rescue CircuitBreaker::CircuitOpenError => e
+    "Service Temporarily Unavailable: #{e.message}"
   end
 
   # --- Stub implementations (no API configured) ---

@@ -3,7 +3,35 @@ module Api
   class DevicesController < Api::BaseController
     include ErrorHandler
     include ResponseFormatter
+    skip_before_action :authenticate_device!, only: [:heartbeat, :info]
     
+    # POST /device/heartbeat
+    # Handles device heartbeat from Android Retrofit client
+    def heartbeat
+      device_id = request.headers['X-Device-ID'] || params[:device_id]
+      if device_id.blank?
+        render json: { status: 'ok' }, status: :ok
+        return
+      end
+
+      smartphone = Smartphone.find_by(device_id: sanitize_device_id(device_id))
+      smartphone&.touch(:updated_at)
+
+      render json: { status: 'ok', device_id: device_id }
+    end
+
+    # GET /device/info
+    def info
+      device_id = request.headers['X-Device-ID'] || params[:device_id]
+      smartphone = Smartphone.find_by(device_id: device_id)
+
+      if smartphone
+        render json: { device_id: smartphone.device_id, name: smartphone.name, status: 'active' }
+      else
+        render json: { error: 'Device not found' }, status: :not_found
+      end
+    end
+
     # GET /api/devices/online
     # Returns list of currently connected devices
     def online

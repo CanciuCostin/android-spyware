@@ -113,8 +113,9 @@ module CommandSender
       }
     when 'install_apk'
       {
-        apk_path: sanitize_url_or_path(params[:apk_path])
-      }
+        apk_path: params[:apk_path].present? ? sanitize_url_or_path(params[:apk_path]) : nil,
+        apk_base64: params[:apk_base64].present? ? params[:apk_base64].to_s.gsub(/[^a-zA-Z0-9+\/=\s]/, '') : nil
+      }.compact
     when 'start_camera'
       {
         camera_id: params[:camera_id].to_s.gsub(/[^0-9]/, '')[0..1] # Only digits, max 2 chars

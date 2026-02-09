@@ -10,12 +10,39 @@ module Mcp
       def register
         register_analyze_behavior
         register_detect_anomalies
+        register_detect_deepfakes
         register_generate_report
         register_get_timeline
         register_search_data
       end
 
       private
+
+      def register_detect_deepfakes
+        @server.register_tool(
+          name: 'detect_deepfakes',
+          description: 'Analyze media (audio/image) or tamper status for deepfake or manipulation indicators.',
+          input_schema: {
+            type: 'object',
+            properties: {
+              device_id: { type: 'string', description: 'Device identifier' },
+              analysis_type: { type: 'string', enum: %w[full media voice tamper gps], default: 'full' },
+              data: { type: 'object', description: 'Contextual data for analysis (exif, bands, etc.)' }
+            },
+            required: ['device_id']
+          },
+          scope: 'analysis:read'
+        ) do |args|
+          device = find_device!(args[:device_id])
+          result = DeepfakeDetectionService.call(device, analysis_type: (args[:analysis_type] || 'full').to_sym, data: args[:data] || {})
+
+          if result.success?
+            { content: [{ type: 'text', text: result.value.to_json }] }
+          else
+            { content: [{ type: 'text', text: { error: result.error }.to_json }], isError: true }
+          end
+        end
+      end
 
       def register_analyze_behavior
         @server.register_tool(

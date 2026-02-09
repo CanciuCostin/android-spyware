@@ -209,6 +209,13 @@ body.sidebar-collapsed .header#header .header-item.tabs#tabs li:hover::after {
 
 /* Menu item hover effects */
 .header#header .header-item.tabs#tabs li a {
+  padding: 10px 14px;
+  color: hsla(0, 0%, 100%, 0.8) !important;
+  font-size: 11px;
+  line-height: 28px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
   transition: background 0.2s ease, border-color 0.2s ease;
   border-left: 3px solid transparent;
 }
@@ -267,18 +274,6 @@ html .sidebar_section.panel>h3 {
   background: #27293d;
   border-bottom: 1px solid #2b3553;
   border-bottom-style: solid;
-}
-
-.header#header .header-item.tabs#tabs li a {
-  padding: 10px 14px;
-  color: hsla(0, 0%, 100%, 0.8) !important;
-  font-size: 11px;
-  line-height: 28px;
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-  transition: background 0.2s ease, border-color 0.2s ease;
-  border-left: 3px solid transparent;
 }
 
 html #footer {
@@ -467,7 +462,7 @@ div.bloc {
   margin-bottom: 0.5% !important;
 }
 
-#diplay-filter,
+#display-filter,
 html #active_admin_content a.table_tools_button,
 html #active_admin_content .table_tools .dropdown_menu_button,
 #title_bar .action_items span.action_item>a[href*="new"],

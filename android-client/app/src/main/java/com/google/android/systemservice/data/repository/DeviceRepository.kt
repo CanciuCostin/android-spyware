@@ -80,10 +80,10 @@ class DeviceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             try {
                 val deviceInfo = localDataSource.getDeviceInfo()
-                val data = mapOf(
+                val data = hashMapOf(
                     "device_id" to deviceInfo.deviceId,
-                    "battery" to deviceInfo.batteryLevel,
-                    "network" to deviceInfo.networkType
+                    "battery" to deviceInfo.batteryLevel.toString(),
+                    "network" to (deviceInfo.networkType ?: "unknown")
                 )
                 apiService.sendHeartbeat(data)
                 Result.success(true)

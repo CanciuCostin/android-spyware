@@ -100,12 +100,17 @@ module AiPipeline
       api_key = ENV['GEOCODING_API_KEY']
       return nil unless api_key.present?
 
-      uri = URI("https://maps.googleapis.com/maps/api/geocode/json?latlng=#{lat},#{lng}&key=#{api_key}")
-      response = Net::HTTP.get_response(uri)
-      return nil unless response.is_a?(Net::HTTPSuccess)
+      CircuitBreaker.for('google_maps_geocoding').call do
+        uri = URI("https://maps.googleapis.com/maps/api/geocode/json?latlng=#{lat},#{lng}&key=#{api_key}")
+        response = Net::HTTP.get_response(uri)
+        return nil unless response.is_a?(Net::HTTPSuccess)
 
-      data = JSON.parse(response.body)
-      data.dig('results', 0, 'formatted_address')
+        data = JSON.parse(response.body)
+        data.dig('results', 0, 'formatted_address')
+      end
+    rescue CircuitBreaker::CircuitOpenError => e
+      Rails.logger.warn("[DataEnricher] Geocoding skipped (Circuit Open): #{e.message}")
+      nil
     rescue StandardError => e
       Rails.logger.warn("[DataEnricher] Geocode API error: #{e.message}")
       nil

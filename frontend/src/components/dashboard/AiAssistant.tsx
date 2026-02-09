@@ -132,30 +132,87 @@ export const AiAssistant: React.FC<{ deviceId?: string }> = ({ deviceId }) => {
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{msg.content}</p>
-                  {msg.type === 'table' && msg.data && (
-                    <div className="mt-2 p-2 bg-black/20 rounded border border-white/5 overflow-x-auto text-[10px]">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b border-white/10">
-                            {Object.keys(msg.data[0] || {}).map((k) => (
-                              <th key={k} className="text-left p-1 uppercase opacity-60">
-                                {k}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {msg.data.slice(0, 5).map((row: any, j: number) => (
-                            <tr key={j} className="border-b border-white/5 last:border-0">
-                              {Object.values(row).map((v: any, k) => (
-                                <td key={k} className="p-1 truncate max-w-[100px]">
-                                  {String(v)}
-                                </td>
+                  
+                  {/* Table Visualization */}
+                  {msg.type === 'table' && msg.data && Array.isArray(msg.data) && (
+                    <div className="mt-2 p-0 bg-black/40 rounded-lg border border-white/10 overflow-hidden text-[11px]">
+                      <div className="max-h-60 overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-white/20">
+                        <table className="w-full border-collapse">
+                          <thead className="sticky top-0 bg-slate-800 z-10 shadow-md">
+                            <tr className="border-b border-white/20">
+                              {Object.keys(msg.data[0] || {}).map((k) => (
+                                <th key={k} className="text-left p-2 uppercase font-bold text-electric-400 whitespace-nowrap">
+                                  {k.replace(/_/g, ' ')}
+                                </th>
                               ))}
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody className="divide-y divide-white/5">
+                            {msg.data.map((row: any, j: number) => (
+                              <tr key={j} className="hover:bg-white/5 transition-colors">
+                                {Object.values(row).map((v: any, k) => (
+                                  <td key={k} className="p-2 break-words min-w-[80px]">
+                                    {v === null || v === undefined ? '-' : String(v)}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      {msg.data.length > 5 && (
+                        <div className="p-1.5 bg-white/5 text-[9px] text-center opacity-50 italic">
+                          Showing {msg.data.length} entries
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Chart/Bar Visualization Placeholder */}
+                  {(msg.type === 'chart' || msg.type === 'bar_chart') && (
+                    <div className="mt-2 p-3 bg-black/20 rounded border border-white/5 flex items-center justify-center h-24">
+                      <div className="flex items-end gap-1 h-full">
+                        {[40, 70, 30, 90, 50].map((h, idx) => (
+                          <div 
+                            key={idx} 
+                            className="w-2 bg-electric-500 rounded-t" 
+                            style={{ height: `${h}%` }} 
+                          />
+                        ))}
+                      </div>
+                      <span className="ml-3 text-[10px] opacity-60">Visualization Loaded</span>
+                    </div>
+                  )}
+
+                  {/* Map Visualization Placeholder */}
+                  {msg.type === 'map' && (
+                    <div className="mt-2 p-2 bg-black/20 rounded border border-white/5 h-32 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-slate-800 opacity-50 flex items-center justify-center">
+                        <span className="text-[10px]">MAP VIEW: {msg.data?.length || 0} points</span>
+                      </div>
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                        <div className="w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Alert/Risk Visualization */}
+                  {msg.type === 'alert' && msg.data && (
+                    <div className="mt-2 p-3 bg-red-500/10 border border-red-500/50 rounded-xl flex items-start gap-3">
+                      <div className="mt-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-red-400 uppercase mb-1">Security Alert</div>
+                        <div className="text-sm text-white/90">{msg.content}</div>
+                        {msg.data.factors && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {msg.data.factors.map((f: any, idx: number) => (
+                              <span key={idx} className="px-2 py-0.5 bg-red-500/20 text-[10px] rounded text-red-300">
+                                {f.type || f}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

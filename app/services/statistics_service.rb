@@ -29,21 +29,24 @@ class StatisticsService
   
   def activity_timeline_data
     start_date = days_range.days.ago.to_date
+    adapter = ActiveRecord::Base.connection.adapter_name
     
-    commands = device.pending_commands
-      .where('created_at >= ?', start_date)
-      .group("DATE(created_at)")
-      .count
-      .transform_keys(&:to_s)
+    # Batch query for counts to avoid N+1 and repeated date extraction
+    date_func = adapter =~ /sqlite/i ? "date(created_at)" : "DATE(created_at)"
+    
+    commands = device.pending_commands.where('created_at >= ?', start_date).group(date_func).count
+    keylogs = device.keylogs.where('created_at >= ?', start_date).group(date_func).count
+    sms = device.sms_messages.where('created_at >= ?', start_date).group(date_func).count
+    photos = device.pictures.where('created_at >= ?', start_date).group(date_func).count
     
     (0..days_range).map do |i|
       date = (start_date + i.days).to_s
       {
         date: date,
         commands: commands[date] || 0,
-        keylogs: device.keylogs.where(created_at: (start_date + i.days).all_day).count,
-        sms: device.sms_messages.where(created_at: (start_date + i.days).all_day).count,
-        photos: device.pictures.where(created_at: (start_date + i.days).all_day).count
+        keylogs: keylogs[date] || 0,
+        sms: sms[date] || 0,
+        photos: photos[date] || 0
       }
     end
   end
@@ -67,14 +70,20 @@ class StatisticsService
   
   def call_sms_stats_data
     start_date = days_range.days.ago.to_date
+    adapter = ActiveRecord::Base.connection.adapter_name
+    date_func = adapter =~ /sqlite/i ? "date(created_at)" : "DATE(created_at)"
+    
+    calls = device.call_logs.where('created_at >= ?', start_date).group(date_func).count
+    sms_sent = device.sms_messages.where('created_at >= ?', start_date).where(message_type: 'sent').group(date_func).count
+    sms_received = device.sms_messages.where('created_at >= ?', start_date).where(message_type: 'received').group(date_func).count
     
     (0..days_range).map do |i|
-      date = (start_date + i.days)
+      date = (start_date + i.days).to_s
       {
-        date: date.to_s,
-        calls: device.call_logs.where(created_at: date.all_day).count,
-        sms_sent: device.sms_messages.where(created_at: date.all_day, message_type: 'sent').count,
-        sms_received: device.sms_messages.where(created_at: date.all_day, message_type: 'received').count
+        date: date,
+        calls: calls[date] || 0,
+        sms_sent: sms_sent[date] || 0,
+        sms_received: sms_received[date] || 0
       }
     end
   end

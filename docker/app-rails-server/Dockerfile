@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
+# cspell:words libpq tzdata pids MALLOC
 
 ### Stage 1: Builder (Dependencies & Assets)
 FROM ruby:3.3.0-slim-bookworm AS builder
@@ -11,11 +12,11 @@ ENV RAILS_ENV=production \
 RUN apt-get update -qq \
     && apt-get install -y --no-install-recommends \
         build-essential \
+        curl \
+        git \
         libpq-dev \
         nodejs \
         npm \
-        git \
-        curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -53,8 +54,8 @@ ENV RAILS_ENV=production \
 # Install only runtime dependencies
 RUN apt-get update -qq \
     && apt-get install -y --no-install-recommends \
-        curl \
         ca-certificates \
+        curl \
         libpq5 \
         tzdata \
     && apt-get clean \

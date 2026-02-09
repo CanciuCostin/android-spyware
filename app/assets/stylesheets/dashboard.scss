@@ -663,3 +663,362 @@ body.admin_dashboard .header#header {
   .stat-card { padding: 14px 12px; }
   .stat-value { font-size: 22px; }
 }
+
+// ─── Enhanced Tab Transitions ───
+.tab-pane {
+  &.active {
+    animation: tabFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ─── Loading Skeleton ───
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: $radius-sm;
+}
+
+// ─── Enhanced Card Hover ───
+.device-card {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba($accent-blue, 0.25);
+    box-shadow:
+      0 16px 48px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba($accent-blue, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+}
+
+// ─── Staggered Card Entry ───
+.device-card:nth-child(1) { animation-delay: 0.1s; }
+.device-card:nth-child(2) { animation-delay: 0.2s; }
+.device-card:nth-child(3) { animation-delay: 0.3s; }
+.device-card:nth-child(4) { animation-delay: 0.4s; }
+.device-card:nth-child(5) { animation-delay: 0.5s; }
+
+// ─── Action Button Ripple Effect ───
+.action-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.1) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.action-btn:hover::after {
+  opacity: 1;
+}
+
+// ─── Smooth Scrollbar for timeline & tabs ───
+.tab-bar,
+.timeline-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
+}
+
+// ─── Toast Slide-Out Animation ───
+.toast {
+  animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  &.removing {
+    animation: toastOut 0.3s ease forwards;
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    max-height: 100px;
+    margin-bottom: 8px;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(80px) scale(0.9);
+    max-height: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+// ─── Stat Card Stagger ───
+.stat-card {
+  animation: cardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+// ─── Focus Styles for Accessibility ───
+.tab-btn:focus-visible,
+.action-btn:focus-visible {
+  outline: 2px solid $accent-blue;
+  outline-offset: 2px;
+}
+
+// ─── Global Utility ───
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+// ─── Dashboard Panels Row ───
+.dashboard-panels {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.panel-card {
+  background: $bg-card;
+  backdrop-filter: blur($glass-blur);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  animation: cardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: 0.2s;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  background: rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid $border-subtle;
+  
+  .panel-icon { font-size: 16px; }
+  .panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: $text-primary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// ─── Timeline ───
+.timeline-list {
+  max-height: 360px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background 0.15s ease;
+  
+  &:hover { background: rgba(255, 255, 255, 0.02); }
+  &:last-child { border-bottom: none; }
+}
+
+.timeline-icon {
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.timeline-content {
+  flex: 1;
+  min-width: 0;
+  
+  .timeline-action {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: $text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .timeline-device {
+    display: block;
+    font-size: 11px;
+    color: $text-muted;
+    margin-top: 1px;
+  }
+}
+
+.timeline-time {
+  font-size: 11px;
+  color: $text-muted;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.empty-timeline {
+  padding: 40px 18px;
+  text-align: center;
+  color: $text-muted;
+  font-size: 13px;
+}
+
+// ─── Health Grid ───
+.health-grid {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.health-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: $radius-sm;
+  transition: background 0.15s ease;
+  
+  &:hover { background: rgba(255, 255, 255, 0.02); }
+  
+  &.healthy .health-status { color: $accent-green; }
+  &.unhealthy .health-status { color: $accent-red; }
+
+  .health-icon { font-size: 18px; flex-shrink: 0; }
+  .health-info {
+    flex: 1;
+    .health-name {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: $text-primary;
+    }
+    .health-status {
+      display: block;
+      font-size: 11px;
+      margin-top: 1px;
+    }
+  }
+}
+
+// ─── Responsive for panels ───
+@media (max-width: 900px) {
+  .dashboard-panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─── Stat Trend Indicator ───
+.stat-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 6px 0 2px;
+  font-size: 11px;
+}
+
+.trend-arrow {
+  font-weight: 700;
+  font-size: 13px;
+  &.trend-up { color: $accent-green; }
+  &.trend-down { color: $accent-red; }
+  &.trend-flat { color: $text-muted; }
+}
+
+.trend-text {
+  color: $text-secondary;
+  font-size: 11px;
+}
+
+// ─── Device Indicators ───
+.device-indicators {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.indicator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  font-size: 11px;
+  color: $text-secondary;
+
+  .indicator-text {
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// ─── Count-Up Animation ───
+.stat-value {
+  animation: countSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes statPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}

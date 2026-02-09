@@ -20,34 +20,19 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.6.6
-      - name: Cache Ruby gems
-        uses: actions/cache@v4
-        with:
-          path: |
-            vendor/bundle
-            ~/.bundle
-          key: ${{ runner.os }}-bundle-${{ hashFiles('Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bundle-
-      - name: Install Ruby gems
-        run: |
-          gem install bundler:2.1.4
-          bundle config set --local path vendor/bundle
-          bundle install --jobs 4 --retry 3 --without production
-      - name: Install lint gems
-        run: gem install rubocop rubocop-rails rubocop-performance
-      - name: Run RuboCop
-        run: rubocop
+          ruby-version: 3.1.6
+          bundler-cache: true
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
       - name: Install JS dependencies
         run: npm ci
       - name: Run ESLint
         run: npm run lint:js
+      - name: Run RuboCop
+        run: bundle exec rubocop
 
   test:
     needs: lint
@@ -79,23 +64,11 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.6.6
-      - name: Cache Ruby gems
-        uses: actions/cache@v4
-        with:
-          path: |
-            vendor/bundle
-            ~/.bundle
-          key: ${{ runner.os }}-bundle-${{ hashFiles('Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bundle-
-      - name: Install Ruby gems
-        run: |
-          gem install bundler:2.1.4
-          bundle config set --local path vendor/bundle
-          bundle install --jobs 4 --retry 3 --without production
+          ruby-version: 3.1.6
+          bundler-cache: true
       - name: Prepare test database
-        run: bundle exec rails db:create db:schema:load
+        run: |
+          bundle exec rails db:create db:schema:load
       - name: Run RSpec suite
         run: bundle exec rspec
       - name: Package Rails artifact

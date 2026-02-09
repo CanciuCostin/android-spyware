@@ -56,7 +56,7 @@ object AndroidConfig {
             } else {
                 "$wsProtocol://$serverBaseUrl"
             }
-            return "$base/cable"
+            return "$base/cable?token=$DEVICE_TOKEN"
         }
     
     val apiBaseUrl: String

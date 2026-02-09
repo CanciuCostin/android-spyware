@@ -16,8 +16,8 @@ interface ApiService {
     suspend fun uploadFile(@Part file: MultipartBody.Part): UploadResponse
     
     @GET("device/info")
-    suspend fun getDeviceInfo(): Map<String, Any>
+    suspend fun getDeviceInfo(): HashMap<String, String>
     
     @POST("device/heartbeat")
-    suspend fun sendHeartbeat(@Body data: Map<String, Any>): Map<String, Any>
+    suspend fun sendHeartbeat(@Body data: HashMap<String, String>): HashMap<String, String>
 }

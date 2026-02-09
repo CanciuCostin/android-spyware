@@ -12,6 +12,7 @@ class WebRTCClient(
     private val context: Context,
     private val deviceId: String,
     private val streamType: String, // "camera" or "microphone"
+    private val iceServers: List<PeerConnection.IceServer> = DEFAULT_ICE_SERVERS,
     private val onSdpCreated: (String, String) -> Unit, // type, sdp
     private val onIceCandidate: (IceCandidate) -> Unit,
     private val onConnectionStateChanged: (PeerConnection.PeerConnectionState) -> Unit
@@ -19,8 +20,8 @@ class WebRTCClient(
     companion object {
         private const val TAG = "WebRTCClient"
         
-        // Google STUN servers for NAT traversal
-        private val ICE_SERVERS = listOf(
+        // Default Google STUN servers
+        val DEFAULT_ICE_SERVERS = listOf(
             PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer(),
             PeerConnection.IceServer.builder("stun:stun1.l.google.com:19302").createIceServer()
         )
@@ -65,10 +66,10 @@ class WebRTCClient(
     }
 
     fun createPeerConnection() {
-        val rtcConfig = PeerConnection.RTCConfiguration(ICE_SERVERS).apply {
+        val rtcConfig = PeerConnection.RTCConfiguration(iceServers).apply {
             bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
             rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.REQUIRE
-            tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED
+            tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.ENABLED
             continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
         }

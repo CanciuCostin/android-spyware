@@ -149,8 +149,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.text "text", null: false
     t.string "language", default: "en"
     t.float "confidence"
-    t.jsonb "speakers", default: []
-    t.jsonb "keywords", default: []
+    t.json "speakers", default: []
+    t.json "keywords", default: []
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["created_at"], name: "index_audio_transcriptions_on_created_at"
@@ -198,8 +198,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.date "date"
     t.string "filename"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "now()" }
-    t.datetime "updated_at", default: -> { "now()" }
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
     t.index ["date"], name: "idx_calls_date"
     t.index ["smartphone_id", "created_at"], name: "idx_calls_device_time", order: { created_at: :desc }
     t.index ["smartphone_id"], name: "index_call_logs_on_smartphone_id"
@@ -238,8 +238,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.bigint "smartphone_id", null: false
     t.string "filename"
     t.string "date"
-    t.datetime "created_at", default: -> { "now()" }
-    t.datetime "updated_at", default: -> { "now()" }
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
     t.index ["smartphone_id", "created_at"], name: "idx_contacts_device_time"
     t.index ["smartphone_id"], name: "index_contacts_on_smartphone_id"
   end
@@ -344,8 +344,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.string "lat"
     t.string "long"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "now()" }
-    t.datetime "updated_at", default: -> { "now()" }
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
     t.index ["smartphone_id", "created_at"], name: "idx_locations_device_time", order: { created_at: :desc }
     t.index ["smartphone_id", "date"], name: "idx_locations_device_date"
     t.index ["smartphone_id"], name: "index_geo_locations_on_smartphone_id"
@@ -460,8 +460,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.string "filename"
     t.bigint "smartphone_id", null: false
     t.string "app_name"
-    t.datetime "created_at", default: -> { "now()" }
-    t.datetime "updated_at", default: -> { "now()" }
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
     t.index ["smartphone_id", "app_name", "created_at"], name: "idx_messaging_dumps_device_app_time"
     t.index ["smartphone_id"], name: "index_messaging_apps_dumps_on_smartphone_id"
   end
@@ -523,8 +523,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.date "date"
     t.string "filename"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "now()" }
-    t.datetime "updated_at", default: -> { "now()" }
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
     t.index ["smartphone_id", "created_at"], name: "idx_pictures_device_time", order: { created_at: :desc }
     t.index ["smartphone_id", "date"], name: "idx_pictures_device_date"
     t.index ["smartphone_id"], name: "index_pictures_on_smartphone_id"
@@ -533,7 +533,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   create_table "queued_commands", force: :cascade do |t|
     t.bigint "smartphone_id", null: false
     t.string "command", null: false
-    t.jsonb "params", default: {}
+    t.json "params", default: {}
     t.integer "priority", default: 5, null: false
     t.datetime "expires_at", null: false
     t.string "status", default: "pending", null: false
@@ -552,8 +552,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "now()" }
-    t.datetime "updated_at", default: -> { "now()" }
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
     t.string "recording_type", default: "audio"
     t.string "call_number"
     t.string "call_direction"
@@ -581,7 +581,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.bigint "scheduled_command_id", null: false
     t.bigint "pending_command_id"
     t.string "status", null: false
-    t.jsonb "result"
+    t.json "result"
     t.datetime "executed_at", null: false
     t.integer "duration_ms"
     t.datetime "created_at", precision: 6, null: false
@@ -595,7 +595,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   create_table "scheduled_commands", force: :cascade do |t|
     t.bigint "smartphone_id", null: false
     t.string "command", null: false
-    t.jsonb "params", default: {}
+    t.json "params", default: {}
     t.integer "schedule_type", default: 0, null: false
     t.string "cron_expression"
     t.datetime "next_run_at"
@@ -605,7 +605,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.integer "max_runs"
     t.string "name"
     t.text "description"
-    t.jsonb "last_result"
+    t.json "last_result"
     t.string "last_status"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -621,8 +621,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.string "duration"
     t.string "filename"
     t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "now()" }
-    t.datetime "updated_at", default: -> { "now()" }
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
     t.index ["smartphone_id", "created_at"], name: "idx_screenshots_device_time", order: { created_at: :desc }
     t.index ["smartphone_id"], name: "index_screenshots_on_smartphone_id"
   end
@@ -664,8 +664,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.date "date"
     t.bigint "smartphone_id", null: false
     t.string "filename"
-    t.datetime "created_at", default: -> { "now()" }
-    t.datetime "updated_at", default: -> { "now()" }
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
     t.index ["date"], name: "idx_sms_date"
     t.index ["smartphone_id", "created_at"], name: "idx_sms_device_time", order: { created_at: :desc }
     t.index ["smartphone_id"], name: "index_sms_messages_on_smartphone_id"
@@ -742,7 +742,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
 
   create_table "user_preferences", force: :cascade do |t|
     t.bigint "admin_user_id", null: false
-    t.jsonb "preferences", default: {}, null: false
+    t.json "preferences", default: {}, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["admin_user_id"], name: "index_user_preferences_on_admin_user_id", unique: true

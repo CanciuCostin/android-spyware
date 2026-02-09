@@ -34,18 +34,14 @@
     "**/*.{code-workspace,csproj,fsproj,vbproj,vcxproj,proj,targets,props}": true
   },
   "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
-  "github.copilot.chat.alternateGeminiModelFPrompt.enabled": true,
   "github.copilot.chat.agent.autoFix": true,
-  "github.copilot.chat.alternateGptPrompt.enabled": true,
-  "github.copilot.chat.anthropic.thinking.budgetTokens": 32000,
+  "github.copilot.chat.anthropic.thinking.budgetTokens": 10000,
   "github.copilot.chat.anthropic.tools.websearch.enabled": true,
   "github.copilot.chat.codesearch.enabled": true,
-  "github.copilot.chat.completionsFetcher": "node-fetch",
+  "github.copilot.chat.completionsFetcher": "streaming-fetch",
   "github.copilot.chat.customAgents.showOrganizationAndEnterpriseAgents": true,
   "github.copilot.chat.generateTests.codeLens": true,
   "github.copilot.chat.githubMcpServer.enabled": true,
-  "github.copilot.chat.newWorkspace.useContext7": true,
-  "github.copilot.chat.nesFetcher": "node-fetch",
   "github.copilot.chat.languageContext.typescript.items": "fill",
   "github.copilot.chat.notebook.enhancedNextEditSuggestions.enabled": true,
   "github.copilot.chat.scopeSelection": true,
@@ -53,19 +49,59 @@
   "github.copilot.chat.languageContext.typescript.enabled": true,
   "github.copilot.chat.languageContext.inline.typescript.enabled": true,
   "github.copilot.chat.languageContext.fix.typescript.enabled": true,
-  "github.copilot.chat.responsesApiReasoningEffort": "high",
+  "github.copilot.chat.responsesApiReasoningEffort": "medium",
   "github.copilot.chat.notebook.followCellExecution.enabled": true,
   "github.copilot.chat.languageContext.typescript.includeDocumentation": true,
   "github.copilot.chat.githubMcpServer.lockdown": false,
   "chat.tools.terminal.blockDetectedFileWrites": "all",
-  "chatgpt.commentCodeLensEnabled": true,
-  "chatgpt.openOnStartup": false,
-  "chatgpt.runCodexInWindowsSubsystemForLinux": true,
   "sonarlint.connectedMode.project": {
     "connectionId": "amazon322",
     "projectKey": "amazon322_ai_calorie_tracker"
   },
   "java.configuration.updateBuildConfiguration": "automatic",
-  "terminal.integrated.shellIntegration.enabled": true,
-  "terminal.integrated.shellIntegration.showWelcome": false
+  "java.jdt.ls.java.home": "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.9.10-hotspot",
+  "jdk.jdkhome": "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.9.10-hotspot",
+  "terminal.integrated.shellIntegration.enabled": false,
+  "terminal.integrated.shellIntegration.showWelcome": false,
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell",
+      "args": ["-NoLogo", "-NoProfile"]
+    },
+    "Command Prompt": {
+      "path": "cmd.exe",
+      "icon": "terminal-cmd"
+    }
+  },
+  "terminal.integrated.env.windows": {
+    "PSExecutionPolicyPreference": "RemoteSigned"
+  },
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.cursorStyle": "line",
+  "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.rightClickBehavior": "paste",
+  "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.scrollback": 10000,
+  "ruby.format": "rufo",
+  "[ruby]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": null
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "git.autofetch": "all",
+  
+  // OpenAI CODEX Extension Configuration
+  "chatgpt.apiKey": "",
+  "chatgpt.model": "gpt-4",
+  "chatgpt.temperature": 0.3,
+  "chatgpt.maxTokens": 2000,
+  "chatgpt.requestTimeout": 30000,
+  "chatgpt.response.showNotification": true,
+  "chatgpt.callbackUrl": "http://localhost:8765",
+  "chatgpt.loginServerPort": 8765
 }
