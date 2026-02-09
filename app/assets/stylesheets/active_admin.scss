@@ -1,79 +1,149 @@
-// SASS variable overrides must be declared before loading up Active Admin's styles.
-//
-// To view the variables that Active Admin provides, take a look at
-// `app/assets/stylesheets/active_admin/mixins/_variables.scss` in the
-// Active Admin source.
-//
-// Active Admin's got SASS!
-// HACKER THEME COLOR PALETTE
-@import url("https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800");
+// ============================================================
+//  EagleSpy V5 — Cyber Command Center Global Theme
+//  ActiveAdmin base stylesheet (all pages)
+//  Dashboard-specific overrides live in dashboard.scss
+// ============================================================
 
-$hacker-bg-dark: #0d1117;
-$hacker-bg-panel: #161b22;
-$hacker-border: #30363d;
-$hacker-text-primary: #c9d1d9;
-$hacker-text-secondary: #8b949e;
-$hacker-accent: #00ff00; // Terminal Green
-$hacker-accent-hover: #00cc00;
-$hacker-accent-secondary: #58a6ff; // Cyber Blue
-$hacker-danger: #f85149;
+// ─── 1. Google Fonts ───
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-$panelBorder: $hacker-border !important;
-$skinActiveColor: rgba(255, 255, 255, 0.1) !default;
-$bodyColor: $hacker-bg-dark !default;
-$skinTextColor: $hacker-text-primary !important;
-$skinTextActiveColor: $hacker-accent !default;
-$skinTextTable: $hacker-text-primary !important;
-$skinHeaderBck: $hacker-bg-panel !important;
-$skinBlack: $hacker-bg-dark !important;
-$panelHeaderBck: $hacker-bg-panel !important;
-$skinBlackLight: $hacker-bg-panel !important;
-$textGray: $hacker-text-secondary !important;
+// ─── 2. SASS Variables & Color Palette ───
+$cc-bg-deep:       #050a12;
+$cc-bg-panel:      #0a1628;
+$cc-bg-surface:    #0f1d32;
+$cc-bg-sidebar:    #060d18;
+$cc-bg-input:      #0c1a2e;
+$cc-border:        rgba(0, 240, 255, 0.08);
+$cc-border-hover:  rgba(0, 240, 255, 0.18);
+$cc-text:          #e8f0ff;
+$cc-text-sec:      #6b7fa3;
+$cc-text-muted:    #4a5f82;
+$cc-cyan:          #00f0ff;
+$cc-magenta:       #b400ff;
+$cc-success:       #00ff88;
+$cc-danger:        #ff3366;
+$cc-warning:       #ffaa00;
+$cc-sidebar-w:     220px;
+$cc-sidebar-w-col: 56px;
+$cc-transition:    0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$cc-radius:        8px;
+$cc-radius-lg:     12px;
+
+// ─── 3. ActiveAdmin Skin Variable Overrides (BEFORE imports) ───
+$panelBorder:         $cc-border !important;
+$skinActiveColor:     rgba(0, 240, 255, 0.12) !default;
+$bodyColor:           $cc-bg-deep !default;
+$skinTextColor:       $cc-text !important;
+$skinTextActiveColor: $cc-cyan !default;
+$skinTextTable:       $cc-text !important;
+$skinHeaderBck:       $cc-bg-sidebar !important;
+$skinBlack:           $cc-bg-deep !important;
+$panelHeaderBck:      $cc-bg-panel !important;
+$skinBlackLight:      $cc-bg-panel !important;
+$textGray:            $cc-text-sec !important;
+
+// ─── 4. ActiveAdmin Core Imports ───
+@import "active_admin/mixins";
+@import "active_admin/base";
+
+@import "timeline";
+
+// ─── Modern Dashboard System ───
+@import "modern_variables";
+@import "responsive";
+@import "loading_states";
+@import "dark_mode";
+@import "ui_polish";
+@import "dashboard";
+
+
+// ============================================================
+//  5. SIDEBAR / HEADER (fixed left navigation)
+// ============================================================
 
 .header#header {
-  border-radius: 0;
-  margin-top: 0;
-  border-right: 1px solid $hacker-border;
-  width: 220px !important;
-  height: 100% !important;
-  overflow-x: hidden;
-  overflow-y: auto;
-  z-index: 100000;
   position: fixed !important;
   left: 0;
   top: 0;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: $cc-sidebar-w !important;
+  height: 100% !important;
+  background: $cc-bg-sidebar !important;
+  border-right: 1px solid $cc-border;
+  border-radius: 0;
+  margin-top: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 100000;
+  transition: width $cc-transition;
+
+  // Custom scrollbar inside sidebar
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba($cc-cyan, 0.15);
+    border-radius: 4px;
+    &:hover { background: rgba($cc-cyan, 0.3); }
+  }
 }
 
-body.sidebar-collapsed .header#header {
-  width: 56px !important;
+// Site title / logo area
+#site_title {
+  padding: 18px 16px 14px;
+  transition: opacity 0.2s ease;
+
+  a, a:link, a:visited {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, $cc-cyan, $cc-magenta);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none !important;
+  }
 }
 
-/* Push content right */
-#title_bar {
-  width: auto !important;
-  margin-left: 220px !important;
-  border-bottom: 1px solid #2b3553 !important;
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+// Tabs container
+#header #tabs {
+  overflow: visible;
 }
 
-#active_admin_content,
-#main_content_wrapper {
-  margin-left: 220px !important;
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+// Menu items
+.header#header .header-item.tabs#tabs li {
+  margin-bottom: 0 !important;
+  background: transparent;
+
+  a {
+    padding: 10px 14px;
+    color: rgba($cc-text, 0.75) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 28px;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    border-left: 3px solid transparent;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    text-shadow: none !important;
+
+    &:hover {
+      background: rgba($cc-cyan, 0.06) !important;
+      border-left-color: rgba($cc-cyan, 0.4);
+      color: $cc-text !important;
+    }
+  }
+
+  &.current a {
+    background: rgba($cc-cyan, 0.1) !important;
+    border-left-color: $cc-cyan !important;
+    color: $cc-cyan !important;
+  }
 }
 
-body.sidebar-collapsed #title_bar,
-body.sidebar-collapsed #active_admin_content,
-body.sidebar-collapsed #main_content_wrapper {
-  margin-left: 56px !important;
-}
-
-#wrapper {
-  margin-left: 0 !important;
-}
-
-/* Sidebar menu item layout */
+// Icon + text layout inside menu items
 .left_menu_icons {
   display: inline-flex;
   align-items: center;
@@ -91,7 +161,7 @@ body.sidebar-collapsed #main_content_wrapper {
   font-weight: 500;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba($cc-text, 0.7);
   white-space: nowrap;
   overflow: hidden;
   transition: opacity 0.2s ease;
@@ -99,44 +169,987 @@ body.sidebar-collapsed #main_content_wrapper {
 }
 
 .left_menu_icon {
-  fill: rgba(255, 255, 255, 0.6);
+  fill: rgba($cc-text, 0.5);
   transition: fill 0.2s ease;
 }
 
-body.sidebar-collapsed .left_menu_title {
-  opacity: 0;
-  width: 0;
-  display: none;
+// Hover — brighten icon
+.header#header .header-item.tabs#tabs li a:hover .left_menu_icon {
+  fill: $cc-cyan;
 }
 
-body.sidebar-collapsed .left_menu_icons {
-  margin-right: 0;
+// Active item icon
+.header#header .header-item.tabs#tabs li.current a .left_menu_icon {
+  fill: $cc-cyan;
 }
 
-body.sidebar-collapsed .header#header .header-item.tabs#tabs li a {
-  padding: 10px 0;
-  display: flex;
-  justify-content: center;
+// ─── Collapsed sidebar state ───
+body.sidebar-collapsed {
+  .header#header {
+    width: $cc-sidebar-w-col !important;
+  }
+
+  .left_menu_title {
+    opacity: 0;
+    width: 0;
+    display: none;
+  }
+
+  .left_menu_icons {
+    margin-right: 0;
+  }
+
+  .header#header .header-item.tabs#tabs li a {
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  #site_title {
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  // Tooltips for collapsed items
+  .header#header .header-item.tabs#tabs li {
+    position: relative;
+
+    &:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 8px;
+      background: rgba($cc-bg-panel, 0.96);
+      color: $cc-text;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      border: 1px solid $cc-border;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+      z-index: 200000;
+      pointer-events: none;
+    }
+  }
 }
 
-body.sidebar-collapsed #site_title {
-  opacity: 0;
+#utility_nav {
+  height: 100%;
+}
+
+
+// ============================================================
+//  6. CONTENT AREA (margin-left shifts with sidebar)
+// ============================================================
+
+#wrapper {
+  margin-left: 0 !important;
+}
+
+#title_bar {
+  width: auto !important;
+  margin-left: $cc-sidebar-w !important;
+  transition: margin-left $cc-transition;
+}
+
+#active_admin_content,
+#main_content_wrapper {
+  margin-left: $cc-sidebar-w !important;
+  transition: margin-left $cc-transition;
+}
+
+#active_admin_content {
+  width: 100% !important;
+  float: none !important;
+  padding-left: 24px;
+  padding-right: 24px;
+  box-sizing: border-box;
+}
+
+body.sidebar-collapsed {
+  #title_bar,
+  #active_admin_content,
+  #main_content_wrapper {
+    margin-left: $cc-sidebar-w-col !important;
+  }
+}
+
+
+// ============================================================
+//  7. TITLE BAR
+// ============================================================
+
+html #title_bar {
+  background: $cc-bg-panel !important;
+  border-bottom: 1px solid $cc-border !important;
+  padding: 14px 24px;
+}
+
+#title_bar h2 {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: $cc-text !important;
+  background: linear-gradient(135deg, $cc-cyan, $cc-magenta);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-shadow: none !important;
+}
+
+.breadcrumb {
+  background-color: transparent !important;
+  margin-bottom: 8px !important;
+  padding: 0 !important;
+  font-weight: 400;
+  font-size: 12px;
+
+  a, a:link, a:visited, a:active {
+    color: $cc-text-sec;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    &:hover { color: $cc-cyan; }
+  }
+
+  .breadcrumb_sep {
+    color: $cc-text-muted;
+  }
+}
+
+
+// ============================================================
+//  8. DATA TABLES
+// ============================================================
+
+html table.index_table {
+  border: none;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: $cc-text !important;
+  width: 100%;
+  background: $cc-bg-panel;
+  border-radius: $cc-radius;
   overflow: hidden;
+
+  th {
+    background: rgba($cc-cyan, 0.04) !important;
+    border: none !important;
+    color: $cc-text-sec !important;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 16px;
+    text-shadow: none;
+
+    a, a:link, a:visited {
+      color: $cc-text-sec !important;
+      text-shadow: none;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+
+      &:hover { color: $cc-cyan !important; }
+    }
+  }
+
+  th.sorted-asc,
+  th.sorted-desc {
+    background-color: rgba($cc-cyan, 0.08) !important;
+    background-image: none;
+
+    a { color: $cc-cyan !important; }
+  }
+
+  // Table rows
+  tr.odd td { background: $cc-bg-panel !important; }
+  tr.even td { background: rgba($cc-bg-surface, 0.5) !important; }
+
+  td {
+    color: $cc-text !important;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.6;
+    padding: 10px 16px;
+    border-top: 1px solid $cc-border;
+    border-bottom: none !important;
+    transition: background 0.15s ease;
+
+    a, a:link, a:visited {
+      color: $cc-cyan !important;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      &:hover { color: lighten($cc-cyan, 15%) !important; }
+    }
+  }
+
+  tr:hover td {
+    background: rgba($cc-cyan, 0.04) !important;
+  }
 }
 
-/* Collapsed sidebar — handled by dashboard.scss for dashboard-specific overrides */
+// Attributes table (show page)
+html .attributes_table table {
+  th, td {
+    text-shadow: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba($cc-text, 0.85) !important;
+    border-bottom: 1px solid $cc-border;
+    padding: 10px 16px;
+  }
 
-/* Sidebar toggle button — applies globally */
+  th {
+    color: $cc-text-sec !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    background: rgba($cc-cyan, 0.03);
+    width: 180px;
+  }
+}
+
+
+// ============================================================
+//  9. PANELS
+// ============================================================
+
+.section,
+.panel,
+.sidebar_section.panel {
+  background: $cc-bg-panel !important;
+  border: 1px solid $cc-border;
+  border-radius: $cc-radius-lg;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.panel h3,
+.sidebar_section.panel h3 {
+  background: rgba($cc-cyan, 0.04) !important;
+  color: $cc-text !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid $cc-border;
+  border-left: 3px solid $cc-cyan;
+  text-shadow: none !important;
+}
+
+.panel_contents {
+  background: $cc-bg-panel !important;
+  padding: 16px;
+  font-size: 13px;
+  color: $cc-text;
+
+  table {
+    tr.even td { background: rgba($cc-bg-surface, 0.5) !important; color: $cc-text !important; }
+    tr.odd td  { background: $cc-bg-panel !important; color: $cc-text !important; }
+
+    th {
+      color: $cc-text-sec !important;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      text-shadow: none;
+    }
+  }
+}
+
+
+// ============================================================
+//  10. FORMS
+// ============================================================
+
+html form fieldset.inputs {
+  background: transparent;
+  border: 1px solid $cc-border;
+  border-radius: $cc-radius-lg;
+  box-shadow: none;
+  padding: 16px;
+  margin-top: 16px;
+
+  legend {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: $cc-text-sec;
+    padding: 0 8px;
+  }
+
+  label {
+    font-family: 'Inter', sans-serif;
+    color: $cc-text-sec !important;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  input {
+    color: $cc-text !important;
+  }
+}
+
+// Text inputs (new & edit pages)
+body.new, body.edit {
+  form {
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="url"],
+    input[type="tel"] {
+      background: $cc-bg-input !important;
+      color: $cc-text !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 14px !important;
+      display: block !important;
+      width: 100% !important;
+      border: 1px solid $cc-border !important;
+      border-radius: 6px !important;
+      height: auto !important;
+      padding: 10px 14px !important;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      outline: none;
+
+      &:focus {
+        border-color: $cc-cyan !important;
+        box-shadow: 0 0 0 3px rgba($cc-cyan, 0.12), 0 0 16px rgba($cc-cyan, 0.08) !important;
+      }
+    }
+
+    textarea {
+      background: $cc-bg-input !important;
+      color: $cc-text !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 14px !important;
+      display: block !important;
+      width: 100% !important;
+      border: 1px solid $cc-border !important;
+      border-radius: 6px !important;
+      height: auto !important;
+      padding: 10px 14px !important;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+      &:focus {
+        border-color: $cc-cyan !important;
+        box-shadow: 0 0 0 3px rgba($cc-cyan, 0.12), 0 0 16px rgba($cc-cyan, 0.08) !important;
+      }
+    }
+  }
+}
+
+// Select dropdowns
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: 0;
+  box-shadow: none;
+  border: 1px solid $cc-border !important;
+  border-radius: 6px;
+  background: $cc-bg-input;
+  background-image: none;
+  padding: 8px 32px 8px 12px;
+  color: $cc-text;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    border-color: $cc-cyan !important;
+    box-shadow: 0 0 0 3px rgba($cc-cyan, 0.12);
+  }
+
+  &::-ms-expand { display: none; }
+}
+
+// Custom select wrapper
+.selectt {
+  position: relative;
+  display: flex;
+  width: 14.4em;
+  height: 3em;
+  line-height: 3;
+  overflow: hidden;
+  border-radius: 6px;
+
+  &::after {
+    content: "\25BC";
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0 1em;
+    background: rgba($cc-cyan, 0.08);
+    color: $cc-text-sec;
+    cursor: pointer;
+    pointer-events: none;
+    transition: color 0.2s ease;
+  }
+
+  &:hover::after { color: $cc-cyan; }
+}
+
+// Login page forms override
+body.active_admin.logged_out.new form {
+  input[type="email"],
+  input[type="password"] {
+    height: auto !important;
+    width: 100% !important;
+  }
+}
+
+
+// ============================================================
+//  11. BUTTONS
+// ============================================================
+
+// Primary gradient buttons
+#display-filter,
+html #active_admin_content a.table_tools_button,
+html #active_admin_content .table_tools .dropdown_menu_button,
+#title_bar .action_items span.action_item > a[href*="new"],
+html form input[type="submit"],
+html a.button,
+html a:link.button,
+html a:visited.button,
+html form fieldset.buttons li.cancel a,
+html form fieldset.actions li.cancel a,
+html form.filter_form a.clear_filters_btn {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  font-style: normal !important;
+  letter-spacing: 0.5px;
+  text-shadow: none !important;
+  text-align: center !important;
+  text-transform: uppercase;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, $cc-cyan, $cc-magenta) !important;
+  background-image: linear-gradient(135deg, $cc-cyan, $cc-magenta) !important;
+  width: auto !important;
+  min-width: 120px;
+  height: 38px !important;
+  line-height: 38px !important;
+  border-radius: $cc-radius !important;
+  box-shadow: 0 2px 12px rgba($cc-cyan, 0.2) !important;
+  padding: 0 20px !important;
+  border: none !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  cursor: pointer;
+  transition: all 0.25s ease !important;
+}
+
+// Button hover
+a.button:not(.disabled):hover,
+a:link.button:not(.disabled):hover,
+a:visited.button:not(.disabled):hover,
+input[type="submit"]:not(.disabled):hover,
+input[type="button"]:not(.disabled):hover,
+button:not(.disabled):hover {
+  background: linear-gradient(135deg, lighten($cc-cyan, 8%), lighten($cc-magenta, 8%)) !important;
+  background-image: linear-gradient(135deg, lighten($cc-cyan, 8%), lighten($cc-magenta, 8%)) !important;
+  box-shadow: 0 4px 20px rgba($cc-cyan, 0.35), 0 0 30px rgba($cc-magenta, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+html form fieldset.buttons li.cancel a:hover,
+html form fieldset.actions li.cancel a:hover,
+html form.filter_form a.clear_filters_btn:hover {
+  background: linear-gradient(135deg, lighten($cc-cyan, 8%), lighten($cc-magenta, 8%)) !important;
+  background-image: linear-gradient(135deg, lighten($cc-cyan, 8%), lighten($cc-magenta, 8%)) !important;
+}
+
+// Action item buttons in title bar
+.title_bar#title_bar .action_items span.action_item > a,
+.title_bar#title_bar .action_items span.action_item > .dropdown_menu > a {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px;
+  text-shadow: none !important;
+  text-align: center !important;
+  text-transform: uppercase;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, $cc-cyan, $cc-magenta) !important;
+  background-image: linear-gradient(135deg, $cc-cyan, $cc-magenta) !important;
+  width: auto !important;
+  min-width: 120px;
+  height: 38px !important;
+  line-height: 38px !important;
+  border-radius: $cc-radius !important;
+  box-shadow: 0 2px 12px rgba($cc-cyan, 0.2) !important;
+  padding: 0 20px !important;
+  border: none !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  cursor: pointer;
+  transition: all 0.25s ease !important;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba($cc-cyan, 0.35), 0 0 30px rgba($cc-magenta, 0.15) !important;
+    transform: translateY(-1px);
+  }
+}
+
+// Button size variants
+.button.mini {
+  padding: 5px 14px !important;
+  font-size: 11px !important;
+  background: linear-gradient(135deg, $cc-cyan, $cc-magenta) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0;
+
+  &:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 16px rgba($cc-cyan, 0.35) !important;
+  }
+}
+
+.button.large {
+  padding: 12px 28px !important;
+  font-size: 14px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 16px rgba($cc-cyan, 0.2) !important;
+  width: auto !important;
+  height: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  &:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba($cc-cyan, 0.4) !important;
+  }
+}
+
+.button.primary {
+  background: linear-gradient(135deg, $cc-cyan, $cc-magenta) !important;
+  color: #ffffff !important;
+  border: none !important;
+
+  &:hover {
+    background: linear-gradient(135deg, lighten($cc-cyan, 8%), lighten($cc-magenta, 8%)) !important;
+  }
+}
+
+// Ghost / secondary buttons
+.btn-secondary {
+  color: $cc-cyan !important;
+  background: transparent !important;
+  border: 1px solid $cc-cyan !important;
+  border-radius: $cc-radius;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba($cc-cyan, 0.1) !important;
+    box-shadow: 0 0 16px rgba($cc-cyan, 0.15);
+  }
+}
+
+// Member links in tables
+a.member_link {
+  color: $cc-cyan !important;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover { color: lighten($cc-cyan, 15%) !important; }
+}
+
+
+// ============================================================
+//  12. PAGINATION
+// ============================================================
+
+.pagination {
+  font-family: 'Inter', sans-serif;
+
+  a, span {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 0 2px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    color: $cc-text-sec;
+    background: rgba($cc-bg-surface, 0.6);
+    border: 1px solid $cc-border;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  a:hover {
+    background: rgba($cc-cyan, 0.1);
+    border-color: rgba($cc-cyan, 0.25);
+    color: $cc-cyan;
+  }
+
+  span.current {
+    background: $cc-cyan !important;
+    color: $cc-bg-deep !important;
+    border-color: $cc-cyan;
+    font-weight: 700;
+  }
+
+  span.gap {
+    background: transparent;
+    border: none;
+    color: $cc-text-muted;
+  }
+
+  .pagination_information {
+    color: $cc-text-sec;
+    font-size: 12px;
+  }
+}
+
+
+// ============================================================
+//  13. STATUS TAGS
+// ============================================================
+
+.status_tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  display: inline-block;
+  line-height: 1.6;
+
+  &.yes, &.active, &.published, &.approved {
+    background: rgba($cc-success, 0.12) !important;
+    color: $cc-success !important;
+    border: 1px solid rgba($cc-success, 0.25);
+  }
+
+  &.no, &.inactive, &.unpublished, &.rejected {
+    background: rgba($cc-danger, 0.12) !important;
+    color: $cc-danger !important;
+    border: 1px solid rgba($cc-danger, 0.25);
+  }
+
+  &.warning, &.pending {
+    background: rgba($cc-warning, 0.12) !important;
+    color: $cc-warning !important;
+    border: 1px solid rgba($cc-warning, 0.25);
+  }
+}
+
+
+// ============================================================
+//  14. FLASH MESSAGES
+// ============================================================
+
+.flashes {
+  margin: 0 24px 16px;
+}
+
+.flash {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 18px;
+  border-radius: $cc-radius;
+  margin-bottom: 12px;
+  border-left: 4px solid;
+
+  &.flash_notice {
+    background: rgba($cc-success, 0.08);
+    border-left-color: $cc-success;
+    color: $cc-success;
+  }
+
+  &.flash_error, &.flash_alert {
+    background: rgba($cc-danger, 0.08);
+    border-left-color: $cc-danger;
+    color: $cc-danger;
+  }
+
+  &.flash_warning {
+    background: rgba($cc-warning, 0.08);
+    border-left-color: $cc-warning;
+    color: $cc-warning;
+  }
+}
+
+
+// ============================================================
+//  15. LOGIN PAGE
+// ============================================================
+
+body.logged_out {
+  background: $cc-bg-deep !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+
+  // Subtle gradient overlay
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 30% 20%, rgba($cc-cyan, 0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 500px 350px at 70% 80%, rgba($cc-magenta, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #wrapper {
+    margin: 0 !important;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  #active_admin_content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #login {
+    width: 400px;
+    max-width: 90vw;
+    background: rgba($cc-bg-panel, 0.9);
+    backdrop-filter: blur(16px);
+    border: 1px solid $cc-border;
+    border-radius: 16px;
+    padding: 40px 36px 32px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 60px rgba($cc-cyan, 0.04);
+
+    &::before {
+      content: 'EAGLESPY V5';
+      display: block;
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, $cc-cyan, $cc-magenta);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    &::after {
+      content: 'Cyber Command Center';
+      display: block;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 400;
+      color: $cc-text-sec;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      display: none; // Hide default "Login" heading — branding replaces it
+    }
+
+    label {
+      color: $cc-text-sec !important;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      background: rgba($cc-bg-surface, 0.6) !important;
+      border: none !important;
+      border-bottom: 2px solid $cc-border !important;
+      border-radius: 0 !important;
+      color: $cc-text !important;
+      font-size: 14px !important;
+      padding: 12px 8px !important;
+      width: 100% !important;
+      height: auto !important;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+
+      &:focus {
+        border-bottom-color: $cc-cyan !important;
+        box-shadow: 0 2px 8px rgba($cc-cyan, 0.1) !important;
+        outline: none;
+      }
+    }
+
+    input[type="submit"] {
+      width: 100% !important;
+      height: 44px !important;
+      line-height: 44px !important;
+      margin-top: 12px;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      letter-spacing: 1px;
+      border-radius: 8px !important;
+    }
+
+    a {
+      color: $cc-cyan;
+      font-size: 12px;
+      &:hover { color: lighten($cc-cyan, 15%); }
+    }
+  }
+
+  // Hide sidebar & title bar on login page
+  #header, #title_bar, #footer {
+    display: none !important;
+  }
+}
+
+
+// ============================================================
+//  16. FOOTER
+// ============================================================
+
+html #footer {
+  background: rgba($cc-bg-deep, 0.6) !important;
+  border-top: 1px solid $cc-border;
+  padding: 12px 24px;
+  z-index: 1000;
+  transition: background 0.2s ease;
+
+  p, a {
+    color: $cc-text-muted !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+  }
+
+  &:hover {
+    background: rgba($cc-bg-panel, 0.4) !important;
+  }
+}
+
+#footer #utility_nav li {
+  padding: 0 !important;
+}
+
+
+// ============================================================
+//  17. DROPDOWN MENUS
+// ============================================================
+
+.dropdown_menu .dropdown_menu_list {
+  background: $cc-bg-panel !important;
+  border: 1px solid $cc-border;
+  border-radius: $cc-radius;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+
+  li {
+    a {
+      color: $cc-text !important;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      padding: 8px 16px;
+      transition: background 0.15s ease;
+      border-bottom: 1px solid $cc-border;
+      display: block;
+
+      &:hover {
+        background: rgba($cc-cyan, 0.08) !important;
+        color: $cc-cyan !important;
+      }
+    }
+
+    &:last-child a { border-bottom: none; }
+  }
+}
+
+.dropdown_menu .dropdown_menu_button {
+  color: $cc-text !important;
+}
+
+
+// ============================================================
+//  18. COMMENTS SECTION
+// ============================================================
+
+.comments {
+  .active_admin_comment {
+    background: $cc-bg-surface;
+    border: 1px solid $cc-border;
+    border-radius: $cc-radius;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+
+    .active_admin_comment_meta {
+      color: $cc-text-sec;
+      font-size: 11px;
+      margin-bottom: 6px;
+
+      a { color: $cc-cyan; }
+    }
+
+    .active_admin_comment_body {
+      color: $cc-text;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  }
+}
+
+
+// ============================================================
+//  19. SIDEBAR TOGGLE BUTTON
+// ============================================================
+
 .sidebar-toggle {
   position: fixed;
   top: 12px;
-  left: 228px;
+  left: $cc-sidebar-w + 8px;
   z-index: 100001;
-  background: rgba(15, 20, 35, 0.85);
+  background: rgba($cc-bg-panel, 0.9);
   backdrop-filter: blur(8px);
-  color: $hacker-text-secondary;
-  border: 1px solid $hacker-border;
-  border-radius: 8px;
+  color: $cc-text-sec;
+  border: 1px solid $cc-border;
+  border-radius: $cc-radius;
   width: 36px;
   height: 36px;
   display: flex;
@@ -145,482 +1158,162 @@ body.sidebar-collapsed #site_title {
   justify-content: center;
   gap: 4px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $cc-transition;
   padding: 0;
   outline: none;
-}
 
-.sidebar-toggle .toggle-bar {
-  display: block;
-  width: 18px;
-  height: 2px;
-  background: $hacker-text-secondary;
-  border-radius: 2px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: center;
-}
+  .toggle-bar {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: $cc-text-sec;
+    border-radius: 2px;
+    transition: all $cc-transition;
+    transform-origin: center;
+  }
 
-.sidebar-toggle:hover {
-  background: rgba(88, 166, 255, 0.15);
-  border-color: $hacker-accent-secondary;
-}
+  &:hover {
+    background: rgba($cc-cyan, 0.12);
+    border-color: rgba($cc-cyan, 0.3);
 
-.sidebar-toggle:hover .toggle-bar {
-  background: $hacker-accent-secondary;
-}
+    .toggle-bar { background: $cc-cyan; }
+  }
 
-.sidebar-toggle.is-active .toggle-bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.sidebar-toggle.is-active .toggle-bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.sidebar-toggle.is-active .toggle-bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  // Hamburger → X animation
+  &.is-active {
+    .toggle-bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .toggle-bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .toggle-bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  }
+}
 
 body.sidebar-collapsed .sidebar-toggle {
-  left: 64px;
+  left: $cc-sidebar-w-col + 8px;
+
+  .toggle-bar {
+    transform: none;
+    opacity: 1;
+  }
 }
 
-body.sidebar-collapsed .sidebar-toggle .toggle-bar {
-  transform: none;
-  opacity: 1;
+
+// ============================================================
+//  20. GLOBAL CUSTOM SCROLLBARS
+// ============================================================
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba($cc-cyan, 0.15) transparent;
 }
 
-/* Tooltip on hover for collapsed sidebar items */
-body.sidebar-collapsed .header#header .header-item.tabs#tabs li {
-  position: relative;
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-body.sidebar-collapsed .header#header .header-item.tabs#tabs li:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  margin-left: 8px;
-  background: rgba(22, 27, 34, 0.95);
-  color: #e6edf3;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  border: 1px solid $hacker-border;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  z-index: 200000;
-  pointer-events: none;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Menu item hover effects */
-.header#header .header-item.tabs#tabs li a {
-  padding: 10px 14px;
-  color: hsla(0, 0%, 100%, 0.8) !important;
-  font-size: 11px;
-  line-height: 28px;
+::-webkit-scrollbar-thumb {
+  background: rgba($cc-cyan, 0.15);
+  border-radius: 4px;
+
+  &:hover { background: rgba($cc-cyan, 0.3); }
+}
+
+
+// ============================================================
+//  21. RESPONSIVE (≤768px)
+// ============================================================
+
+@media (max-width: 768px) {
+  .header#header {
+    transform: translateX(-100%);
+    width: $cc-sidebar-w !important;
+    z-index: 100002;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+
+  body.sidebar-open .header#header {
+    transform: translateX(0);
+  }
+
+  body.sidebar-collapsed .header#header {
+    transform: translateX(-100%);
+  }
+
+  #title_bar,
+  #active_admin_content,
+  #main_content_wrapper {
+    margin-left: 0 !important;
+  }
+
+  body.sidebar-collapsed #title_bar,
+  body.sidebar-collapsed #active_admin_content,
+  body.sidebar-collapsed #main_content_wrapper {
+    margin-left: 0 !important;
+  }
+
+  .sidebar-toggle {
+    left: 12px !important;
+    top: 12px;
+  }
+
+  body.sidebar-collapsed .sidebar-toggle {
+    left: 12px !important;
+  }
+
+  body.sidebar-open .sidebar-toggle {
+    left: $cc-sidebar-w + 8px !important;
+  }
+
+  // Mobile overlay backdrop
+  body.sidebar-open::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100001;
+    pointer-events: auto;
+  }
+
+  // Tables horizontal scroll
+  table.index_table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  #title_bar h2 {
+    font-size: 18px !important;
+  }
+}
+
+
+// ============================================================
+//  22. GLOBAL BODY & TYPOGRAPHY
+// ============================================================
+
+html body.active_admin {
+  background: $cc-bg-deep !important;
+  font-family: 'Inter', sans-serif;
   font-weight: 400;
-  display: flex;
-  align-items: center;
-  transition: background 0.2s ease, border-color 0.2s ease;
-  border-left: 3px solid transparent;
-}
-
-.header#header .header-item.tabs#tabs li a:hover {
-  background: rgba(88, 166, 255, 0.08) !important;
-  border-left-color: rgba(88, 166, 255, 0.5);
-}
-
-.header#header .header-item.tabs#tabs li a:hover .left_menu_icon {
-  fill: rgba(255, 255, 255, 0.9);
-}
-
-.header#header .header-item.tabs#tabs li.current a {
-  background: rgba(88, 166, 255, 0.12) !important;
-  border-left-color: $hacker-accent-secondary !important;
-}
-
-/* Layout helpers */
-
-@import "active_admin/mixins";
-@import "active_admin/base";
-
-@import "active_admin_flat_skin";
-@import "timeline";
-
-// ─── Modern Dashboard System ───
-@import "modern_variables";
-@import "responsive";
-@import "loading_states";
-@import "dark_mode";
-@import "ui_polish";
-@import "dashboard";
-
-/* Legacy sidebar button styles removed — using .sidebar-toggle now */
-
-svg:not(:root) {
-  overflow: hidden;
-}
-
-#footer {
-  z-index: 1000;
-}
-
-html #title_bar {
-  background: $hacker-bg-panel !important;
-  border-bottom: 1px solid $hacker-border !important;
-}
-
-#map {
-  height: 100%;
-}
-
-/* Site title */
-html .sidebar_section.panel>h3 {
-  background: #27293d;
-  border-bottom: 1px solid #2b3553;
-  border-bottom-style: solid;
-}
-
-html #footer {
-  background: rgba(39, 41, 61, 0.1) !important;
-}
-
-.panel_contents {
-  background-color: #27293d !important;
-}
-
-.panel_contents table tr.even td {
-  background: $hacker-bg-panel !important;
-  color: $hacker-text-primary !important;
-}
-
-.panel_contents table tr.odd td {
-  background: $hacker-bg-dark !important;
-  color: $hacker-text-primary !important;
-}
-
-.section,
-.panel,
-.sidebar_section.panel {
-  background: #27293d !important;
-}
-
-.panel h3,
-.sidebar_section.panel h3 {
-  color: white !important;
-}
-
-.title_bar#title_bar h2 {
-  color: white;
-}
-
-.breadcrumb a,
-.breadcrumb a:link,
-.breadcrumb a:visited,
-.breadcrumb a:active {
-  color: white;
+  color: $cc-text !important;
+  padding-bottom: 60px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  color: white !important;
-  font-family: Poppins, sans-serif !important;
-  font-weight: 300;
-}
-
-
-#footer #utility_nav li {
-  padding: 0 !important;
-}
-
-svg:hover {
-  fill: #00b9ce !important;
-}
-
-html #footer:hover {
-  background: rgba(39, 41, 61, 0.2) !important;
-}
-
-html #title_bar:hover {
-  background: rgba(39, 41, 61, 0.2) !important;
-}
-
-html #header ul.tabs>li:hover>a,
-html #header ul.tabs>li.current>a {
-  background: #27293d !important;
-  border-radius: 0 !important;
-  margin: -10px 0;
-  display: block;
-  margin-top: 0 !important;
-}
-
-.breadcrumb {
-  background-color: rgba(39, 41, 61, 0.1) !important;
-  margin-bottom: 12px !important;
-  padding: unset !important;
+  color: $cc-text !important;
+  font-family: 'Inter', sans-serif !important;
   font-weight: 400;
 }
 
-.btn-secondary {
-  color: #fff;
-  background-color: #c62828 !important;
-  border-color: #6b6c75 !important;
-}
-
-
-.tab-content {
-  border: none;
-  padding-top: 0 !important;
-}
-
-#header #tabs {
-  overflow: visible;
-}
-
-.header#header .header-item.tabs#tabs li {
-  margin-bottom: 0 !important;
-  background: transparent;
-}
-
-#utility_nav {
-  height: 100%;
-}
-
-html table.index_table tr.odd td,
-html table.index_table tr.even td,
-html table.index_table th {
-  background: #27293d;
-}
-
-html table.index_table td,
-html table.index_table td a,
-html table.index_table td a:link,
-html table.index_table td a:visited {
-  color: #6b6c75 !important;
-  font-family: Poppins, sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 35px;
-}
-
-.menu_item.current {
-  background: #673ab7 !important;
-}
-
-html body.active_admin {
-  background: linear-gradient(#1e1e2f, #1e1e24) !important;
-  font-family: "Source Sans Pro", sans-serif;
-  padding-bottom: 80px;
-}
-
-body.index.admin_pictures #wrapper #active_admin_content #main_content_wrapper,
-body.index.admin_apk_payloads #wrapper #active_admin_content #main_content_wrapper {
-  background: #27293d;
-  border-radius: 0.2857rem;
-}
-
-body.index.admin_pictures #wrapper #active_admin_content #main_content_wrapper #main_content,
-body.index.admin_apk_payloads #wrapper #active_admin_content #main_content_wrapper #main_content {
-  padding: 2%;
-}
-
-html table.index_table {
-  border: none;
-  font-family: Poppins, sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  color: hsla(0, 0%, 100%, 0.7) !important;
-}
-
-table.index_table th.sorted-asc,
-table.index_table th.sorted-desc {
-  background-color: #27293d;
-  background-image: none;
-}
-
-table.index_table td {
-  border-top: 0.0625rem solid #e3e3e3;
-  border-bottom: none !important;
-  border-color: hsla(0, 0%, 100%, 0.1);
-}
-
-html table.index_table th {
-  border: none !important;
-  color: hsla(0, 0%, 100%, 0.7) !important;
-}
-
-html table.index_table th a,
-html table.index_table th a:link,
-html table.index_table th a:visited,
-table.index_table th {
-  font-size: 15px;
-  line-height: 35px;
-  color: hsla(0, 0%, 100%, 0.7) !important;
-  text-shadow: none;
-}
-
+// Overflow control for specific resource pages
 body.index.admin_pictures,
 body.index.admin_apk_payloads {
   overflow-x: hidden;
-}
-
-div.bloc {
-  margin-bottom: 0.5% !important;
-}
-
-#display-filter,
-html #active_admin_content a.table_tools_button,
-html #active_admin_content .table_tools .dropdown_menu_button,
-#title_bar .action_items span.action_item>a[href*="new"],
-html form input[type="submit"],
-html a.button,
-html a:link.button,
-html a:visited.button,
-html form fieldset.buttons li.cancel a,
-html form fieldset.actions li.cancel a,
-html form.filter_form a.clear_filters_btn {
-  font-size: 0.875rem !important;
-  line-height: 1.35em;
-  font-weight: 600 !important;
-  font-style: normal !important;
-  text-shadow: none !important;
-  text-align: center !important;
-  color: $hacker-bg-dark !important;
-  background-image: linear-gradient(to bottom left,
-      $hacker-accent-secondary,
-      $hacker-accent,
-      $hacker-accent-secondary) !important;
-  width: 135px !important;
-  height: 40px !important;
-  border-radius: 0.4285rem !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  border: none !important;
-  display: table-cell !important;
-  vertical-align: middle !important;
-}
-
-html form fieldset.buttons li.cancel a:hover,
-html form fieldset.actions li.cancel a:hover,
-html form.filter_form a.clear_filters_btn:hover {
-  background-image: linear-gradient(to bottom left,
-      $hacker-accent-secondary,
-      $hacker-accent,
-      $hacker-accent-secondary) !important;
-}
-
-#active_admin_content {
-  width: 100% !important;
-  float: none !important;
-  padding-left: 20px;
-  padding-right: 20px;
-  box-sizing: border-box;
-}
-
-a.button:not(.disabled):hover,
-a:link.button:not(.disabled):hover,
-a:visited.button:not(.disabled):hover,
-input[type="submit"]:not(.disabled):hover,
-input[type="button"]:not(.disabled):hover,
-button:not(.disabled):hover {
-  background-color: "" !important;
-  background-image: linear-gradient(to bottom left,
-      $hacker-accent-secondary,
-      $hacker-accent,
-      $hacker-accent-secondary) !important;
-}
-
-.panel .panel_contents {
-  font-size: 10px;
-}
-
-html form fieldset.inputs {
-  top: 20px;
-  border-radius: 30px;
-  border: 0.0625rem solid #e3e3e3;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: none;
-  background: transparent;
-}
-
-body.new form input[type="text"],
-html body.new form input[type="password"],
-html body.new form input[type="email"],
-html body.new form input[type="number"],
-html body.new form input[type="url"],
-html body.new form input[type="tel"],
-html form textarea {
-  background: #343a43 !important;
-  font-size: 18px !important;
-  display: block !important;
-  width: 100% !important;
-  border: none !important;
-  border-bottom: 1px solid #e14eca !important;
-  box-sizing: initial;
-  height: auto !important;
-  padding: 8px 12px !important;
-}
-
-body.edit form input[type="text"],
-html body.edit form input[type="password"],
-html body.edit form input[type="email"],
-html body.edit form input[type="number"],
-html body.edit form input[type="url"],
-html body.edit form input[type="tel"],
-html body.edit form textarea {
-  background: #343a43 !important;
-  font-size: 18px !important;
-  display: block !important;
-  width: 100% !important;
-  border: none !important;
-  border-bottom: 1px solid #e14eca !important;
-  box-sizing: initial;
-  height: auto !important;
-  padding: 8px 12px !important;
-}
-
-body.active_admin.logged_out.new form input[type="email"],
-html body.active_admin.logged_out.new form input[type="password"] {
-  height: 100% !important;
-  width: 100% !important;
-}
-
-html .panel_contents table th,
-html .attributes_table table th,
-html .attributes_table table td {
-  text-shadow: none;
-  font-weight: 400;
-  font-family: Poppins, sans-serif;
-  line-height: 35px;
-  color: rgba(255, 255, 255, 0.7) !important;
-  font-size: 14px;
-}
-
-.attributes_table table th,
-.attributes_table table td {
-  border-bottom: 0.0625rem solid #e3e3e3;
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.title_bar#title_bar .action_items span.action_item>a,
-.title_bar#title_bar .action_items span.action_item>.dropdown_menu>a {
-  font-size: 0.875rem !important;
-  line-height: 1.35em;
-  font-weight: 600 !important;
-  font-style: normal !important;
-  text-shadow: none !important;
-  text-align: center !important;
-  color: $hacker-bg-dark !important;
-  background-image: linear-gradient(to bottom left,
-      $hacker-accent-secondary,
-      $hacker-accent,
-      $hacker-accent-secondary) !important;
-  width: 135px !important;
-  height: 40px !important;
-  border-radius: 0.4285rem !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  border: none !important;
-  display: table-cell !important;
-  vertical-align: middle !important;
-}
-
-html form fieldset.inputs input {
-  color: white;
 }
 
 body.new.admin_apk_payloads,
@@ -644,116 +1337,104 @@ body.admin_sms_messages {
   overflow-x: hidden;
 }
 
-select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  -ms-appearance: none;
-  appearance: none;
-  outline: 0;
-  box-shadow: none;
-  border: 0 !important;
-  background: #343a43;
-  background-image: none;
-  flex: 1;
-  padding: 0 0.5em;
-  color: #fff;
-  cursor: pointer;
+// Resource-specific content wrappers
+body.index.admin_pictures,
+body.index.admin_apk_payloads {
+  #wrapper #active_admin_content #main_content_wrapper {
+    background: $cc-bg-panel;
+    border-radius: $cc-radius;
+
+    #main_content { padding: 2%; }
+  }
 }
 
-/* Remove IE arrow */
-select::-ms-expand {
-  display: none;
-}
 
-/* Custom Select */
-.selectt {
-  position: relative;
-  display: flex;
-  width: 14.4em;
-  height: 3em;
-  line-height: 3;
+// ============================================================
+//  23. MISC / UTILITY
+// ============================================================
+
+svg:not(:root) {
   overflow: hidden;
-  border-radius: 0.25em;
 }
 
-/* Arrow */
-.selectt::after {
-  content: "\25BC";
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 0 1em;
-  background: #39414d;
-  cursor: pointer;
-  pointer-events: none;
-  -webkit-transition: 0.25s all ease;
-  -o-transition: 0.25s all ease;
-  transition: 0.25s all ease;
+svg:hover {
+  fill: $cc-cyan !important;
 }
 
-/* Transition */
-.selectt:hover::after {
-  color: #f39c12;
+#map {
+  height: 100%;
 }
 
-/* ========================================
-   Button Variants (used by keylogger, etc.)
-   ======================================== */
-
-.button.mini {
-  padding: 6px 14px !important;
-  font-size: 12px !important;
-  background: linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%) !important;
-  color: #ffffff !important;
-  border: none !important;
-  border-radius: 6px !important;
-  font-weight: 600 !important;
-  transition: all 0.2s ease !important;
-  width: auto !important;
-  height: auto !important;
+.tab-content {
+  border: none;
+  padding-top: 0 !important;
 }
 
-.button.mini:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+div.bloc {
+  margin-bottom: 0.5% !important;
 }
 
-.button.large {
-  padding: 14px 28px !important;
-  font-size: 14px !important;
-  border-radius: 10px !important;
-  font-weight: 600 !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  width: auto !important;
-  height: auto !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+// Filter form sidebar (right-side on index pages)
+.sidebar_section.panel {
+  h3 {
+    border-left-color: $cc-magenta;
+  }
 }
 
-.button.large:hover {
-  transform: translateY(-3px) scale(1.05) !important;
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+// Batch actions
+.batch_actions_selector {
+  .dropdown_menu_button {
+    color: $cc-text !important;
+  }
+
+  .dropdown_menu_list {
+    background: $cc-bg-panel !important;
+    border: 1px solid $cc-border;
+    border-radius: $cc-radius;
+
+    a {
+      color: $cc-text !important;
+      &:hover {
+        background: rgba($cc-cyan, 0.08) !important;
+        color: $cc-cyan !important;
+      }
+    }
+  }
 }
 
-.button.primary {
-  background: linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%) !important;
-  color: #ffffff !important;
-  border: none !important;
+// Scopes (tabs above tables)
+.scopes {
+  .scope {
+    a {
+      color: $cc-text-sec !important;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: $cc-text !important;
+        border-bottom-color: rgba($cc-cyan, 0.3);
+      }
+
+      &.selected {
+        color: $cc-cyan !important;
+        border-bottom-color: $cc-cyan;
+        font-weight: 600;
+      }
+
+      .count {
+        font-size: 10px;
+        color: $cc-text-muted;
+        margin-left: 4px;
+      }
+    }
+  }
 }
 
-.button.primary:hover {
-  background: linear-gradient(135deg, #7c8ef5 0%, #8a5bb5 100%) !important;
+// Table tools row
+.table_tools {
+  margin-bottom: 12px;
 }
-
-/* Title Bar Enhancements */
-#title_bar h2 {
-  font-size: 28px !important;
-  font-weight: 600 !important;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
-// Force recompile 02/09/2026 18:17:29
