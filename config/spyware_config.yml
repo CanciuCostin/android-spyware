@@ -1,27 +1,26 @@
 default: &default
-#rails_ip: ip address to run rails server
+#rails_ip: ip address to run rails server      
   rails_ip: 213.91.211.150
 #rails_port: port to run rails server
-  rails_port: 4444
-#malware_ip: ip address for malware connection
+  rails_port: 443
+#malware_ip: ip address for malware connection 
   malware_ip: 0.0.0.0
-#malware_port: port for malware connection
+#malware_port: port for malware connection     
   malware_port: 4444
 #msfrpcd_ip: ip address for metasploit RPC daemon
   msfrpcd_ip: 0.0.0.0
-#msfrpcd_port: port for metasploit RPC daemon
+#msfrpcd_port: port for metasploit RPC daemon  
   msfrpcd_port: 3333
 #target_ip: usb/[IP address]
   target_ip: usb
 #use_ssl: true/false
-  use_ssl: false
+  use_ssl: true
 #cert_path: path to ssl certificate
   cert_path: certificate.cert
 #key_path: path to ssl key
   cert_key: key.key
 #ca_cert_path: path to certificate authority certificate
   ca_cert_path: ca_cert.cert
-  
   
 
 development:

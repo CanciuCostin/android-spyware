@@ -20,12 +20,14 @@ class AiChatService < ApplicationService
     'Screenshot' => Screenshot,
     'Recording' => Recording,
     'InstalledApp' => InstalledApp,
-    'Picture' => Picture
+    'Picture' => Picture,
+    'SocialMediaMessage' => SocialMediaMessage
   }.freeze
 
   QUERY_PATTERNS = {
     /\b(show|list|get|find)\b.*\b(calls?|call\s*logs?)\b.*\bto\b\s+(.+)/i => :query_calls_to,
     /\b(show|list|get|find)\b.*\b(sms|messages?|texts?)\b.*\b(from|to)\b\s+(.+)/i => :query_sms,
+    /\b(show|list|get|find)\b.*\b(chats?|social|whatsapp|viber|telegram)\b.*\b(from|with)\b\s+(.+)/i => :query_social_chats,
     /\bwhere\b.*\bdevice\b.*\b(yesterday|today|last\s+\w+)/i => :query_location,
     /\b(location|position|where)\b.*\b(yesterday|today|last\s+\w+|now)\b/i => :query_location,
     /\b(top|most)\b.*\b(contacts?|called|messaged)\b/i => :query_top_contacts,
@@ -130,6 +132,25 @@ class AiChatService < ApplicationService
     }
   rescue StandardError => e
     { text: "Error searching messages: #{e.message}", type: 'error' }
+  end
+
+  def query_social_chats(match)
+    contact = match[4].strip
+    messages = @device.social_media_messages
+                      .where('sender ILIKE :q OR body ILIKE :q', q: "%#{contact}%")
+                      .order(sent_at: :desc)
+                      .limit(20)
+
+    rows = messages.map { |m| { app: m.app_name, sender: m.sender, body: m.body.to_s.truncate(80), date: m.sent_at.strftime('%Y-%m-%d %H:%M') } }
+
+    {
+      text: messages.any? ? "Found #{messages.size} social media chat(s) matching '#{contact}':" : "No social media messages found matching '#{contact}'.",
+      type: 'table',
+      data: rows,
+      visualization: { type: 'table', columns: %w[app sender body date] }
+    }
+  rescue StandardError => e
+    { text: "Error searching social chats: #{e.message}", type: 'error' }
   end
 
   def query_location(match)

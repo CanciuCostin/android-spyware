@@ -300,6 +300,7 @@ ActiveAdmin.register_page "Dashboard" do
                 [admin_contacts_path(q: { smartphone_id_eq: device.id }), "👥", "Contacts", "c-purple"],
                 [admin_pictures_path(q: { smartphone_id_eq: device.id }), "🖼️", "Gallery", "c-amber"],
                 [admin_recordings_path(q: { smartphone_id_eq: device.id }), "🎵", "Recordings", "c-pink"],
+                [admin_social_media_messages_path(q: { smartphone_id_eq: device.id }), "📱", "Social Chat", "c-cyan"],
                 [admin_file_browser_path(device_id: device.id), "📁", "Files", "c-lime"],
               ].each do |path, icon, label, cls|
                 a href: path, class: "action-btn #{cls}" do

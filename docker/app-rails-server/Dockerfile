@@ -8,7 +8,7 @@ ENV RAILS_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
     BUNDLE_WITHOUT=development:test
 
-# Install build dependencies
+# Install build dependencies + Nginx
 RUN apt-get update -qq \
     && apt-get install -y --no-install-recommends \
         build-essential \
@@ -17,6 +17,7 @@ RUN apt-get update -qq \
         libpq-dev \
         nodejs \
         npm \
+        nginx \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -51,13 +52,14 @@ ENV RAILS_ENV=production \
     RAILS_SERVE_STATIC_FILES=1 \
     MALLOC_ARENA_MAX=2
 
-# Install only runtime dependencies
+# Install only runtime dependencies + Nginx
 RUN apt-get update -qq \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
         libpq5 \
         tzdata \
+        nginx \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && groupadd -r rails --gid=1000 \
@@ -75,15 +77,20 @@ COPY --from=builder --chown=rails:rails /app /app
 RUN mkdir -p tmp/pids tmp/cache tmp/sockets log files/payloads files/dumps storage \
     && chown -R rails:rails /app
 
+# Copy Nginx config
+COPY docker/app-rails-server/nginx.conf /etc/nginx/sites-enabled/default
+COPY docker/app-rails-server/ssl /etc/nginx/ssl
+RUN chmod 644 /etc/nginx/ssl/* # Ensure correct permissions for Nginx
+
 # Switch to non-root user (Security Best Practice)
 USER rails
 
 # Expose Rails Port
-EXPOSE 3000
+EXPOSE 443
 
 # Enhanced health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:3000/health/live || exit 1
+    CMD curl -f https://localhost/health/live || exit 1
 
-# Default Command
-CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
+# Default Command: Start Nginx and then Rails
+CMD ["sh", "-c", "nginx -g 'daemon off;' & bundle exec rails server -b 0.0.0.0 -p 3000 -e production"]

