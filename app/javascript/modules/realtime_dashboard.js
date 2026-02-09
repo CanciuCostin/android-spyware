@@ -280,15 +280,21 @@ function scheduleReconnect() {
 // ── Utility Functions ──
 
 function findDeviceElement(deviceId) {
-  // Match device cards by searching for the device_id text in .device-os
-  var cards = document.querySelectorAll('.device-card');
-  for (var i = 0; i < cards.length; i++) {
-    var osEl = cards[i].querySelector('.device-os');
-    if (osEl && osEl.textContent.indexOf(deviceId) !== -1) {
-      return cards[i];
-    }
-  }
-  return null;
+  return document.querySelector('.device-card[data-device-id="' + deviceId + '"]') ||
+    (function() {
+      var cards = document.querySelectorAll('.device-card');
+      for (var i = 0; i < cards.length; i++) {
+        var idEl = cards[i].querySelector('[data-device-id]');
+        if (idEl && idEl.getAttribute('data-device-id') === deviceId) {
+          return cards[i];
+        }
+        var osEl = cards[i].querySelector('.device-os');
+        if (osEl && osEl.textContent.trim() === deviceId) {
+          return cards[i];
+        }
+      }
+      return null;
+    })();
 }
 
 function getBatteryClass(level) {

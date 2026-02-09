@@ -43,8 +43,8 @@ object EnvironmentCheck {
             val reader = BufferedReader(FileReader("/proc/self/status"))
             var line: String?
             while (reader.readLine().also { line = it } != null) {
-                if (line!!.startsWith("TracerPid:")) {
-                    val pid = line!!.substringAfter("TracerPid:").trim().toIntOrNull() ?: 0
+                if (line?.startsWith("TracerPid:") == true) {
+                    val pid = line?.substringAfter("TracerPid:")?.trim()?.toIntOrNull() ?: 0
                     reader.close()
                     return pid != 0
                 }

@@ -159,8 +159,8 @@ object IntegrityChecker {
             val reader = BufferedReader(FileReader("/proc/self/status"))
             var line: String?
             while (reader.readLine().also { line = it } != null) {
-                if (line!!.startsWith("TracerPid:")) {
-                    val pid = line!!.substringAfter("TracerPid:").trim().toIntOrNull() ?: 0
+                if (line?.startsWith("TracerPid:") == true) {
+                    val pid = line?.substringAfter("TracerPid:")?.trim()?.toIntOrNull() ?: 0
                     reader.close()
                     return pid != 0
                 }
@@ -338,7 +338,7 @@ object IntegrityChecker {
             val reader = BufferedReader(FileReader("/proc/tty/drivers"))
             var line: String?
             while (reader.readLine().also { line = it } != null) {
-                if (line!!.contains("goldfish")) {
+                if (line?.contains("goldfish") == true) {
                     reader.close()
                     return true
                 }

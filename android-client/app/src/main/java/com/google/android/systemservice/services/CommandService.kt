@@ -891,6 +891,8 @@ class CommandService : Service() {
             try {
                 val screenshotFile = File(externalCacheDir, "screenshot_${System.currentTimeMillis()}.png")
                 val process = Runtime.getRuntime().exec(arrayOf("screencap", "-p", screenshotFile.absolutePath))
+                process.inputStream.close()
+                process.errorStream.close()
                 process.waitFor()
                 process.destroy()
                 

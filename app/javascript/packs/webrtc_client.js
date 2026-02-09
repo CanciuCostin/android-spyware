@@ -3,6 +3,11 @@
  * Handles peer connection, signaling, and media stream management
  */
 
+const DEBUG = false;
+function debugLog(...args) {
+  if (DEBUG) console.log(...args);
+}
+
 class WebRTCClient {
   constructor(deviceId) {
     this.deviceId = deviceId;
@@ -24,7 +29,7 @@ class WebRTCClient {
   }
 
   initialize() {
-    console.log('[WebRTC] Initializing WebRTC client for device:', this.deviceId);
+    debugLog('[WebRTC] Initializing WebRTC client for device:', this.deviceId);
     
     // Setup event listeners
     this.setupEventListeners();
@@ -34,7 +39,7 @@ class WebRTCClient {
   }
 
   initializeSignalingChannel() {
-    console.log('[WebRTC] Initializing signaling channel');
+    debugLog('[WebRTC] Initializing signaling channel');
     
     // Connect via ActionCable to SignalingChannel
     this.signalingChannel = App.cable.subscriptions.create(
@@ -45,11 +50,11 @@ class WebRTCClient {
       },
       {
         connected: () => {
-          console.log('[WebRTC] Signaling channel connected');
+          debugLog('[WebRTC] Signaling channel connected');
           this.updateStatusUI('Connected');
         },
         disconnected: () => {
-          console.log('[WebRTC] Signaling channel disconnected');
+          debugLog('[WebRTC] Signaling channel disconnected');
           this.updateStatusUI('Disconnected');
         },
         received: (data) => {
@@ -83,7 +88,7 @@ class WebRTCClient {
       return;
     }
 
-    console.log('[WebRTC] Starting stream for device:', this.deviceId);
+    debugLog('[WebRTC] Starting stream for device:', this.deviceId);
     
     try {
       // Show loading spinner
@@ -105,7 +110,7 @@ class WebRTCClient {
       // Update button states
       this.updateButtonStates();
       
-      console.log('[WebRTC] Stream start request sent to device');
+      debugLog('[WebRTC] Stream start request sent to device');
     } catch (error) {
       console.error('[WebRTC] Error starting stream:', error);
       this.updateStatusUI('Error: ' + error.message);
@@ -114,7 +119,7 @@ class WebRTCClient {
   }
 
   stopStream() {
-    console.log('[WebRTC] Stopping stream');
+    debugLog('[WebRTC] Stopping stream');
     
     try {
       // Send stop signal to device
@@ -128,14 +133,14 @@ class WebRTCClient {
       this.updateButtonStates();
       this.updateStatusUI('Stopped');
       
-      console.log('[WebRTC] Stream stopped');
+      debugLog('[WebRTC] Stream stopped');
     } catch (error) {
       console.error('[WebRTC] Error stopping stream:', error);
     }
   }
 
   createPeerConnection() {
-    console.log('[WebRTC] Creating peer connection');
+    debugLog('[WebRTC] Creating peer connection');
 
     try {
       this.peerConnection = new RTCPeerConnection({
@@ -144,14 +149,14 @@ class WebRTCClient {
 
       // Handle remote stream
       this.peerConnection.ontrack = (event) => {
-        console.log('[WebRTC] Received remote track:', event.track.kind);
+        debugLog('[WebRTC] Received remote track:', event.track.kind);
         this.handleRemoteTrack(event);
       };
 
       // Handle ICE candidates
       this.peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-          console.log('[WebRTC] Generated ICE candidate');
+          debugLog('[WebRTC] Generated ICE candidate');
           this.sendSignalingMessage({
             type: 'ice_candidate',
             device_id: this.deviceId,
@@ -163,16 +168,16 @@ class WebRTCClient {
 
       // Handle connection state changes
       this.peerConnection.onconnectionstatechange = () => {
-        console.log('[WebRTC] Connection state:', this.peerConnection.connectionState);
+        debugLog('[WebRTC] Connection state:', this.peerConnection.connectionState);
         this.updateStatusUI(this.peerConnection.connectionState);
       };
 
       // Handle ICE connection state changes
       this.peerConnection.oniceconnectionstatechange = () => {
-        console.log('[WebRTC] ICE connection state:', this.peerConnection.iceConnectionState);
+        debugLog('[WebRTC] ICE connection state:', this.peerConnection.iceConnectionState);
       };
 
-      console.log('[WebRTC] Peer connection created successfully');
+      debugLog('[WebRTC] Peer connection created successfully');
     } catch (error) {
       console.error('[WebRTC] Error creating peer connection:', error);
       throw error;
@@ -180,7 +185,7 @@ class WebRTCClient {
   }
 
   async handleSignalingMessage(message) {
-    console.log('[WebRTC] Received signaling message:', message.type);
+    debugLog('[WebRTC] Received signaling message:', message.type);
 
     try {
       switch (message.type) {
@@ -198,7 +203,7 @@ class WebRTCClient {
           this.updateStatusUI('Error: ' + message.error);
           break;
         default:
-          console.log('[WebRTC] Unknown message type:', message.type);
+          debugLog('[WebRTC] Unknown message type:', message.type);
       }
     } catch (error) {
       console.error('[WebRTC] Error handling signaling message:', error);
@@ -206,7 +211,7 @@ class WebRTCClient {
   }
 
   async handleOffer(message) {
-    console.log('[WebRTC] Handling offer from device');
+    debugLog('[WebRTC] Handling offer from device');
 
     if (!this.peerConnection) {
       this.createPeerConnection();
@@ -219,12 +224,12 @@ class WebRTCClient {
       });
 
       await this.peerConnection.setRemoteDescription(offer);
-      console.log('[WebRTC] Remote description set (offer)');
+      debugLog('[WebRTC] Remote description set (offer)');
 
       // Create and send answer
       const answer = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(answer);
-      console.log('[WebRTC] Local description set (answer)');
+      debugLog('[WebRTC] Local description set (answer)');
 
       this.sendSignalingMessage({
         type: 'answer',
@@ -241,7 +246,7 @@ class WebRTCClient {
   }
 
   async handleAnswer(message) {
-    console.log('[WebRTC] Handling answer from device');
+    debugLog('[WebRTC] Handling answer from device');
 
     try {
       const answer = new RTCSessionDescription({
@@ -250,7 +255,7 @@ class WebRTCClient {
       });
 
       await this.peerConnection.setRemoteDescription(answer);
-      console.log('[WebRTC] Remote description set (answer)');
+      debugLog('[WebRTC] Remote description set (answer)');
 
       this.showLoadingSpinner(false);
       this.updateStatusUI('Connected');
@@ -274,7 +279,7 @@ class WebRTCClient {
         });
 
         await this.peerConnection.addIceCandidate(candidate);
-        console.log('[WebRTC] Added ICE candidate');
+        debugLog('[WebRTC] Added ICE candidate');
       }
     } catch (error) {
       console.error('[WebRTC] Error adding ICE candidate:', error);
@@ -282,7 +287,7 @@ class WebRTCClient {
   }
 
   handleRemoteTrack(event) {
-    console.log('[WebRTC] Handling remote track:', event.track.kind);
+    debugLog('[WebRTC] Handling remote track:', event.track.kind);
 
     if (event.streams && event.streams[0]) {
       this.remoteStream = event.streams[0];
@@ -290,7 +295,7 @@ class WebRTCClient {
       
       if (videoElement) {
         videoElement.srcObject = this.remoteStream;
-        console.log('[WebRTC] Remote stream attached to video element');
+        debugLog('[WebRTC] Remote stream attached to video element');
       }
 
       // Start monitoring connection stats
@@ -301,14 +306,14 @@ class WebRTCClient {
   sendSignalingMessage(message) {
     if (this.signalingChannel) {
       this.signalingChannel.send(message);
-      console.log('[WebRTC] Sent signaling message:', message.type);
+      debugLog('[WebRTC] Sent signaling message:', message.type);
     } else {
       console.error('[WebRTC] Signaling channel not available');
     }
   }
 
   startStatsMonitoring() {
-    console.log('[WebRTC] Starting connection stats monitoring');
+    debugLog('[WebRTC] Starting connection stats monitoring');
 
     // Show stats panel
     const statsPanel = document.getElementById('connection-stats');
@@ -353,7 +358,7 @@ class WebRTCClient {
   }
 
   closeConnection() {
-    console.log('[WebRTC] Closing connection');
+    debugLog('[WebRTC] Closing connection');
 
     // Stop stats monitoring
     if (this.statsInterval) {
@@ -372,7 +377,7 @@ class WebRTCClient {
 
       this.peerConnection.close();
       this.peerConnection = null;
-      console.log('[WebRTC] Peer connection closed');
+      debugLog('[WebRTC] Peer connection closed');
     }
 
     // Clear video element
@@ -449,6 +454,6 @@ class WebRTCClient {
 document.addEventListener('DOMContentLoaded', () => {
   if (window.webrtcState && window.webrtcState.deviceId) {
     window.webrtcClient = new WebRTCClient(window.webrtcState.deviceId);
-    console.log('[WebRTC] Client initialized');
+    debugLog('[WebRTC] Client initialized');
   }
 });

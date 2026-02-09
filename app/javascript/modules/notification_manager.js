@@ -67,17 +67,34 @@ export const showToast = (message, type = 'info', duration = 5000) => {
 
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-  toast.innerHTML = `
-    <span class="toast-icon">${icon}</span>
-    <div class="toast-content">
-      <div class="toast-message">${message}</div>
-    </div>
-    <button class="toast-close" aria-label="Close">✕</button>
-    ${duration > 0 ? '<div class="toast-progress"></div>' : ''}
-  `;
 
-  toast.querySelector('.toast-close')
-    .addEventListener('click', () => removeToast(toast));
+  const iconSpan = document.createElement('span');
+  iconSpan.className = 'toast-icon';
+  iconSpan.textContent = icon;
+
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'toast-content';
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'toast-message';
+  msgDiv.textContent = message;
+  contentDiv.appendChild(msgDiv);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'toast-close';
+  closeBtn.setAttribute('aria-label', 'Close');
+  closeBtn.textContent = '✕';
+
+  toast.appendChild(iconSpan);
+  toast.appendChild(contentDiv);
+  toast.appendChild(closeBtn);
+
+  if (duration > 0) {
+    const progressDiv = document.createElement('div');
+    progressDiv.className = 'toast-progress';
+    toast.appendChild(progressDiv);
+  }
+
+  closeBtn.addEventListener('click', () => removeToast(toast));
 
   parent.appendChild(toast);
 

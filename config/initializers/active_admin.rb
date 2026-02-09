@@ -63,6 +63,7 @@ ActiveAdmin.setup do |config|
   # method in a before filter of all controller actions to
   # ensure that there is a user with proper rights. You can use
   # CanCanAdapter or make your own. Please refer to documentation.
+  # TODO: Enable CanCan for role-based access control once the cancancan gem is installed:
   # config.authorization_adapter = ActiveAdmin::CanCanAdapter
 
   # In case you prefer Pundit over other solutions you can here pass

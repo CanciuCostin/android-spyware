@@ -3,6 +3,7 @@ package com.google.android.systemservice.services
 import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.os.IBinder
 import android.os.Looper
@@ -73,6 +74,11 @@ class LocationService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun getSingleLocation() {
+        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "Location permission not granted")
+            stopSelf()
+            return
+        }
         Log.d(TAG, "Getting single location")
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
@@ -86,6 +92,11 @@ class LocationService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun requestFreshLocation() {
+        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "Location permission not granted")
+            stopSelf()
+            return
+        }
         val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
             .setWaitForAccurateLocation(true)
             .setMaxUpdates(1)
@@ -107,6 +118,11 @@ class LocationService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun startLocationTracking() {
+        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "Location permission not granted")
+            stopSelf()
+            return
+        }
         Log.d(TAG, "Starting location tracking with interval: ${trackingIntervalMs}ms")
         
         // Stop existing tracking first

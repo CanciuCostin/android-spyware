@@ -33,7 +33,8 @@ ActiveAdmin.register Recording do
     column("Play") { |r|
       if r.filename.present?
         audio_path = "/files/dumps/audio/#{r.filename}"
-        raw("<audio controls preload='none' style='height:30px;width:200px'><source src='#{audio_path}'></audio>")
+        audio_path_escaped = ERB::Util.html_escape(audio_path)
+        text_node "<audio controls preload='none' style='height:30px;width:200px'><source src='#{audio_path_escaped}'></audio>".html_safe
       end
     }
     actions
@@ -59,7 +60,8 @@ ActiveAdmin.register Recording do
       row("Audio Player") { |r|
         if r.filename.present?
           audio_path = "/files/dumps/audio/#{r.filename}"
-          raw("<audio controls><source src='#{audio_path}'></audio>")
+          audio_path_escaped = ERB::Util.html_escape(audio_path)
+          text_node "<audio controls><source src='#{audio_path_escaped}'></audio>".html_safe
         end
       }
       row :created_at

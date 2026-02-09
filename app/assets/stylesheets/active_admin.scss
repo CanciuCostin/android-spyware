@@ -547,11 +547,30 @@ html form textarea {
   background: #343a43 !important;
   font-size: 18px !important;
   display: block !important;
-  width: 10% !important;
+  width: 100% !important;
   border: none !important;
   border-bottom: 1px solid #e14eca !important;
   box-sizing: initial;
-  height: 15px !important;
+  height: auto !important;
+  padding: 8px 12px !important;
+}
+
+body.edit form input[type="text"],
+html body.edit form input[type="password"],
+html body.edit form input[type="email"],
+html body.edit form input[type="number"],
+html body.edit form input[type="url"],
+html body.edit form input[type="tel"],
+html body.edit form textarea {
+  background: #343a43 !important;
+  font-size: 18px !important;
+  display: block !important;
+  width: 100% !important;
+  border: none !important;
+  border-bottom: 1px solid #e14eca !important;
+  box-sizing: initial;
+  height: auto !important;
+  padding: 8px 12px !important;
 }
 
 body.active_admin.logged_out.new form input[type="email"],

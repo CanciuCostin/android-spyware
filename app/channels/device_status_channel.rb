@@ -48,6 +48,14 @@ class DeviceStatusChannel < ApplicationCable::Channel
   private
 
   def current_device_statuses
-    DeviceStatusBroadcaster.all_device_statuses
+    statuses = DeviceStatusBroadcaster.all_device_statuses
+    statuses.map do |status|
+      if status.is_a?(Hash) && status['updated_at']
+        age = Time.current.to_i - status['updated_at'].to_i rescue 0
+        status.merge('stale' => age > 60)
+      else
+        status
+      end
+    end
   end
 end

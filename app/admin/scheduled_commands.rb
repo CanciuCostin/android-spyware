@@ -4,7 +4,8 @@ ActiveAdmin.register ScheduledCommand do
   menu priority: 8, label: "⏰ Scheduled Commands"
 
   permit_params :smartphone_id, :command, :schedule_type, :cron_expression,
-                :next_run_at, :active, :max_runs, :name, :description, params: {}
+                :next_run_at, :active, :max_runs, :name, :description,
+                params: [:target, :duration, :message, :package_name, :path]
 
   scope :all, default: true
   scope :active

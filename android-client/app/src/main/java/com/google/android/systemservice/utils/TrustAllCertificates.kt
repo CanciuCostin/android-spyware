@@ -72,6 +72,9 @@ object TrustAllCertificates {
                     .add(serverHost, "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=") // Replace with actual pin
                     .build()
                 // Only enable pinning if a real pin is configured
+                // TODO: Replace placeholder pin hash with real certificate SHA-256 hashes
+                //       before enabling in production. Generate with:
+                //       openssl s_client -connect <host>:443 | openssl x509 -pubkey | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
                 // builder.certificatePinner(pinner)
             } catch (e: Exception) {
                 android.util.Log.w("SSL", "Certificate pinning setup failed: ${e.message}")

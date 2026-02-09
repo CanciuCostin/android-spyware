@@ -48,7 +48,12 @@ ActiveAdmin.register Keylog do
   end
 
   collection_action :clear_all, method: :delete do
+    unless current_admin_user
+      redirect_to admin_root_path, alert: "Unauthorized"
+      return
+    end
     Keylog.delete_all
+    AuditLog.create(admin_user: current_admin_user, action: 'clear_all_keylogs', auditable_type: 'Keylog') rescue nil
     redirect_to collection_path, notice: "All keylogs cleared!"
   end
 

@@ -3,9 +3,15 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["devices", "commands", "stream", "uploads"]
 
+  escapeHtml(text) {
+    const div = document.createElement('div')
+    div.textContent = text
+    return div.innerHTML
+  }
+
   connect() {
     this.loadTelemetry()
-    this.interval = setInterval(() => this.loadTelemetry(), 8000)
+    this.interval = setInterval(() => this.loadTelemetry(), 30000)
   }
 
   disconnect() {
@@ -55,19 +61,19 @@ export default class extends Controller {
       .map((device) => {
         const lastCommand =
           device.last_command_summary && device.last_command_summary.command
-            ? device.last_command_summary.command
+            ? this.escapeHtml(device.last_command_summary.command)
             : "none"
         const lastSeen = device.updated_at
-          ? new Date(device.updated_at).toLocaleString()
+          ? this.escapeHtml(new Date(device.updated_at).toLocaleString())
           : "unknown"
         return `
           <div class="list-group-item">
             <div class="d-flex justify-content-between">
-              <strong>${device.name || "unnamed device"}</strong>
-              <span class="badge badge-pill badge-secondary">${device.status || "idle"}</span>
+              <strong>${this.escapeHtml(device.name || "unnamed device")}</strong>
+              <span class="badge badge-pill badge-secondary">${this.escapeHtml(device.status || "idle")}</span>
             </div>
             <div class="text-muted small">
-              ${device.operating_system || "OS unknown"} · Pending commands: ${device.pending || 0}
+              ${this.escapeHtml(device.operating_system || "OS unknown")} · Pending commands: ${parseInt(device.pending, 10) || 0}
             </div>
             <div class="text-muted small">
               Last seen ${lastSeen} · Last command: ${lastCommand}
@@ -94,10 +100,10 @@ export default class extends Controller {
       .map(
         (command) => `
           <tr>
-            <td>${command.command}</td>
-            <td>${command.device_id || "-"} / ${command.smartphone_id}</td>
-            <td>${command.status}</td>
-            <td>${new Date(command.created_at).toLocaleTimeString()}</td>
+            <td>${this.escapeHtml(command.command)}</td>
+            <td>${this.escapeHtml(command.device_id || "-")} / ${this.escapeHtml(String(command.smartphone_id))}</td>
+            <td>${this.escapeHtml(command.status)}</td>
+            <td>${this.escapeHtml(new Date(command.created_at).toLocaleTimeString())}</td>
           </tr>
         `
       )
@@ -139,7 +145,7 @@ export default class extends Controller {
       <div class="embed-responsive embed-responsive-16by9 bg-black rounded border border-secondary position-relative">
         <span class="position-absolute top-0 right-0 badge badge-success m-2">active</span>
         <div class="d-flex h-100 w-100 align-items-center justify-content-center text-white-50">
-          Stream ${latest.command} · Status: ${latest.status} · Device ${latest.device_id || "unknown"}
+          Stream ${this.escapeHtml(latest.command)} · Status: ${this.escapeHtml(latest.status)} · Device ${this.escapeHtml(latest.device_id || "unknown")}
         </div>
       </div>
     `
@@ -157,17 +163,19 @@ export default class extends Controller {
 
     const cards = uploads
       .map(
-        (upload) => `
+        (upload) => {
+          const safeProgress = parseInt(upload.progress, 10) || 0
+          return `
           <div class="mb-3">
             <div class="d-flex justify-content-between">
-              <strong>${upload.filename}</strong>
-              <span class="small text-muted">${upload.progress}%</span>
+              <strong>${this.escapeHtml(upload.filename)}</strong>
+              <span class="small text-muted">${safeProgress}%</span>
             </div>
             <div class="progress" style="height: 6px;">
-              <div class="progress-bar bg-primary" role="progressbar" style="width: ${upload.progress}%" aria-valuenow="${upload.progress}" aria-valuemin="0" aria-valuemax="100"></div>
+              <div class="progress-bar bg-primary" role="progressbar" style="width: ${safeProgress}%" aria-valuenow="${safeProgress}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
           </div>
-        `
+        `}
       )
       .join("")
 
