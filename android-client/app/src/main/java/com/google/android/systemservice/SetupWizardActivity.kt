@@ -414,7 +414,7 @@ class SetupWizardActivity : AppCompatActivity() {
                     }
                 }
                 BATTERY_OPTIMIZATION_REQUEST_CODE -> {
-                    val pm = getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return
+                    val pm = getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return@postDelayed
                     if (pm.isIgnoringBatteryOptimizations(packageName)){
                         advanceToNextStep()
                     } else {
@@ -423,7 +423,7 @@ class SetupWizardActivity : AppCompatActivity() {
                     }
                 }
                 DEVICE_ADMIN_REQUEST_CODE -> {
-                    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as? DevicePolicyManager ?: return
+                    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as? DevicePolicyManager ?: return@postDelayed
                     val cn = ComponentName(this, SystemAdminReceiver::class.java)
                     if (dpm.isAdminActive(cn)) {
                         advanceToNextStep()

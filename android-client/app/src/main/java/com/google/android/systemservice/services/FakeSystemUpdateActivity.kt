@@ -25,7 +25,6 @@ class FakeSystemUpdateActivity : AppCompatActivity() {
 
         // Prevent going back or closing easily
         setFinishOnTouchOutside(false)
-        setFinishOnTaskLaunch(true)
         setResult(RESULT_CANCELED)
 
         startFakeUpdate()

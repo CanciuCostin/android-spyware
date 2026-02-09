@@ -14,7 +14,7 @@ default: &default
 #target_ip: usb/[IP address]
   target_ip: usb
 #use_ssl: true/false
-  use_ssl: true
+  use_ssl: false
 #cert_path: path to ssl certificate
   cert_path: certificate.cert
 #key_path: path to ssl key

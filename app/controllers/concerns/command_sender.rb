@@ -29,6 +29,7 @@ module CommandSender
     ambient_record browse_files start_webrtc_stream
     list_files download_file upload_file delete_file preview_file
     rename_file move_file search_files upload_file_chunk
+    ping social_media_chats
   ].freeze
   
   def send_command_async(smartphone, command, params = {})
@@ -54,18 +55,19 @@ module CommandSender
       status: :pending
     )
     
-    # Broadcast command to device via ActionCable
-    # Channel stream name must match CommandChannel#subscribed: "commands_#{device_id}"
-    ActionCable.server.broadcast(
-      "commands_#{device_id}",
-      {
-        request_id: request_id,
-        command: command,
-        params: sanitized_params
-      }
-    )
-    
-    Rails.logger.info("Sent command #{command} to device #{device_id}, request_id: #{request_id}")
+        # Broadcast command to device via ActionCable
+        # Channel stream name must match CommandChannel#subscribed: "commands_#{device_id}"        
+        ActionCable.server.broadcast(
+          "commands_#{device_id}",
+          {
+            message: {
+              request_id: request_id,
+              action: command.to_s,
+              params: sanitized_params
+            }
+          }
+        )
+        Rails.logger.info("Sent command #{command} to device #{device_id}, request_id: #{request_id}")
     
     pending_command
   end

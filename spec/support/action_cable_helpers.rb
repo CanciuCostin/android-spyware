@@ -35,7 +35,7 @@ module ActionCableHelpers
   # Simulate a device connecting via ActionCable and subscribing to CommandChannel
   def simulate_device_subscription(device_id, token: 'test-device-token')
     channel = CommandChannel.new(
-      stub_connection(device_id: device_id, token: token),
+      mock_connection_for_helpers(device_id: device_id, token: token),
       { device_id: device_id }
     )
     allow(channel).to receive(:stream_from)
@@ -46,7 +46,7 @@ module ActionCableHelpers
   # Simulate a signaling channel subscription
   def simulate_signaling_subscription(device_id, is_admin: false)
     channel = SignalingChannel.new(
-      stub_connection(device_id: device_id),
+      mock_connection_for_helpers(device_id: device_id),
       { device_id: device_id, is_admin: is_admin.to_s }
     )
     allow(channel).to receive(:stream_from)
@@ -57,7 +57,7 @@ module ActionCableHelpers
   # Simulate a file browser channel subscription
   def simulate_file_browser_subscription(device_id)
     channel = FileBrowserChannel.new(
-      stub_connection(device_id: device_id),
+      mock_connection_for_helpers(device_id: device_id),
       { device_id: device_id }
     )
     allow(channel).to receive(:stream_from)
@@ -67,7 +67,7 @@ module ActionCableHelpers
 
   private
 
-  def stub_connection(device_id:, token: nil)
+  def mock_connection_for_helpers(device_id: nil, token: nil)
     conn = double('connection')
     allow(conn).to receive(:logger).and_return(Rails.logger)
     allow(conn).to receive(:identifiers).and_return([:current_identifier, :current_user_type])

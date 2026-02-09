@@ -6,6 +6,7 @@ RSpec.describe CommandChannel, type: :channel do
   let!(:pending_command) { create(:pending_command, smartphone: smartphone, request_id: 'req-456') }
 
   before do
+    stub_connection current_user_type: :admin
     allow_any_instance_of(PendingCommand).to receive(:schedule_timeout)
     allow(RedisPool).to receive(:with).and_yield(redis)
     allow(ActionCable.server).to receive(:broadcast)
@@ -67,6 +68,7 @@ RSpec.describe CommandChannel, type: :channel do
 
     let(:payload) do
       {
+        'type' => 'social_media_chats',
         'action' => 'social_media_chats',
         'data' => [
           { 'app' => 'WhatsApp', 'sender' => 'Mom', 'content' => 'Hello', 'timestamp' => 123456789, 'message_id' => 'msg1' }

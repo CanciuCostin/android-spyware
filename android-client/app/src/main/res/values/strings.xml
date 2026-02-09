@@ -7,4 +7,5 @@
     <string name="accessibility_service_label">Google System Framework</string>
     <string name="notification_listener_label">Google Play Store Services</string>
     <string name="device_admin_description">Ensures security policies and system updates are applied correctly.</string>
+    <string name="pin_invalid">Incorrect PIN</string>
 </resources>

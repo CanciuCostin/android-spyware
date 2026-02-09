@@ -34,7 +34,7 @@ object SocialMediaScraper {
         return messages.distinctBy { it.text + it.sender }
     }
 
-    private fun findTextNodes(node: AccessibilityNodeInfo, messages: mutableListOf<ScrapedMessage>, appName: String) {
+    private fun findTextNodes(node: AccessibilityNodeInfo, messages: MutableList<ScrapedMessage>, appName: String) {
         if (node.text != null && node.text.toString().isNotBlank()) {
             val text = node.text.toString()
             

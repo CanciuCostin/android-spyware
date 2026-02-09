@@ -13,6 +13,7 @@ module Androidspyware
     config.autoload_paths << Rails.root.join("app", "graphql")
     config.autoload_paths << Rails.root.join("app", "middleware")
     config.autoload_paths << Rails.root.join("app", "validators")
+    config.autoload_paths << Rails.root.join("app", "services", "response_processors")
     config.middleware.use Rack::Attack
     require_relative '../app/middleware/input_sanitization_middleware'
     require_relative '../app/middleware/audit_middleware'

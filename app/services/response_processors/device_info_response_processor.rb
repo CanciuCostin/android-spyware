@@ -1,4 +1,4 @@
-class DeviceinfoResponseProcessor
+class DeviceInfoResponseProcessor
   def initialize(pending_command, response)
     @pending_command = pending_command
     @response = response

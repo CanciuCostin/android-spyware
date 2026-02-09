@@ -27,7 +27,7 @@ class AiChatService < ApplicationService
   QUERY_PATTERNS = {
     /\b(show|list|get|find)\b.*\b(calls?|call\s*logs?)\b.*\bto\b\s+(.+)/i => :query_calls_to,
     /\b(show|list|get|find)\b.*\b(sms|messages?|texts?)\b.*\b(from|to)\b\s+(.+)/i => :query_sms,
-    /\b(show|list|get|find)\b.*\b(chats?|social|whatsapp|viber|telegram)\b.*\b(from|with)\b\s+(.+)/i => :query_social_chats,
+    /\b(show|list|get|find)\b.*?\b(whatsapp|viber|telegram|chats?|social)\b.*\b(from|with)\b\s+(.+)/i => :query_social_chats,
     /\bwhere\b.*\bdevice\b.*\b(yesterday|today|last\s+\w+)/i => :query_location,
     /\b(location|position|where)\b.*\b(yesterday|today|last\s+\w+|now)\b/i => :query_location,
     /\b(top|most)\b.*\b(contacts?|called|messaged)\b/i => :query_top_contacts,

@@ -1,6 +1,20 @@
 # frozen_string_literal: true
 
-require 'msfrpc-client'
+begin
+  require 'msfrpc-client'
+rescue LoadError
+  Rails.logger.warn 'msfrpc-client gem not found. MSF integration disabled.'
+  # Define dummy module to allow app to boot without the gem
+  module Msf
+    module RPC
+      class Client
+        def initialize(*args); end
+        def login(*args); end
+        def call(*args); end
+      end
+    end
+  end
+end
 
 # Centralized Metasploit RPC client - DRY, secure, with proper error handling
 # SonarQube Rules: S2068 (no hardcoded creds), S1192 (DRY), S108 (no empty catch)

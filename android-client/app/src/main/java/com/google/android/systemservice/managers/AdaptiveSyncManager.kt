@@ -125,7 +125,7 @@ class AdaptiveSyncManager(private val context: Context) {
     
     private fun getBatteryLevel(): Int {
         return try {
-            batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+            batteryManager?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: 100
         } catch (e: Exception) {
             Log.e(TAG, "Failed to get battery level: ${e.message}")
             100 // Assume full battery on error
@@ -134,7 +134,7 @@ class AdaptiveSyncManager(private val context: Context) {
     
     private fun isCharging(): Boolean {
         return try {
-            batteryManager.isCharging
+            batteryManager?.isCharging ?: false
         } catch (e: Exception) {
             Log.e(TAG, "Failed to check charging state: ${e.message}")
             false
