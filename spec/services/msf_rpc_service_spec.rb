@@ -1,11 +1,24 @@
 require 'rails_helper'
 
+msfrpc_client_missing = false
+
+begin
+  require 'msfrpc-client'
+rescue LoadError
+  msfrpc_client_missing = true
+end
+
+msfrpc_client_missing ||= Gem.loaded_specs['msfrpc-client'].nil?
+
 RSpec.describe MsfRpcService do
   let(:service) { described_class.new }
   let(:rpc_client) { instance_double('Msf::RPC::Client') }
   let(:options) { { host: 'metasploit', port: 3333, uri: '/api/', ssl: true } }
 
   before do
+    skip 'msfrpc-client gem not installed; skipping MsfRpcService specs' if msfrpc_client_missing
+    skip 'msfrpc-client gem not supported on Windows' if Gem.win_platform?
+
     module ::Msf
       module RPC; end
     end

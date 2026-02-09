@@ -16,6 +16,9 @@ class LocationResponseProcessor
       return
     end
 
+    latitude = latitude.to_f
+    longitude = longitude.to_f
+
     begin
       # Extract additional location data (provider, accuracy, etc.)
       provider = location_data['provider']
@@ -27,7 +30,7 @@ class LocationResponseProcessor
 
       # Deduplicate by coordinates (numeric comparison with tolerance) within a short time window
       existing = GeoLocation.where(smartphone: @smartphone)
-                            .where('ABS(latitude - ?) < 0.0001 AND ABS(longitude - ?) < 0.0001', latitude, longitude)
+                            .where('ABS(lat - ?) < 0.0001 AND ABS(long - ?) < 0.0001', latitude, longitude)
                             .where('created_at > ?', 1.minute.ago)
                             .exists?
 
@@ -40,7 +43,7 @@ class LocationResponseProcessor
       end
 
       # Optional: Save location data to file for legacy behavior/backup
-      save_location_to_file(location_data, provider, accuracy) if ENV['SAVE_LOCATION_FILES'] == 'true'
+      save_location_to_file(location_data, provider, accuracy) if truthy?(ENV['SAVE_LOCATION_FILES'])
 
       # Mark command as completed with response data
       @pending_command.mark_completed(@response)
@@ -50,6 +53,10 @@ class LocationResponseProcessor
   end
 
   private
+
+  def truthy?(value)
+    ActiveModel::Type::Boolean.new.cast(value)
+  end
 
   # Optional method for legacy file-saving behavior
   def save_location_to_file(location_data, provider, accuracy)

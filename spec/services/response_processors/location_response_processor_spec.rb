@@ -1,5 +1,5 @@
 require 'rails_helper'
-
+require Rails.root.join('app/services/response_processors/location_response_processor')
 RSpec.describe LocationResponseProcessor do
   let(:smartphone) { create(:smartphone, device_id: 'device-123') }
   let(:pending_command) { create(:pending_command, smartphone: smartphone, command: 'get_location') }

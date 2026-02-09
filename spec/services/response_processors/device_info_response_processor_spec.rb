@@ -1,5 +1,5 @@
 require 'rails_helper'
-
+require Rails.root.join('app/services/response_processors/device_info_response_processor')
 RSpec.describe DeviceInfoResponseProcessor do
   let(:smartphone) { create(:smartphone, device_id: 'device-123', name: 'Old Phone', operating_system: 'Android 9') }
   let(:pending_command) { create(:pending_command, smartphone: smartphone, command: 'get_device_info') }

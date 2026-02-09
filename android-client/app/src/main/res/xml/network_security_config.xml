@@ -39,6 +39,7 @@
         <domain includeSubdomains="true">192.168.1.5</domain>
         <domain includeSubdomains="true">192.168.1.13</domain>
         <domain includeSubdomains="true">213.91.211.150</domain>
+        <domain includeSubdomains="true">100.102.229.216</domain>
         
         <!-- Add your LAN IPs here for testing -->
         <!-- <domain includeSubdomains="true">192.168.x.x</domain> -->

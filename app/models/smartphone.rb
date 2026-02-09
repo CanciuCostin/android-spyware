@@ -3,6 +3,8 @@ class Smartphone < ApplicationRecord
   include Cacheable
   include Paginatable
 
+  attribute :is_rooted, :boolean
+
   belongs_to :apk_installation
   has_many :pending_commands, dependent: :destroy
   has_many :call_logs, dependent: :destroy

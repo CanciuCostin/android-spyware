@@ -1,5 +1,5 @@
 require 'rails_helper'
-
+require Rails.root.join('app/services/response_processors/contacts_response_processor')
 RSpec.describe ContactsResponseProcessor do
   let(:smartphone) { create(:smartphone, device_id: 'device-123') }
   let(:pending_command) { create(:pending_command, smartphone: smartphone, command: 'get_contacts') }
@@ -159,10 +159,12 @@ RSpec.describe ContactsResponseProcessor do
       end
     end
     
-    context 'when file directory cannot be created' do
-      before do
-        allow(FileUtils).to receive(:mkdir_p).and_raise(Errno::EACCES, 'Permission denied')
-      end
+  context 'when file directory cannot be created' do
+    let(:response) { { 'contacts' => [] } }
+
+    before do
+      allow(FileUtils).to receive(:mkdir_p).and_raise(Errno::EACCES, 'Permission denied')
+    end
       
       it 'raises an error' do
         expect {

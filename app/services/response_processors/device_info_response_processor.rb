@@ -6,12 +6,20 @@ class DeviceInfoResponseProcessor
   end
   
   def process
-    device_info = @response
-    @smartphone.update(
-      operating_system: "Android #{device_info['android_version']}",
-      name: device_info['device_model'] || @smartphone.name,
-      is_rooted: device_info['is_rooted'] || false
-    )
+    device_info = @response || {}
+    updates = {}
+
+    version = device_info['android_version']
+    updates[:operating_system] = "Android #{version}" if version.present?
+
+    model = device_info['device_model'].presence || device_info['model'].presence
+    updates[:name] = model if model.present?
+
+    unless device_info['is_rooted'].nil?
+      updates[:is_rooted] = ActiveModel::Type::Boolean.new.cast(device_info['is_rooted'])
+    end
+
+    @smartphone.update(updates) if updates.any?
     @pending_command.mark_completed(@response)
   end
 end
