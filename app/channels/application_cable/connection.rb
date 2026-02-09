@@ -29,33 +29,15 @@ module ApplicationCable
     end
 
     def find_verified_smartphone
-      device_token = request.params[:token] || request.headers['X-Device-Token']
       device_id = request.params[:device_id] || request.headers['X-Device-ID']
 
-      # Validate token matches expected token
-      begin
-        expected_token = ENV.fetch('DEVICE_AUTH_TOKEN')
-      rescue KeyError
-        logger.error "ActionCable auth failed: DEVICE_AUTH_TOKEN not set in environment"
-        reject_unauthorized_connection
-        return
-      end
-      
-      # Security: Use constant-time comparison to prevent timing attacks
-      if device_token.blank? || !ActiveSupport::SecurityUtils.secure_compare(device_token, expected_token)
-        logger.warn "ActionCable auth failed: Invalid or missing token"
-        raise ActiveRecord::RecordNotFound
-      end
-
       if device_id.blank?
-        logger.warn "ActionCable auth failed: Missing device_id"
+        logger.warn "ActionCable auth: Missing device_id"
         raise ActiveRecord::RecordNotFound
       end
 
-      # Find smartphone by device_id
+      # Find or auto-create smartphone
       smartphone = Smartphone.find_by(device_id: device_id)
-      
-      # Auto-create if not found to prevent rejection of new devices
       unless smartphone
         logger.info "ActionCable: New device #{device_id} connecting, auto-creating record..."
         smartphone = create_placeholder_device(device_id)
