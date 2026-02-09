@@ -1,5 +1,6 @@
 class SmartphonesController < InheritedResources::Base
   skip_before_action :authenticate_admin_user!, raise: false
+  skip_before_action :verify_authenticity_token
   # Thread-safe recording state managed via Smartphone.is_recording column
 
   def dump_sysinfo
@@ -634,6 +635,8 @@ class SmartphonesController < InheritedResources::Base
       format.js {
         render "dump_device_info", locals: { commandOutput: commandOutput }
       }
+      format.json { render json: { output: commandOutput } }
+      format.any { render json: { output: commandOutput } }
     end
   end
 

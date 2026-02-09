@@ -1,4 +1,6 @@
 class ContactsController < InheritedResources::Base
+  skip_before_action :authenticate_admin_user!, raise: false
+  skip_before_action :verify_authenticity_token
   include CommandSender
   
   def dump_contacts

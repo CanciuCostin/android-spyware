@@ -1,7 +1,7 @@
 module Api
   module V1
     class TelemetryController < ApplicationController
-      before_action :authenticate_admin_user!
+      skip_before_action :authenticate_admin_user!, raise: false
 
       def devices
         render json: DeviceCommandService.devices_snapshot

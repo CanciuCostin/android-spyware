@@ -111,6 +111,7 @@ Rails.application.routes.draw do
     resources :commands, only: [:show] do
       member do
         post :ack
+        post :respond
         post :send_command
       end
     end

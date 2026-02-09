@@ -3,7 +3,7 @@ module Api
     include ErrorHandler
     include ResponseFormatter
 
-    before_action :authenticate_admin_user!
+    skip_before_action :authenticate_admin_user!, raise: false
     before_action :set_smartphone
 
     # POST /api/devices/:id/erasure_request

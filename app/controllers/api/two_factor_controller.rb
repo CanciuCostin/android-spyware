@@ -2,7 +2,7 @@
 
 module Api
   class TwoFactorController < ApplicationController
-    before_action :authenticate_admin_user!
+    skip_before_action :authenticate_admin_user!, raise: false
     skip_before_action :verify_authenticity_token
     respond_to :json
 

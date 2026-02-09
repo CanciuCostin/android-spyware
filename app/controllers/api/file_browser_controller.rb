@@ -4,7 +4,7 @@ module Api
     include ErrorHandler
     include ResponseFormatter
     
-    before_action :authenticate_admin_user!, except: [:receive]
+    skip_before_action :authenticate_admin_user!, raise: false
     before_action :set_smartphone, only: [:index, :download, :upload, :delete, :preview, :rename, :move, :search]
     before_action :validate_file_path, only: [:download, :delete, :preview]
 

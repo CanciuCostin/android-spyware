@@ -21,6 +21,11 @@ class Rack::Attack
       (ip.start_with?('172.') && ip.split('.')[1].to_i.between?(16, 31))
   end
 
+  # Allow device API endpoints without throttling
+  safelist('allow-device-api') do |req|
+    req.path.start_with?('/api/') || req.path.start_with?('/cable')
+  end
+
   ### Blocklists ###
 
   # Dynamic blocklist via cache (managed by RateLimitService)

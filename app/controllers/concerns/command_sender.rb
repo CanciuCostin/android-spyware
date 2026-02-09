@@ -60,11 +60,9 @@ module CommandSender
         ActionCable.server.broadcast(
           "commands_#{device_id}",
           {
-            message: {
-              request_id: request_id,
-              action: command.to_s,
-              params: sanitized_params
-            }
+            request_id: request_id,
+            action: command.to_s,
+            params: sanitized_params
           }
         )
         Rails.logger.info("Sent command #{command} to device #{device_id}, request_id: #{request_id}")

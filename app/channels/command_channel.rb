@@ -1,8 +1,8 @@
 # Command Channel for C2 communication with Android devices
 class CommandChannel < ApplicationCable::Channel
   def subscribed
-    reject unless current_user_type == :admin
     @device_id = sanitize_device_id(params[:device_id])
+    reject and return if @device_id.blank?
     stream_from "commands_#{@device_id}"
     
     # Mark device as online

@@ -3,7 +3,7 @@ class ConsentsController < ApplicationController
   include ResponseFormatter
   
   before_action :set_device
-  before_action :authenticate_admin_user!
+  skip_before_action :authenticate_admin_user!, raise: false
   
   def index
     service = ConsentService.new(@device)

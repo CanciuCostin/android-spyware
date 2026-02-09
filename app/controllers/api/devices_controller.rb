@@ -15,10 +15,23 @@ module Api
         return
       end
 
-      smartphone = Smartphone.find_by(device_id: sanitize_device_id(device_id))
-      smartphone&.touch(:updated_at)
+      clean_id = sanitize_device_id(device_id)
+      smartphone = Smartphone.find_by(device_id: clean_id)
+      if smartphone
+        smartphone.touch(:updated_at)
+      else
+        # Auto-register new device on first heartbeat
+        apk_payload = ApkPayload.first || ApkPayload.create!(name: 'default')
+        apk = ApkInstallation.create!(status: 'installed', apk_payload: apk_payload)
+        smartphone = Smartphone.create!(
+          device_id: clean_id,
+          name: params[:model] || "Device #{clean_id[0..7]}",
+          apk_installation: apk
+        )
+        Rails.logger.info "[Heartbeat] Auto-registered device #{clean_id} as Smartphone##{smartphone.id}"
+      end
 
-      render json: { status: 'ok', device_id: device_id }
+      render json: { status: 'ok', device_id: device_id, smartphone_id: smartphone.id }
     end
 
     # GET /device/info

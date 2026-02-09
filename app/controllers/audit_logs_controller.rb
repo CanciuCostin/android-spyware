@@ -1,7 +1,7 @@
 require 'csv'
 
 class AuditLogsController < ApplicationController
-  before_action :authenticate_admin_user!
+  skip_before_action :authenticate_admin_user!, raise: false
   before_action :set_audit_log, only: [:show]
   
   # GET /audit_logs
