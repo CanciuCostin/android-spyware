@@ -2,7 +2,7 @@
 
 ## Overview
 
-The AI Image Recognition service provides OCR (text extraction), face detection, object detection, and EXIF metadata extraction for images. Supports Google Vision API and OpenAI Vision, with EXIF extraction working offline.
+The AI Image Recognition service provides OCR (text extraction), face detection, object detection, and EXIF metadata extraction for images. Supports Google Vision API and Google Gemini Vision, with EXIF extraction working offline.
 
 ## API Endpoints
 
@@ -54,8 +54,8 @@ GET /api/ai/image/device_images/:device_id?limit=20
 - Confidence scores
 - Block-level text segmentation
 
-**OpenAI Vision:**
-- Text extraction using GPT-4 Vision
+**Google Gemini Vision:**
+- Text extraction using Gemini 2.0 Flash Vision
 - Natural language text description
 
 **Stub mode (no API):**
@@ -76,7 +76,7 @@ GET /api/ai/image/device_images/:device_id?limit=20
 - Object labels with confidence scores
 - Bounding box coordinates
 
-**OpenAI Vision:**
+**Google Gemini Vision:**
 - Object descriptions in natural language
 - Structured JSON output
 
@@ -104,12 +104,12 @@ Analyzes recent pictures from a device with configurable limit.
 | Environment Variable | Service | Description |
 |---------------------|---------|-------------|
 | `GOOGLE_VISION_API_KEY` | Google Cloud Vision | Enables OCR, face detection, object detection |
-| `OPENAI_API_KEY` | OpenAI | Enables Vision-based OCR and object detection |
-| `OPENAI_VISION_MODEL` | OpenAI | Vision model (default: `gpt-4o-mini`) |
+| `GEMINI_API_KEY` | Google Gemini | Enables Vision-based OCR and object detection |
+| `GEMINI_VISION_MODEL` | Google Gemini | Vision model (default: `gemini-2.0-flash`) |
 
 ### Feature Availability Matrix
 
-| Feature | No API | Google Vision | OpenAI |
+| Feature | No API | Google Vision | Google Gemini |
 |---------|--------|--------------|--------|
 | OCR | ❌ Stub | ✅ Full | ✅ Basic |
 | Face Detection | ❌ Stub | ✅ Full | ❌ |
@@ -129,7 +129,7 @@ Supported MIME types:
 ## Admin UI
 
 Access via **Admin → 🧠 AI → 🖼️ Image Recognition**. Features:
-- API status indicators (Google Vision / OpenAI / EXIF)
+- API status indicators (Google Vision / Google Gemini / EXIF)
 - File upload for manual image analysis
 - Individual analysis buttons (Full, OCR, Faces, Objects, Metadata)
 - Device image batch analysis

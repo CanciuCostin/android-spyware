@@ -23,7 +23,7 @@ module Androidspyware
     config.middleware.use SecurityHeaders
     config.middleware.use ConsentEnforcement
     config.spyware_config = config_for(:spyware_config)
-    config.web_console.whiny_requests = false
+    # config.web_console.whiny_requests = false if config.respond_to?(:web_console)
     config.serve_static_files = true
     config.middleware.use ::ActionDispatch::Static, Rails.root.join("files").join("dumps").join("sms_messages_dumps").to_s,
                           index: config.public_file_server.index_name, headers: config.public_file_server.headers || {}

@@ -34,7 +34,7 @@ class JsonLogFormatter < Logger::Formatter
 end
 
 # Apply JSON formatter in non-development environments
-unless Rails.env.development?
+unless Rails.env.development? || Rails.env.test?
   Rails.logger.formatter = JsonLogFormatter.new
 end
 

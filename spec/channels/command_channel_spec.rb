@@ -6,6 +6,7 @@ RSpec.describe CommandChannel, type: :channel do
   let!(:pending_command) { create(:pending_command, smartphone: smartphone, request_id: 'req-456') }
 
   before do
+    allow_any_instance_of(PendingCommand).to receive(:schedule_timeout)
     allow(RedisPool).to receive(:with).and_yield(redis)
     allow(ActionCable.server).to receive(:broadcast)
   end
@@ -56,6 +57,38 @@ RSpec.describe CommandChannel, type: :channel do
       expect(ActionCable.server).to receive(:broadcast).with("commands_#{smartphone.device_id}", hash_including('action' => 'reboot'))
 
       perform(:send_command, 'command' => 'reboot')
+    end
+  end
+
+  describe '#process_social_media_chats' do
+    before do
+      subscribe(device_id: smartphone.device_id)
+    end
+
+    let(:payload) do
+      {
+        'action' => 'social_media_chats',
+        'data' => [
+          { 'app' => 'WhatsApp', 'sender' => 'Mom', 'content' => 'Hello', 'timestamp' => 123456789, 'message_id' => 'msg1' }
+        ]
+      }
+    end
+
+    it 'creates SocialMediaMessage records and handles deduplication' do
+      # First run - should create
+      perform(:receive, payload)
+      expect(SocialMediaMessage.count).to eq(1)
+      
+      message = SocialMediaMessage.last
+      expect(message.smartphone).to eq(smartphone)
+      expect(message.app_name).to eq('WhatsApp')
+      expect(message.sender).to eq('Mom')
+      expect(message.body).to eq('Hello')
+      expect(message.sent_at).to eq(Time.at(123456789 / 1000))
+
+      # Second run with same data - should not create duplicate
+      perform(:receive, payload)
+      expect(SocialMediaMessage.count).to eq(1)
     end
   end
 end

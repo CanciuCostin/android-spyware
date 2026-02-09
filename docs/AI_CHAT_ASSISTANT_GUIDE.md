@@ -65,12 +65,12 @@ Returns available commands and whether AI mode is enabled.
 ### 1. Pattern Matching (Default)
 Works without any external API. Uses regex patterns to parse natural language queries and translates them directly to database queries.
 
-### 2. AI-Powered (with OpenAI)
-When `OPENAI_API_KEY` is configured, queries are sent to OpenAI for more sophisticated natural language understanding. The AI model generates structured database queries from arbitrary natural language input.
+### 2. AI-Powered (with Google Gemini)
+When `GEMINI_API_KEY` is configured, queries are sent to Google Gemini for more sophisticated natural language understanding. The AI model generates structured database queries from arbitrary natural language input.
 
 **Environment Variables:**
-- `OPENAI_API_KEY` — OpenAI API key (enables AI mode)
-- `OPENAI_MODEL` — Model to use (default: `gpt-4o-mini`)
+- `GEMINI_API_KEY` — Google Gemini API key (enables AI mode)
+- `GEMINI_MODEL` — Model to use (default: `gemini-2.0-flash`)
 
 ## Multi-Turn Conversations
 

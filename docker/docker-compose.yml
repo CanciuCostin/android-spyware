@@ -90,7 +90,7 @@ services:
              rails db:migrate 2>/dev/null || rails db:setup &&
              WEBPACKER_PRECOMPILE=false rails assets:precompile &&
              nginx -g 'daemon off;' &
-             bundle exec rails s -b 0.0.0.0 -p 443 -e production"
+             bundle exec rails s -b 0.0.0.0 -p 3000 -e production"
     tty: true
     environment:
       ADB_HOST: host.docker.internal

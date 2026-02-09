@@ -51,7 +51,7 @@ Batch-analyzes SMS messages for a device with aggregate statistics.
 - IP addresses
 - Proper nouns (capitalized words, filtered for sentence starters)
 
-**With OpenAI API:**
+**With Google Gemini API:**
 - People names
 - Places/locations
 - Organizations
@@ -68,7 +68,7 @@ Uses built-in positive/negative word lists to calculate a sentiment score from -
 | -0.2 to 0.2 | Neutral |
 | < -0.2 | Negative |
 
-**AI-powered (with OpenAI):**
+**AI-powered (with Google Gemini):**
 More nuanced sentiment analysis with explanation text.
 
 ### 3. Language Detection
@@ -102,8 +102,8 @@ Batch analysis of SMS messages with aggregate statistics:
 
 | Variable | Description |
 |----------|-------------|
-| `OPENAI_API_KEY` | Enables AI-powered entity extraction and sentiment analysis |
-| `OPENAI_MODEL` | Model to use (default: `gpt-4o-mini`) |
+| `GEMINI_API_KEY` | Enables AI-powered entity extraction and sentiment analysis |
+| `GEMINI_MODEL` | Model to use (default: `gemini-2.0-flash`) |
 
 ## Admin UI
 

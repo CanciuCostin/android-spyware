@@ -135,9 +135,17 @@ class AiChatService < ApplicationService
   end
 
   def query_social_chats(match)
+    app_type = match[2]
     contact = match[4].strip
-    messages = @device.social_media_messages
-                      .where('sender ILIKE :q OR body ILIKE :q', q: "%#{contact}%")
+    
+    t = SocialMediaMessage.arel_table
+    scope = @device.social_media_messages
+
+    unless %w[chat chats social].include?(app_type.downcase)
+      scope = scope.where(t[:app_name].matches(app_type))
+    end
+    
+    messages = scope.where(t[:sender].matches("%#{contact}%").or(t[:body].matches("%#{contact}%")))
                       .order(sent_at: :desc)
                       .limit(20)
 
