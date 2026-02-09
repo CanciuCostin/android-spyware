@@ -121,12 +121,19 @@ class CommandChannel < ApplicationCable::Channel
       Time.current.strftime('%Y-%m-%d %H:%M:%S')
     end
 
-    GeoLocation.create!(
-      smartphone: smartphone,
-      lat: latitude,
-      long: longitude,
-      date: formatted_time
-    )
+    # Deduplicate by coordinates + timestamp (within 1 second window)
+    existing = GeoLocation.where(smartphone: smartphone, lat: latitude.to_s, long: longitude.to_s)
+                          .where('created_at > ?', 1.second.ago)
+                          .exists?
+
+    unless existing
+      GeoLocation.create!(
+        smartphone: smartphone,
+        lat: latitude,
+        long: longitude,
+        date: formatted_time
+      )
+    end
     
     # Broadcast to admin for live map
     ActionCable.server.broadcast(

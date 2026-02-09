@@ -68,6 +68,12 @@ class ResponseProcessor
     pending_command = PendingCommand.find_by(request_id: request_id)
     return Rails.logger.warn("[ResponseProcessor] PendingCommand not found for request_id: #{request_id}") unless pending_command
     
+    # Idempotency guard: skip if already completed/failed/timed-out (race between ActionCable and HTTP paths)
+    unless pending_command.pending? || pending_command.processing?
+      Rails.logger.info "[ResponseProcessor] Skipping already-#{pending_command.status} command for request_id: #{request_id}"
+      return
+    end
+
     Rails.logger.info "[ResponseProcessor] Processing command '#{pending_command.command}' for request_id: #{request_id}"
     
     # Get the appropriate processor class based on command type

@@ -98,3 +98,9 @@ static-analysis.datadog.yml
 
 # Data dumps (user data)
 files/dumps/
+
+# Docker environment secrets
+docker/.env
+
+# Device secret token
+config/device_secret.token

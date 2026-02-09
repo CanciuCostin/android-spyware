@@ -25,6 +25,15 @@ docker pull eaglespy:$VERSION
 echo "🚀 Starting $NEW_ENV environment..."
 docker-compose -f docker-compose.${NEW_ENV}.yml up -d
 
+# Run database migrations before health check
+echo "🗄️ Running database migrations..."
+docker-compose -f docker-compose.${NEW_ENV}.yml run --rm web bundle exec rails db:migrate
+if [ $? -ne 0 ]; then
+  echo "❌ Migration failed! Stopping $NEW_ENV..."
+  docker-compose -f docker-compose.${NEW_ENV}.yml down
+  exit 1
+fi
+
 # Wait for health check
 echo "🏥 Waiting for health check..."
 for i in {1..30}; do

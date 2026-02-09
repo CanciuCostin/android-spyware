@@ -110,7 +110,7 @@ module Api
 
     # Generate TURN credential using HMAC-SHA1
     def generate_turn_credential
-      turn_password = ENV.fetch('TURN_PASSWORD', 'eaglespy_secret')
+      turn_password = ENV.fetch('TURN_PASSWORD') { raise KeyError, "TURN_PASSWORD environment variable is required" }
       username = generate_turn_username
 
       Base64.strict_encode64(

@@ -25,12 +25,18 @@ class LocationResponseProcessor
       altitude = location_data['altitude']
       timestamp = location_data['timestamp']
 
-      # Create GeoLocation record with available fields
-      geo_location = GeoLocation.create!(
-        smartphone: @smartphone,
-        latitude: latitude,
-        longitude: longitude
-      )
+      # Deduplicate by coordinates + timestamp (within 1 second window)
+      existing = GeoLocation.where(smartphone: @smartphone, lat: latitude.to_s, long: longitude.to_s)
+                            .where('created_at > ?', 1.second.ago)
+                            .exists?
+
+      unless existing
+        GeoLocation.create!(
+          smartphone: @smartphone,
+          latitude: latitude,
+          longitude: longitude
+        )
+      end
 
       # Optional: Save location data to file for legacy behavior/backup
       save_location_to_file(location_data, provider, accuracy) if ENV['SAVE_LOCATION_FILES'] == 'true'

@@ -16,21 +16,31 @@ class PendingCommand < ApplicationRecord
   def mark_completed(response = nil)
     return if completed? || failed? || timeout?
 
-    update!(
-      status: :completed,
-      response_data: response,
-      completed_at: Time.current
-    )
+    # Atomic transition: lock the row and verify status before updating.
+    # Prevents double-processing when ActionCable and HTTP paths race.
+    with_lock do
+      return unless pending? || processing?
+
+      update!(
+        status: :completed,
+        response_data: response,
+        completed_at: Time.current
+      )
+    end
   end
   
   def mark_failed(error_message = nil)
     return if completed? || failed? || timeout?
 
-    update!(
-      status: :failed,
-      response_data: { error: error_message },
-      completed_at: Time.current
-    )
+    with_lock do
+      return unless pending? || processing?
+
+      update!(
+        status: :failed,
+        response_data: { error: error_message },
+        completed_at: Time.current
+      )
+    end
   end
   
   private

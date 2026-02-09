@@ -1,12 +1,16 @@
 Rails.application.routes.draw do
-  # Health Check Endpoints (for Docker/K8s)
-  get '/health', to: 'health#index'
-  get '/health/ready', to: 'health#ready'
-  get '/health/live', to: 'health#live'
-  get '/health/startup', to: 'health#startup'
+  # Health Check Endpoints (for Docker/K8s) — local or authenticated only
+  health_constraint = ->(req) { req.local? || req.env['HTTP_AUTHORIZATION'].present? }
 
-  # Prometheus Metrics Endpoint
-  get '/metrics', to: 'metrics#index'
+  constraints(health_constraint) do
+    get '/health', to: 'health#index'
+    get '/health/ready', to: 'health#ready'
+    get '/health/live', to: 'health#live'
+    get '/health/startup', to: 'health#startup'
+
+    # Prometheus Metrics Endpoint
+    get '/metrics', to: 'metrics#index'
+  end
 
   # Audit Trail System
   resources :audit_logs, only: [:index, :show] do

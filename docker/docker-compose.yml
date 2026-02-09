@@ -41,11 +41,11 @@ services:
       - redis_data:/data
     networks:
       - eaglespy-network
-    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}" --maxmemory 512mb --maxmemory-policy allkeys-lru
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:-changeme}" --maxmemory 512mb --maxmemory-policy allkeys-lru
     environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-changeme}
     healthcheck:
-      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -97,10 +97,10 @@ services:
       OTEL_TRACES_EXPORTER: jaeger
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      ANDROIDSPYWARE_DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      ANDROIDSPYWARE_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       ANDROIDSPYWARE_DATABASE_HOST: db
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
+      REDIS_URL: ${REDIS_URL:-redis://:${REDIS_PASSWORD:-changeme}@redis:6379/1}
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?RAILS_MASTER_KEY must be set in .env}
       RAILS_ENV: production
       RAILS_HOST: ${RAILS_HOST:-localhost}
       PRODUCTION_HOST: ${PRODUCTION_HOST:-localhost}

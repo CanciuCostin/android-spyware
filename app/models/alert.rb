@@ -16,7 +16,10 @@ class Alert < ApplicationRecord
   after_create :send_notifications
   
   def acknowledge!(admin_user)
-    update!(acknowledged_at: Time.current, acknowledged_by: admin_user)
+    rows = Alert.where(id: id, acknowledged_at: nil)
+                .update_all(acknowledged_at: Time.current, acknowledged_by_id: admin_user.id)
+    raise ActiveRecord::StaleObjectError, "Alert already acknowledged" if rows == 0
+    reload
   end
   
   def acknowledged?

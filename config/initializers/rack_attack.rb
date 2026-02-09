@@ -1,7 +1,12 @@
 require 'rack/attack'
 
 class Rack::Attack
-  Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+  Rack::Attack.cache.store = begin
+    ActiveSupport::Cache::RedisCacheStore.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/1')
+  rescue => e
+    Rails.logger.warn("[Rack::Attack] Redis unavailable (#{e.message}), falling back to MemoryStore")
+    ActiveSupport::Cache::MemoryStore.new
+  end
 
   ### Safelists ###
 

@@ -23,11 +23,12 @@ class SmsResponseProcessor
     
     File.write(file_path, content)
     
-    SmsMessage.create!(
-      date: timestamp.gsub("_", " ").gsub("--", ":"),
+    SmsMessage.find_or_create_by!(
       filename: filename,
       smartphone_id: @smartphone.id
-    )
+    ) do |m|
+      m.date = timestamp.gsub("_", " ").gsub("--", ":")
+    end
     
     @pending_command.mark_completed(@response)
   end

@@ -4,7 +4,8 @@ module Api
     include ErrorHandler
     include ResponseFormatter
     skip_before_action :authenticate_device!, only: [:heartbeat, :info]
-    
+    before_action :set_authorized_device, only: [:show, :send_command]
+
     # POST /device/heartbeat
     # Handles device heartbeat from Android Retrofit client
     def heartbeat
@@ -56,13 +57,12 @@ module Api
     
     # GET /api/devices/:id
     def show
-      device = Smartphone.find(params[:id])
-      render_success(device, serializer: DeviceSerializer, include: [:statistics])
+      render_success(@device, serializer: DeviceSerializer, include: [:statistics])
     end
     
     # POST /api/devices/:id/commands
     def send_command
-      device = Smartphone.find(params[:id])
+      device = @device
       result = DeviceCommandService.call(device, params[:command], command_params)
       
       if result.success?
@@ -80,6 +80,17 @@ module Api
     end
     
     private
+
+    # Scope device lookup to the authenticated device's own identity
+    def set_authorized_device
+      authenticated_device_id = sanitize_device_id(request.headers['X-Device-ID'] || params[:device_id])
+      @device = Smartphone.find(params[:id])
+
+      return if @device.device_id == authenticated_device_id
+
+      Rails.logger.warn("[API::DevicesController] IDOR attempt: device #{authenticated_device_id} tried to access device #{@device.device_id}")
+      render json: { error: 'Forbidden' }, status: :forbidden
+    end
     
     def command_params
       params.permit(:duration, :quality, :filename, :options, :camera_id)

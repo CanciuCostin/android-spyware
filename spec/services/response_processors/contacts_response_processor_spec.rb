@@ -175,7 +175,7 @@ RSpec.describe ContactsResponseProcessor do
       let(:response) { { 'contacts' => [] } }
       
       before do
-        allow(Contact).to receive(:create!).and_raise(ActiveRecord::RecordInvalid)
+        allow(Contact).to receive(:find_or_create_by!).and_raise(ActiveRecord::RecordInvalid)
       end
       
       it 'raises an error' do

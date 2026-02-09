@@ -19,11 +19,12 @@ class ContactsResponseProcessor
     
     File.write(file_path, content)
     
-    Contact.create!(
-      date: timestamp.gsub("_", " ").gsub("--", ":"),
+    Contact.find_or_create_by!(
       filename: filename,
       smartphone_id: @smartphone.id
-    )
+    ) do |c|
+      c.date = timestamp.gsub("_", " ").gsub("--", ":")
+    end
     
     @pending_command.mark_completed(@response)
   end
