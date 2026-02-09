@@ -1,5 +1,5 @@
 class SmartphonesController < InheritedResources::Base
-  before_action :authenticate_admin_user!
+  skip_before_action :authenticate_admin_user!, raise: false
   # Thread-safe recording state managed via Smartphone.is_recording column
 
   def dump_sysinfo

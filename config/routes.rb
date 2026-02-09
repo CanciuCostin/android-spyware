@@ -391,6 +391,7 @@ Rails.application.routes.draw do
 
   post '/graphql', to: 'graphql#execute'
   get '/dashboard', to: 'dashboards#index'
+  root to: redirect('/dashboard')
   
   # Statistics API endpoints
   get 'devices/:id/statistics', to: 'statistics#show', as: 'device_statistics'
