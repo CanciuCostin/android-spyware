@@ -1,0 +1,252 @@
+#!/usr/bin/env ruby
+# Database Optimization Verification Script
+# Run this to verify all optimizations are properly installed
+
+require_relative '../config/environment'
+
+class OptimizationVerifier
+  REQUIRED_INDEXES = [
+    'idx_keylogs_device_time',
+    'idx_keylogs_app_name',
+    'idx_keylogs_recent',
+    'idx_locations_device_time',
+    'idx_sms_device_time',
+    'idx_calls_device_time',
+    'idx_commands_queue',
+    'idx_commands_active'
+  ].freeze
+  
+  REQUIRED_VIEWS = [
+    'device_summaries',
+    'keylog_app_stats',
+    'command_queue_health',
+    'device_summaries_cached'
+  ].freeze
+  
+  def initialize
+    @errors = []
+    @warnings = []
+    @successes = []
+  end
+  
+  def run
+    puts "\n" + "=" * 80
+    puts "  Database Optimization Verification"
+    puts "=" * 80 + "\n"
+    
+    check_indexes
+    check_views
+    check_partitioning
+    check_query_performance
+    check_connection_pool
+    check_cache_availability
+    
+    print_summary
+    
+    @errors.empty?
+  end
+  
+  private
+  
+  def check_indexes
+    puts "\n📊 Checking Indexes..."
+    
+    REQUIRED_INDEXES.each do |index_name|
+      exists = ActiveRecord::Base.connection.execute(<<-SQL).count > 0
+        SELECT 1 FROM pg_indexes 
+        WHERE schemaname = 'public' 
+        AND indexname = '#{index_name}'
+      SQL
+      
+      if exists
+        @successes << "Index #{index_name} exists"
+        puts "  ✓ #{index_name}"
+      else
+        @errors << "Missing index: #{index_name}"
+        puts "  ✗ #{index_name} (MISSING)"
+      end
+    end
+  end
+  
+  def check_views
+    puts "\n👁  Checking Views..."
+    
+    REQUIRED_VIEWS.each do |view_name|
+      # Check if it's a regular view
+      view_exists = ActiveRecord::Base.connection.execute(<<-SQL).count > 0
+        SELECT 1 FROM pg_views 
+        WHERE schemaname = 'public' 
+        AND viewname = '#{view_name}'
+      SQL
+      
+      # Check if it's a materialized view
+      matview_exists = ActiveRecord::Base.connection.execute(<<-SQL).count > 0
+        SELECT 1 FROM pg_matviews 
+        WHERE schemaname = 'public' 
+        AND matviewname = '#{view_name}'
+      SQL
+      
+      if view_exists || matview_exists
+        type = matview_exists ? "materialized" : "regular"
+        @successes << "View #{view_name} (#{type}) exists"
+        puts "  ✓ #{view_name} (#{type})"
+      else
+        @errors << "Missing view: #{view_name}"
+        puts "  ✗ #{view_name} (MISSING)"
+      end
+    end
+  end
+  
+  def check_partitioning
+    puts "\n🗂  Checking Partitioning..."
+    
+    is_partitioned = ActiveRecord::Base.connection.execute(<<-SQL).count > 0
+      SELECT 1 FROM pg_partitioned_table 
+      WHERE partrelid = 'keylogs'::regclass
+    SQL
+    
+    if is_partitioned
+      partition_count = ActiveRecord::Base.connection.execute(<<-SQL).count
+        SELECT c.relname 
+        FROM pg_class c
+        JOIN pg_inherits i ON i.inhrelid = c.oid
+        JOIN pg_class p ON p.oid = i.inhparent
+        WHERE p.relname = 'keylogs'
+      SQL
+      
+      @successes << "Keylogs table is partitioned (#{partition_count} partitions)"
+      puts "  ✓ Keylogs table is partitioned"
+      puts "  ✓ Found #{partition_count} partitions"
+      
+      # Check for future coverage (next 3 months)
+      current_month = Date.today.beginning_of_month
+      missing_future = []
+      
+      3.times do |i|
+        month = current_month + (i + 1).months
+        partition_name = "keylogs_#{month.strftime('%Y_%m')}"
+        
+        exists = ActiveRecord::Base.connection.execute(<<-SQL).count > 0
+          SELECT 1 FROM pg_tables 
+          WHERE schemaname = 'public' 
+          AND tablename = '#{partition_name}'
+        SQL
+        
+        unless exists
+          missing_future << partition_name
+        end
+      end
+      
+      if missing_future.any?
+        @warnings << "Missing future partitions: #{missing_future.join(', ')}"
+        puts "  ⚠ Missing future partitions: #{missing_future.join(', ')}"
+        puts "    Run: rake db:partitions:create_future[3]"
+      else
+        @successes << "Future partitions (3 months) exist"
+        puts "  ✓ Future partitions exist"
+      end
+    else
+      @warnings << "Keylogs table is NOT partitioned (may be intentional if table is small)"
+      puts "  ⚠ Keylogs table is NOT partitioned"
+      puts "    Note: Partitioning only runs if table has >100k rows"
+    end
+  end
+  
+  def check_query_performance
+    puts "\n⚡ Checking Query Performance..."
+    
+    # Check if pg_stat_statements is enabled
+    begin
+      ActiveRecord::Base.connection.execute("SELECT * FROM pg_stat_statements LIMIT 1")
+      @successes << "pg_stat_statements extension is enabled"
+      puts "  ✓ pg_stat_statements enabled"
+    rescue
+      @warnings << "pg_stat_statements extension not enabled"
+      puts "  ⚠ pg_stat_statements not enabled"
+      puts "    Run: CREATE EXTENSION pg_stat_statements;"
+    end
+    
+    # Test a simple query performance
+    start_time = Time.current
+    Smartphone.limit(1).to_a
+    duration = (Time.current - start_time) * 1000
+    
+    if duration < 100
+      @successes << "Basic query performance is good (#{duration.round(2)}ms)"
+      puts "  ✓ Basic query test: #{duration.round(2)}ms"
+    else
+      @warnings << "Basic query is slow (#{duration.round(2)}ms)"
+      puts "  ⚠ Basic query test: #{duration.round(2)}ms (expected <100ms)"
+    end
+  end
+  
+  def check_connection_pool
+    puts "\n🔌 Checking Connection Pool..."
+    
+    pool_config = ActiveRecord::Base.connection_db_config.configuration_hash
+    pool_size = pool_config[:pool] || 5
+    
+    if pool_size >= 10
+      @successes << "Connection pool size is adequate (#{pool_size})"
+      puts "  ✓ Pool size: #{pool_size}"
+    else
+      @warnings << "Connection pool size is small (#{pool_size})"
+      puts "  ⚠ Pool size: #{pool_size} (recommended: 25+)"
+    end
+    
+    # Check current pool stats
+    stats = OptimizedQueries.connection_pool_stats
+    puts "  ℹ Current: #{stats[:connections]} connections (#{stats[:busy_connections]} busy, #{stats[:idle_connections]} idle)"
+  end
+  
+  def check_cache_availability
+    puts "\n💾 Checking Cache..."
+    
+    # Test Redis connection
+    begin
+      Rails.cache.write('test_key', 'test_value', expires_in: 1.second)
+      value = Rails.cache.read('test_key')
+      
+      if value == 'test_value'
+        @successes << "Cache is working (Redis connected)"
+        puts "  ✓ Cache is operational"
+      else
+        @warnings << "Cache write/read mismatch"
+        puts "  ⚠ Cache write/read mismatch"
+      end
+    rescue => e
+      @errors << "Cache not available: #{e.message}"
+      puts "  ✗ Cache not available: #{e.message}"
+    end
+  end
+  
+  def print_summary
+    puts "\n" + "=" * 80
+    puts "  Summary"
+    puts "=" * 80
+    
+    puts "\n✅ Successes: #{@successes.count}"
+    # @successes.each { |msg| puts "  ✓ #{msg}" }
+    
+    if @warnings.any?
+      puts "\n⚠️  Warnings: #{@warnings.count}"
+      @warnings.each { |msg| puts "  ⚠ #{msg}" }
+    end
+    
+    if @errors.any?
+      puts "\n❌ Errors: #{@errors.count}"
+      @errors.each { |msg| puts "  ✗ #{msg}" }
+      puts "\n  Please run migrations: rails db:migrate"
+    else
+      puts "\n🎉 All optimizations are properly installed!"
+    end
+    
+    puts "\n" + "=" * 80 + "\n"
+  end
+end
+
+# Run verification
+verifier = OptimizationVerifier.new
+success = verifier.run
+
+exit(success ? 0 : 1)

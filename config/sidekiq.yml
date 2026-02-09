@@ -1,0 +1,16 @@
+# Sidekiq queue configuration
+# Start with: bundle exec sidekiq -C config/sidekiq.yml
+
+:concurrency: <%= ENV.fetch('SIDEKIQ_CONCURRENCY', 10) %>
+:timeout: 25
+:verbose: false
+
+:queues:
+  - [critical, 6]
+  - [default, 4]
+  - [notifications, 3]
+  - [scheduled, 2]
+  - [low_priority, 1]
+
+# Limit memory to prevent runaway jobs
+:max_retries: 5

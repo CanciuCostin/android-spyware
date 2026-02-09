@@ -1,0 +1,66 @@
+<%= content_for :title, "Dashboard Modernization" %>
+
+<div class="container-fluid py-4" data-controller="dashboard">
+  <div class="row mb-3">
+    <div class="col">
+      <h1 class="mb-0">EagleSpy Control Center</h1>
+      <p class="text-muted">Device telemetry, streaming, and command visibility in one modern view.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-header d-flex justify-content-between">
+          <span>Devices</span>
+          <small class="text-muted">live</small>
+        </div>
+        <div class="card-body p-0" data-dashboard-target="devices">
+          <div class="p-3 text-center text-muted">Loading devices…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-header d-flex justify-content-between">
+          <span>Streaming Viewer</span>
+          <small class="text-muted">WebRTC status</small>
+        </div>
+        <div class="card-body" data-dashboard-target="stream">
+          <div class="embed-responsive embed-responsive-16by9 bg-dark rounded d-flex align-items-center justify-content-center">
+            <span class="text-white-50">Stream will appear here when WebRTC is active.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8 mb-3">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between">
+          <span>Command Queue</span>
+          <span class="small text-muted">Latest 30</span>
+        </div>
+        <div class="card-body p-0" data-dashboard-target="commands">
+          <div class="p-3 text-muted text-center">Loading queue…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between">
+          <span>Upload Progress</span>
+          <small class="text-muted">Chunked uploads</small>
+        </div>
+        <div class="card-body" data-dashboard-target="uploads">
+          <div class="text-muted text-center">Monitoring uploads…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= javascript_pack_tag "dashboard", defer: true %>

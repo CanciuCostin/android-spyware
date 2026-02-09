@@ -1,0 +1,359 @@
+/* ============================================
+   EagleSpy V5 — Loading States & Animations
+   Skeleton screens, spinners, progress bars
+   ============================================ */
+
+@import 'modern_variables';
+
+// ─── Skeleton Screens ───
+.skeleton {
+  @include skeleton;
+  border-radius: var(--radius-sm);
+  
+  &.skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+    
+    &:last-child { margin-bottom: 0; }
+  }
+  
+  &.skeleton-title {
+    height: 1.5em;
+    width: 60%;
+    margin-bottom: 1em;
+  }
+  
+  &.skeleton-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+  }
+  
+  &.skeleton-card {
+    height: 200px;
+    border-radius: var(--radius-lg);
+  }
+  
+  &.skeleton-stat {
+    height: 120px;
+    border-radius: var(--radius-md);
+  }
+}
+
+// Skeleton grid
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+// ─── Loading Spinner ───
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border-subtle);
+  border-top-color: var(--color-accent-blue);
+  border-radius: 50%;
+  animation: spinner-rotate 0.6s linear infinite;
+  
+  &.spinner-sm {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+  }
+  
+  &.spinner-lg {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+  }
+  
+  &.spinner-xl {
+    width: 48px;
+    height: 48px;
+    border-width: 4px;
+  }
+}
+
+@keyframes spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
+// Button with spinner
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spinner-rotate 0.6s linear infinite;
+  }
+}
+
+// ─── Progress Bar ───
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  
+  &.progress-sm { height: 4px; }
+  &.progress-lg { height: 8px; }
+  
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-accent-blue), var(--color-accent-purple));
+    border-radius: var(--radius-full);
+    transition: width var(--transition-base);
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+      );
+      animation: progress-shimmer 1.5s ease-in-out infinite;
+    }
+  }
+  
+  // Indeterminate state
+  &.progress-indeterminate .progress-fill {
+    width: 40% !important;
+    animation: progress-indeterminate 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes progress-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@keyframes progress-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+// Progress with label
+.progress-container {
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    
+    .progress-percent {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+    }
+  }
+}
+
+// ─── Pulse Animation (for live indicators) ───
+.pulse {
+  animation: pulse-scale 2s ease-in-out infinite;
+}
+
+@keyframes pulse-scale {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+// ─── Fade In Animations ───
+.fade-in {
+  animation: fade-in var(--transition-base) ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.slide-up {
+  animation: slide-up var(--transition-slow) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Staggered animations
+@for $i from 1 through 12 {
+  .stagger-#{$i} {
+    animation-delay: #{$i * 0.05}s;
+  }
+}
+
+// ─── Loading Overlay ───
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--color-bg-base), 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--space-md);
+  z-index: var(--z-modal);
+  
+  &.loading-overlay-fixed {
+    position: fixed;
+  }
+  
+  .loading-text {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+}
+
+// ─── Shimmer Effect ───
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.05),
+      transparent
+    );
+    animation: shimmer-slide 2s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+// ─── Optimistic UI States ───
+.optimistic-update {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+  
+  &.update-success {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  &.update-error {
+    opacity: 1;
+    pointer-events: auto;
+    animation: shake 0.4s ease;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+// ─── Data Loading States ───
+.data-loading {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  
+  .spinner { margin-right: var(--space-sm); }
+}
+
+.data-empty {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-xl);
+  
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: var(--space-md);
+    opacity: 0.5;
+  }
+  
+  .empty-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-sm);
+  }
+  
+  .empty-description {
+    font-size: var(--text-sm);
+    max-width: 400px;
+  }
+}
+
+// ─── Dots Loading Animation ───
+.dots-loading {
+  display: inline-flex;
+  gap: 4px;
+  
+  span {
+    width: 6px;
+    height: 6px;
+    background: var(--color-text-secondary);
+    border-radius: 50%;
+    animation: dots-bounce 1.4s ease-in-out infinite;
+    
+    &:nth-child(1) { animation-delay: 0s; }
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+@keyframes dots-bounce {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}

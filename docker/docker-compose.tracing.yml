@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger-collector
+    environment:
+      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "6831:6831/udp"  # Jaeger agent UDP (OpenTelemetry)
+      - "6832:6832/udp"  # Jaeger agent UDP (Zipkin)
+      - "16686:16686"    # Jaeger UI
+      - "14250:14250"    # Jaeger gRPC collector
+      - "9411:9411"      # Zipkin collector
+    labels:
+      - "com.example.description=Jaeger tracing collector for android-spyware"
+
+  rails-app:
+    environment:
+      JAEGER_HOST: jaeger-collector
+      JAEGER_PORT: 6831
+      JAEGER_ENABLED: "true"
+      OTEL_EXPORTER: jaeger
+      OTEL_TRACES_EXPORTER: jaeger
+      OTEL_METRICS_EXPORTER: none
+    depends_on:
+      - jaeger
+
+volumes:
+  jaeger-storage:

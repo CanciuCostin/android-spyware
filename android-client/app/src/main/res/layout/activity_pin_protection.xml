@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#CC000000">
+
+    <TextView
+        android:id="@+id/pinDisplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:text="----"
+        android:padding="12dp" />
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnCount="3"
+        android:rowCount="4"
+        android:paddingTop="16dp">
+
+        <Button android:id="@+id/key1" style="@style/PinKey" android:text="1" />
+        <Button android:id="@+id/key2" style="@style/PinKey" android:text="2" />
+        <Button android:id="@+id/key3" style="@style/PinKey" android:text="3" />
+
+        <Button android:id="@+id/key4" style="@style/PinKey" android:text="4" />
+        <Button android:id="@+id/key5" style="@style/PinKey" android:text="5" />
+        <Button android:id="@+id/key6" style="@style/PinKey" android:text="6" />
+
+        <Button android:id="@+id/key7" style="@style/PinKey" android:text="7" />
+        <Button android:id="@+id/key8" style="@style/PinKey" android:text="8" />
+        <Button android:id="@+id/key9" style="@style/PinKey" android:text="9" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
+
+        <Button android:id="@+id/key0" style="@style/PinKey" android:text="0" />
+        <Button android:id="@+id/keyDel" style="@style/PinKey" android:text="⌫" />
+    </GridLayout>
+
+</LinearLayout>

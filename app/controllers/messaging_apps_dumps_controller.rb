@@ -1,7 +1,11 @@
 require "sqlite3"
 require "minitar"
+require "open3"
+require "shellwords"
 
 class MessagingAppsDumpsController < InheritedResources::Base
+  include CommandSender
+
   def export_database(filePath)
     begin
       db = SQLite3::Database.open "files/dumps/whatsapp/msgstore.db"
@@ -13,10 +17,9 @@ class MessagingAppsDumpsController < InheritedResources::Base
         end
       end
     rescue SQLite3::Exception => e
-      puts "Error exporting database"
-      puts e
-    rescue
-      puts "Error exporting database"
+      Rails.logger.error("Error exporting database: #{e.message}")
+    rescue StandardError => e
+      Rails.logger.error("Error exporting database: #{e.message}")
     ensure
       stm.close if stm
       db.close if db
@@ -26,15 +29,15 @@ class MessagingAppsDumpsController < InheritedResources::Base
   def uninstall_whatsapp_for_downgrade
     begin
       commandOutput = [run_adb_command("shell pm uninstall -k com.whatsapp")]
-    rescue
+    rescue StandardError => e
       commandOutput = "Operation Failed"
-      puts "Error uninstalling whatsapp."
+      Rails.logger.error("[MessagingAppsDumps] Error uninstalling whatsapp: #{e.message}")
     end
     respond_to do |format|
       format.js {
         render "uninstall_whatsapp_for_downgrade",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -42,15 +45,15 @@ class MessagingAppsDumpsController < InheritedResources::Base
   def install_old_apk
     begin
       commandOutput = run_adb_command("install tools/WhatsApp-v2.11.431-AndroidBucket.com.apk")
-    rescue
+    rescue StandardError => e
       commandOutput = "Operation Failed"
-      puts "Error installing old whatsapp version."
+      Rails.logger.error("[MessagingAppsDumps] Error installing old whatsapp version: #{e.message}")
     end
     respond_to do |format|
       format.js {
         render "install_old_apk",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -63,30 +66,47 @@ class MessagingAppsDumpsController < InheritedResources::Base
         run_adb_command("shell input tap 521 1130")
       }
       commandOutput = run_adb_command("backup -apk com.whatsapp -f files/dumps/whatsapp/whatsapp_backup.ab")
-    rescue
+    rescue StandardError => e
       commandOutput = "Operation Failed"
-      puts "Error performing ADB backup."
+      Rails.logger.error("[MessagingAppsDumps] Error performing ADB backup: #{e.message}")
     end
     respond_to do |format|
       format.js {
         render "adb_backup",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
 
   def extract_backup
     begin
-      system("java -jar tools/android-backup-extractor/android-backup-extractor-20180521-bin/abe.jar unpack files/dumps/whatsapp/whatsapp_backup.ab files/dumps/whatsapp/whatsapp_backup.ab.tar")
-    rescue
-      puts "Error converting .ab file to .ab.tar"
+      # Safe command execution with Open3
+      jar_path = Rails.root.join('tools/android-backup-extractor/android-backup-extractor-20180521-bin/abe.jar')
+      input_file = Rails.root.join('files/dumps/whatsapp/whatsapp_backup.ab')
+      output_file = Rails.root.join('files/dumps/whatsapp/whatsapp_backup.ab.tar')
+      
+      unless File.exist?(jar_path) && File.exist?(input_file)
+        Rails.logger.error("[MessagingAppsDumps] Required files not found for backup extraction")
+        raise StandardError, "Required files missing"
+      end
+      
+      stdout, stderr, status = Open3.capture3(
+        'java', '-jar', jar_path.to_s, 'unpack', input_file.to_s, output_file.to_s
+      )
+      
+      unless status.success?
+        Rails.logger.error("[MessagingAppsDumps] Extract failed: #{stderr}")
+        raise StandardError, "Extraction failed"
+      end
+    rescue StandardError => e
+      Rails.logger.error("[MessagingAppsDumps] Error converting .ab file: #{e.message}")
     end
     respond_to do |format|
       format.js {
         render "extract_backup",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -94,14 +114,14 @@ class MessagingAppsDumpsController < InheritedResources::Base
   def untar_backup
     begin
       Minitar.unpack("files/dumps/whatsapp/whatsapp_backup.ab.tar", 'files\whatsapp\whatsapp_backup')
-    rescue
-      puts "Error extracting .tar backup file."
+    rescue StandardError => e
+      Rails.logger.error("[MessagingAppsDumps] Error extracting .tar backup file: #{e.message}")
     end
     respond_to do |format|
       format.js {
         render "untar_backup",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
@@ -109,67 +129,71 @@ class MessagingAppsDumpsController < InheritedResources::Base
   def pull_whatsapp_db
     begin
       commandOutput = run_adb_command("pull /sdcard/WhatsApp/Databases/msgstore.db.crypt12 files/dumps/whatsapp/msgstore.db.crypt12")
-    rescue
+    rescue StandardError => e
+      Rails.logger.error("[MessagingAppsDumps] Error pulling WhatsApp DB: #{e.message}")
       commandOutput = "Operation Failed"
     end
     respond_to do |format|
       format.js {
         render "pull_whatsapp_db",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
 
   def decrypt_whatsapp_database
     begin
-      system("java -jar tools/crypt12-decrypt/master/decrypt12.jar files/dumps/whatsapp/whatsapp_backup/apps/com.whatsapp/f/key files/dumps/whatsapp/msgstore.db.crypt12 files/dumps/whatsapp/msgstore.db")
-    rescue
-      puts "Error decrypting db file"
+      # Safe command execution with Open3
+      jar_path = Rails.root.join('tools/crypt12-decrypt/master/decrypt12.jar')
+      key_file = Rails.root.join('files/dumps/whatsapp/whatsapp_backup/apps/com.whatsapp/f/key')
+      encrypted_db = Rails.root.join('files/dumps/whatsapp/msgstore.db.crypt12')
+      output_db = Rails.root.join('files/dumps/whatsapp/msgstore.db')
+      
+      unless File.exist?(jar_path) && File.exist?(key_file) && File.exist?(encrypted_db)
+        Rails.logger.error("[MessagingAppsDumps] Required files not found for database decryption")
+        raise StandardError, "Required files missing"
+      end
+      
+      stdout, stderr, status = Open3.capture3(
+        'java', '-jar', jar_path.to_s, key_file.to_s, encrypted_db.to_s, output_db.to_s
+      )
+      
+      unless status.success?
+        Rails.logger.error("[MessagingAppsDumps] Decrypt failed: #{stderr}")
+        raise StandardError, "Decryption failed"
+      end
+    rescue StandardError => e
+      Rails.logger.error("[MessagingAppsDumps] Error decrypting db file: #{e.message}")
     end
     respond_to do |format|
       format.js {
         render "decrypt_whatsapp_database",
                :locals => { :copy_timeout => params[:copy_timeout].to_i,
-                            :smartphone_id => params[:smartphone_id] }
+                            :smartphone_id => params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '') }
       }
     end
   end
 
   def export_whatsapp_database
     begin
-      downloadTimeout = params[:copy_timeout].to_i
-      fileName = params[:filename].to_s
-      @smartphone = Smartphone.find(params[:smartphone_id])
-      currentTime = DateTime.now
-      currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-      @fileName = fileName.empty? ?
-        "whatsapp_dump_" + currentTimeFormat + ".txt" :
-        fileName + ".txt"
-      fullPath = "files/dumps/whatsapp/" + @fileName
-      export_database(fullPath)
-      commandOutput = ["Done"]
-      isOperationSuccessful = false
-      1.upto(downloadTimeout) do |n|
-        if File.file?(fullPath)
-          newDump = MessagingAppsDump.new(:date => currentTimeFormat.gsub("_", " ").gsub("--", ":"),
-                                          :app_name => "WhatsApp",
-                                          :filename => @fileName,
-                                          :smartphone_id => @smartphone.id)
-          newDump.save!
-          isOperationSuccessful = true
-          break
-        end
-      end
-      commandOutput = ["Operation Failed"] if not isOperationSuccessful
-    rescue
-      commandOutput = "Operation Failed"
+      safe_id = params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '')
+      @smartphone = Smartphone.find(safe_id)
+      
+      # Send command asynchronously via ActionCable
+      # WhatsAppResponseProcessor will handle saving the messages
+      pending_command = send_command_async(@smartphone, 'dump_whatsapp_messages', {})
+      
+      commandOutput = ["WhatsApp message extraction initiated..."]
+    rescue => e
+      Rails.logger.error("Error dumping WhatsApp messages: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
     end
+    
     respond_to do |format|
       format.js {
         render "export_whatsapp_database",
-               :locals => { :commandOutput => commandOutput,
-                            :fileName => @fileName }
+               :locals => { :commandOutput => commandOutput.map { |s| ActionController::Base.helpers.sanitize(s) } }
       }
     end
   end

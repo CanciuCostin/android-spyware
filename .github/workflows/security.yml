@@ -1,0 +1,66 @@
+name: Security Scans
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  scans:
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_WITHOUT: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6.6
+      - name: Cache Ruby gems
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor/bundle
+            ~/.bundle
+          key: ${{ runner.os }}-bundle-sec-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bundle-sec-
+      - name: Install Ruby gems
+        run: |
+          gem install bundler:2.1.4
+          bundle config set --local path vendor/bundle
+          bundle install --jobs 4 --retry 3 --without production
+      - name: Install Brakeman
+        run: gem install brakeman
+      - name: Run Brakeman
+        run: bundle exec brakeman --no-progress --format json --output brakeman-report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: brakeman-report
+          path: brakeman-report.json
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      - name: Install JS dependencies
+        run: npm ci --prefer-offline
+      - name: Run npm audit
+        env:
+          CI: true
+        run: npm audit --audit-level=moderate
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@v1
+        with:
+          scan-type: fs
+          format: table
+          output: trivy-report.txt
+          exit-code: 1
+          severity: CRITICAL,HIGH
+          cache-dir: ${{ runner.temp }}/trivy-cache
+      - uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.txt

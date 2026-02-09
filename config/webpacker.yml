@@ -13,8 +13,8 @@ default: &default
   # ['app/assets', 'engine/foo/app/assets']
   resolved_paths: []
 
-  # Reload manifest.json on all requests so we reload latest compiled packs
-  cache_manifest: false
+  # Cache manifest.json for performance (set false only when changing JS packs)
+  cache_manifest: true
 
   # Extract and emit a css file
   extract_css: false
@@ -52,8 +52,8 @@ development:
   <<: *default
   compile: true
 
-  # Verifies that correct packages and versions are installed by inspecting package.json, yarn.lock, and node_modules
-  check_yarn_integrity: true
+  # Skip yarn integrity check for faster boot
+  check_yarn_integrity: false
 
   # Reference: https://webpack.js.org/configuration/dev-server/
   dev_server:

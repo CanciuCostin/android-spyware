@@ -7,6 +7,11 @@
 # Ignore bundler config.
 /.bundle
 
+# Ignore environment file with secrets
+.env
+.credentials_generated.json
+.env.tracing
+
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*
@@ -33,3 +38,63 @@ yarn-debug.log*
 *.key
 *.crt
 *.csr
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md
+
+.gemini/
+gha-creds-*.json
+
+# Signing keys
+*.keystore
+*.jks
+
+# Build artifacts
+android-client/app/build/
+android-client/.gradle/
+*.apk
+*.class
+
+# Build outputs
+public/*.apk
+
+# Tools - large binaries
+tools/*.apk
+tools/platform-tools/
+
+# IDE & Editor
+*.code-workspace
+.mcp-debug-tools/
+
+# IDE caches
+.sonarlint/
+.qodo/
+
+# Environment
+.env.ai
+
+# Temp files
+NUL
+temp_prefs.xml
+*.log
+files/uploads/
+files/payloads/
+
+# Vendor
+vendor/gems/
+
+# Archives
+*.tar.gz
+
+# Memory bank (Copilot)
+memory-bank/
+copilot-fleet-scaffold/
+
+# Frontend build
+frontend/dist/
+
+# Static analysis
+static-analysis.datadog.yml
+
+# Data dumps (user data)
+files/dumps/

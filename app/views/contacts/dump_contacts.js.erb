@@ -1,4 +1,4 @@
-var commandOutput = <%=raw commandOutput%>;
+var commandOutput = <%= commandOutput.to_json.html_safe %>;
 $( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
 
 if (commandOutput[0] != "Operation Failed"){

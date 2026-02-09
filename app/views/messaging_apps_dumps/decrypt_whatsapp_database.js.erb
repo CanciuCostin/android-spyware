@@ -1,5 +1,5 @@
-var smartphone_id = <%=raw smartphone_id%>;
-var copy_timeout = <%=raw copy_timeout%>;
+var smartphone_id = <%= smartphone_id.to_json.html_safe %>;
+var copy_timeout = <%= copy_timeout.to_json.html_safe %>;
 $( ".Terminal__body" ).trigger("write",[" > ", "Exporting database . . .", ["SELECT * FROM chat;"] ]);
 
 jQuery.ajax({

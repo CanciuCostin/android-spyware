@@ -1,55 +1,69 @@
 class RecordingsController < InheritedResources::Base
+  include CommandSender
+  
   def microphone_rec
     begin
-      time = params[:time].to_s
-      commandTimeout = params[:exec_timeout].to_i
-      downloadTimeout = params[:copy_timeout].to_i
-      fileName = params[:filename].to_s
+      duration = params[:time].present? ? params[:time].to_i : 10
       @smartphone = Smartphone.find(params[:smartphone_id])
       currentTime = DateTime.now
       currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-      @fileName = fileName.empty? ? "microphone_rec_" + currentTimeFormat + ".wav" : fileName + ".wav"
-      processCommand = "record_mic -d #{time} -f #{@fileName}"
-      commandOutput = start_msf_process(processCommand)
-      1.upto(commandTimeout) do |n|
-        if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
-          break
+      @fileName = "audio_recording_#{currentTimeFormat}.wav"
+      
+      # Send start_audio command
+      start_cmd = send_command_and_wait(@smartphone, 'start_audio', {}, timeout: 5.seconds)
+      
+      if start_cmd.completed?
+        # Wait for recording duration
+        sleep(duration)
+        
+        # Send stop_audio command
+        stop_cmd = send_command_and_wait(@smartphone, 'stop_audio', {}, timeout: 30.seconds)
+        
+        if stop_cmd.completed? && stop_cmd.response_data['audio_base64'].present?
+          # Decode Base64 and save audio
+          audio_bytes = Base64.decode64(stop_cmd.response_data['audio_base64'])
+          file_path = Rails.root.join('files', 'dumps', 'recordings', @fileName)
+          FileUtils.mkdir_p(File.dirname(file_path))
+          File.binwrite(file_path, audio_bytes)
+          
+          # Save to database
+          Recording.create!(
+            date: currentTimeFormat.gsub("_", " ").gsub("--", ":"),
+            duration: duration,
+            filename: @fileName,
+            smartphone_id: @smartphone.id
+          )
+          
+          commandOutput = ["Recording successful: #{@fileName} (#{stop_cmd.response_data['size']} bytes)"]
         else
-          puts "Waiting ..."
+          commandOutput = ["Recording failed: No audio data received"]
         end
-        sleep 1
+      else
+        commandOutput = ["Failed to start recording"]
       end
-      copyRecCommand = "docker cp kali_container:/#{@fileName} files/dumps/microphone_recs/#{@fileName}"
-      system(copyRecCommand)
-      fullPath = "files/dumps/microphone_recs/" + @fileName
-      isOperationSuccessful = false
-      1.upto(downloadTimeout) do |n|
-        if File.file?(fullPath)
-          newRec = Recording.new(:date => currentTimeFormat.gsub("_", " ").gsub("--", ":"),
-                                 :duration => 5,
-                                 :filename => @fileName,
-                                 :smartphone_id => @smartphone.id)
-          newRec.save!
-          isOperationSuccessful = true
-          break
-        end
-        sleep 1
-      end
-      commandOutput = ["Operation Failed"] if not isOperationSuccessful
-    rescue
-      puts "Error on microphone rec."
-      commandOutput = ["Operation Failed"]
+
+    rescue => e
+      Rails.logger.error("Error in microphone_rec: #{e.message}")
+      commandOutput = ["Operation Failed", e.message]
     end
+    
     respond_to do |format|
       format.js {
-        render "microphone_rec",
-               :locals => { :commandOutput => commandOutput,
-                            :fileName => @fileName }
+        render "microphone_rec", locals: { commandOutput: commandOutput, fileName: @fileName }
       }
     end
   end
 
   private
+
+  # SonarQube S2068: Use centralized CredentialsService instead of hardcoded credentials
+  def find_active_session_for_smartphone(smartphone)
+    msf_service = MsfRpcService.new
+    msf_service.android_session_id
+  rescue MsfRpcService::ConnectionError => e
+    Rails.logger.error("MSF connection failed: #{e.message}")
+    nil
+  end
 
   def recording_params
     params.require(:recording).permit(:date,

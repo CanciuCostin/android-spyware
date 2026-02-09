@@ -1,0 +1,334 @@
+/* ============================================
+   EagleSpy V5 — Responsive Design System
+   Mobile-first approach with breakpoints
+   ============================================ */
+
+@import 'modern_variables';
+
+// ─── Base Responsive Setup ───
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  touch-action: pan-y;
+}
+
+// ─── Mobile Menu Toggle Button ───
+.mobile-menu-toggle {
+  @include touch-target;
+  display: none;
+  position: fixed;
+  top: var(--space-md);
+  left: var(--space-md);
+  z-index: var(--z-fixed);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  padding: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  
+  .bar {
+    width: 20px;
+    height: 2px;
+    background: var(--color-text-secondary);
+    border-radius: 2px;
+    transition: all var(--transition-base);
+  }
+  
+  &:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-border-hover);
+    .bar { background: var(--color-text-primary); }
+  }
+  
+  &.active {
+    .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    display: flex;
+  }
+}
+
+// ─── Responsive Tables ───
+.responsive-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-subtle);
+  
+  @media (max-width: $breakpoint-md) {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
+
+table.index_table {
+  @media (max-width: $breakpoint-md) {
+    // Card layout on mobile
+    thead { display: none; }
+    
+    tbody tr {
+      display: block;
+      margin-bottom: var(--space-md);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border: 1px solid var(--color-border-subtle);
+    }
+    
+    tbody td {
+      display: block;
+      text-align: left !important;
+      padding: var(--space-sm) 0 !important;
+      border: none !important;
+      
+      &::before {
+        content: attr(data-label);
+        display: block;
+        font-weight: var(--weight-semibold);
+        color: var(--color-text-muted);
+        font-size: var(--text-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
+    }
+  }
+}
+
+// ─── Touch-Friendly Buttons ───
+a.button, button, input[type="submit"], .action-btn {
+  @include touch-target;
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: var(--text-base) !important;
+    padding: var(--space-md) !important;
+  }
+}
+
+// ─── Mobile Dashboard Adjustments ───
+@media (max-width: $breakpoint-md) {
+  body.admin_dashboard {
+    // Hide sidebar by default on mobile
+    .header#header {
+      transform: translateX(-100%);
+      transition: transform var(--transition-base);
+    }
+    
+    &.sidebar-open .header#header {
+      transform: translateX(0);
+    }
+    
+    // Remove sidebar margin on mobile
+    #title_bar,
+    #active_admin_content,
+    #main_content_wrapper {
+      margin-left: 0 !important;
+    }
+    
+    // Adjust padding
+    #active_admin_content {
+      padding: var(--space-md) !important;
+    }
+    
+    // Stack stats vertically
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-sm);
+    }
+    
+    .stat-card {
+      padding: var(--space-md);
+      
+      .stat-value { font-size: 22px; }
+      .stat-label { font-size: 10px; }
+    }
+    
+    // Device cards
+    .device-card {
+      margin-bottom: var(--space-md);
+    }
+    
+    .device-header {
+      padding: var(--space-md);
+      flex-wrap: wrap;
+      
+      .device-status {
+        width: 100%;
+        margin-top: var(--space-sm);
+        justify-content: center;
+      }
+    }
+    
+    // Tab bar scroll
+    .tab-bar {
+      padding: 0 var(--space-md);
+      
+      .tab-btn {
+        font-size: var(--text-sm);
+        padding: var(--space-sm) var(--space-md);
+      }
+    }
+    
+    // Action grids
+    .action-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+    }
+    
+    .action-btn {
+      padding: var(--space-md) var(--space-sm);
+      min-height: 80px;
+      
+      .action-icon { font-size: 20px; }
+      .action-label { font-size: 10px; }
+    }
+    
+    // Analytics grid
+    .analytics-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+    }
+  }
+}
+
+// ─── Small Mobile (< 480px) ───
+@media (max-width: $breakpoint-sm) {
+  body.admin_dashboard {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .action-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .action-btn {
+      min-height: 70px;
+      padding: var(--space-sm);
+      
+      .action-label {
+        font-size: 9px;
+        line-height: 1.2;
+      }
+    }
+    
+    .analytics-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .device-avatar {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .device-meta h3 {
+      font-size: 14px;
+    }
+    
+    .eagle-title h1 {
+      font-size: 22px;
+    }
+  }
+}
+
+// ─── Tablet (768px - 1024px) ───
+@media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg) {
+  body.admin_dashboard {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .action-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .analytics-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+
+// ─── Desktop (> 1024px) ───
+@media (min-width: $breakpoint-lg) {
+  body.admin_dashboard {
+    .stats-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+    
+    .action-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .analytics-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+  }
+}
+
+// ─── Large Desktop (> 1440px) ───
+@media (min-width: $breakpoint-xl) {
+  body.admin_dashboard {
+    #active_admin_content {
+      max-width: 1600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}
+
+// ─── Horizontal Scroll Indicators ───
+.scroll-container {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    background: linear-gradient(to left, var(--color-bg-card), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+  
+  &.has-scroll::after {
+    opacity: 1;
+  }
+}
+
+// ─── Landscape Mobile ───
+@media (max-width: $breakpoint-md) and (orientation: landscape) {
+  body.admin_dashboard {
+    .stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .action-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+}

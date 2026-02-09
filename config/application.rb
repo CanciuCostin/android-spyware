@@ -10,6 +10,18 @@ module Androidspyware
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
+    config.autoload_paths << Rails.root.join("app", "graphql")
+    config.autoload_paths << Rails.root.join("app", "middleware")
+    config.autoload_paths << Rails.root.join("app", "validators")
+    config.middleware.use Rack::Attack
+    require_relative '../app/middleware/input_sanitization_middleware'
+    require_relative '../app/middleware/audit_middleware'
+    require_relative '../app/middleware/security_headers'
+    require_relative '../app/middleware/consent_enforcement'
+    config.middleware.use InputSanitizationMiddleware
+    config.middleware.use AuditMiddleware
+    config.middleware.use SecurityHeaders
+    config.middleware.use ConsentEnforcement
     config.spyware_config = config_for(:spyware_config)
     config.web_console.whiny_requests = false
     config.serve_static_files = true

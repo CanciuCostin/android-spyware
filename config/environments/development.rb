@@ -1,12 +1,10 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  # In the development environment your application's code is reloaded on
-  # every request. This slows down response time but is perfect for development
-  # since you don't have to restart the web server when you make code changes.
-  config.cache_classes = false
+  # Cache classes for performance (avoids reloading code on every request)
+  config.cache_classes = true
 
-  # Do not eager load code on boot.
+  # Do not eager load code on boot (faster startup).
   config.eager_load = false
 
   # Show full error reports.
@@ -45,13 +43,29 @@ Rails.application.configure do
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
 
-  # Debug mode disables concatenation and preprocessing of assets.
-  # This option may cause significant delays in view rendering with a large
-  # number of complex assets.
-  config.assets.debug = true
+  # Concatenate assets for faster page loads
+  config.assets.debug = false
 
   # Suppress logger output for asset requests.
   config.assets.quiet = true
+
+  # Allow Action Cable connections from external devices (e.g., Android client)
+  config.action_cable.disable_request_forgery_protection = true
+  # SECURITY: Restrict origins to known hosts instead of allowing all
+  # In production, use specific domains; in development, allow localhost and common LAN IPs
+  config.action_cable.allowed_request_origins = [
+    /^http:\/\/localhost(:\d+)?$/,
+    /^http:\/\/127\.0\.0\.1(:\d+)?$/,
+    /^http:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/,
+    /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/,
+    /^http:\/\/100\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/,  # Tailscale VPN
+    /^ws:\/\/localhost(:\d+)?$/,
+    /^ws:\/\/127\.0\.0\.1(:\d+)?$/,
+    /^ws:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/,
+    /^ws:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/,
+    /^ws:\/\/100\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/,  # Tailscale VPN
+    Rails.application.config.action_cable.url
+  ].compact
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
@@ -59,4 +73,9 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   # config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  # Optional: Enable SSL in development for testing
+  # Uncomment to test SSL locally (requires certificates)
+  # config.force_ssl = true
+  # config.ssl_options = { redirect: { status: 302 } }
 end

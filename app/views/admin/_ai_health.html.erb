@@ -1,0 +1,132 @@
+<div class="ai-health-page" style="padding: 20px;">
+  <style>
+    .health-card { background: #1a1a2e; border: 1px solid #30305a; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .health-card h3 { color: #00d4ff; margin-top: 0; }
+    .health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .health-stat { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 15px; text-align: center; }
+    .health-stat .value { font-size: 28px; font-weight: 700; color: #58a6ff; }
+    .health-stat .label { font-size: 12px; color: #8b949e; margin-top: 5px; }
+    .health-btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; margin: 5px; transition: all 0.3s; }
+    .health-btn-check { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+    .health-btn-logs { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+    .health-btn-suggest { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    .health-btn-stats { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+    .health-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .health-btn:disabled { opacity: 0.5; cursor: wait; }
+    .health-output { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-top: 15px; color: #c9d1d9; font-family: monospace; white-space: pre-wrap; max-height: 600px; overflow-y: auto; min-height: 100px; }
+    .health-status { font-size: 24px; font-weight: 700; padding: 10px 20px; border-radius: 8px; display: inline-block; }
+    .health-loading { display: none; color: #00d4ff; padding: 20px; text-align: center; }
+    .health-loading.active { display: block; }
+    .health-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #30305a; border-top: 3px solid #00d4ff; border-radius: 50%; animation: hspin 1s linear infinite; margin-right: 10px; }
+    @keyframes hspin { to { transform: rotate(360deg); } }
+    .issue-critical { border-left: 4px solid #f85149; padding-left: 10px; margin: 8px 0; }
+    .issue-warning { border-left: 4px solid #d29922; padding-left: 10px; margin: 8px 0; }
+  </style>
+
+  <h2 style="color: #00d4ff; margin-bottom: 5px;">🔍 AI Health Monitor</h2>
+  <p style="color: #8b949e;">System health, log analysis, and improvement suggestions</p>
+
+  <!-- Quick Status -->
+  <div class="health-card">
+    <h3>📊 Quick Status</h3>
+    <div class="health-grid">
+      <div class="health-stat">
+        <div class="value" id="h-status">—</div>
+        <div class="label">System Status</div>
+      </div>
+      <div class="health-stat">
+        <div class="value" id="h-devices">—</div>
+        <div class="label">Devices Online</div>
+      </div>
+      <div class="health-stat">
+        <div class="value" id="h-errors">—</div>
+        <div class="label">Errors</div>
+      </div>
+      <div class="health-stat">
+        <div class="value" id="h-warnings">—</div>
+        <div class="label">Warnings</div>
+      </div>
+    </div>
+    <button class="health-btn health-btn-stats" onclick="quickStatus()">🔄 Refresh Status</button>
+  </div>
+
+  <!-- Actions -->
+  <div class="health-card">
+    <h3>🎯 Health Actions</h3>
+    <button class="health-btn health-btn-check" onclick="fullHealthCheck()">🏥 Full Health Check</button>
+    <button class="health-btn health-btn-logs" onclick="analyzeLogs()">📋 Analyze Logs</button>
+    <button class="health-btn health-btn-suggest" onclick="getSuggestions()">💡 Get AI Suggestions</button>
+    <button class="health-btn health-btn-stats" onclick="commandStats()">📈 Command Stats</button>
+  </div>
+
+  <!-- Output -->
+  <div class="health-card">
+    <h3>📄 Results</h3>
+    <div id="health-loading" class="health-loading">
+      <span class="health-spinner"></span> Analyzing... This may take 15-30 seconds for AI-powered checks.
+    </div>
+    <div id="health-output" class="health-output">Click an action button to start health monitoring.</div>
+  </div>
+</div>
+
+<script>
+function hShowLoading() {
+  document.getElementById('health-loading').className = 'health-loading active';
+  document.querySelectorAll('.health-btn').forEach(function(b) { b.disabled = true; });
+}
+
+function hHideLoading() {
+  document.getElementById('health-loading').className = 'health-loading';
+  document.querySelectorAll('.health-btn').forEach(function(b) { b.disabled = false; });
+}
+
+function hShowResult(data) {
+  hHideLoading();
+  var output = document.getElementById('health-output');
+  if (typeof data === 'string') {
+    output.textContent = data;
+  } else {
+    output.textContent = JSON.stringify(data, null, 2);
+  }
+}
+
+function hPost(action) {
+  hShowLoading();
+  var token = document.querySelector('meta[name="csrf-token"]').content;
+  fetch('/admin/ai_health/' + action, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) { hShowResult(data); })
+  .catch(function(e) { hShowResult('Error: ' + e.message); });
+}
+
+function hGet(action) {
+  hShowLoading();
+  fetch('/admin/ai_health/' + action)
+  .then(function(r) { return r.json(); })
+  .then(function(data) { hShowResult(data); })
+  .catch(function(e) { hShowResult('Error: ' + e.message); });
+}
+
+function quickStatus() {
+  fetch('/admin/ai_health/quick_status')
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    document.getElementById('h-status').textContent = data.status || '—';
+    document.getElementById('h-devices').textContent = (data.online_count || 0) + '/' + (data.device_count || 0);
+    document.getElementById('h-errors').textContent = data.error_count || 0;
+    document.getElementById('h-warnings').textContent = data.warning_count || 0;
+  })
+  .catch(function(e) { console.error(e); });
+}
+
+function fullHealthCheck() { hPost('full_check'); }
+function analyzeLogs() { hPost('analyze_logs'); }
+function getSuggestions() { hPost('suggestions'); }
+function commandStats() { hGet('command_stats'); }
+
+// Auto-refresh status on load
+document.addEventListener('DOMContentLoaded', quickStatus);
+</script>

@@ -1,0 +1,13 @@
+
+allprojects {
+    task printAllModuleCoordinates {
+        doLast {
+            allprojects.each { proj ->
+                def group = proj.group ?: 'undefined'
+                def version = proj.version ?: 'undefined'
+                def projectPath = proj.projectDir?.absolutePath ?: 'undefined'
+                println "MODULE_COORD: " + proj.path + "|" + group + "|" + proj.name + "|" + version + "|" + projectPath
+            }
+        }
+    }
+}

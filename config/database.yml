@@ -24,29 +24,13 @@ default: &default
 development:
   <<: *default
   database: android_spyware_development
-  username: postgres
-  host: <%= ENV['ANDROIDSPYWARE_DATABASE_HOST'] %>
-  # The specified database role being used to connect to postgres.
-  # To create additional roles in postgres see `$ createuser --help`.
-  # When left blank, postgres will use the default role. This is
-  # the same name as the operating system user that initialized the database.
-  # The password associated with the postgres role (username).
-  #password:
-  # Connect on a TCP socket. Omitted by default since the client uses a
-  # domain socket that doesn't need configuration. Windows does not have
-  # domain sockets, so uncomment these lines.
-
-  # The TCP port the server listens on. Defaults to 5432.
-  # If your server runs on a different port number, change accordingly.
-  #port: 5432
-  # Schema search path. The server defaults to $user,public
-  #schema_search_path: myapp,sharedapp,public
-
-  # Minimum log levels, in increasing order:
-  #   debug5, debug4, debug3, debug2, debug1,
-  #   log, notice, warning, error, fatal, and panic
-  # Defaults to warning.
-  #min_messages: notice
+  username: <%= ENV.fetch('POSTGRES_USER', 'postgres') %>
+  password: <%= ENV.fetch('POSTGRES_PASSWORD', 'postgres') %>
+  host: <%= ENV.fetch('ANDROIDSPYWARE_DATABASE_HOST', 'localhost') %>
+  port: <%= ENV.fetch('ANDROIDSPYWARE_DATABASE_PORT', '5433') %>
+  # Optimized pool for development
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 10 } %>
+  timeout: 5000
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -78,6 +62,18 @@ test:
 production:
   <<: *default
   database: android_spyware_production
-  username: postgres
+  username: <%= ENV.fetch('POSTGRES_USER', 'postgres') %>
+  password: <%= ENV['ANDROIDSPYWARE_DATABASE_PASSWORD'] %>
   host: <%= ENV['ANDROIDSPYWARE_DATABASE_HOST'] %>
-#<%= ENV['ANDROIDSPYWARE_DATABASE_PASSWORD'] %>
+  # Optimized connection pool settings for high-volume production
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 25 } %>
+  timeout: 5000
+  checkout_timeout: 5
+  reaping_frequency: 10
+  # Enable prepared statements for better performance
+  prepared_statements: true
+  # Statement timeout (30 seconds) to prevent long-running queries
+  variables:
+    statement_timeout: 30000
+    # Enable query plan caching
+    plan_cache_mode: 'auto'

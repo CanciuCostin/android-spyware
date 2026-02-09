@@ -1,6 +1,6 @@
 <%= stylesheet_link_tag 'smartphones2', media: 'all', 'data-turbolinks-track': 'reload' %>
 <%= stylesheet_link_tag 'smartphones', media: 'all', 'data-turbolinks-track': 'reload' %>
-<%= javascript_pack_tag 'smartphones', 'data-turbolinks-track': 'reload' %>
+<%# javascript_pack_tag 'smartphones', 'data-turbolinks-track': 'reload' %>
 <%= stylesheet_link_tag 'arrow_buttons', media: 'all', 'data-turbolinks-track': 'reload' %>
 <%= stylesheet_link_tag 'status', media: 'all', 'data-turbolinks-track': 'reload' %>
 <%= stylesheet_link_tag 'tooltip', media: 'all', 'data-turbolinks-track': 'reload' %>
@@ -114,7 +114,15 @@
                 <div class="app_names">
                     <span class="app_name">Hide App</span>
                     <span class="app_name">Show App</span>
-                    <span class="app_name">Crypto Minner</span>
+                    <span class.app_name">Crypto Minner</span>
+                </div>
+                <div class="app_row">
+                    <%= render "get_accounts_app_icon", :smartphone => smartphone %>
+                    <%= render "toggle_wifi_app_icon", :smartphone => smartphone %>
+                </div>
+                <div class="app_names">
+                    <span class="app_name">Get Accounts</span>
+                    <span class="app_name">Toggle Wi-Fi</span>
                 </div>
             </div>
             <div class="timee">

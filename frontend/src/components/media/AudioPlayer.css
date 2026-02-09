@@ -1,0 +1,531 @@
+/* AudioPlayer.css - Waveform visualization audio player */
+
+.audio-player {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface-elevated, #ffffff);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  user-select: none;
+}
+
+/* Waveform container */
+.waveform-container {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(135deg, rgba(33, 150, 243, 0.05), rgba(3, 155, 229, 0.02));
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.waveform-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Waveform overlay */
+.waveform-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.2s;
+}
+
+.waveform-container:hover .waveform-overlay {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.waveform-play-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--primary-color, #2196f3);
+  color: white;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  outline: none;
+}
+
+.waveform-play-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.waveform-play-btn:active {
+  transform: scale(0.95);
+}
+
+.waveform-play-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+}
+
+/* Audio controls */
+.audio-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Controls rows */
+.controls-left,
+.controls-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Control buttons */
+.control-btn {
+  background: none;
+  border: none;
+  color: var(--text-primary, #333);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.control-btn:hover {
+  background: rgba(33, 150, 243, 0.1);
+  color: var(--primary-color, #2196f3);
+}
+
+.control-btn:active {
+  transform: scale(0.95);
+}
+
+.control-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary-color, #2196f3);
+}
+
+/* Play button */
+.play-btn {
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+/* Time display */
+.time-display {
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  font-weight: 500;
+  min-width: 80px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Progress container */
+.progress-container {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+}
+
+.progress-background {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 4px;
+  background: var(--border-color, #e0e0e0);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-buffered {
+  height: 100%;
+  background: rgba(33, 150, 243, 0.4);
+  transition: width 0.1s linear;
+}
+
+.progress-played {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--primary-color, #2196f3);
+  transition: width 0.1s linear;
+}
+
+.progress-slider {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+}
+
+.progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--primary-color, #2196f3);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+}
+
+.progress-container:hover .progress-slider::-webkit-slider-thumb {
+  transform: scale(1.4);
+  box-shadow: 0 2px 6px rgba(33, 150, 243, 0.4);
+}
+
+.progress-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--primary-color, #2196f3);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+}
+
+.progress-container:hover .progress-slider::-moz-range-thumb {
+  transform: scale(1.4);
+  box-shadow: 0 2px 6px rgba(33, 150, 243, 0.4);
+}
+
+.progress-slider::-moz-range-track {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.progress-slider::-moz-range-progress {
+  background: transparent;
+}
+
+/* Volume control */
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.volume-btn {
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.volume-slider {
+  width: 70px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border-color, #e0e0e0);
+  border: none;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: var(--primary-color, #2196f3);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: var(--primary-color, #2196f3);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.volume-slider::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+.volume-slider::-moz-range-progress {
+  background: var(--primary-color, #2196f3);
+}
+
+/* Playback speed select */
+.playback-speed-select {
+  background: rgba(33, 150, 243, 0.05);
+  border: 1px solid var(--border-color, #e0e0e0);
+  color: var(--text-primary, #333);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+  font-weight: 500;
+}
+
+.playback-speed-select:hover {
+  background: rgba(33, 150, 243, 0.1);
+  border-color: var(--primary-color, #2196f3);
+}
+
+.playback-speed-select:focus {
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+  border-color: var(--primary-color, #2196f3);
+}
+
+.playback-speed-select option {
+  background: var(--surface-elevated, #ffffff);
+  color: var(--text-primary, #333);
+}
+
+/* Compact player */
+.audio-player-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(33, 150, 243, 0.05);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  outline: none;
+}
+
+.compact-play-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--primary-color, #2196f3);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.compact-play-btn:hover {
+  background: var(--primary-darker, #1976d2);
+  transform: scale(1.05);
+}
+
+.compact-play-btn:active {
+  transform: scale(0.95);
+}
+
+.compact-play-btn:focus-visible {
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.3);
+}
+
+.compact-progress-container {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  cursor: pointer;
+}
+
+.compact-progress-container .progress-background {
+  height: 4px;
+}
+
+.compact-time-display {
+  font-size: 11px;
+  color: var(--text-secondary, #666);
+  font-weight: 500;
+  min-width: 40px;
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .audio-player {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .waveform-container {
+    height: 80px;
+  }
+
+  .playback-speed-select {
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  .volume-slider {
+    width: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .audio-player {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .waveform-container {
+    height: 60px;
+  }
+
+  .control-btn {
+    font-size: 14px;
+    padding: 5px 6px;
+  }
+
+  .play-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .time-display {
+    font-size: 11px;
+    min-width: 70px;
+  }
+
+  .playback-speed-select {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+
+  .volume-slider {
+    width: 50px;
+  }
+
+  .volume-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .progress-container {
+    height: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .audio-controls {
+    gap: 8px;
+  }
+
+  .controls-left,
+  .controls-right {
+    gap: 8px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .progress-container {
+    order: -1;
+    width: 100%;
+  }
+
+  .waveform-container {
+    height: 50px;
+  }
+
+  .play-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .time-display {
+    font-size: 10px;
+    min-width: 60px;
+  }
+
+  .volume-control {
+    gap: 4px;
+  }
+
+  .volume-slider {
+    width: 40px;
+  }
+
+  .volume-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+
+  .playback-speed-select {
+    font-size: 9px;
+    padding: 3px 5px;
+  }
+}
+
+/* Keyboard focus */
+.audio-player:focus,
+.audio-player-compact:focus {
+  outline: 2px solid var(--primary-color, #2196f3);
+  outline-offset: 2px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .audio-player {
+    background: var(--surface-elevated, #1e1e1e);
+  }
+
+  .waveform-container {
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(3, 155, 229, 0.05));
+  }
+
+  .control-btn:hover {
+    background: rgba(33, 150, 243, 0.2);
+  }
+
+  .playback-speed-select {
+    background: rgba(33, 150, 243, 0.1);
+    color: #e0e0e0;
+  }
+
+  .playback-speed-select option {
+    background: #1e1e1e;
+    color: #e0e0e0;
+  }
+}

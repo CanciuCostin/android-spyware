@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Ignore TODO comments in generated/build files -->
+    <issue id="TodoComment">
+        <ignore path="**/build/**" />
+    </issue>
+    
+    <!-- Suppress unused resource warnings in Material Design build intermediates -->
+    <issue id="UnusedResources">
+        <ignore path="**/build/intermediates/**" />
+    </issue>
+    
+    <!-- Ignore all issues in generated code -->
+    <issue id="all">
+        <ignore path="**/build/generated/**" />
+        <ignore path="**/build/intermediates/**" />
+    </issue>
+</lint>

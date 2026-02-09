@@ -1,0 +1,9 @@
+<div id="start-webrtc-stream-result" class="alert alert-info alert-dismissible fade show" role="alert">
+  <strong><i class="fas fa-video"></i> WebRTC Stream</strong>
+  <% commandOutput.each do |output| %>
+    <div><%= output %></div>
+  <% end %>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>

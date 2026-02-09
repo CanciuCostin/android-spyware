@@ -1,0 +1,544 @@
+/* ============================================
+   EagleSpy V5 — UI Polish & Components
+   Transitions, toasts, modals, empty states
+   ============================================ */
+
+@import 'modern_variables';
+
+// ─── Smooth Transitions (CSS, not jQuery) ───
+.transition-all { transition: all var(--transition-base); }
+.transition-fast { transition: all var(--transition-fast); }
+.transition-slow { transition: all var(--transition-slow); }
+
+.transition-colors {
+  transition: background-color var(--transition-base),
+              border-color var(--transition-base),
+              color var(--transition-base);
+}
+
+.transition-transform {
+  transition: transform var(--transition-base);
+}
+
+.transition-opacity {
+  transition: opacity var(--transition-base);
+}
+
+// ─── Toast Notifications ───
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  pointer-events: none;
+  max-width: 420px;
+  
+  @media (max-width: $breakpoint-sm) {
+    left: var(--space-md);
+    right: var(--space-md);
+    top: var(--space-md);
+    max-width: none;
+  }
+}
+
+.toast {
+  @include glass-card;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: toast-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: all;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--toast-color, var(--color-accent-blue));
+  }
+  
+  .toast-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  
+  .toast-content {
+    flex: 1;
+    min-width: 0;
+    
+    .toast-title {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+      font-size: var(--text-base);
+      margin-bottom: 2px;
+    }
+    
+    .toast-message {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+  }
+  
+  .toast-close {
+    @include touch-target;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+    font-size: 18px;
+    
+    &:hover {
+      background: var(--color-bg-hover);
+      color: var(--color-text-primary);
+    }
+  }
+  
+  // Progress bar for auto-dismiss
+  .toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-border-subtle);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      background: var(--toast-color, var(--color-accent-blue));
+      animation: toast-progress 5s linear forwards;
+    }
+  }
+  
+  // Toast types
+  &.toast-success {
+    --toast-color: var(--color-success);
+    .toast-icon { color: var(--color-success); }
+  }
+  
+  &.toast-error {
+    --toast-color: var(--color-error);
+    .toast-icon { color: var(--color-error); }
+  }
+  
+  &.toast-warning {
+    --toast-color: var(--color-warning);
+    .toast-icon { color: var(--color-warning); }
+  }
+  
+  &.toast-info {
+    --toast-color: var(--color-info);
+    .toast-icon { color: var(--color-info); }
+  }
+  
+  // Exit animation
+  &.toast-exit {
+    animation: toast-slide-out 0.2s ease forwards;
+  }
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toast-slide-out {
+  to {
+    opacity: 0;
+    transform: translateX(120%);
+  }
+}
+
+@keyframes toast-progress {
+  to { width: 100%; }
+}
+
+// ─── Modal / Dialog ───
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  animation: fade-in 0.2s ease;
+  
+  @media (max-width: $breakpoint-sm) {
+    padding: var(--space-md);
+  }
+}
+
+.modal {
+  @include glass-card;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: modal-scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-xl);
+  
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    
+    .modal-title {
+      font-size: var(--text-xl);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+    
+    .modal-close {
+      @include touch-target;
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      transition: all var(--transition-fast);
+      
+      &:hover {
+        background: var(--color-bg-hover);
+        color: var(--color-text-primary);
+      }
+    }
+  }
+  
+  .modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    
+    p {
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--space-md);
+      
+      &:last-child { margin-bottom: 0; }
+    }
+  }
+  
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--color-border-subtle);
+    display: flex;
+    gap: var(--space-sm);
+    justify-content: flex-end;
+    
+    @media (max-width: $breakpoint-sm) {
+      flex-direction: column-reverse;
+      
+      .btn { width: 100%; }
+    }
+  }
+}
+
+@keyframes modal-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// ─── Confirmation Dialog (for destructive actions) ───
+.modal.modal-confirm {
+  max-width: 400px;
+  
+  .modal-header {
+    background: rgba(var(--color-accent-red-rgb), 0.1);
+    border-bottom-color: rgba(var(--color-accent-red-rgb), 0.2);
+    
+    .modal-title {
+      color: var(--color-error);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      &::before {
+        content: '⚠️';
+        font-size: 24px;
+      }
+    }
+  }
+  
+  .modal-footer {
+    .btn-danger {
+      background: var(--color-error) !important;
+      color: white !important;
+      
+      &:hover {
+        background: #dc2626 !important;
+      }
+    }
+  }
+}
+
+// ─── Button Styles ───
+.btn {
+  @include touch-target;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none !important;
+  
+  &:focus-visible {
+    @include focus-ring;
+  }
+  
+  &.btn-primary {
+    background: var(--color-accent-blue);
+    color: white;
+    
+    &:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+  
+  &.btn-secondary {
+    background: var(--color-bg-elevated);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-subtle);
+    
+    &:hover {
+      background: var(--color-bg-hover);
+      border-color: var(--color-border-hover);
+    }
+  }
+  
+  &.btn-danger {
+    background: var(--color-error);
+    color: white;
+    
+    &:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+  
+  &.btn-ghost {
+    background: transparent;
+    color: var(--color-text-secondary);
+    
+    &:hover {
+      background: var(--color-bg-hover);
+      color: var(--color-text-primary);
+    }
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+// ─── Empty States ───
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  
+  .empty-icon {
+    font-size: 64px;
+    margin-bottom: var(--space-lg);
+    display: block;
+    opacity: 0.6;
+    line-height: 1;
+  }
+  
+  .empty-title {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-sm);
+  }
+  
+  .empty-description {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    max-width: 400px;
+    margin: 0 auto var(--space-lg);
+    line-height: 1.6;
+  }
+  
+  .empty-action {
+    margin-top: var(--space-lg);
+  }
+  
+  // Illustration variants
+  &.empty-no-devices .empty-icon::before { content: '📱'; }
+  &.empty-no-data .empty-icon::before { content: '📊'; }
+  &.empty-no-results .empty-icon::before { content: '🔍'; }
+  &.empty-error .empty-icon::before { content: '⚠️'; }
+}
+
+// ─── Card Hover Effects ───
+.card-hover {
+  transition: all var(--transition-base);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+.card-glow {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    background: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(var(--color-accent-blue-rgb), 0.1),
+      transparent 40%
+    );
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+  }
+  
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+// ─── Tooltip ───
+[data-tooltip] {
+  position: relative;
+  
+  &::before,
+  &::after {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-fast);
+  }
+  
+  &::before {
+    content: attr(data-tooltip);
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    margin-bottom: 8px;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    z-index: var(--z-tooltip);
+  }
+  
+  &::after {
+    content: '';
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 2px;
+    border: 4px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+  }
+  
+  &:hover::before,
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+// ─── Badge ───
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &.badge-success {
+    background: rgba(var(--color-accent-green-rgb), 0.15);
+    color: var(--color-success);
+  }
+  
+  &.badge-error {
+    background: rgba(var(--color-accent-red-rgb), 0.15);
+    color: var(--color-error);
+  }
+  
+  &.badge-warning {
+    background: rgba(var(--color-accent-amber-rgb), 0.15);
+    color: var(--color-warning);
+  }
+  
+  &.badge-info {
+    background: rgba(var(--color-accent-blue-rgb), 0.15);
+    color: var(--color-info);
+  }
+}
+
+// ─── Divider ───
+.divider {
+  height: 1px;
+  background: var(--color-border-subtle);
+  margin: var(--space-lg) 0;
+  
+  &.divider-vertical {
+    width: 1px;
+    height: auto;
+    margin: 0 var(--space-md);
+  }
+}

@@ -1,0 +1,177 @@
+name: Rails CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+env:
+  RAILS_ENV: test
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_WITHOUT: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6.6
+      - name: Cache Ruby gems
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor/bundle
+            ~/.bundle
+          key: ${{ runner.os }}-bundle-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bundle-
+      - name: Install Ruby gems
+        run: |
+          gem install bundler:2.1.4
+          bundle config set --local path vendor/bundle
+          bundle install --jobs 4 --retry 3 --without production
+      - name: Install lint gems
+        run: gem install rubocop rubocop-rails rubocop-performance
+      - name: Run RuboCop
+        run: rubocop
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      - name: Install JS dependencies
+        run: npm ci
+      - name: Run ESLint
+        run: npm run lint:js
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      ANDROIDSPYWARE_DATABASE_HOST: 127.0.0.1
+      ANDROIDSPYWARE_DATABASE_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGHOST: 127.0.0.1
+      BUNDLE_WITHOUT: production
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: android_spyware_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6.6
+      - name: Cache Ruby gems
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor/bundle
+            ~/.bundle
+          key: ${{ runner.os }}-bundle-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bundle-
+      - name: Install Ruby gems
+        run: |
+          gem install bundler:2.1.4
+          bundle config set --local path vendor/bundle
+          bundle install --jobs 4 --retry 3 --without production
+      - name: Prepare test database
+        run: bundle exec rails db:create db:schema:load
+      - name: Run RSpec suite
+        run: bundle exec rspec
+      - name: Package Rails artifact
+        run: |
+          mkdir -p artifacts
+          tar -czf artifacts/rails-app.tar.gz \
+            app config db lib public Gemfile Gemfile.lock package.json package-lock.json .eslintrc.json .rubocop.yml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rails-app
+          path: artifacts/rails-app.tar.gz
+
+  system_test:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      ANDROIDSPYWARE_DATABASE_HOST: 127.0.0.1
+      ANDROIDSPYWARE_DATABASE_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGHOST: 127.0.0.1
+      BUNDLE_WITHOUT: production
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: android_spyware_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6.6
+      - name: Cache Ruby gems
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor/bundle
+            ~/.bundle
+          key: ${{ runner.os }}-bundle-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bundle-
+      - name: Install Ruby gems
+        run: |
+          gem install bundler:2.1.4
+          bundle config set --local path vendor/bundle
+          bundle install --jobs 4 --retry 3 --without production
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      - name: Install JS dependencies
+        run: npm ci
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+      - name: Prepare test database
+        run: bundle exec rails db:create db:schema:load
+      - name: Run system tests
+        run: bundle exec rspec spec/system/ --format documentation
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-test-screenshots
+          path: tmp/screenshots/
+          retention-days: 7

@@ -1,0 +1,1208 @@
+{
+  "scan_info": {
+    "app_path": "E:/EagleSpy V5",
+    "rails_version": "6.1.7.10",
+    "security_warnings": 47,
+    "start_time": "2026-02-08 19:42:56 +0200",
+    "end_time": "2026-02-08 19:44:03 +0200",
+    "duration": 67.0057698,
+    "checks_performed": [
+      "BasicAuth",
+      "BasicAuthTimingAttack",
+      "CSRFTokenForgeryCVE",
+      "ContentTag",
+      "CookieSerialization",
+      "CreateWith",
+      "CrossSiteScripting",
+      "DefaultRoutes",
+      "Deserialize",
+      "DetailedExceptions",
+      "DigestDoS",
+      "DynamicFinders",
+      "EOLRails",
+      "EOLRuby",
+      "EscapeFunction",
+      "Evaluation",
+      "Execute",
+      "FileAccess",
+      "FileDisclosure",
+      "FilterSkipping",
+      "ForgerySetting",
+      "HeaderDoS",
+      "I18nXSS",
+      "JRubyXML",
+      "JSONEncoding",
+      "JSONEntityEscape",
+      "JSONParsing",
+      "LinkTo",
+      "LinkToHref",
+      "MailTo",
+      "MassAssignment",
+      "MimeTypeDoS",
+      "ModelAttrAccessible",
+      "ModelAttributes",
+      "ModelSerialize",
+      "NestedAttributes",
+      "NestedAttributesBypass",
+      "NumberToCurrency",
+      "PageCachingCVE",
+      "Pathname",
+      "PermitAttributes",
+      "QuoteTableName",
+      "Ransack",
+      "Redirect",
+      "RegexDoS",
+      "Render",
+      "RenderDoS",
+      "RenderInline",
+      "ResponseSplitting",
+      "RouteDoS",
+      "SQL",
+      "SQLCVEs",
+      "SSLVerify",
+      "SafeBufferManipulation",
+      "SanitizeConfigCve",
+      "SanitizeMethods",
+      "SelectTag",
+      "SelectVulnerability",
+      "Send",
+      "SendFile",
+      "SessionManipulation",
+      "SessionSettings",
+      "SimpleFormat",
+      "SingleQuotes",
+      "SkipBeforeFilter",
+      "SprocketsPathTraversal",
+      "StripTags",
+      "SymbolDoSCVE",
+      "TemplateInjection",
+      "TranslateBug",
+      "UnsafeReflection",
+      "UnsafeReflectionMethods",
+      "ValidationRegex",
+      "VerbConfusion",
+      "WeakRSAKey",
+      "WithoutProtection",
+      "XMLDoS",
+      "YAMLParsing"
+    ],
+    "number_of_controllers": 60,
+    "number_of_models": 50,
+    "number_of_templates": 112,
+    "ruby_version": "3.1.6",
+    "brakeman_version": "7.1.1"
+  },
+  "warnings": [
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "04135892223a9e83dba93f0e9c25af22f19596e16cab8940619d8f6c07ea07d4",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped parameter value",
+      "file": "app/views/messaging_apps_dumps/adb_backup.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "params[:smartphone_id]",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "MessagingAppsDumpsController",
+          "method": "adb_backup",
+          "line": 75,
+          "file": "app/controllers/messaging_apps_dumps_controller.rb",
+          "rendered": {
+            "name": "messaging_apps_dumps/adb_backup",
+            "file": "app/views/messaging_apps_dumps/adb_backup.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "messaging_apps_dumps/adb_backup"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        79
+      ]
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "0993b4a6f86ff4a008749496a196239d1addae787765ee6dd365f350fc7b937e",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped parameter value",
+      "file": "app/views/messaging_apps_dumps/untar_backup.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "params[:smartphone_id]",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "MessagingAppsDumpsController",
+          "method": "untar_backup",
+          "line": 122,
+          "file": "app/controllers/messaging_apps_dumps_controller.rb",
+          "rendered": {
+            "name": "messaging_apps_dumps/untar_backup",
+            "file": "app/views/messaging_apps_dumps/untar_backup.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "messaging_apps_dumps/untar_backup"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        79
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "09b60806ab6adba67378a6f8434bc572253657b11fefcb6b446f86f02e764e20",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/contacts_controller.rb",
+      "line": 15,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"contacts\", \"contacts_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}.json\").cleanpath))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::ContactsController",
+        "method": "upload_dump"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "09b60806ab6adba67378a6f8434bc572253657b11fefcb6b446f86f02e764e20",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/contacts_controller.rb",
+      "line": 29,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"contacts\", \"contacts_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}.json\").cleanpath))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::ContactsController",
+        "method": "upload_dump"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "18c6270fb77af513e690c5f2fe35294a93f470001110d9afd39fdc57dc52bbbb",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/screenshots_controller.rb",
+      "line": 70,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"screen_snaps\", (\"screen_record_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.mp4\" or \"#{params[:filename].to_s}.mp4\"))))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ScreenshotsController",
+        "method": "screen_record"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Path Traversal",
+      "warning_code": 125,
+      "fingerprint": "1f784c27cdee236e7c8ad26d59403d10e24e8efca3280f8d972703a1461397a7",
+      "check_name": "Pathname",
+      "message": "Absolute paths in `Pathname#join` cause the entire path to be relative to the absolute path, ignoring any prior values",
+      "file": "app/controllers/screenshots_controller.rb",
+      "line": 69,
+      "link": "https://brakemanscanner.org/docs/warning_types/path_traversal/",
+      "code": "Rails.root.join(\"files\", \"dumps\", \"screen_snaps\", (\"screen_record_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.mp4\" or \"#{params[:filename].to_s}.mp4\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ScreenshotsController",
+        "method": "screen_record"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "High",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "2599869bb179c9028145c6193f12a974976548f5621d892f5164a04ef111643d",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/jobs/backup_verification_job.rb",
+      "line": 36,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "system(\"pg_restore --list #{file} > /dev/null 2>&1\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "BackupVerificationJob",
+        "method": "verify_backup"
+      },
+      "user_input": "file",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ]
+    },
+    {
+      "warning_type": "Path Traversal",
+      "warning_code": 125,
+      "fingerprint": "3040a1629ef8178f1c7d7c297046efffc3317ad3884a16d76db14bf3a44187f1",
+      "check_name": "Pathname",
+      "message": "Absolute paths in `Pathname#join` cause the entire path to be relative to the absolute path, ignoring any prior values",
+      "file": "app/controllers/call_logs_controller.rb",
+      "line": 19,
+      "link": "https://brakemanscanner.org/docs/warning_types/path_traversal/",
+      "code": "Rails.root.join(\"files\", \"dumps\", \"calllogs_dumps\", (\"calllogs_dump_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.txt\" or \"#{params[:filename].to_s}.txt\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CallLogsController",
+        "method": "dump_calllogs"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "High",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "30cabe9e7fb40d8960100834ec70face4531bc3999006bd8d6003eb9a0e744dd",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/media_controller.rb",
+      "line": 122,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.open(secure_filepath(\"files/dumps/audio\", \"#{(\"call\" or \"audio\")}_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}_#{SecureRandom.uuid}.mp3\"), \"wb\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::MediaController",
+        "method": "upload_audio"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "3fe1fbf2836f88193590be1cba6d93b63c2a586df2fdd5c344ced293df82a7d4",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/storage_cleanup_service.rb",
+      "line": 113,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`df -B1 \"#{Rails.application.config.x.storage.local_root.to_s}\" 2>/dev/null`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "StorageCleanupService",
+        "method": "get_local_disk_info"
+      },
+      "user_input": "Rails.application.config.x.storage.local_root",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "43ec84463b80316e0fd8faf6e1fc820f812e5f3dc9d58bc09637bcc4c2101e52",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/call_logs_controller.rb",
+      "line": 20,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"calllogs_dumps\", (\"calllogs_dump_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.txt\" or \"#{params[:filename].to_s}.txt\"))))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CallLogsController",
+        "method": "dump_calllogs"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "4eaa72960121623884e845ecd96d60f5ce4fc5ff6dff5ab21c6977d6d2692750",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped parameter value",
+      "file": "app/views/messaging_apps_dumps/pull_whatsapp_db.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "params[:smartphone_id]",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "MessagingAppsDumpsController",
+          "method": "pull_whatsapp_db",
+          "line": 138,
+          "file": "app/controllers/messaging_apps_dumps_controller.rb",
+          "rendered": {
+            "name": "messaging_apps_dumps/pull_whatsapp_db",
+            "file": "app/views/messaging_apps_dumps/pull_whatsapp_db.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "messaging_apps_dumps/pull_whatsapp_db"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        79
+      ]
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "553aedcd43431459954dfdff17d90c37c7bb662f0cd2a90b856a17fd0ffc5e7b",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/payload_generation_service.rb",
+      "line": 44,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture3(*build_msfvenom_command(\"#{\"/root/files/payloads\"}/#{sanitize_filename(apk_payload.name)}\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PayloadGenerationService",
+        "method": "generate"
+      },
+      "user_input": "sanitize_filename(apk_payload.name)",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ]
+    },
+    {
+      "warning_type": "Path Traversal",
+      "warning_code": 125,
+      "fingerprint": "5be0b5f53a5777b06b32818c3f58c53fccda313b358433c9691c810ea866490e",
+      "check_name": "Pathname",
+      "message": "Absolute paths in `Pathname#join` cause the entire path to be relative to the absolute path, ignoring any prior values",
+      "file": "app/controllers/screenshots_controller.rb",
+      "line": 18,
+      "link": "https://brakemanscanner.org/docs/warning_types/path_traversal/",
+      "code": "Rails.root.join(\"files\", \"dumps\", \"screen_snaps\", (\"screen_snap_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.png\" or \"#{params[:filename].to_s}.png\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ScreenshotsController",
+        "method": "dump_screen_snap"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "High",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "626120727c6fa5e9287261791d79c7582ecdd748f113e5c6ef37b4ced88589d3",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/media_controller.rb",
+      "line": 43,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.open(secure_filepath(\"files/dumps/photos\", \"photo_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}_#{SecureRandom.uuid}#{(File.extname(params[:file].original_filename).downcase rescue \".jpg\" or \".jpg\")}\"), \"wb\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::MediaController",
+        "method": "upload_photo"
+      },
+      "user_input": "params[:file].original_filename",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "63a73f478183d6e99216a5c4413bd6e0f26bc5e514c8fe46463f84c148b50f59",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped parameter value",
+      "file": "app/views/messaging_apps_dumps/extract_backup.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "params[:smartphone_id]",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "MessagingAppsDumpsController",
+          "method": "extract_backup",
+          "line": 107,
+          "file": "app/controllers/messaging_apps_dumps_controller.rb",
+          "rendered": {
+            "name": "messaging_apps_dumps/extract_backup",
+            "file": "app/views/messaging_apps_dumps/extract_backup.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "messaging_apps_dumps/extract_backup"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        79
+      ]
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "6ae9c631c051fd29c27e68a2639374e05bd2f19a4257cc90c0130493d91d0688",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/services/optimized_queries.rb",
+      "line": 183,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.execute(\"EXPLAIN ANALYZE #{sql}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OptimizedQueries",
+        "method": "s(:self).analyze_query"
+      },
+      "user_input": "sql",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "6edbd2a8000fe42286ce57db729f8d75b0a43326d7a8a0e02e3c3b320ff31744",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/call_logs_controller.rb",
+      "line": 15,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"calls\", \"calls_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}.json\").cleanpath))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::CallLogsController",
+        "method": "upload_dump"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "6edbd2a8000fe42286ce57db729f8d75b0a43326d7a8a0e02e3c3b320ff31744",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/call_logs_controller.rb",
+      "line": 29,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"calls\", \"calls_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}.json\").cleanpath))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::CallLogsController",
+        "method": "upload_dump"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "6f72f198aee412a036667e54b0c4456685632713e8e85266e3114e179ba9eca7",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped parameter value",
+      "file": "app/views/messaging_apps_dumps/install_old_apk.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "params[:smartphone_id]",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "MessagingAppsDumpsController",
+          "method": "install_old_apk",
+          "line": 54,
+          "file": "app/controllers/messaging_apps_dumps_controller.rb",
+          "rendered": {
+            "name": "messaging_apps_dumps/install_old_apk",
+            "file": "app/views/messaging_apps_dumps/install_old_apk.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "messaging_apps_dumps/install_old_apk"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        79
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "729dcefb227417d003cb00a9d13304063205700d672e22bcea18d53bc1cf890e",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/api/gdpr_controller.rb",
+      "line": 28,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(DataExportService.new(Smartphone.find(params[:id])).export_as_zip.value, :type => \"application/zip\", :disposition => \"attachment\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::GdprController",
+        "method": "data_export"
+      },
+      "user_input": "Smartphone.find(params[:id])",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "799323fe1ecc76a49dcb3d3d0c54b2907bc53033eb47bb00ec1b94157f69ad60",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/media_controller.rb",
+      "line": 101,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(secure_filepath(\"files/dumps/audio\", \"#{(\"call\" or \"audio\")}_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}_#{SecureRandom.uuid}#{(File.extname(params[:file].original_filename).downcase rescue \".mp3\" or \".mp3\")}\")))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::MediaController",
+        "method": "upload_audio"
+      },
+      "user_input": "params[:file].original_filename",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "7b90cda6ebb601a2d40a5ce88242c0fcf2be7e898a81b1a7c7d7fa5d9924532d",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/media_controller.rb",
+      "line": 121,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(secure_filepath(\"files/dumps/audio\", \"#{(\"call\" or \"audio\")}_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}_#{SecureRandom.uuid}.mp3\")))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::MediaController",
+        "method": "upload_audio"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "7bdfbcce5c924df03bf39e81d96a29a474547a4981920625fcf407c6a8fafab5",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/media_controller.rb",
+      "line": 102,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.open(secure_filepath(\"files/dumps/audio\", \"#{(\"call\" or \"audio\")}_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}_#{SecureRandom.uuid}#{(File.extname(params[:file].original_filename).downcase rescue \".mp3\" or \".mp3\")}\"), \"wb\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::MediaController",
+        "method": "upload_audio"
+      },
+      "user_input": "params[:file].original_filename",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "8748167ce41afbc4bfb8a14629f5b58062fddc29e2e466da16ab6f72c6dbb507",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/screenshots_controller.rb",
+      "line": 19,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"screen_snaps\", (\"screen_snap_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.png\" or \"#{params[:filename].to_s}.png\"))))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ScreenshotsController",
+        "method": "dump_screen_snap"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "8b174a0df88bce3132e093617d3a89ba37ede664dbdc3eee9400a7cff6dacbae",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/contacts_controller.rb",
+      "line": 16,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.open(Rails.root.join(\"files\", \"dumps\", \"contacts\", \"contacts_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}.json\").cleanpath, \"wb\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::ContactsController",
+        "method": "upload_dump"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "8cf9e3b7c09b0a76182936bd40f93b831c980188bb28c1e630c291e7ba577bf9",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/storage_cleanup_service.rb",
+      "line": 101,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`wmic logicaldisk where \"DeviceID='#{Rails.application.config.x.storage.local_root.to_s[(0..2)][(0..1)]}'\" get FreeSpace,Size /format:csv 2>NUL`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "StorageCleanupService",
+        "method": "get_local_disk_info"
+      },
+      "user_input": "Rails.application.config.x.storage.local_root.to_s[(0..2)][(0..1)]",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ]
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "921eb98fd5a8e3a142f29dec9db4654565ab6d701b7be94c2552437e74d15b4e",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/api/security_analysis_controller.rb",
+      "line": 41,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params[:exif_data].permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::SecurityAnalysisController",
+        "method": "media_analysis"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        915
+      ]
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "9b1896833f7c9f3d59e1654190a9ef4173ae3afc242a5b33f3ef08db95ad1159",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/jobs/apk_build_job.rb",
+      "line": 40,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture3((\"gradlew.bat\" or \"./gradlew\"), \"assembleRelease\", \"-PserverBaseUrl=#{\"#{payload.destination_ip.to_s.gsub(/[^0-9a-zA-Z.\\-:]/, \"\")}:#{payload.destination_port.to_i.to_s}\"}\", :chdir => Rails.root.join(\"../android-client\").to_s)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ApkBuildJob",
+        "method": "build_apk"
+      },
+      "user_input": "payload.destination_ip.to_s.gsub(/[^0-9a-zA-Z.\\-:]/, \"\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "a13bb2d82423c42b332116deafbfbaa71f0e69876bc64e51bf8b9f1cf4af052a",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/call_logs_controller.rb",
+      "line": 16,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.open(Rails.root.join(\"files\", \"dumps\", \"calls\", \"calls_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}.json\").cleanpath, \"wb\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::CallLogsController",
+        "method": "upload_dump"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "a4e89dc0c7add13bdc0d776ac66fc2e1d108fe1853fa3da8a05945ac853ccd71",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/channels/application_cable/connection.rb",
+      "line": 74,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.execute(\"SELECT pg_advisory_xact_lock(#{Zlib.crc32(device_id)})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ApplicationCable::Connection",
+        "method": "create_placeholder_device"
+      },
+      "user_input": "Zlib.crc32(device_id)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "a9be2597357b6688e708ac0be2bd169a3684df82b36aea21b54ae7c37006ee4a",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/sms_messages_controller.rb",
+      "line": 44,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.open(Rails.root.join(\"files\", \"dumps\", \"sms\", \"sms_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}.json\"), \"wb\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::SmsMessagesController",
+        "method": "upload_dump"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "ab375121ffbd1c41ae8c9a54d36f9118c0891512cf44f0eaf1f369ba8893e8ce",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/pictures_controller.rb",
+      "line": 28,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"pictures\", (\"webcam_snap_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.jpeg\" or \"#{params[:filename].to_s}.jpeg\"))))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PicturesController",
+        "method": "take_picture"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "abb87f4c9bf9183522e31ab7bb43f60711a633a50805bc47b1b1c3ac950281fc",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped parameter value",
+      "file": "app/views/messaging_apps_dumps/decrypt_whatsapp_database.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "params[:smartphone_id]",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "MessagingAppsDumpsController",
+          "method": "decrypt_whatsapp_database",
+          "line": 171,
+          "file": "app/controllers/messaging_apps_dumps_controller.rb",
+          "rendered": {
+            "name": "messaging_apps_dumps/decrypt_whatsapp_database",
+            "file": "app/views/messaging_apps_dumps/decrypt_whatsapp_database.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "messaging_apps_dumps/decrypt_whatsapp_database"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        79
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "ac17635e752f0e4aae3110c9a555af6229d4d9ec3b98f37d631be6ee8f01aabe",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/media_controller.rb",
+      "line": 42,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(secure_filepath(\"files/dumps/photos\", \"photo_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}_#{SecureRandom.uuid}#{(File.extname(params[:file].original_filename).downcase rescue \".jpg\" or \".jpg\")}\")))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::MediaController",
+        "method": "upload_photo"
+      },
+      "user_input": "params[:file].original_filename",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Path Traversal",
+      "warning_code": 125,
+      "fingerprint": "b26d27a7cce233adfd66c36f0f7f208e19c30fb89ff2cf3045b1cc4b94029b2b",
+      "check_name": "Pathname",
+      "message": "Absolute paths in `Pathname#join` cause the entire path to be relative to the absolute path, ignoring any prior values",
+      "file": "app/controllers/contacts_controller.rb",
+      "line": 20,
+      "link": "https://brakemanscanner.org/docs/warning_types/path_traversal/",
+      "code": "Rails.root.join(\"files\", \"dumps\", \"contacts_dumps\", (\"contacts_dump_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.txt\" or \"#{params[:filename].to_s}.txt\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ContactsController",
+        "method": "dump_contacts"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "High",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "b8e9bc1f3cbcba17977155f0473d8e0514a0347c89e6d3dbf2583be909762ff9",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/services/optimized_queries.rb",
+      "line": 198,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.execute(\"        SELECT \\n          query,\\n          calls,\\n          total_exec_time,\\n          mean_exec_time,\\n          max_exec_time,\\n          rows\\n        FROM pg_stat_statements\\n        WHERE mean_exec_time > #{min_duration_ms}\\n        ORDER BY mean_exec_time DESC\\n        LIMIT #{limit};\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OptimizedQueries",
+        "method": "s(:self).slow_queries"
+      },
+      "user_input": "min_duration_ms",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "c12bed02ae46f78392a5d171f0cb7f48b1587ac67392a6b933cc07e71f9c9120",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/smartphones_controller.rb",
+      "line": 522,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(File.expand_path(params[:app]))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SmartphonesController",
+        "method": "install_app"
+      },
+      "user_input": "params[:app]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "c6b120fc96ece21856c09f42db359b8263466a3a0960d2ba07ac7fa6da10fee7",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped parameter value",
+      "file": "app/views/messaging_apps_dumps/uninstall_whatsapp_for_downgrade.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "params[:smartphone_id]",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "MessagingAppsDumpsController",
+          "method": "uninstall_whatsapp_for_downgrade",
+          "line": 38,
+          "file": "app/controllers/messaging_apps_dumps_controller.rb",
+          "rendered": {
+            "name": "messaging_apps_dumps/uninstall_whatsapp_for_downgrade",
+            "file": "app/views/messaging_apps_dumps/uninstall_whatsapp_for_downgrade.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "messaging_apps_dumps/uninstall_whatsapp_for_downgrade"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        79
+      ]
+    },
+    {
+      "warning_type": "Path Traversal",
+      "warning_code": 125,
+      "fingerprint": "d09f8e81c3c79d7dd98a1745d5456ce305fd086409b64169699907c3fdc123e9",
+      "check_name": "Pathname",
+      "message": "Absolute paths in `Pathname#join` cause the entire path to be relative to the absolute path, ignoring any prior values",
+      "file": "app/controllers/pictures_controller.rb",
+      "line": 27,
+      "link": "https://brakemanscanner.org/docs/warning_types/path_traversal/",
+      "code": "Rails.root.join(\"files\", \"dumps\", \"pictures\", (\"webcam_snap_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.jpeg\" or \"#{params[:filename].to_s}.jpeg\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PicturesController",
+        "method": "take_picture"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "High",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "d48d667eec8ce184beee2aaccc859db39a58e877005d250fed102f8e70933ef5",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `constantize` called on model attribute",
+      "file": "app/controllers/notification_channels_controller.rb",
+      "line": 60,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "\"#{NotificationChannel.find(params[:id]).channel_type.camelize}Notifier\".constantize",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "NotificationChannelsController",
+        "method": "test"
+      },
+      "user_input": "NotificationChannel.find(params[:id]).channel_type",
+      "confidence": "Medium",
+      "cwe_id": [
+        470
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "d6e89c92fd95dcc866f251c7063eb1ac3a53c36bbd792c3da8d2d6a602aca409",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/contacts_controller.rb",
+      "line": 21,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"contacts_dumps\", (\"contacts_dump_#{DateTime.now.strftime(\"%Y-%m-%d_%H--%M--%S\")}.txt\" or \"#{params[:filename].to_s}.txt\"))))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ContactsController",
+        "method": "dump_contacts"
+      },
+      "user_input": "params[:filename].to_s",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 120,
+      "fingerprint": "d84924377155b41e094acae7404ec2e521629d86f97b0ff628e3d1b263f8101c",
+      "check_name": "EOLRails",
+      "message": "Support for Rails 6.1.7.10 ended on 2024-10-01",
+      "file": "Gemfile.lock",
+      "line": 285,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        1104
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "da66302cd12b6eed2b158d204f7e56e41e798b24bb28cda26cef142213b97189",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/media_controller.rb",
+      "line": 56,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(secure_filepath(\"files/dumps/photos\", \"photo_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}_#{SecureRandom.uuid}.jpg\")))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::MediaController",
+        "method": "upload_photo"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "e623fc3b965761f2f806e69547810cb669f2010ec33803cd9660ff3f5ecfe443",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/sms_messages_controller.rb",
+      "line": 43,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.dirname(Rails.root.join(\"files\", \"dumps\", \"sms\", \"sms_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}.json\")))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::SmsMessagesController",
+        "method": "upload_dump"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "eb0527e94056fa406c4f3fec2d6c20bb2e905f5811281dcc0c50be0d74c6710d",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/api/media_controller.rb",
+      "line": 57,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.open(secure_filepath(\"files/dumps/photos\", \"photo_#{sanitize_device_id((params[:device_id] or request.headers[\"X-Device-ID\"]))}_#{Time.now.to_i}_#{SecureRandom.uuid}.jpg\"), \"wb\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::MediaController",
+        "method": "upload_photo"
+      },
+      "user_input": "params[:device_id]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ]
+    },
+    {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 121,
+      "fingerprint": "edf687f759ec9765bd5db185dbc615c80af77d6e7e19386fc42934e7a80307af",
+      "check_name": "EOLRuby",
+      "message": "Support for Ruby 2.6.4 ended on 2022-03-31",
+      "file": ".ruby-version",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        1104
+      ]
+    }
+  ],
+  "ignored_warnings": [],
+  "errors": [
+    {
+      "error": "app/controllers/api/commands_controller.rb:118 :: parse error on value \"$\" ($end) Could not parse app/controllers/api/commands_controller.rb",
+      "location": "C:/tools/ruby31/lib/ruby/gems/3.1.0/gems/racc-1.8.1/lib/racc/parser.rb:536:in `on_error'"
+    }
+  ],
+  "obsolete": []
+}

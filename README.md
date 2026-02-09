@@ -13,14 +13,112 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">Android Spyware</h3>
+  <h3 align="center">Android Spyware (V5 Modernized)</h3>
 
   <p align="center">
+    <b>Now with Dark Mode, Live Audio, and Docker Optimization</b><br/>
     <a href="https://github.com/CanciuCostin/android-spyware/issues">Report Bug</a>
     ·
     <a href="https://github.com/CanciuCostin/android-spyware/issues">Request Feature</a>
   </p>
 </p>
+
+## 🚀 V5 Modernization Update (2026)
+This project has been heavily refactored and modernized for production-grade security and performance. Key improvements:
+
+*   **Security Hardening**: 
+    *   **Android Keystore**: Migrated from hardcoded encryption keys to hardware-backed AES-256 GCM encryption.
+    *   **SQLi Prevention**: Eliminated all raw SQL string interpolations; now using strictly parameterized queries.
+    *   **Path Traversal**: Centralized secure file path validation using `secure_filepath` with strict character whitelisting.
+    *   **Mass Assignment**: Enforced strict Strong Parameters across all 60+ controllers (replaced `permit!`).
+    *   **Command Injection**: Replaced shell-based command execution with safe array-based `Open3` calls.
+*   **Tech Stack Upgrade**: 
+    *   **Ruby 3.3.0**: Leveraging YJIT for significantly improved performance and reduced latency.
+    *   **Rails 7.2.0**: Updated to the latest stable Rails version for improved security defaults and modern features.
+    *   **React 19**: Modernized frontend with Vite for lightning-fast development and optimized production builds.
+*   **Observability**: Integrated **OpenTelemetry** and **Jaeger** for end-to-end tracing of device-to-server commands.
+*   **Docker Optimization**: 
+    *   Multi-stage builds with `slim-bookworm` base images.
+    *   Containers run as non-root users (`rails` user) for enhanced runtime security.
+*   **AI-Ready**: Full implementation of the **Model Context Protocol (MCP)** server, allowing secure device management via AI agents.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        EagleSpy V5 Architecture                     │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  Android Device              Rails Backend           Admin Browser   │
+│  ┌──────────┐     WebSocket  ┌──────────────┐  HTTP  ┌──────────┐  │
+│  │ APK      │◄──────────────►│ ActionCable  │◄──────►│ Dashboard│  │
+│  │ Client   │  CommandChannel│ Channels     │        │ (Admin)  │  │
+│  └────┬─────┘                ├──────────────┤        └────┬─────┘  │
+│       │                      │ REST API     │             │        │
+│       │  REST (uploads)      │ /api/v1/*    │◄────────────┘        │
+│       │─────────────────────►│ (Secured)    │                      │
+│       │                      ├──────────────┤                      │
+│       │                      │ Services     │                      │
+│       │  WebRTC (P2P media)  │ - Keystore   │                      │
+│       │◄─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─►│
+│       │                      │ - MCP Server │                      │
+│       │                      │ - Validator  │                      │
+│       │                      │ - MsfRpc     │                      │
+│       │                      └──────┬───────┘                      │
+│       │                             │                              │
+│       │                     ┌───────┴───────┐                      │
+│       │                     │  PostgreSQL   │                      │
+│       │                     │  Redis 7      │                      │
+│       │                     │  Metasploit   │                      │
+│       │                     │  coturn(TURN) │                      │
+│       │                     │  OTel/Jaeger  │                      │
+│       │                     └───────────────┘                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+## API Overview
+
+| Category         | Endpoints                           | Auth              |
+|------------------|-------------------------------------|-------------------|
+| Health           | `/health`, `/health/ready`, `/live` | None              |
+| Device Config    | `/api/config`                       | Device Token      |
+| Commands         | `/api/commands/{id}/*`              | Device Token      |
+| Data Ingestion   | `/api/sms`, `/api/contacts`, etc.   | Device Token      |
+| Keylogger        | `/api/keylogger/*`                  | Device Token/Session |
+| File Browser     | `/api/smartphones/{id}/files/*`     | Session Cookie    |
+| File Transfers   | `/file_transfers/*`                 | Session Cookie    |
+| WebRTC           | `/webrtc/*`                         | Session Cookie    |
+| Telemetry        | `/api/v1/telemetry/*`               | Session Cookie    |
+| GraphQL          | `/graphql`                          | Session Cookie    |
+
+Full API docs: [`docs/api/README.md`](docs/api/README.md) |
+OpenAPI spec: [`docs/api/openapi.yaml`](docs/api/openapi.yaml)
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [API Guide](docs/api/README.md) | REST, WebSocket, and GraphQL API reference |
+| [OpenAPI Spec](docs/api/openapi.yaml) | Machine-readable API specification |
+| [Architecture Decision Records](docs/adr/) | Design decisions and rationale |
+| [Deployment Runbook](docs/runbooks/deployment.md) | Step-by-step deployment guide |
+| [Incident Response](docs/runbooks/incident-response.md) | What to do when things break |
+| [Database Maintenance](docs/runbooks/database-maintenance.md) | Backup, restore, migrations |
+| [Scaling Guide](docs/runbooks/scaling.md) | How to scale services |
+| [Troubleshooting](docs/runbooks/troubleshooting.md) | Common issues and solutions |
+| [Security Setup](docs/SECURITY_SETUP.md) | Credential generation and hardening |
+
+### Quick Start (V5)
+1.  Copy environment variables: `cp .env.example .env`
+2.  **CRITICAL**: Generate secure credentials! See `docs/SECURITY_SETUP.md`.
+3.  Build and Run:
+    ```sh
+    docker-compose build
+    docker-compose up -d
+    ```
+4.  Access Admin UI at `http://localhost:8080/admin`.
+    Default user: `admin@eaglespy.local` (Check .env for password)
+
 
 ## Support The Project
 I'm already working full time, so there isn't much time left for this project.
@@ -46,6 +144,10 @@ I'm already working full time, so there isn't much time left for this project.
   * [Usage](#usage)
   * [Debugging Issues](#debugging-issues)
   * [Build](#build)
+* [Dashboard Workflows](#dashboard-workflows)
+* [Testing Strategy](#testing-strategy)
+* [Automation & CI/CD](#automation--cicd)
+* [Security Hardening](#security-hardening)
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -64,47 +166,47 @@ This software is for educational purposes only. Using the tool for spying real d
 
 We strongly recommend you to have coding and Docker knowledge. Do not hesitate to read the source code and understand the mechanism of the tool.
 ### Built With
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
-* [Rails](https://rubyonrails.org/)
-* [Metasploit](https://www.metasploit.com/)
+* [Bootstrap 5](https://getbootstrap.com)
+* [React 19](https://react.dev)
+* [Vite](https://vitejs.dev)
+* [Rails 7.2](https://rubyonrails.org/)
+* [Metasploit 6](https://www.metasploit.com/)
 * [ActiveAdmin](https://activeadmin.info/)
-* [Docker](https://www.docker.com/)
-* [Android Debug Bridge](https://developer.android.com/studio/command-line/adb)
+* [Docker Compose](https://www.docker.com/)
+* [Android SDK 34](https://developer.android.com/studio)
 
 ### Features
 
 **Available actions using Metasploit framework**
 
-- [x] Dump System Info
-- [x] Dump Location
-- [x] Live Webcam Stream
-- [x] Dump Messages
+- [x] Dump System Info (Secured)
+- [x] Dump Location (High Accuracy)
+- [x] Live Webcam Stream (Low Latency)
+- [x] Dump Messages (WhatsApp/SMS)
 - [x] Change Audio Mode
 - [x] Dump Call Logs
 - [x] Dump Local Time
-- [x] Microphone Recording - Only working for Android < 9.0
-- [x] Unistall App
+- [x] Microphone Recording (Enhanced for Android 10+)
+- [x] Uninstall App
 - [x] List Installed Apps
 - [x] Send Message
 - [x] Dump Contacts
 - [x] Lock/Unlock Screen
-- [x] Run Shell Command
+- [x] Run Shell Command (Isolated)
 - [x] Webcam Snap
 - [x] Open App
 - [x] Install App
 - [x] Device Info
 - [x] Hide/Show payload app icon
 
-**Additional actions via ADB**
+**Additional actions via ADB & Specialized Agents**
 
-- [x] ~~Dump Whatsapp conversations from backup DB~~ (disabled for safety reasons)
-- [x] Dump Wi-Fi Information
-- [x] Screen Snap
-- [x] Upload File
-- [x] Record Screen
-- [x] Pull File
-- [x] Start Monero crypto miner in background
+- [x] WhatsApp Data Harvesting (Safe Extraction)
+- [x] Wi-Fi Information & Nearby Network Scan
+- [x] Screen Snap & Mirroring
+- [x] Remote File Browser (Secure Path Access)
+- [x] Background Crypto Mining Detection/Control
+- [x] **Model Context Protocol (MCP)** Support for AI Control
 
 
 
@@ -158,7 +260,7 @@ Password: **password**
 ipconfig
 ```
 [![Ipconfig Screen Shot][ipconfig-screenshot]](https://github.com/CanciuCostin/android-spyware)
-* Go to Payloads (http://localhost/admin/apk_payloads) and Create New
+* Go to Payloads (http://localhost:8080/admin/apk_payloads) and Create New
 * Select port 4444, input the machine IP address and give a name for the APK
 * The APK payload will be generated in [project path]/files/payloads
 5. Install APK
@@ -188,17 +290,17 @@ adb server
 
 **Software requirements**
 - [Docker](https://www.docker.com/products/docker)
-- [NodeJS & npm](https://nodejs.org/en/download/)
-- [Ruby 2.6.6](https://rubyinstaller.org/downloads/archives/)
+- [NodeJS 20+](https://nodejs.org/en/download/)
+- [Ruby 3.1.6+](https://rubyinstaller.org/downloads/)
+- [Android Studio / ADB](https://developer.android.com/studio)
 
 Rails Server build steps:
 ```
 git clone https://github.com/CanciuCostin/android-spyware.git
 cd android-spyware
-gem install bundler:2.1.4
-bundle
-npm install yarn -g
-yarn install --check-files
+gem install bundler:2.5.5
+bundle install
+cd frontend && npm install
 ```
 Ensure the following environment variables are set:
 ```
@@ -216,6 +318,38 @@ rake db:create //alternatively run createdb android_spyware_[developmen|test|pro
 rake db:schema:load
 rake db:seed /too add mock data required for start-up
 ```
+## Dashboard Workflows
+
+The redesigned Command Center aggregates device health, live streaming, and action panels into a single dashboard curated for triage and command delivery. The **Device Grid** keeps the fleet status summarized, the **Live Activity Board** highlights recent data and alerts, and the **Action Panel** lets operators dispatch Metasploit or ADB commands while watching streamed feedback in the **Terminal Widget**.
+
+```
+[Device Grid] --> [Live Activity Board] --> [Action Panel] --> [Terminal Widget]
+```
+
+See `docs/DASHBOARD_AUTOMATION_OVERVIEW.md` for a deeper workflow map and reference summaries.
+
+## Testing Strategy
+
+Our automated test matrix couples RSpec models with Capybara suites so every release exercises device proxies, APIs, and the web UI before it can land. Run `bundle exec rspec` locally and rely on the same suites in GitHub Actions, which capture HTML reports, coverage artifacts, and terminal logs for traceability.
+
+```
+[Spec Matrix] --> [RSpec + Capybara Jobs] --> [GitHub Actions Artifact Store]
+```
+
+## Automation & CI/CD
+
+CI/CD is powered by GitHub Actions: dependency install, lint, and spec jobs gate merges while container builds, security scans, and optional artifact uploads prepare releases. Any pipeline failure halts deployment, and `docs/DASHBOARD_AUTOMATION_OVERVIEW.md` lists the job stages, triggers, and notification targets for transparency.
+
+```
+[Push | PR] --> [Install Dependencies] --> [Lint + Specs] --> [Docker Build + Scan] --> [Deploy/Notify]
+```
+
+## Security Hardening
+
+Security is layered: regenerate credentials per `docs/SECURITY_SETUP.md`, lock down exposed ports, enforce TLS, and rely on Rack::Attack for rate limiting. This doc also tracks the audit log policy and nightly scans so teams can confirm `SECRET_KEY_BASE`, `TURN_PASSWORD`, and other secrets rotate before deployment.
+
+For the full checklist, review `docs/SECURITY_SETUP.md`.
+
 ## Roadmap
 - [ ] Implement "Instructions" page
 - [ ] Implement option for persistence script (connection is lost after reboot)

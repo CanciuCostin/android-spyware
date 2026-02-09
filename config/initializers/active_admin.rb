@@ -246,6 +246,17 @@ ActiveAdmin.setup do |config|
   #     end
   #   end
 
+  # Organize Menu Structure
+  config.namespace :admin do |admin|
+    admin.build_menu do |menu|
+      menu.add label: "🚀 Command Center", priority: 1, url: "/admin/dashboard"
+      menu.add label: "👁 Surveillance", priority: 2
+      menu.add label: "📦 Data", priority: 3
+      menu.add label: "📦 APK", priority: 4
+      menu.add label: "🧠 AI", priority: 5
+    end
+  end
+
   # == Download Links
   #
   # You can disable download links on resource listing pages,

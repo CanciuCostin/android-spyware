@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "eaglespy": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://localhost:3000/api/mcp"
+      ],
+      "env": {
+        "MCP_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}

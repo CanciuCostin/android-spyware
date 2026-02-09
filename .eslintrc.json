@@ -1,0 +1,29 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "public/packs/",
+    "public/assets/",
+    "tmp/",
+    "log/"
+  ],
+  "rules": {
+    "no-console": "off",
+    "no-unused-vars": [
+      "warn",
+      {
+        "varsIgnorePattern": "^_"
+      }
+    ]
+  }
+}

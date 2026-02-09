@@ -1,6 +1,6 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-  #config.secret_key_base = ENV["SECRET_KEY_BASE"]
+  config.secret_key_base = ENV["SECRET_KEY_BASE"]
 
   # Code is not reloaded between requests.
   config.cache_classes = true
@@ -27,6 +27,7 @@ Rails.application.configure do
   # config.assets.css_compressor = :sass
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.
+  # Security: Disable dynamic compilation in production
   config.assets.compile = false
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
@@ -45,11 +46,47 @@ Rails.application.configure do
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  # Enable when SSL is configured - RECOMMENDED for production
+  # Force SSL, enable strict transport security, and secure cookies.
+  config.force_ssl = ENV.fetch('FORCE_SSL', 'true') == 'true'
+  config.ssl_options = {
+    hsts: {
+      expires: 31536000, # 1 year in seconds
+      subdomains: true,
+      preload: true
+    },
+    secure_cookies: true,
+    redirect: {
+      exclude: ->(request) { 
+        # Don't redirect health checks or monitoring endpoints
+        request.path =~ /\/(health|metrics|status)$/
+      }
+    }
+  }
+  config.require_master_key = true
+
+
+  allowed_hosts = []
+  allowed_hosts << ENV['RAILS_HOST']
+  allowed_hosts << ENV['PRODUCTION_HOST']
+  allowed_hosts << ENV['ADMIN_HOST']
+  allowed_hosts << 'localhost'
+  unless ENV['ALLOW_ALL_HOSTS'] == 'true'
+    config.hosts.clear
+    allowed_hosts.each do |host|
+      config.hosts << host if host.present?
+    end
+  end
+
+  config.action_dispatch.default_headers.merge!(
+    'X-Frame-Options' => 'DENY',
+    'X-Content-Type-Options' => 'nosniff',
+    'Referrer-Policy' => 'strict-origin-when-cross-origin'
+  )
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :debug
+  config.log_level = :info
 
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]

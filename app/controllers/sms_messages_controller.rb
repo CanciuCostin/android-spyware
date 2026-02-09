@@ -1,46 +1,29 @@
 class SmsMessagesController < InheritedResources::Base
+  before_action :authenticate_admin_user!
+  include CommandSender
+  
   def dump_messages
     begin
-      commandTimeout = params[:exec_timeout].to_i
-      downloadTimeout = params[:copy_timeout].to_i
-      fileName = params[:filename].to_s
-      @smartphone = Smartphone.find(params[:smartphone_id])
-      currentTime = DateTime.now
-      currentTimeFormat = currentTime.strftime("%Y-%m-%d_%H--%M--%S")
-      @fileName = fileName.empty? ?
-        "sms_messages_dump_" + currentTimeFormat + ".txt" :
-        fileName + ".txt"
-      processCommand = "dump_sms -o #{@fileName}"
-      commandOutput = start_msf_process(processCommand)
-      1.upto(commandTimeout) do |n|
-        if system("docker exec kali_container sh -c \"ls | grep #{@fileName}\"")
-          break
-        else
-          puts "Waiting ..."
-        end
-        sleep 1
-      end
-      copyMessagesCommand = "docker cp kali_container:/#{@fileName} files/dumps/sms_messages_dumps/#{@fileName}"
-      system(copyMessagesCommand)
-      fullPath = "files/dumps/sms_messages_dumps/" + @fileName
-      isOperationSuccessful = false
-      1.upto(downloadTimeout) do |n|
-        if File.file?(fullPath)
-          newMessageDump = SmsMessage.new(:date => currentTimeFormat.gsub("_", " ").gsub("--", ":"),
-                                          :filename => @fileName,
-                                          :smartphone_id => @smartphone.id)
-          newMessageDump.save!
-          isOperationSuccessful = true
-          break
-        else
-          puts "Waiting ..."
-        end
-        sleep 1
-      end
-      commandOutput = ["Operation Failed"] if not isOperationSuccessful
-    rescue
-      puts "Error on dump messages"
-      commandOutput = ["Operation Failed"]
+      smartphone_id = params[:smartphone_id]
+      @smartphone = Smartphone.find(smartphone_id)
+      
+      # Send command via ActionCable to Android app
+      command_data = {
+        command: "get_sms",
+        timestamp: Time.now.to_i
+      }
+      
+      ActionCable.server.broadcast(
+        "commands_#{@smartphone.device_id}",
+        command_data
+      )
+      
+      commandOutput = ["Command sent to device #{@smartphone.device_id}", "SMS dump requested..."]
+      @fileName = "sms_dump_#{Time.now.to_i}.txt"
+    rescue => e
+      Rails.logger.error("Error on dump messages: #{e.message}")
+      commandOutput = ["Operation Failed: #{e.message}"]
+      @fileName = "error.txt"
     end
     respond_to do |format|
       format.js {
@@ -52,13 +35,27 @@ class SmsMessagesController < InheritedResources::Base
   end
 
   def send_sms
-    processCommand = 'send_sms -d 0729380759 -t "bla bla"'
-    commandOutput = start_msf_process(processCommand)
-    respond_to do |format|
-      format.js {
-        render "send_message",
-               :locals => { :commandOutput => commandOutput }
-      }
+    begin
+      # SECURITY FIX: Use strong parameters instead of direct access
+      sms_params = sms_message_params
+      @smartphone = Smartphone.find(sms_params[:smartphone_id])
+      phone_number = sms_params[:phone_number]
+      message_body = sms_params[:message_body]
+      
+      # Send SMS command asynchronously
+      pending_command = send_command_async(
+        @smartphone,
+        'send_sms',
+        { phone_number: phone_number, message_body: message_body }
+      )
+      
+      flash[:notice] = "SMS sending command sent to device. Request ID: #{pending_command.request_id}"
+      redirect_to sms_messages_path
+      
+    rescue => e
+      Rails.logger.error("Error sending SMS: #{e.message}")
+      flash[:alert] = "Failed to send SMS: #{e.message}"
+      redirect_to sms_messages_path
     end
   end
 
@@ -67,6 +64,8 @@ class SmsMessagesController < InheritedResources::Base
   def sms_message_params
     params.require(:sms_message).permit(:date,
                                         :filename,
-                                        :smartphone_id)
+                                        :smartphone_id,
+                                        :phone_number,
+                                        :message_body)
   end
 end

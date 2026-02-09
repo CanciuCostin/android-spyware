@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Base configuration: trust system certificates, no cleartext by default -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <!-- Add user certificates for testing with self-signed certs -->
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+    
+    <!-- Production domain with certificate pinning -->
+    <!-- INSTRUCTIONS: Replace 'yourdomain.com' with your actual domain -->
+    <!-- Replace PIN values with your certificate's SHA-256 hashes -->
+    <!-- To get PIN: openssl x509 -in cert.pem -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64 -->
+    <!--
+    <domain-config>
+        <domain includeSubdomains="true">yourdomain.com</domain>
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</pin>
+            <pin digest="SHA-256">BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=</pin>
+        </pin-set>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+    -->
+    
+    <!-- Development/Testing: Allow cleartext traffic for local IPs -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Localhost -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        
+        <!-- Android emulator host -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        
+        <!-- Common private network ranges -->
+        <domain includeSubdomains="true">192.168.1.5</domain>
+        <domain includeSubdomains="true">192.168.1.13</domain>
+        <domain includeSubdomains="true">213.91.211.150</domain>
+        
+        <!-- Add your LAN IPs here for testing -->
+        <!-- <domain includeSubdomains="true">192.168.x.x</domain> -->
+        
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>
+

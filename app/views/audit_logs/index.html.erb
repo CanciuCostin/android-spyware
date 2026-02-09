@@ -1,0 +1,50 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-clipboard-list"></i>
+            Audit Trail
+          </h3>
+          <div class="card-tools">
+            <%= link_to "Export CSV", export_audit_logs_path(format: :csv, **params.permit(:admin_user_id, :action, :auditable_type, :start_date, :end_date)), class: "btn btn-sm btn-primary" %>
+            <%= link_to "Statistics", stats_audit_logs_path, class: "btn btn-sm btn-info", target: "_blank" %>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Timestamp</th>
+                  <th>Admin User</th>
+                  <th>Action</th>
+                  <th>Resource</th>
+                  <th>IP Address</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @audit_logs.each do |log| %>
+                  <tr>
+                    <td><%= log.id %></td>
+                    <td><%= log.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+                    <td><%= log.admin_user&.email || 'System' %></td>
+                    <td><span class="badge badge-info"><%= log.action.upcase %></span></td>
+                    <td><%= log.auditable_type %> #<%= log.auditable_id %></td>
+                    <td><code><%= log.ip_address %></code></td>
+                    <td><%= link_to "View", audit_log_path(log), class: "btn btn-sm btn-outline-primary" %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+          <%= paginate @audit_logs %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

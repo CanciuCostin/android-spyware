@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  eaglespy-blue:
+    image: eaglespy:${VERSION:-latest}
+    container_name: eaglespy-prod-blue
+    ports:
+      - "3000:3000"
+    environment:
+      - RAILS_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+    volumes:
+      - ./storage:/app/storage
+      - ./log:/app/log
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: eaglespy_production
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

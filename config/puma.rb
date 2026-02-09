@@ -3,25 +3,23 @@
 # Any libraries that use thread pools should be configured to match
 # the maximum value specified for Puma. Default is set to 5 threads for minimum
 # and maximum; this matches the default thread size of Active Record.
-#
-path_to_key="C:/Users/Costin/Desktop/Workspaces/android-spyware/server.key"
-path_to_cert="C:/Users/Costin/Desktop/Workspaces/android-spyware/server.crt"
-#if ENV.fetch("RAILS_ENV") == 'development'
-#  ssl_bind '127.0.0.1', '3000', {
-#    key: path_to_key,
-#    cert: path_to_cert,
-#    verify_mode: 'none'
-#  }
-#end
-
 
 max_threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
 min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
 threads min_threads_count, max_threads_count
 
-# Specifies the `port` that Puma will listen on to receive requests; default is 3000.
-#
-port        ENV.fetch("PORT") { 3000 }
+# SSL Configuration
+# Enable SSL/TLS if USE_SSL environment variable is set to 'true'
+if ENV.fetch('USE_SSL', 'false') == 'true'
+  ssl_bind '0.0.0.0', ENV.fetch('PORT', 3000), {
+    key: ENV.fetch('SSL_KEY_PATH', 'server.key'),
+    cert: ENV.fetch('SSL_CERT_PATH', 'server.crt'),
+    verify_mode: ENV.fetch('SSL_VERIFY_MODE', 'none') # Use 'peer' for production with valid certs
+  }
+else
+  # Standard HTTP port binding
+  port ENV.fetch("PORT") { 3000 }
+end
 
 # Specifies the `environment` that Puma will run in.
 #

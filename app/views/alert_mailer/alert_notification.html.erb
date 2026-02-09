@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      border-bottom: 3px solid;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .header.low { border-color: #28a745; }
+    .header.medium { border-color: #ffc107; }
+    .header.high { border-color: #fd7e14; }
+    .header.critical { border-color: #dc3545; }
+    h2 {
+      margin: 0;
+    }
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    .info-table td {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    .info-table td:first-child {
+      font-weight: bold;
+      width: 150px;
+    }
+    .message-box {
+      background: #f8f9fa;
+      border-left: 4px solid #007bff;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .metadata-box {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      padding: 15px;
+      margin: 20px 0;
+      overflow-x: auto;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .actions {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-right: 10px;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="header <%= @alert.severity %>">
+    <h2><%= @alert.title %></h2>
+  </div>
+
+  <table class="info-table">
+    <tr>
+      <td>Severity</td>
+      <td><strong><%= @alert.severity.upcase %></strong></td>
+    </tr>
+    <tr>
+      <td>Device</td>
+      <td><%= @device.device_name || 'Unknown' %> (<%= @device.target_ip %>)</td>
+    </tr>
+    <tr>
+      <td>Event Type</td>
+      <td><%= @alert.alert_rule.event_type %></td>
+    </tr>
+    <tr>
+      <td>Triggered At</td>
+      <td><%= @alert.triggered_at.strftime('%Y-%m-%d %H:%M:%S %Z') %></td>
+    </tr>
+  </table>
+
+  <% if @alert.message.present? %>
+  <div class="message-box">
+    <h3 style="margin-top: 0;">Message</h3>
+    <%= simple_format(@alert.message) %>
+  </div>
+  <% end %>
+
+  <% if @alert.metadata.present? %>
+  <div class="metadata-box">
+    <h3 style="margin-top: 0;">Additional Data</h3>
+    <pre><%= JSON.pretty_generate(@alert.metadata) %></pre>
+  </div>
+  <% end %>
+
+  <div class="actions">
+    <p>Take action:</p>
+    <a href="<%= url_for(controller: 'apk_installations', action: 'show', id: @device.id, only_path: false) %>" class="btn">View Device</a>
+  </div>
+
+  <div class="footer">
+    <p>This is an automated alert from EagleSpy V5 Notification System.</p>
+    <p>Alert ID: <%= @alert.id %> | Rule: <%= @alert.alert_rule.name %></p>
+  </div>
+</body>
+</html>

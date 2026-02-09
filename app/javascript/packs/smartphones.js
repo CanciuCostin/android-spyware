@@ -1,4 +1,4 @@
-import "../stylesheets/application";
+import '../stylesheets/application';
 
 $(document).ready(() => {
   $('[data-toggle="tooltip"]').tooltip();
@@ -6,20 +6,25 @@ $(document).ready(() => {
   $('[data-toggle="carousel"]').carousel();
   $('[data-toggle="dropdown"]').dropdown();
 
-  var modal = document.getElementById("myModal");
-  var btn = document.getElementById("phoneBtna");
-  var span = document.getElementsByClassName("close")[0];
-  btn.onclick = function () {
-    modal.style.display = "block";
-  };
+  const modal = document.getElementById('myModal');
+  const btn = document.getElementById('phoneBtna');
+  const span = document.getElementsByClassName('close')[0];
 
-  span.onclick = function () {
-    modal.style.display = "none";
-  };
+  if (btn) {
+    btn.addEventListener('click', () => {
+      modal.style.display = 'block';
+    });
+  }
 
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
+  if (span) {
+    span.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+  }
+
+  window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
     }
-  };
+  });
 });

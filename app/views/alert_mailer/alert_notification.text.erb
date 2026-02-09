@@ -1,0 +1,25 @@
+<%= @alert.title %>
+====================================
+
+Severity: <%= @alert.severity.upcase %>
+Device: <%= @device.device_name || 'Unknown' %> (<%= @device.target_ip %>)
+Event Type: <%= @alert.alert_rule.event_type %>
+Triggered At: <%= @alert.triggered_at.strftime('%Y-%m-%d %H:%M:%S %Z') %>
+
+<% if @alert.message.present? %>
+MESSAGE:
+--------
+<%= @alert.message %>
+
+<% end %>
+<% if @alert.metadata.present? %>
+ADDITIONAL DATA:
+----------------
+<%= JSON.pretty_generate(@alert.metadata) %>
+
+<% end %>
+---
+Alert ID: <%= @alert.id %>
+Rule: <%= @alert.alert_rule.name %>
+
+This is an automated alert from EagleSpy V5 Notification System.
