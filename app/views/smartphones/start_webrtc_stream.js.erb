@@ -1,9 +1,68 @@
-<div id="start-webrtc-stream-result" class="alert alert-info alert-dismissible fade show" role="alert">
-  <strong><i class="fas fa-video"></i> WebRTC Stream</strong>
-  <% commandOutput.each do |output| %>
-    <div><%= output %></div>
-  <% end %>
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
+var commandOutput = <%= commandOutput.to_json.html_safe %>;
+var deviceId = "<%= smartphone.device_id %>";
+
+// Close any existing modals
+if (window.closeModal) window.closeModal();
+
+// Create WebRTC Modal UI
+var modalHtml = `
+<div class="webrtc-container" style="text-align: center; padding: 10px;">
+    <div id="stream-status" class="badge badge-warning" style="margin-bottom: 10px; padding: 5px 10px;">Initializing...</div>
+    
+    <div class="video-wrapper" style="position: relative; width: 100%; max-width: 640px; margin: 0 auto; background: #000; border-radius: 8px; overflow: hidden; aspect-ratio: 4/3;">
+        <video id="remoteVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <div id="loading-spinner" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #00d4ff;">
+            <i class="fas fa-circle-notch fa-spin fa-3x"></i>
+        </div>
+    </div>
+    
+    <div class="controls" style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+        <button id="start-stream-btn" class="cb" style="border-color: #22c55e; color: #22c55e;">Start</button>
+        <button id="stop-stream-btn" class="cb" style="border-color: #ef4444; color: #ef4444;">Stop</button>
+        <button id="full-screen-btn" class="cb">Fullscreen</button>
+    </div>
+    
+    <div id="connection-stats" style="margin-top: 10px; font-size: 0.75rem; color: #666; display: none;">
+        Data: <span id="bytes-received">0 B</span> | Packets: <span id="packets-received">0</span>
+    </div>
+
+    <div style="margin-top: 10px; font-family: monospace; font-size: 0.8rem; text-align: left; max-height: 100px; overflow-y: auto; background: #0d0d15; padding: 5px; border-radius: 4px;">
+        ${commandOutput.join('<br>')}
+    </div>
 </div>
+`;
+
+if (window.showOutput) {
+    window.showOutput("Live Video Stream", modalHtml);
+    
+    // Initialize WebRTC
+    // Note: We need to wait a brief moment for the modal to be inserted into DOM
+    setTimeout(function() {
+        if (typeof WebRTCClient !== 'undefined') {
+            window.activeWebRTC = new WebRTCClient(deviceId);
+            window.activeWebRTC.startStream();
+            
+            // Cleanup on modal close
+            var modal = document.getElementById('modal');
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === "class") {
+                        if (!modal.classList.contains('show')) {
+                            if (window.activeWebRTC) {
+                                window.activeWebRTC.stopStream();
+                                window.activeWebRTC = null;
+                            }
+                            observer.disconnect();
+                        }
+                    }
+                });
+            });
+            observer.observe(modal, { attributes: true });
+        } else {
+            alert("WebRTC Client library not loaded. Please refresh the page.");
+        }
+    }, 500);
+} else {
+    // Fallback
+    $( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
+}

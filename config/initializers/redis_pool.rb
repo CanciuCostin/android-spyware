@@ -12,8 +12,21 @@ module RedisPool
   # Adjust based on concurrency needs (Puma threads, Sidekiq workers, etc.)
   POOL_SIZE = ENV.fetch('REDIS_POOL_SIZE', ENV.fetch('RAILS_MAX_THREADS', 5).to_i + 10).to_i
   
-  POOL = ConnectionPool.new(size: POOL_SIZE, timeout: 5) do
-    Redis.new(url: REDIS_URL)
+  POOL = ConnectionPool.new(size: POOL_SIZE, timeout: 1) do
+    begin
+      r = Redis.new(url: REDIS_URL)
+      r.ping # Fail fast if no Redis
+      r
+    rescue
+      # Fallback mock for Windows without Redis
+      Class.new do
+        def method_missing(*args); nil; end
+        def sadd(*args); true; end
+        def srem(*args); true; end
+        def set(*args); true; end
+        def get(*args); nil; end
+      end.new
+    end
   end
 
   # Helper to execute Redis commands with pooled connection

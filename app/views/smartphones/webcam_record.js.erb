@@ -1,6 +1,23 @@
-var commandOutput = <%= commandOutput.to_json %>;
-$( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
+var commandOutput = <%= commandOutput.to_json.html_safe %>;
+var fileName = "<%= fileName rescue '' %>";
 
-if (commandOutput[0] != "Operation Failed" && commandOutput[0] != "Control+Z"){
-    window.open("localhost/<%= fileName %>")
+if (window.showOutput) {
+    window.showOutput("Webcam Record", commandOutput.join("\n"));
+    
+    if (fileName && fileName.length > 0) {
+        var url = "/files/dumps/pictures/" + fileName;
+        var link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.textContent = "View Recording";
+        link.style.display = "block";
+        link.style.marginTop = "10px";
+        link.style.color = "#00d4ff";
+        document.getElementById('modal-body').appendChild(link);
+    }
+} else {
+    $( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
+    if (fileName && fileName.length > 0) {
+        window.open("/files/dumps/pictures/" + fileName, '_blank');
+    }
 }

@@ -7,8 +7,8 @@ class GeofenceEvent < ApplicationRecord
   validates :lng, presence: true, numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }
   validates :triggered_at, presence: true
 
-  scope :entries, -> { where(event_type: 'entry') }
-  scope :exits, -> { where(event_type: 'exit') }
+  scope :entry_events, -> { where(event_type: 'entry') }
+  scope :exit_events, -> { where(event_type: 'exit') }
   scope :recent, -> { order(triggered_at: :desc) }
   scope :for_device, ->(smartphone_id) { where(smartphone_id: smartphone_id) }
 end

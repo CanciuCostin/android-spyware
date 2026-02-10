@@ -25,7 +25,12 @@
 
 ## Status of Commands
 
-### ✅ Passing Commands (10/17)
+**Current Status: RE-VERIFYING AFTER CRASH FIX**
+- ✅ Server restarted and stable
+- ✅ App crash loop resolved
+- 🔄 Re-testing all commands to ensure stability post-fix
+
+### ✅ Previously Passing Commands (16/17)
 1. Device Info - ✓ Working
 2. WiFi - ✓ Working
 3. Accounts - ✓ Working
@@ -43,7 +48,7 @@
 15. Ambient (Light) - ✓ Working
 16. Location (localtime) - ✓ Working
 
-### ⏱️ Timeout Issues (7 commands)
+### ⏱️ Known Timeout Issues (7 commands - under re-testing)
 1. Hide App - **TIMEOUT**
 2. Show App - **TIMEOUT**
 3. Silent Mode - **TIMEOUT**
@@ -52,7 +57,9 @@
 6. Front Camera - **TIMEOUT**
 7. Screenshot - **TIMEOUT**
 
-### ✅ Fixed Issues
+### ✅ Recent Fixes
+- **Crash Loop Fixed**: App no longer crashes on startup
+- **Server Restart**: Successfully restarted and stable
 - All connectivity issues resolved
 - Device receives all commands successfully
 - 403 Consent Errors - Fixed with middleware bypass

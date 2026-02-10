@@ -1,2 +1,29 @@
-var commandOutput = <%= commandOutput.to_json %>;
-$( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
+var commandOutput = <%= commandOutput.to_json.html_safe %>;
+// Show in dashboard modal
+if (window.showOutput) {
+  window.showOutput("Photo Capture", commandOutput.join("\n"));
+} else {
+  // Fallback for legacy terminal
+  $( ".Terminal__body" ).trigger("write",[" msf > ", "", commandOutput ]);
+}
+
+// Check for file path in output
+var fileLine = commandOutput.find(l => l.includes("Photo captured:"));
+if (fileLine) {
+    var filename = fileLine.split(": ")[1].split(" ")[0];
+    var url = "/files/dumps/pictures/" + filename;
+    
+    // Add downloadable link to modal or open in new tab
+    if (window.showOutput) {
+        var link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.textContent = "View Photo (" + filename + ")";
+        link.style.display = "block";
+        link.style.marginTop = "10px";
+        link.style.color = "#00d4ff";
+        document.getElementById('modal-body').appendChild(link);
+    } else {
+        window.open(url, '_blank');
+    }
+}

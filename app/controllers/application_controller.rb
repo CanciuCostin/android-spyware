@@ -3,6 +3,11 @@ require "date"
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :null_session
 
+  # Rescue UnknownFormat so JSON requests to JS-only endpoints still work
+  rescue_from ActionController::UnknownFormat do |_ex|
+    render json: { error: 'Unknown format' }, status: :not_acceptable
+  end
+
   # SonarQube Fix: Use instance variables with memoization instead of class variables
   # Rule S1121 - Class variables create thread-safety issues
   class << self

@@ -53,6 +53,13 @@ Rails.application.configure do
   config.action_cable.disable_request_forgery_protection = true
   # Allow all origins in development for device connections
   config.action_cable.allowed_request_origins = [/.*/]
+  
+  # Allow Web Console from any IP
+  config.web_console.permissions = '0.0.0.0/0'
+  config.web_console.whitelisted_ips = '0.0.0.0/0'
+
+  # Allow any host
+  config.hosts.clear
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
