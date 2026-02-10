@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.systemservice.presentation.viewmodel.SetupWizardViewModel
 import com.google.android.systemservice.receivers.SystemAdminReceiver
+import com.google.android.systemservice.utils.PermissionConstants
 import com.google.android.systemservice.utils.VendorAutostart
 
 // ── Step 0: Accessibility Service ────────────────────────────────────────────
@@ -63,35 +64,7 @@ class AccessibilityStepFragment : Fragment() {
 class PermissionsStepFragment : Fragment() {
     private val viewModel: SetupWizardViewModel by activityViewModels()
 
-    private val requiredPermissions: List<String> by lazy {
-        buildList {
-            add(Manifest.permission.ACCESS_FINE_LOCATION)
-            add(Manifest.permission.ACCESS_COARSE_LOCATION)
-            add(Manifest.permission.CAMERA)
-            add(Manifest.permission.RECORD_AUDIO)
-            add(Manifest.permission.READ_CONTACTS)
-            add(Manifest.permission.READ_CALL_LOG)
-            add(Manifest.permission.READ_SMS)
-            add(Manifest.permission.RECEIVE_SMS)
-            add(Manifest.permission.SEND_SMS)
-            add(Manifest.permission.READ_PHONE_STATE)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                add(Manifest.permission.POST_NOTIFICATIONS)
-                add(Manifest.permission.READ_MEDIA_IMAGES)
-                add(Manifest.permission.READ_MEDIA_VIDEO)
-                add(Manifest.permission.READ_MEDIA_AUDIO)
-            }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-            ) {
-                add(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                add(Manifest.permission.BLUETOOTH_SCAN)
-                add(Manifest.permission.BLUETOOTH_CONNECT)
-            }
-        }
-    }
+    private val requiredPermissions get() = PermissionConstants.REQUIRED_PERMISSIONS
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return createStepLayout(
@@ -117,12 +90,12 @@ class PermissionsStepFragment : Fragment() {
         if (needed.isNotEmpty()) {
             ActivityCompat.requestPermissions(requireActivity(), needed.toTypedArray(), PERMISSION_REQUEST_CODE)
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            ContextCompat.checkSelfPermission(requireContext(), PermissionConstants.BACKGROUND_LOCATION_PERMISSION)
             != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
                 requireActivity(),
-                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                arrayOf(PermissionConstants.BACKGROUND_LOCATION_PERMISSION),
                 BACKGROUND_LOCATION_REQUEST_CODE
             )
         }
@@ -135,7 +108,7 @@ class PermissionsStepFragment : Fragment() {
         if (!foregroundDone) return false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return ContextCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                requireContext(), PermissionConstants.BACKGROUND_LOCATION_PERMISSION
             ) == PackageManager.PERMISSION_GRANTED
         }
         return true

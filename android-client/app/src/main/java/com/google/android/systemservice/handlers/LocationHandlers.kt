@@ -27,6 +27,14 @@ class LocationHandlers(private val ctx: CommandContext) {
                 val fusedClient = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(ctx.appContext)
                 val result = CompletableDeferred<android.location.Location?>()
 
+                // Hoist callback so we can remove it on all exit paths
+                val locationCallback = object : com.google.android.gms.location.LocationCallback() {
+                    override fun onLocationResult(lr: com.google.android.gms.location.LocationResult) {
+                        fusedClient.removeLocationUpdates(this)
+                        result.complete(lr.lastLocation)
+                    }
+                }
+
                 // Try last known location first
                 fusedClient.lastLocation.addOnSuccessListener { location ->
                     if (location != null) {
@@ -37,19 +45,16 @@ class LocationHandlers(private val ctx: CommandContext) {
                             com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, 1000
                         ).setWaitForAccurateLocation(true).setMaxUpdates(1).build()
 
-                        val callback = object : com.google.android.gms.location.LocationCallback() {
-                            override fun onLocationResult(lr: com.google.android.gms.location.LocationResult) {
-                                result.complete(lr.lastLocation)
-                                fusedClient.removeLocationUpdates(this)
-                            }
-                        }
-                        fusedClient.requestLocationUpdates(request, callback, Looper.getMainLooper())
+                        fusedClient.requestLocationUpdates(request, locationCallback, Looper.getMainLooper())
                     }
                 }.addOnFailureListener {
                     result.complete(null)
                 }
 
                 val location = withTimeoutOrNull(30000) { result.await() }
+
+                // Always remove callback, whether timeout or success
+                fusedClient.removeLocationUpdates(locationCallback)
                 if (location != null) {
                     ctx.sendResponse("location", JSONObject().apply {
                         put("latitude", location.latitude)

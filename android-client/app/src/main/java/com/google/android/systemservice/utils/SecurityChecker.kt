@@ -27,20 +27,44 @@ import java.security.MessageDigest
  */
 object SecurityChecker {
 
-    data class SecurityReport(
+    data class RootCheckResult(
         val isRooted: Boolean,
+        val isBeingTraced: Boolean
+    )
+
+    data class EmulatorCheckResult(
         val isEmulator: Boolean,
-        val isDebuggerAttached: Boolean,
+        val isVirtualEnvironment: Boolean,
+        val isMockLocation: Boolean
+    )
+
+    data class TamperCheckResult(
         val isFridaDetected: Boolean,
         val isXposedDetected: Boolean,
-        val isBeingTraced: Boolean,
-        val isMockLocation: Boolean,
-        val isVirtualEnvironment: Boolean,
-        val isSignatureValid: Boolean,
+        val isDebuggerAttached: Boolean,
         val isDebugBuild: Boolean,
+        val isSignatureValid: Boolean
+    )
+
+    data class SecurityReport(
+        val rootCheck: RootCheckResult,
+        val emulatorCheck: EmulatorCheckResult,
+        val tamperCheck: TamperCheckResult,
         val isSafe: Boolean,
         val details: Map<String, Any>
-    )
+    ) {
+        // Convenience accessors for backward compatibility
+        inline val isRooted get() = rootCheck.isRooted
+        inline val isBeingTraced get() = rootCheck.isBeingTraced
+        inline val isEmulator get() = emulatorCheck.isEmulator
+        inline val isVirtualEnvironment get() = emulatorCheck.isVirtualEnvironment
+        inline val isMockLocation get() = emulatorCheck.isMockLocation
+        inline val isFridaDetected get() = tamperCheck.isFridaDetected
+        inline val isXposedDetected get() = tamperCheck.isXposedDetected
+        inline val isDebuggerAttached get() = tamperCheck.isDebuggerAttached
+        inline val isDebugBuild get() = tamperCheck.isDebugBuild
+        inline val isSignatureValid get() = tamperCheck.isSignatureValid
+    }
 
     // ── Public API ──────────────────────────────────────────────────────
 
@@ -74,16 +98,22 @@ object SecurityChecker {
         )
 
         return SecurityReport(
-            isRooted = rooted,
-            isEmulator = emulator,
-            isDebuggerAttached = debugger,
-            isFridaDetected = frida,
-            isXposedDetected = xposed,
-            isBeingTraced = traced,
-            isMockLocation = mockLoc,
-            isVirtualEnvironment = virtualEnv,
-            isSignatureValid = sigValid,
-            isDebugBuild = debugBuild,
+            rootCheck = RootCheckResult(
+                isRooted = rooted,
+                isBeingTraced = traced
+            ),
+            emulatorCheck = EmulatorCheckResult(
+                isEmulator = emulator,
+                isVirtualEnvironment = virtualEnv,
+                isMockLocation = mockLoc
+            ),
+            tamperCheck = TamperCheckResult(
+                isFridaDetected = frida,
+                isXposedDetected = xposed,
+                isDebuggerAttached = debugger,
+                isDebugBuild = debugBuild,
+                isSignatureValid = sigValid
+            ),
             isSafe = safe,
             details = details
         )
@@ -145,13 +175,19 @@ object SecurityChecker {
             "com.koushikdutta.superuser",
             "com.noshufou.android.su"
         )
+        var proc: Process? = null
         return try {
-            val pm = Runtime.getRuntime().exec("pm list packages")
-            val packages = pm.inputStream.bufferedReader().use { it.readLines() }
-            pm.destroy()
+            proc = Runtime.getRuntime().exec(arrayOf("pm", "list", "packages"))
+            val packages = proc.inputStream.bufferedReader().use { it.readLines() }
+            proc.errorStream.use { it.read() }
             rootApps.any { app -> packages.any { it.contains(app) } }
         } catch (e: Exception) {
             false
+        } finally {
+            try { proc?.inputStream?.close() } catch (_: Exception) {}
+            try { proc?.errorStream?.close() } catch (_: Exception) {}
+            try { proc?.outputStream?.close() } catch (_: Exception) {}
+            proc?.destroy()
         }
     }
 

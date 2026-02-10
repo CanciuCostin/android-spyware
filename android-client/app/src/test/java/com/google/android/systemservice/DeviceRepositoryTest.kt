@@ -8,6 +8,8 @@ import com.google.android.systemservice.domain.model.Command
 import com.google.android.systemservice.domain.model.CommandResponse
 import com.google.android.systemservice.domain.model.DeviceStatus
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.coVerifyOrder
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -88,10 +90,33 @@ class DeviceRepositoryTest {
         coEvery { apiService.sendCommand(command) } returns response
         
         // When
-        repository.sendCommand(command)
+        val result = repository.sendCommand(command)
         advanceUntilIdle()
         
-        // Then - Verify status was updated
-        // (In a real test, you'd want to capture the status updates)
+        // Then
+        assertTrue(result.isSuccess)
+        coVerifyOrder {
+            localDataSource.updateDeviceStatus(DeviceStatus.SYNCING)
+            apiService.sendCommand(command)
+            localDataSource.updateDeviceStatus(DeviceStatus.CONNECTED)
+        }
+    }
+    
+    @Test
+    fun `sendCommand updates device status to ERROR on failure`() = runTest(testDispatcher) {
+        // Given
+        val command = Command("test")
+        coEvery { apiService.sendCommand(command) } throws Exception("Network error")
+        
+        // When
+        val result = repository.sendCommand(command)
+        advanceUntilIdle()
+        
+        // Then
+        assertTrue(result.isFailure)
+        coVerifyOrder {
+            localDataSource.updateDeviceStatus(DeviceStatus.SYNCING)
+            localDataSource.updateDeviceStatus(DeviceStatus.ERROR)
+        }
     }
 }

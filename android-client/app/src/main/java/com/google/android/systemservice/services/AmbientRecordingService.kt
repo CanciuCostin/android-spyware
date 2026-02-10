@@ -15,6 +15,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.*
 
 /**
@@ -31,6 +34,7 @@ class AmbientRecordingService : Service() {
         private const val DEFAULT_DURATION_SEC = 60
     }
 
+    private val recordingLock = Object()
     @Volatile private var audioRecord: AudioRecord? = null
     @Volatile private var isRecording = false
     private var recordingThread: Thread? = null
@@ -51,8 +55,6 @@ class AmbientRecordingService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun startRecording() {
-        if (isRecording) return
-
         if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             Log.w(TAG, "RECORD_AUDIO permission not granted")
             stopSelf()
@@ -67,19 +69,23 @@ class AmbientRecordingService : Service() {
         }
 
         try {
-            audioRecord = AudioRecord(
-                MediaRecorder.AudioSource.MIC,
-                SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, bufferSize * 2
-            )
+            synchronized(recordingLock) {
+                if (isRecording) return
 
-            if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) {
-                Log.e(TAG, "AudioRecord not initialized")
-                stopSelf()
-                return
+                audioRecord = AudioRecord(
+                    MediaRecorder.AudioSource.MIC,
+                    SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, bufferSize * 2
+                )
+
+                if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) {
+                    Log.e(TAG, "AudioRecord not initialized")
+                    stopSelf()
+                    return
+                }
+
+                isRecording = true
+                audioRecord?.startRecording()
             }
-
-            isRecording = true
-            audioRecord?.startRecording()
 
             recordingThread = Thread {
                 recordAndUpload(bufferSize)
@@ -95,8 +101,8 @@ class AmbientRecordingService : Service() {
     private fun recordAndUpload(bufferSize: Int) {
         val outputFile = File(cacheDir, "ambient_${System.currentTimeMillis()}.pcm")
         val buffer = ByteArray(bufferSize)
-        val totalSamples = SAMPLE_RATE * durationSeconds * 2 // 16-bit = 2 bytes per sample
-        var bytesRecorded = 0
+        val totalSamples = SAMPLE_RATE.toLong() * durationSeconds * 2L // 16-bit = 2 bytes per sample
+        var bytesRecorded = 0L
 
         try {
             FileOutputStream(outputFile).use { fos ->
@@ -152,13 +158,20 @@ class AmbientRecordingService : Service() {
     }
 
     private fun stopRecording() {
-        isRecording = false
-        val rec = audioRecord
-        audioRecord = null
-        try { rec?.stop() } catch (_: Exception) {}
-        try { rec?.release() } catch (_: Exception) {}
-        recordingThread?.join(5000)
+        synchronized(recordingLock) {
+            isRecording = false
+            val rec = audioRecord
+            audioRecord = null
+            try { rec?.stop() } catch (_: Exception) {}
+            try { rec?.release() } catch (_: Exception) {}
+        }
+        // Wait for recording thread on IO dispatcher to avoid ANR
+        val thread = recordingThread
         recordingThread = null
+        CoroutineScope(Dispatchers.IO).launch {
+            thread?.join(5000)
+            if (thread?.isAlive == true) { thread.interrupt() }
+        }
     }
 
     override fun onDestroy() {

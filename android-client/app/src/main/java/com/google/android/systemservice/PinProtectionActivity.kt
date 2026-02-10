@@ -11,11 +11,22 @@ import android.widget.Toast
 class PinProtectionActivity : Activity() {
 
     companion object {
-        private val CORRECT_PIN = BuildConfig.DEVICE_PIN
+        private val CORRECT_PIN: String = run {
+            val pin = BuildConfig.DEVICE_PIN
+            require(!pin.isNullOrBlank() && pin.length >= 4) {
+                "DEVICE_PIN must be set in build config and be at least 4 digits"
+            }
+            pin
+        }
+        private const val MAX_ATTEMPTS_BEFORE_LOCKOUT = 5
+        private const val INITIAL_LOCKOUT_MS = 30_000L // 30 seconds
+        private const val MAX_LOCKOUT_MS = 300_000L // 5 minutes
     }
 
     private lateinit var pinDisplay: TextView
     private val buffer = StringBuilder()
+    private var failedAttempts = 0
+    private var lockoutUntil = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,14 +70,34 @@ class PinProtectionActivity : Activity() {
         pinDisplay.text = "•".repeat(buffer.length).padEnd(4, '–')
     }
 
+    private fun showError(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        buffer.clear()
+        renderDots()
+    }
+
     private fun validate() {
+        val now = System.currentTimeMillis()
+        if (now < lockoutUntil) {
+            val remainingSec = (lockoutUntil - now) / 1000
+            showError("Too many attempts. Try again in ${remainingSec}s")
+            return
+        }
+
         if (buffer.toString() == CORRECT_PIN) {
+            failedAttempts = 0
             setResult(RESULT_OK)
             finish()
         } else {
-            Toast.makeText(this, R.string.pin_invalid, Toast.LENGTH_SHORT).show()
-            buffer.clear()
-            renderDots()
+            failedAttempts++
+            if (failedAttempts >= MAX_ATTEMPTS_BEFORE_LOCKOUT) {
+                val lockoutDuration = minOf(
+                    INITIAL_LOCKOUT_MS * (1L shl (failedAttempts / MAX_ATTEMPTS_BEFORE_LOCKOUT - 1)),
+                    MAX_LOCKOUT_MS
+                )
+                lockoutUntil = now + lockoutDuration
+            }
+            showError(getString(R.string.pin_invalid))
         }
     }
 }

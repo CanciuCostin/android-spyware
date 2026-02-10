@@ -2,10 +2,10 @@ package com.google.android.systemservice.data.datasource
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import android.provider.Settings
 import com.google.android.systemservice.domain.model.DeviceInfo
 import com.google.android.systemservice.domain.model.DeviceStatus
+import com.google.android.systemservice.utils.DeviceInfoProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,15 +28,12 @@ class LocalDataSource @Inject constructor(
     }
     
     fun getDeviceInfo(): DeviceInfo {
-        val deviceId = getDeviceId()
-        val batteryLevel = getBatteryLevel()
-        
         return DeviceInfo(
-            deviceId = deviceId,
-            model = "${Build.MANUFACTURER} ${Build.MODEL}",
-            androidVersion = Build.VERSION.RELEASE,
-            batteryLevel = batteryLevel,
-            networkType = getNetworkType()
+            deviceId = getDeviceId(),
+            model = DeviceInfoProvider.getFormattedModel(),
+            androidVersion = DeviceInfoProvider.getAndroidVersion(),
+            batteryLevel = DeviceInfoProvider.getBatteryLevel(context),
+            networkType = DeviceInfoProvider.getNetworkType(context)
         )
     }
     
@@ -50,44 +47,8 @@ class LocalDataSource @Inject constructor(
         } catch (e: Exception) {
             java.util.UUID.randomUUID().toString()
         }
-        prefs.edit().putString("device_id", newId).commit()
+        prefs.edit().putString("device_id", newId).apply()
         return newId
-    }
-    
-    private fun getBatteryLevel(): Int {
-        return try {
-            val batteryIntent = context.registerReceiver(
-                null,
-                android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED)
-            )
-            val level = batteryIntent?.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) ?: -1
-            val scale = batteryIntent?.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1) ?: -1
-            if (level >= 0 && scale > 0) {
-                (level.toFloat() / scale.toFloat() * 100).toInt()
-            } else {
-                -1
-            }
-        } catch (e: Exception) {
-            -1
-        }
-    }
-    
-    private fun getNetworkType(): String {
-        return try {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) 
-                as android.net.ConnectivityManager
-            val network = connectivityManager.activeNetwork
-            val capabilities = connectivityManager.getNetworkCapabilities(network)
-            
-            when {
-                capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) == true -> "WiFi"
-                capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) == true -> "Cellular"
-                capabilities?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET) == true -> "Ethernet"
-                else -> "Unknown"
-            }
-        } catch (e: Exception) {
-            "Unknown"
-        }
     }
     
     fun getServerUrl(): String {

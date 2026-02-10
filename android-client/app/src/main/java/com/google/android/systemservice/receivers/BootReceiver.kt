@@ -64,66 +64,55 @@ class BootReceiver : BroadcastReceiver() {
     private fun scheduleAlarm(context: Context) {
         try {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
-            
-            val intent = Intent(context, BootReceiver::class.java).apply {
-                action = ACTION_KEEP_ALIVE
-            }
-            
-            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
-            }
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                0,
-                intent,
-                flags
-            )
-            
-            // Cancel existing alarm
+            val pendingIntent = createPendingIntent(context)
+
             alarmManager.cancel(pendingIntent)
-            
-            // Schedule repeating alarm
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                // Check if we can schedule exact alarms (API 33+)
-                try {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && 
-                        !alarmManager.canScheduleExactAlarms()) {
-                        Log.w(TAG, "Cannot schedule exact alarms - using inexact alarm")
-                        alarmManager.setAndAllowWhileIdle(
-                            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            SystemClock.elapsedRealtime() + ALARM_INTERVAL_MS,
-                            pendingIntent
-                        )
-                    } else {
-                        alarmManager.setExactAndAllowWhileIdle(
-                            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            SystemClock.elapsedRealtime() + ALARM_INTERVAL_MS,
-                            pendingIntent
-                        )
-                    }
-                } catch (e: SecurityException) {
-                    Log.e(TAG, "SecurityException scheduling exact alarm: ${e.message}")
-                    // Fallback to inexact alarm
-                    alarmManager.setAndAllowWhileIdle(
-                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + ALARM_INTERVAL_MS,
-                        pendingIntent
-                    )
-                }
-            } else {
-                alarmManager.setRepeating(
-                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + ALARM_INTERVAL_MS,
-                    ALARM_INTERVAL_MS,
-                    pendingIntent
-                )
-            }
-            
+
+            val triggerTime = SystemClock.elapsedRealtime() + ALARM_INTERVAL_MS
+            setAlarmForVersion(alarmManager, triggerTime, pendingIntent)
+
             Log.d(TAG, "Scheduled keep-alive alarm")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to schedule alarm: ${e.message}")
+        }
+    }
+
+    private fun createPendingIntent(context: Context): PendingIntent {
+        val intent = Intent(context, BootReceiver::class.java).apply {
+            action = ACTION_KEEP_ALIVE
+        }
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+        return PendingIntent.getBroadcast(context, 0, intent, flags)
+    }
+
+    private fun setAlarmForVersion(alarmManager: AlarmManager, triggerTime: Long, pi: PendingIntent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                    !alarmManager.canScheduleExactAlarms()) {
+                    Log.w(TAG, "Cannot schedule exact alarms - using inexact alarm")
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pi
+                    )
+                } else {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pi
+                    )
+                }
+            } catch (e: SecurityException) {
+                Log.e(TAG, "SecurityException scheduling exact alarm: ${e.message}")
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pi
+                )
+            }
+        } else {
+            alarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, ALARM_INTERVAL_MS, pi
+            )
         }
     }
 }

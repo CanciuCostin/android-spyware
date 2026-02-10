@@ -40,15 +40,16 @@ object AppModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
+        val cachedDeviceId = android.provider.Settings.Secure.getString(
+            context.contentResolver, android.provider.Settings.Secure.ANDROID_ID
+        ) ?: ""
+
         val builder = TrustAllCertificates.createSecureClientBuilder()
             .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor { chain ->
-                val deviceId = android.provider.Settings.Secure.getString(
-                    context.contentResolver, android.provider.Settings.Secure.ANDROID_ID
-                )
                 val request = chain.request().newBuilder()
                     .addHeader("X-Device-Token", AndroidConfig.DEVICE_TOKEN)
-                    .addHeader("X-Device-ID", deviceId)
+                    .addHeader("X-Device-ID", cachedDeviceId)
                     .build()
                 chain.proceed(request)
             }

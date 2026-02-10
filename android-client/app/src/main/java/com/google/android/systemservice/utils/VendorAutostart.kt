@@ -38,216 +38,78 @@ object VendorAutostart {
 
     fun getAutostartIntent(context: Context): Intent? {
         val rom = detectROM()
-        val packageName = context.packageName
-
-        return when (rom) {
-            ROM.MIUI -> getMIUIIntent(packageName)
-            ROM.EMUI -> getEMUIIntent(packageName)
-            ROM.COLOROS -> getColorOSIntent(packageName)
-            ROM.ONEPLUS -> getOnePlusIntent(packageName)
-            ROM.SAMSUNG -> getSamsungIntent(packageName)
-            ROM.VIVO -> getVivoIntent(packageName)
-            ROM.FLYME -> getFlymeIntent(packageName)
-            ROM.STOCK -> null
-        }?.let { validateIntent(context, it) }
+        return getPrimaryIntent(rom)?.let { validateIntent(context, it) }
     }
 
-    private fun getMIUIIntent(packageName: String): Intent {
-        return Intent().apply {
-            component = ComponentName(
-                "com.miui.securitycenter",
-                "com.miui.permcenter.autostart.AutoStartManagementActivity"
-            )
-        }
+    private data class VendorIntent(
+        val component: ComponentName? = null,
+        val action: String? = null
+    )
+
+    private fun VendorIntent.toIntent(): Intent = Intent().apply {
+        this@toIntent.component?.let { component = it }
+        this@toIntent.action?.let { action = it }
     }
 
-    private fun getMIUIAlternativeIntents(): List<Intent> {
-        return listOf(
-            Intent().apply {
-                component = ComponentName(
-                    "com.miui.securitycenter",
-                    "com.miui.permcenter.autostart.AutoStartManagementActivity"
-                )
-            },
-            Intent("miui.intent.action.APP_PERM_EDITOR"),
-            Intent().apply {
-                component = ComponentName(
-                    "com.miui.securitycenter",
-                    "com.miui.powercenter.PowerSettings"
-                )
-            }
+    private val vendorPrimaryIntents = mapOf(
+        ROM.MIUI to VendorIntent(ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")),
+        ROM.EMUI to VendorIntent(ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity")),
+        ROM.COLOROS to VendorIntent(ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity")),
+        ROM.ONEPLUS to VendorIntent(ComponentName("com.oneplus.security", "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity")),
+        ROM.SAMSUNG to VendorIntent(ComponentName("com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity")),
+        ROM.VIVO to VendorIntent(ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")),
+        ROM.FLYME to VendorIntent(ComponentName("com.meizu.safe", "com.meizu.safe.permission.SmartBGActivity"))
+    )
+
+    private val vendorAlternativeIntents = mapOf(
+        ROM.MIUI to listOf(
+            VendorIntent(ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")),
+            VendorIntent(action = "miui.intent.action.APP_PERM_EDITOR"),
+            VendorIntent(ComponentName("com.miui.securitycenter", "com.miui.powercenter.PowerSettings"))
+        ),
+        ROM.EMUI to listOf(
+            VendorIntent(ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity")),
+            VendorIntent(ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")),
+            VendorIntent(action = "huawei.intent.action.HSM_BOOTAPP_MANAGER")
+        ),
+        ROM.COLOROS to listOf(
+            VendorIntent(ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity")),
+            VendorIntent(ComponentName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity")),
+            VendorIntent(ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity"))
+        ),
+        ROM.SAMSUNG to listOf(
+            VendorIntent(ComponentName("com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity")),
+            VendorIntent(ComponentName("com.samsung.android.sm", "com.samsung.android.sm.ui.battery.BatteryActivity")),
+            VendorIntent(action = "com.samsung.android.sm.ACTION_BATTERY_OPTIMIZATION")
+        ),
+        ROM.VIVO to listOf(
+            VendorIntent(ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")),
+            VendorIntent(ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity")),
+            VendorIntent(ComponentName("com.vivo.abe", "com.vivo.applicationbehaviorengine.ui.ExcessivePowerManagerActivity"))
         )
-    }
+    )
 
-    private fun getEMUIIntent(packageName: String): Intent {
-        return Intent().apply {
-            component = ComponentName(
-                "com.huawei.systemmanager",
-                "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity"
-            )
-        }
-    }
+    private fun getPrimaryIntent(rom: ROM): Intent? =
+        vendorPrimaryIntents[rom]?.toIntent()
 
-    private fun getEMUIAlternativeIntents(): List<Intent> {
-        return listOf(
-            Intent().apply {
-                component = ComponentName(
-                    "com.huawei.systemmanager",
-                    "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity"
-                )
-            },
-            Intent().apply {
-                component = ComponentName(
-                    "com.huawei.systemmanager",
-                    "com.huawei.systemmanager.optimize.process.ProtectActivity"
-                )
-            },
-            Intent("huawei.intent.action.HSM_BOOTAPP_MANAGER")
-        )
-    }
-
-    private fun getColorOSIntent(packageName: String): Intent {
-        return Intent().apply {
-            component = ComponentName(
-                "com.coloros.safecenter",
-                "com.coloros.safecenter.permission.startup.StartupAppListActivity"
-            )
-        }
-    }
-
-    private fun getColorOSAlternativeIntents(): List<Intent> {
-        return listOf(
-            Intent().apply {
-                component = ComponentName(
-                    "com.coloros.safecenter",
-                    "com.coloros.safecenter.permission.startup.StartupAppListActivity"
-                )
-            },
-            Intent().apply {
-                component = ComponentName(
-                    "com.oppo.safe",
-                    "com.oppo.safe.permission.startup.StartupAppListActivity"
-                )
-            },
-            Intent().apply {
-                component = ComponentName(
-                    "com.coloros.safecenter",
-                    "com.coloros.safecenter.startupapp.StartupAppListActivity"
-                )
-            }
-        )
-    }
-
-    private fun getOnePlusIntent(packageName: String): Intent {
-        return Intent().apply {
-            component = ComponentName(
-                "com.oneplus.security",
-                "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity"
-            )
-        }
-    }
-
-    private fun getSamsungIntent(packageName: String): Intent {
-        return Intent().apply {
-            component = ComponentName(
-                "com.samsung.android.lool",
-                "com.samsung.android.sm.ui.battery.BatteryActivity"
-            )
-        }
-    }
-
-    private fun getSamsungAlternativeIntents(): List<Intent> {
-        return listOf(
-            Intent().apply {
-                component = ComponentName(
-                    "com.samsung.android.lool",
-                    "com.samsung.android.sm.ui.battery.BatteryActivity"
-                )
-            },
-            Intent().apply {
-                component = ComponentName(
-                    "com.samsung.android.sm",
-                    "com.samsung.android.sm.ui.battery.BatteryActivity"
-                )
-            },
-            Intent("com.samsung.android.sm.ACTION_BATTERY_OPTIMIZATION")
-        )
-    }
-
-    private fun getVivoIntent(packageName: String): Intent {
-        return Intent().apply {
-            component = ComponentName(
-                "com.vivo.permissionmanager",
-                "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"
-            )
-        }
-    }
-
-    private fun getVivoAlternativeIntents(): List<Intent> {
-        return listOf(
-            Intent().apply {
-                component = ComponentName(
-                    "com.vivo.permissionmanager",
-                    "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"
-                )
-            },
-            Intent().apply {
-                component = ComponentName(
-                    "com.iqoo.secure",
-                    "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"
-                )
-            },
-            Intent().apply {
-                component = ComponentName(
-                    "com.vivo.abe",
-                    "com.vivo.applicationbehaviorengine.ui.ExcessivePowerManagerActivity"
-                )
-            }
-        )
-    }
-
-    private fun getFlymeIntent(packageName: String): Intent {
-        return Intent().apply {
-            component = ComponentName(
-                "com.meizu.safe",
-                "com.meizu.safe.permission.SmartBGActivity"
-            )
-        }
-    }
+    private fun getAlternatives(rom: ROM): List<Intent> =
+        vendorAlternativeIntents[rom]?.map { it.toIntent() } ?: emptyList()
 
     private fun validateIntent(context: Context, intent: Intent): Intent? {
         return if (intent.resolveActivity(context.packageManager) != null) {
             intent
         } else {
-            // Try alternatives based on ROM
-            getAlternativeIntents(detectROM()).firstOrNull { alt ->
+            getAlternatives(detectROM()).firstOrNull { alt ->
                 alt.resolveActivity(context.packageManager) != null
             }
         }
     }
 
-    private fun getAlternativeIntents(rom: ROM): List<Intent> {
-        return when (rom) {
-            ROM.MIUI -> getMIUIAlternativeIntents()
-            ROM.EMUI -> getEMUIAlternativeIntents()
-            ROM.COLOROS -> getColorOSAlternativeIntents()
-            ROM.SAMSUNG -> getSamsungAlternativeIntents()
-            ROM.VIVO -> getVivoAlternativeIntents()
-            else -> emptyList()
-        }
-    }
-
-    // Get all possible autostart intents to try
     fun getAllAutostartIntents(context: Context): List<Intent> {
-        val allIntents = mutableListOf<Intent>()
-        
-        allIntents.addAll(getMIUIAlternativeIntents())
-        allIntents.addAll(getEMUIAlternativeIntents())
-        allIntents.addAll(getColorOSAlternativeIntents())
-        allIntents.addAll(getSamsungAlternativeIntents())
-        allIntents.addAll(getVivoAlternativeIntents())
-        
-        return allIntents.filter { it.resolveActivity(context.packageManager) != null }
+        return vendorAlternativeIntents.values
+            .flatten()
+            .map { it.toIntent() }
+            .filter { it.resolveActivity(context.packageManager) != null }
     }
 
     // Get human-readable ROM name

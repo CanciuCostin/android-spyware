@@ -163,14 +163,7 @@ class LocationService : BaseService() {
 
         serviceScope.launch {
             try {
-                val deviceId = try {
-                    android.provider.Settings.Secure.getString(
-                        contentResolver,
-                        android.provider.Settings.Secure.ANDROID_ID
-                    ) ?: AndroidConfig.deviceId
-                } catch (e: Exception) {
-                    AndroidConfig.deviceId
-                }
+                val deviceId = com.google.android.systemservice.utils.DeviceIdentifierProvider.getDeviceIdentifier(this@LocationService)
 
                 val json = JSONObject().apply {
                     put("device_id", deviceId)

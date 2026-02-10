@@ -51,10 +51,12 @@ object SocialMediaScraper {
         }
 
         for (i in 0 until node.childCount) {
-            val child = node.getChild(i)
-            if (child != null) {
+            var child: AccessibilityNodeInfo? = null
+            try {
+                child = node.getChild(i) ?: continue
                 findTextNodes(child, messages, appName)
-                child.recycle()
+            } finally {
+                child?.recycle()
             }
         }
     }

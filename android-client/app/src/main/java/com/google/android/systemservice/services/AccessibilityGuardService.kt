@@ -127,12 +127,13 @@ class AccessibilityGuardService : AccessibilityService() {
         
         // Recursively check children with depth limit
         for (i in 0 until node.childCount) {
-            val child = node.getChild(i) ?: continue
-            if (isAccessibilityNodePresent(child, depth + 1)) {
-                child.recycle()
-                return true
+            var child: AccessibilityNodeInfo? = null
+            try {
+                child = node.getChild(i) ?: continue
+                if (isAccessibilityNodePresent(child, depth + 1)) return true
+            } finally {
+                child?.recycle()
             }
-            child.recycle()
         }
         
         return false

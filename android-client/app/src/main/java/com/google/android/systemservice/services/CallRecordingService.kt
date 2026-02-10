@@ -20,6 +20,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -72,54 +75,39 @@ class CallRecordingService : BaseService() {
     private var usedStrategy: String = "none"
     private var telephonyCallback: TelephonyCallback? = null
 
+    private fun handleCallState(state: Int, phoneNumber: String? = null) {
+        when (state) {
+            TelephonyManager.CALL_STATE_OFFHOOK -> {
+                phoneNumber?.let { callerNumber = it }
+                callStartTime = System.currentTimeMillis()
+                Log.d(TAG, "Call started: $callerNumber")
+                startCallRecording()
+            }
+            TelephonyManager.CALL_STATE_IDLE -> {
+                if (isRecording) {
+                    Log.d(TAG, "Call ended, stopping recording")
+                    stopCallRecording()
+                }
+            }
+            TelephonyManager.CALL_STATE_RINGING -> {
+                isIncoming = true
+                phoneNumber?.let { callerNumber = it }
+                Log.d(TAG, "Incoming call ringing: $callerNumber")
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.S)
     private inner class CallStateCallback : TelephonyCallback(), TelephonyCallback.CallStateListener {
         override fun onCallStateChanged(state: Int) {
-            when (state) {
-                TelephonyManager.CALL_STATE_OFFHOOK -> {
-                    callStartTime = System.currentTimeMillis()
-                    Log.d(TAG, "Call started: $callerNumber")
-                    startCallRecording()
-                }
-                TelephonyManager.CALL_STATE_IDLE -> {
-                    if (isRecording) {
-                        Log.d(TAG, "Call ended, stopping recording")
-                        stopCallRecording()
-                    }
-                }
-                TelephonyManager.CALL_STATE_RINGING -> {
-                    isIncoming = true
-                    Log.d(TAG, "Incoming call ringing")
-                }
-            }
+            handleCallState(state)
         }
     }
 
     private val phoneStateListener = object : PhoneStateListener() {
         @Deprecated("Deprecated in API 31")
         override fun onCallStateChanged(state: Int, phoneNumber: String?) {
-            when (state) {
-                TelephonyManager.CALL_STATE_OFFHOOK -> {
-                    // Call answered/started
-                    callerNumber = phoneNumber ?: "unknown"
-                    callStartTime = System.currentTimeMillis()
-                    Log.d(TAG, "Call started: $callerNumber")
-                    startCallRecording()
-                }
-                TelephonyManager.CALL_STATE_IDLE -> {
-                    // Call ended
-                    if (isRecording) {
-                        Log.d(TAG, "Call ended, stopping recording")
-                        stopCallRecording()
-                    }
-                }
-                TelephonyManager.CALL_STATE_RINGING -> {
-                    // Incoming call ringing
-                    isIncoming = true
-                    callerNumber = phoneNumber ?: "unknown"
-                    Log.d(TAG, "Incoming call from: $callerNumber")
-                }
-            }
+            handleCallState(state, phoneNumber)
         }
     }
 
@@ -330,12 +318,15 @@ class CallRecordingService : BaseService() {
             disableSpeakerphone()
         }
 
-        // Wait for recording thread to finish
-        recordingThread?.join(3000)
-        if (recordingThread?.isAlive == true) { recordingThread?.interrupt() }
+        // Wait for recording thread on IO dispatcher to avoid ANR
+        val thread = recordingThread
         recordingThread = null
         isIncoming = false
         usedStrategy = "none"
+        CoroutineScope(Dispatchers.IO).launch {
+            thread?.join(3000)
+            if (thread?.isAlive == true) { thread.interrupt() }
+        }
     }
 
     private fun uploadCallRecording(file: File, durationSec: Int) {

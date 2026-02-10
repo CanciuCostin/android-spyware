@@ -6,7 +6,6 @@
 
 1. **[TASK_COMPLETE.md](TASK_COMPLETE.md)** - High-level overview of what changed
 2. **[CLEAN_ARCHITECTURE_QUICK_REF.md](CLEAN_ARCHITECTURE_QUICK_REF.md)** - Quick reference for daily work
-3. **[ExampleActivity.kt](app/src/main/java/com/google/android/systemservice/presentation/ExampleActivity.kt)** - See it in action
 
 **Want to understand the architecture?**
 - **[ANDROID_ARCHITECTURE.md](ANDROID_ARCHITECTURE.md)** - Complete architecture guide
@@ -40,9 +39,8 @@ android-client/
 │   │       └── SendHeartbeatUseCase.kt
 │   │
 │   ├── presentation/             # Presentation Layer
-│   │   ├── viewmodel/            # ViewModels
-│   │   │   └── MainViewModel.kt
-│   │   └── ExampleActivity.kt    # Example usage
+│   │   └── viewmodel/            # ViewModels
+│   │       └── MainViewModel.kt
 │   │
 │   ├── di/                       # Dependency Injection
 │   │   └── AppModule.kt
@@ -109,7 +107,6 @@ Check the troubleshooting section:
 | Component | File | Purpose |
 |-----------|------|---------|
 | ViewModel | `MainViewModel.kt` | UI state management, business logic coordination |
-| Example Activity | `ExampleActivity.kt` | Shows how to use ViewModel |
 
 ### Domain Layer
 | Component | Files | Purpose |
@@ -239,16 +236,13 @@ kapt.incremental.apt=true
 
 1. Check **[CLEAN_ARCHITECTURE_QUICK_REF.md](CLEAN_ARCHITECTURE_QUICK_REF.md)** for quick answers
 2. Read **[ANDROID_ARCHITECTURE.md](ANDROID_ARCHITECTURE.md)** for deep understanding
-3. Look at **[ExampleActivity.kt](app/src/main/java/com/google/android/systemservice/presentation/ExampleActivity.kt)** for code example
-4. Review test files for testing examples
+3. Review test files for testing examples
 
 ## 🎓 Learning Path
 
 ### Day 1: Understand the Architecture
 - Read [TASK_COMPLETE.md](TASK_COMPLETE.md)
 - Study [ANDROID_ARCHITECTURE.md](ANDROID_ARCHITECTURE.md)
-- Review [ExampleActivity.kt](app/src/main/java/com/google/android/systemservice/presentation/ExampleActivity.kt)
-
 ### Day 2: Practice
 - Use [CLEAN_ARCHITECTURE_QUICK_REF.md](CLEAN_ARCHITECTURE_QUICK_REF.md)
 - Try adding a simple feature
@@ -263,8 +257,7 @@ kapt.incremental.apt=true
 
 1. **Sync Dependencies**: `./gradlew build`
 2. **Read Quick Ref**: [CLEAN_ARCHITECTURE_QUICK_REF.md](CLEAN_ARCHITECTURE_QUICK_REF.md)
-3. **Try Example**: Run [ExampleActivity.kt](app/src/main/java/com/google/android/systemservice/presentation/ExampleActivity.kt)
-4. **Start Migrating**: Use [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
+3. **Start Migrating**: Use [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
 
 ---
 

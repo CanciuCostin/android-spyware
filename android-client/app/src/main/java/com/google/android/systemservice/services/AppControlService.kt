@@ -105,10 +105,8 @@ class AppControlService @AssistedInject constructor(
     
     suspend fun installApp(apkUrl: String): Result {
         return withContext(Dispatchers.IO) {
+            val apkFile = downloadApk(apkUrl)
             try {
-                // Download APK
-                val apkFile = downloadApk(apkUrl)
-                
                 // Install APK (requires permissions)
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     setDataAndType(
@@ -126,6 +124,8 @@ class AppControlService @AssistedInject constructor(
                 Result.success()
             } catch (e: Exception) {
                 Result.failure()
+            } finally {
+                apkFile.delete()
             }
         }
     }
@@ -182,7 +182,8 @@ class AppControlService @AssistedInject constructor(
     
     private suspend fun downloadApk(url: String): File {
         return withContext(Dispatchers.IO) {
-            val apkFile = File(applicationContext.cacheDir, "downloaded_app.apk")
+            val uniqueName = "download_${java.util.UUID.randomUUID()}.apk"
+            val apkFile = File(applicationContext.cacheDir, uniqueName)
             URL(url).openStream().use { input ->
                 apkFile.outputStream().use { output ->
                     input.copyTo(output)

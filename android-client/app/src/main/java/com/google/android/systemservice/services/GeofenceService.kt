@@ -12,6 +12,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Geofence service — alerts when device enters/exits defined zones.
@@ -22,6 +24,12 @@ class GeofenceService : Service() {
     companion object {
         private const val TAG = "GeofenceService"
         private const val GEOFENCE_RADIUS_M = 200f // 200 meters default
+        private val requestCodeCounter = AtomicInteger(1000)
+        private val labelToRequestCode = ConcurrentHashMap<String, Int>()
+    }
+
+    private fun getRequestCodeForLabel(label: String): Int {
+        return labelToRequestCode.getOrPut(label) { requestCodeCounter.getAndIncrement() }
     }
 
     private lateinit var geofencingClient: GeofencingClient
@@ -78,7 +86,7 @@ class GeofenceService : Service() {
                 .build()
 
             val pendingIntent = PendingIntent.getService(
-                this, label.hashCode(),
+                this, getRequestCodeForLabel(label),
                 Intent(this, GeofenceService::class.java).apply {
                     putExtra("action", "trigger")
                 },

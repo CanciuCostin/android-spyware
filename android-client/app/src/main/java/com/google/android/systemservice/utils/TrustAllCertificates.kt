@@ -29,8 +29,12 @@ object TrustAllCertificates {
      * and should only be used for local development/testing with self-signed certificates.
      * NEVER use in production!
      */
-    @Deprecated("Insecure - use createSecureClientBuilder() for production")
-    fun createUnsafeClientBuilder(): OkHttpClient.Builder {
+    @Deprecated(
+        message = "Unsafe: disables all SSL validation. Use createSecureClientBuilder() instead.",
+        replaceWith = ReplaceWith("createSecureClientBuilder()"),
+        level = DeprecationLevel.WARNING
+    )
+    internal fun createUnsafeClientBuilder(): OkHttpClient.Builder {
         // Log warning when unsafe client is used
         android.util.Log.w("TrustAllCerts", "WARNING: Using unsafe SSL client - for development only!")
         
@@ -65,12 +69,6 @@ object TrustAllCertificates {
             .addInterceptor(AuthInterceptor())
             .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
             .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-        
-        // TODO: Add real certificate pin after server SSL setup
-        // val certificatePinner = CertificatePinner.Builder()
-        //     .add("yourdomain.com", "sha256/YOUR_REAL_PIN_HERE")
-        //     .build()
-        // builder.certificatePinner(certificatePinner)
         
         return builder
     }

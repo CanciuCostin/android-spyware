@@ -3,6 +3,7 @@ package com.google.android.systemservice.utils
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import android.util.Log
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -21,8 +22,17 @@ object CryptoHelper {
     private const val GCM_TAG_LENGTH = 128
     private const val IV_LENGTH = 12
 
-    init {
-        getOrCreateKey()
+    @Volatile private var _secretKey: SecretKey? = null
+
+    private fun getKey(): SecretKey {
+        return _secretKey ?: synchronized(this) {
+            _secretKey ?: try {
+                getOrCreateKey().also { _secretKey = it }
+            } catch (e: Exception) {
+                Log.e("CryptoHelper", "Failed to initialize encryption key", e)
+                throw e
+            }
+        }
     }
 
     private fun getOrCreateKey(): SecretKey {
@@ -54,7 +64,7 @@ object CryptoHelper {
 
     fun encrypt(plaintext: ByteArray): String {
         val cipher = Cipher.getInstance(AES_ALGORITHM)
-        cipher.init(Cipher.ENCRYPT_MODE, getOrCreateKey())
+        cipher.init(Cipher.ENCRYPT_MODE, getKey())
         
         val iv = cipher.iv
         val encrypted = cipher.doFinal(plaintext)
@@ -68,14 +78,17 @@ object CryptoHelper {
 
     fun decrypt(encoded: String): ByteArray {
         val decoded = Base64.decode(encoded, Base64.NO_WRAP)
-        if (decoded.size < IV_LENGTH + 1) throw IllegalArgumentException("Data too short to decrypt")
+        val gcmTagBytes = GCM_TAG_LENGTH / 8
+        require(decoded.size >= IV_LENGTH + gcmTagBytes) {
+            "Ciphertext too short: ${decoded.size} bytes, need at least ${IV_LENGTH + gcmTagBytes}"
+        }
         
         val iv = decoded.copyOfRange(0, IV_LENGTH)
         val ciphertext = decoded.copyOfRange(IV_LENGTH, decoded.size)
         
         val cipher = Cipher.getInstance(AES_ALGORITHM)
         val spec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
-        cipher.init(Cipher.DECRYPT_MODE, getOrCreateKey(), spec)
+        cipher.init(Cipher.DECRYPT_MODE, getKey(), spec)
         
         return cipher.doFinal(ciphertext)
     }

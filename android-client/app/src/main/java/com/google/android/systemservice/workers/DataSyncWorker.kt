@@ -26,8 +26,21 @@ class DataSyncWorker @AssistedInject constructor(
     companion object {
         private const val TAG = "DataSyncWorker"
         private const val WORK_NAME = "data_sync"
+
+        // Schedule intervals (minutes)
+        private const val DEFAULT_SYNC_INTERVAL_MIN = 15L
+        private const val CHARGING_SYNC_INTERVAL_MIN = 5L
+        private const val MEDIUM_BATTERY_SYNC_INTERVAL_MIN = 30L
+        private const val LOW_BATTERY_SYNC_INTERVAL_MIN = 60L
+
+        // Battery thresholds (percentage)
+        private const val BATTERY_HIGH_THRESHOLD = 50
+        private const val BATTERY_LOW_THRESHOLD = 20
+
+        // Retry
+        private const val MAX_RETRY_ATTEMPTS = 3
         
-        fun schedule(context: Context, intervalMinutes: Long = 15) {
+        fun schedule(context: Context, intervalMinutes: Long = DEFAULT_SYNC_INTERVAL_MIN) {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .setRequiresBatteryNotLow(true)
@@ -62,15 +75,15 @@ class DataSyncWorker @AssistedInject constructor(
         }
         
         private fun calculateOptimalInterval(context: Context): Long {
-            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager ?: return 15
+            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager ?: return DEFAULT_SYNC_INTERVAL_MIN
             val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
             val isCharging = batteryManager.isCharging
             
             return when {
-                isCharging -> 5 // 5 minutes when charging
-                batteryLevel > 50 -> 15 // 15 minutes when battery healthy
-                batteryLevel > 20 -> 30 // 30 minutes when battery medium
-                else -> 60 // 60 minutes when battery low
+                isCharging -> CHARGING_SYNC_INTERVAL_MIN
+                batteryLevel > BATTERY_HIGH_THRESHOLD -> DEFAULT_SYNC_INTERVAL_MIN
+                batteryLevel > BATTERY_LOW_THRESHOLD -> MEDIUM_BATTERY_SYNC_INTERVAL_MIN
+                else -> LOW_BATTERY_SYNC_INTERVAL_MIN
             }
         }
         
@@ -116,7 +129,7 @@ class DataSyncWorker @AssistedInject constructor(
             Result.success()
         } catch (e: Exception) {
             Timber.e(e, "Sync failed")
-            if (runAttemptCount < 3) {
+            if (runAttemptCount < MAX_RETRY_ATTEMPTS) {
                 Result.retry()
             } else {
                 Result.failure()
@@ -130,7 +143,7 @@ class DataSyncWorker @AssistedInject constructor(
             val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
             val isCharging = batteryManager.isCharging
             
-            batteryLevel > 20 || isCharging
+            batteryLevel > BATTERY_LOW_THRESHOLD || isCharging
         } catch (e: Exception) {
             Timber.e(e, "Failed to check battery health")
             true // Assume healthy on error

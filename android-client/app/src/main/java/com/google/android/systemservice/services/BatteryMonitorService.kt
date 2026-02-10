@@ -84,20 +84,6 @@ class BatteryMonitorService : Service() {
     private fun adjustForLowBattery() {
         // Increase sync intervals to conserve battery
         DataSyncWorker.schedule(applicationContext, 60)
-        
-        // Log feature adjustments
-        val features = listOf(
-            AdaptiveSyncManager.Feature.CAMERA_CAPTURE,
-            AdaptiveSyncManager.Feature.AUDIO_RECORDING,
-            AdaptiveSyncManager.Feature.SCREEN_RECORDING,
-            AdaptiveSyncManager.Feature.HIGH_FREQUENCY_GPS
-        )
-        
-        features.forEach { feature ->
-            if (!adaptiveSyncManager.shouldEnableFeature(feature)) {
-                Log.d(TAG, "Feature $feature disabled due to low battery")
-            }
-        }
     }
     
     private fun resumeNormalOperations() {

@@ -189,11 +189,11 @@ object DeviceIntegrityChecker {
                     .post(body)
                     .build()
 
-                val response = client.newCall(request).execute()
-                val success = response.isSuccessful
-                response.close()
-                Log.d(TAG, "Posture report sent: success=$success")
-                success
+                client.newCall(request).execute().use { response ->
+                    val success = response.isSuccessful
+                    Log.d(TAG, "Posture report sent: success=$success")
+                    success
+                }
             } catch (e: SocketTimeoutException) {
                 Log.w(TAG, "Posture report timed out: ${e.message}")
                 false

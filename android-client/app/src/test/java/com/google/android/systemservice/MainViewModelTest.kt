@@ -9,8 +9,10 @@ import com.google.android.systemservice.domain.usecase.ObserveDeviceStatusUseCas
 import com.google.android.systemservice.domain.usecase.SendCommandUseCase
 import com.google.android.systemservice.domain.usecase.SendHeartbeatUseCase
 import com.google.android.systemservice.domain.usecase.UploadFileUseCase
+import com.google.android.systemservice.domain.model.UploadResponse
 import com.google.android.systemservice.presentation.viewmodel.MainViewModel
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +23,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -107,5 +110,52 @@ class MainViewModelTest {
         
         // Then
         assertEquals(DeviceStatus.SYNCING, viewModel.deviceStatus.value)
+    }
+    
+    @Test
+    fun `uploadFile success updates state`() = runTest(testDispatcher) {
+        // Given
+        val mockFile = mockk<File>()
+        val uploadResponse = UploadResponse(fileId = "123", url = "https://example.com/file", success = true)
+        coEvery { repository.uploadFile(mockFile) } returns Result.success(uploadResponse)
+        
+        // When
+        viewModel.uploadFile(mockFile)
+        advanceUntilIdle()
+        
+        // Then
+        val state = viewModel.uiState.value
+        assertTrue(state is MainViewModel.UiState.Success)
+        assertEquals(uploadResponse, (state as MainViewModel.UiState.Success).data)
+    }
+    
+    @Test
+    fun `uploadFile failure updates error state`() = runTest(testDispatcher) {
+        // Given
+        val mockFile = mockk<File>()
+        val exception = Exception("Upload failed")
+        coEvery { repository.uploadFile(mockFile) } returns Result.failure(exception)
+        
+        // When
+        viewModel.uploadFile(mockFile)
+        advanceUntilIdle()
+        
+        // Then
+        val state = viewModel.uiState.value
+        assertTrue(state is MainViewModel.UiState.Error)
+        assertEquals("Upload failed", (state as MainViewModel.UiState.Error).message)
+    }
+    
+    @Test
+    fun `sendPeriodicHeartbeat calls repository`() = runTest(testDispatcher) {
+        // Given
+        coEvery { repository.sendHeartbeat() } returns Result.success(true)
+        
+        // When - advance past the 60-second delay to trigger heartbeat
+        advanceTimeBy(60_001)
+        advanceUntilIdle()
+        
+        // Then
+        coVerify(atLeast = 1) { repository.sendHeartbeat() }
     }
 }
