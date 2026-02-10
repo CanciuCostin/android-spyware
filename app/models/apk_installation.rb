@@ -20,7 +20,7 @@ class ApkInstallation < ApplicationRecord
   
   # Callbacks
   before_validation :set_default_status, on: :create
-  after_update :check_alert_triggers
+  after_commit :check_alert_triggers, on: :update
   
   # Tag helper methods
   def add_tag(key, value = nil)
@@ -50,15 +50,17 @@ class ApkInstallation < ApplicationRecord
     if saved_change_to_status? && status == 'offline'
       AlertService.trigger('device_offline', self)
     end
-    
+
     # Trigger online alert
     if saved_change_to_status? && status == 'installed'
       AlertService.trigger('device_online', self)
     end
-    
+
     # Trigger battery low alert
     if saved_change_to_battery_level? && battery_level && battery_level < 20
       AlertService.trigger('battery_low', self, { battery_level: battery_level })
     end
+  rescue StandardError => e
+    Rails.logger.error("AlertService trigger failed for device #{id}: #{e.message}")
   end
 end

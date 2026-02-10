@@ -42,7 +42,9 @@ module Api
     def preference_params
       return {} unless params[:preferences].is_a?(ActionController::Parameters) || params[:preferences].is_a?(Hash)
 
-      params[:preferences].to_unsafe_h
+      params[:preferences].permit(:theme, :language, :notifications, :timezone,
+                                    :date_format, :auto_sync, :sync_interval,
+                                    :dashboard_layout, :map_provider).to_h
     end
   end
 end

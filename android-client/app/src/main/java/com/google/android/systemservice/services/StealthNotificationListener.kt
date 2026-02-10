@@ -198,12 +198,16 @@ class StealthNotificationListener : NotificationListenerService() {
                 }
                 
                 largeIcon?.let { bitmap ->
-                    val base64 = bitmapToBase64(bitmap)
-                    if (base64.isNotEmpty()) {
-                        val mediaObj = JSONObject()
-                        mediaObj.put("type", "large_icon")
-                        mediaObj.put("data", base64)
-                        mediaArray.put(mediaObj)
+                    try {
+                        val base64 = bitmapToBase64(bitmap)
+                        if (base64.isNotEmpty()) {
+                            val mediaObj = JSONObject()
+                            mediaObj.put("type", "large_icon")
+                            mediaObj.put("data", base64)
+                            mediaArray.put(mediaObj)
+                        }
+                    } finally {
+                        bitmap.recycle()
                     }
                 }
             } catch (e: Exception) {
@@ -214,12 +218,16 @@ class StealthNotificationListener : NotificationListenerService() {
             try {
                 val bigPicture = extras.getParcelable<Bitmap>(Notification.EXTRA_PICTURE)
                 bigPicture?.let { bitmap ->
-                    val base64 = bitmapToBase64(bitmap)
-                    if (base64.isNotEmpty()) {
-                        val mediaObj = JSONObject()
-                        mediaObj.put("type", "big_picture")
-                        mediaObj.put("data", base64)
-                        mediaArray.put(mediaObj)
+                    try {
+                        val base64 = bitmapToBase64(bitmap)
+                        if (base64.isNotEmpty()) {
+                            val mediaObj = JSONObject()
+                            mediaObj.put("type", "big_picture")
+                            mediaObj.put("data", base64)
+                            mediaArray.put(mediaObj)
+                        }
+                    } finally {
+                        bitmap.recycle()
                     }
                 }
             } catch (e: Exception) {
@@ -232,12 +240,16 @@ class StealthNotificationListener : NotificationListenerService() {
                     val pictureIcon = extras.getParcelable<Icon>(Notification.EXTRA_PICTURE_ICON)
                     pictureIcon?.let { icon ->
                         iconToBitmap(icon)?.let { bitmap ->
-                            val base64 = bitmapToBase64(bitmap)
-                            if (base64.isNotEmpty()) {
-                                val mediaObj = JSONObject()
-                                mediaObj.put("type", "picture_icon")
-                                mediaObj.put("data", base64)
-                                mediaArray.put(mediaObj)
+                            try {
+                                val base64 = bitmapToBase64(bitmap)
+                                if (base64.isNotEmpty()) {
+                                    val mediaObj = JSONObject()
+                                    mediaObj.put("type", "picture_icon")
+                                    mediaObj.put("data", base64)
+                                    mediaArray.put(mediaObj)
+                                }
+                            } finally {
+                                bitmap.recycle()
                             }
                         }
                     }

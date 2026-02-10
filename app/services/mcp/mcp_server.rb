@@ -5,10 +5,12 @@ module Mcp
     attr_reader :tools, :resources, :prompts
 
     def initialize
+      @mutex = Mutex.new
       @tools = {}
       @resources = {}
       @prompts = {}
       register_all
+      freeze_registries!
     end
 
     def server_info
@@ -109,6 +111,12 @@ module Mcp
     class PromptNotFoundError < StandardError; end
 
     private
+
+    def freeze_registries!
+      @tools.freeze
+      @resources.freeze
+      @prompts.freeze
+    end
 
     def register_all
       Tools::DeviceTools.new(self).register

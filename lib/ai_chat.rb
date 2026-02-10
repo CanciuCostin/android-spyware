@@ -236,6 +236,14 @@ class AiChat
       case cmd_name
       when 'shell_command'
         shell_cmd = cmd_params.join(':')
+        allowed = %w[ls cat df du whoami id uname uptime date pwd free top ps ifconfig ip getprop dumpsys pm wm settings]
+        base_cmd = shell_cmd.strip.split(/\s+/).first.to_s.split('/').last.to_s
+        unless allowed.include?(base_cmd)
+          return { error: "Command not allowed: #{base_cmd}. Only read-only commands are permitted." }
+        end
+        if shell_cmd.match?(/[;&|`$\(\)]/)
+          return { error: 'Shell metacharacters are not permitted in commands.' }
+        end
         return broadcast_command(smartphone, 'shell_command', { command: shell_cmd }, 30)
       when 'send_sms'
         number = cmd_params[0]

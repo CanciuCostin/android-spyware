@@ -67,12 +67,17 @@ class OfflineDataQueue(private val context: Context) {
     fun persistToDisk() {
         if (memoryQueue.isEmpty()) return
 
+        // Snapshot queue contents before clearing to prevent data loss on crash
+        val snapshot = mutableListOf<QueueItem>()
+        while (memoryQueue.isNotEmpty()) {
+            val item = memoryQueue.poll() ?: break
+            snapshot.add(item)
+        }
+        if (snapshot.isEmpty()) return
+
         try {
             val byType = mutableMapOf<String, MutableList<QueueItem>>()
-            
-            // Drain memory queue
-            while (memoryQueue.isNotEmpty()) {
-                val item = memoryQueue.poll() ?: break
+            for (item in snapshot) {
                 byType.getOrPut(item.type) { mutableListOf() }.add(item)
             }
 
@@ -92,6 +97,8 @@ class OfflineDataQueue(private val context: Context) {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to persist queue: ${e.message}")
+            // Re-add items to queue on failure to prevent data loss
+            snapshot.forEach { memoryQueue.offer(it) }
         }
     }
 

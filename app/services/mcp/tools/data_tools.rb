@@ -35,8 +35,16 @@ module Mcp
         ) do |args|
           device = find_device!(args[:device_id])
           locations = device.geo_locations.order(created_at: :desc)
-          locations = locations.where('created_at >= ?', Time.parse(args[:since])) if args[:since].present?
-          locations = locations.where('created_at <= ?', Time.parse(args[:until])) if args[:until].present?
+          if args[:since].present?
+            since_time = begin; Time.parse(args[:since]); rescue ArgumentError; nil; end
+            raise McpServer::ToolNotFoundError, "Invalid 'since' timestamp: #{args[:since]}" unless since_time
+            locations = locations.where('created_at >= ?', since_time)
+          end
+          if args[:until].present?
+            until_time = begin; Time.parse(args[:until]); rescue ArgumentError; nil; end
+            raise McpServer::ToolNotFoundError, "Invalid 'until' timestamp: #{args[:until]}" unless until_time
+            locations = locations.where('created_at <= ?', until_time)
+          end
           locations = locations.limit([[args[:limit] || 50, 1].max, McpConfig.max_results].min)
 
           {

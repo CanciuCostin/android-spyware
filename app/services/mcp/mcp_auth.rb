@@ -69,7 +69,7 @@ module Mcp
       Rails.logger.info("[MCP Audit] #{log_entry.to_json}")
       log_entry
     rescue StandardError => e
-      Rails.logger.warn("[MCP Audit] Failed to log: #{e.message}")
+      Rails.logger.error("[MCP Audit] Failed to log: #{e.message} — #{e.backtrace&.first}")
     end
 
     class AuthenticationError < StandardError; end

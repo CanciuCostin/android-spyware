@@ -1,3 +1,4 @@
+/* global App */
 /**
  * WebRTC Client for Live Streaming
  * Handles peer connection, signaling, and media stream management

@@ -97,12 +97,12 @@ module Api
     # Scope device lookup to the authenticated device's own identity
     def set_authorized_device
       authenticated_device_id = sanitize_device_id(request.headers['X-Device-ID'] || params[:device_id])
-      @device = Smartphone.find(params[:id])
+      @device = Smartphone.find_by(id: params[:id], device_id: authenticated_device_id)
 
-      return if @device.device_id == authenticated_device_id
-
-      Rails.logger.warn("[API::DevicesController] IDOR attempt: device #{authenticated_device_id} tried to access device #{@device.device_id}")
-      render json: { error: 'Forbidden' }, status: :forbidden
+      unless @device
+        Rails.logger.warn("[API::DevicesController] IDOR attempt: device #{authenticated_device_id} tried to access device #{params[:id]}")
+        render json: { error: 'Forbidden' }, status: :forbidden
+      end
     end
     
     def command_params

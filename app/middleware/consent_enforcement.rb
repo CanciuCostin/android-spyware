@@ -11,9 +11,6 @@ class ConsentEnforcement
   end
   
   def call(env)
-    # Skip consent checks in development
-    return @app.call(env) if Rails.env.development?
-
     # Skip for WebSocket upgrade requests (ActionCable)
     return @app.call(env) if env['HTTP_UPGRADE']&.downcase == 'websocket'
 
@@ -34,7 +31,7 @@ class ConsentEnforcement
   private
   
   def requires_consent_check?(request)
-    PROTECTED_ENDPOINTS.keys.any? { |path| request.path.include?(path) }
+    PROTECTED_ENDPOINTS.keys.any? { |path| request.path.split('/').include?(path) }
   end
   
   def extract_device_id(request)

@@ -82,7 +82,7 @@ class GeofenceService : Service() {
                 Intent(this, GeofenceService::class.java).apply {
                     putExtra("action", "trigger")
                 },
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
             geofencingClient.addGeofences(request, pendingIntent)

@@ -8,6 +8,7 @@ import Rails from '@rails/ujs';
 import * as ActiveStorage from '@rails/activestorage';
 import * as ActionCable from '@rails/actioncable';
 import Turbolinks from 'turbolinks';
+import $ from 'jquery';
 
 import '../stylesheets/application';
 import 'channels';
@@ -16,6 +17,7 @@ import 'channels';
 Rails.start();
 ActiveStorage.start();
 Turbolinks.start();
+window.$ = window.jQuery = $;
 
 // Expose ActionCable globally for ActiveAdmin inline scripts
 window.ActionCable = ActionCable;

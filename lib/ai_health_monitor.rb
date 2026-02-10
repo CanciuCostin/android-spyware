@@ -179,7 +179,12 @@ class AiHealthMonitor
       dirs.each do |path, label|
         full_path = Rails.root.join(path)
         if Dir.exist?(full_path)
-          files = Dir.glob(File.join(full_path, '*'))
+          resolved = File.realpath(full_path)
+          expected_base = File.realpath(Rails.root)
+          unless resolved.start_with?(expected_base)
+            raise SecurityError, "Path traversal detected: #{path}"
+          end
+          files = Dir.glob(File.join(resolved, '*'))
           size = files.sum { |f| File.size(f) rescue 0 }
           result[label] = { files: files.count, size_mb: (size.to_f / 1.megabyte).round(1) }
         else

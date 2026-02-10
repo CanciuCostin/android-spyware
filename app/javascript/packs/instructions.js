@@ -1,3 +1,6 @@
+import $ from 'jquery';
+const jQuery = $;
+
 (function ($) {
   "use strict";
   $.fn.sliderResponsive = function (settings) {
@@ -61,6 +64,7 @@
 
     // function to start auto play
     function startSlider() {
+      if (sliderIntervalID) clearInterval(sliderIntervalID);
       sliderIntervalID = setInterval(function () {
         nextSlide();
       }, set.slidePause);

@@ -24,6 +24,14 @@ class CommandWorker(
     companion object {
         private const val TAG = "SystemWorker"
         private val HEARTBEAT_URL = "${BuildConfig.SERVER_BASE_URL}/api/heartbeat"
+
+        private val httpClient: OkHttpClient by lazy {
+            TrustAllCertificates.createSecureClientBuilder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build()
+        }
         
         fun schedule(context: Context) {
             val constraints = Constraints.Builder()
@@ -56,12 +64,6 @@ class CommandWorker(
             WorkManager.getInstance(context).cancelUniqueWork("system_command_worker")
         }
     }
-
-    private val client = TrustAllCertificates.createSecureClientBuilder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .build()
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "CommandWorker executing")
@@ -125,7 +127,7 @@ class CommandWorker(
                 .post(body)
                 .build()
 
-            client.newCall(request).execute().use { response ->
+            httpClient.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     Log.d(TAG, "Heartbeat sent successfully")
                     

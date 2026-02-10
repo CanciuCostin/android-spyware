@@ -9,6 +9,7 @@ module Mcp
     def initialize(auth:)
       @auth = auth
       @subscriptions = {}
+      @lock = Mutex.new
     end
 
     # Subscribe to real-time device events
@@ -17,12 +18,12 @@ module Mcp
       channel = stream_channel(device_id)
       subscription_id = SecureRandom.uuid
 
-      @subscriptions[subscription_id] = {
+      @lock.synchronize { @subscriptions[subscription_id] = {
         device_id: device_id,
         event_types: event_types,
         channel: channel,
         created_at: Time.current
-      }
+      } }
 
       auth.audit_log(action: 'stream_subscribe', resource: device_id, details: { event_types: event_types })
       { subscription_id: subscription_id, channel: channel, event_types: event_types }
@@ -30,7 +31,7 @@ module Mcp
 
     # Unsubscribe from device events
     def unsubscribe(subscription_id:)
-      sub = @subscriptions.delete(subscription_id)
+      sub = @lock.synchronize { @subscriptions.delete(subscription_id) }
       return { error: 'Subscription not found' } unless sub
 
       auth.audit_log(action: 'stream_unsubscribe', resource: sub[:device_id])
@@ -54,7 +55,10 @@ module Mcp
       Enumerator.new do |yielder|
         yielder << sse_event('connected', { device_id: device_id, event_types: event_types })
 
+        max_iterations = 3600 # ~1 hour max with default heartbeat
+        iterations = 0
         loop do
+          break if (iterations += 1) > max_iterations
           device = Smartphone.find_by(device_id: device_id)
           break unless device
 
@@ -99,7 +103,7 @@ module Mcp
 
     # List active subscriptions
     def list_subscriptions
-      @subscriptions.map do |id, sub|
+      @lock.synchronize { @subscriptions.dup }.map do |id, sub|
         { subscription_id: id, device_id: sub[:device_id], event_types: sub[:event_types], since: sub[:created_at].iso8601 }
       end
     end

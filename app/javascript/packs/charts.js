@@ -1,3 +1,4 @@
+/* global L */
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
 import flatpickr from 'flatpickr';
@@ -438,6 +439,7 @@ class ChartManager {
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.chartManager) return;
   if (document.querySelector('[data-controller="charts"]')) {
     window.chartManager = new ChartManager();
     

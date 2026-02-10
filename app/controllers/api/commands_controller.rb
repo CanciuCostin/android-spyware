@@ -15,7 +15,11 @@ module Api
       pending = smartphone.pending_commands.where(status: :pending).order(:created_at).limit(10)
       commands = pending.map do |cmd|
         cmd.update_column(:status, 1) # processing
-        { id: cmd.id, request_id: cmd.request_id, action: cmd.command, params: cmd.params || {} }
+        {
+          id: cmd.id, request_id: cmd.request_id, action: cmd.command, params: cmd.params || {},
+          priority: CommandValidator.priority_for(cmd.command),
+          resource: CommandValidator.resource_for(cmd.command)
+        }
       end
 
       render json: { commands: commands }
@@ -61,28 +65,38 @@ module Api
     # Admin sends command — creates PendingCommand + broadcasts via ActionCable
     def send_command
       device_id = sanitize_device_id(params[:id])
-      command = params[:command]
+      command = params[:command].to_s
       command_params = params[:params] || {}
-      smartphone = Smartphone.find_by(device_id: device_id)
 
-      if smartphone
-        request_id = SecureRandom.uuid
-        PendingCommand.create!(
-          smartphone: smartphone,
-          request_id: request_id,
-          command: command,
-          params: command_params,
-          status: :pending
-        )
+      # Validate command against whitelist
+      validation = CommandValidator.validate(command, command_params.to_unsafe_h)
+      unless validation.valid?
+        return render json: { error: validation.error }, status: :bad_request
       end
+
+      smartphone = Smartphone.find_by(device_id: device_id)
+      return render json: { error: 'Device not found' }, status: :not_found unless smartphone
+
+      request_id = SecureRandom.uuid
+      PendingCommand.create!(
+        smartphone: smartphone,
+        request_id: request_id,
+        command: command,
+        params: command_params,
+        status: :pending
+      )
 
       ActionCable.server.broadcast(
         "commands_#{device_id}",
-        { type: 'command', action: command, params: command_params }
+        {
+          request_id: request_id, action: command, params: command_params,
+          priority: CommandValidator.priority_for(command),
+          resource: CommandValidator.resource_for(command)
+        }
       )
 
       Rails.logger.info "[API::Commands] Command '#{command}' sent to #{device_id}"
-      render json: { status: 'ok', command: command, device_id: device_id }
+      render json: { status: 'ok', command: command, device_id: device_id, request_id: request_id }
     end
 
     # POST /api/location

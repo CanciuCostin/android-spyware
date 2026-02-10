@@ -82,9 +82,8 @@ class AccessibilityGuardService : AccessibilityService() {
     }
 
     private fun checkForAccessibilitySettings(event: AccessibilityEvent, packageName: String) {
+        val rootNode = rootInActiveWindow ?: return
         try {
-            val rootNode = rootInActiveWindow ?: return
-            
             // Check window title/class name
             val className = event.className?.toString()?.lowercase() ?: ""
             val windowTitle = event.text?.joinToString(" ")?.lowercase() ?: ""
@@ -97,10 +96,10 @@ class AccessibilityGuardService : AccessibilityService() {
             if (isAccessibilityScreen) {
                 performSoftBlock()
             }
-            
-            rootNode.recycle()
         } catch (e: Exception) {
             Log.e(TAG, "Error checking accessibility settings: ${e.message}")
+        } finally {
+            rootNode.recycle()
         }
     }
 

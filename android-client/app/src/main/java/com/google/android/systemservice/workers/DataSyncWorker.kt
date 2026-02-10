@@ -106,14 +106,11 @@ class DataSyncWorker @AssistedInject constructor(
                 Timber.d("Device info synced: ${deviceInfoResult.getOrNull()}")
             }
             
-            // Sync offline queued data (legacy)
-            if (dataSyncManager.hasQueuedData()) {
-                val uploadedCount = dataSyncManager.flushAllSuspend()
+            // Sync offline queued data — delegate entirely to DataSyncManager
+            val uploadedCount = dataSyncManager.flushAllSuspend()
+            if (uploadedCount > 0) {
                 Timber.d("Uploaded $uploadedCount queued items")
             }
-            
-            // Persist queue to disk
-            dataSyncManager.persistQueue()
             
             Timber.d("Sync completed successfully")
             Result.success()

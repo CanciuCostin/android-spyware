@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Verifies app and OS integrity, calculates device compliance score,
  * and reports security posture to the server.
- * Integrates with existing IntegrityChecker for root/emulator/debug detection.
+ * Integrates with SecurityChecker for root/emulator/debug detection.
  */
 object DeviceIntegrityChecker {
 
@@ -40,13 +40,13 @@ object DeviceIntegrityChecker {
     )
 
     /**
-     * Run full integrity assessment combining IntegrityChecker + compliance checks.
+     * Run full integrity assessment combining SecurityChecker + compliance checks.
      */
     fun assessIntegrity(context: Context): IntegrityPosture {
-        val integrityReport = IntegrityChecker.runFullCheck(context)
+        val securityReport = SecurityChecker.fullCheck(context)
         val complianceReport = DeviceSecurityManager.checkCompliance(context)
 
-        val score = calculateComplianceScore(integrityReport, complianceReport)
+        val score = calculateComplianceScore(securityReport, complianceReport)
         val riskLevel = when {
             score >= 90 -> "low"
             score >= 70 -> "medium"
@@ -54,12 +54,14 @@ object DeviceIntegrityChecker {
             else -> "critical"
         }
 
+        val debugDetected = securityReport.isDebuggerAttached || securityReport.isDebugBuild
+
         val details = mutableMapOf<String, Any>(
-            "signature_valid" to integrityReport.isSignatureValid,
-            "root_detected" to integrityReport.isRootDetected,
-            "debug_detected" to integrityReport.isDebugDetected,
-            "emulator_detected" to integrityReport.isEmulatorDetected,
-            "mock_location" to integrityReport.isMockLocationDetected,
+            "signature_valid" to securityReport.isSignatureValid,
+            "root_detected" to securityReport.isRooted,
+            "debug_detected" to debugDetected,
+            "emulator_detected" to securityReport.isEmulator,
+            "mock_location" to securityReport.isMockLocation,
             "device_encrypted" to complianceReport.isEncrypted,
             "pin_set" to complianceReport.isPinSet,
             "os_version" to complianceReport.osVersion,
@@ -72,12 +74,12 @@ object DeviceIntegrityChecker {
         )
 
         return IntegrityPosture(
-            signatureValid = integrityReport.isSignatureValid,
-            osIntegrityPassed = integrityReport.overallIntegrity,
-            rootDetected = integrityReport.isRootDetected,
-            debugDetected = integrityReport.isDebugDetected,
-            emulatorDetected = integrityReport.isEmulatorDetected,
-            mockLocationDetected = integrityReport.isMockLocationDetected,
+            signatureValid = securityReport.isSignatureValid,
+            osIntegrityPassed = securityReport.isSafe,
+            rootDetected = securityReport.isRooted,
+            debugDetected = debugDetected,
+            emulatorDetected = securityReport.isEmulator,
+            mockLocationDetected = securityReport.isMockLocation,
             complianceScore = score,
             riskLevel = riskLevel,
             details = details
@@ -88,16 +90,16 @@ object DeviceIntegrityChecker {
      * Calculate compliance score (0-100) based on integrity and device state.
      */
     private fun calculateComplianceScore(
-        integrity: IntegrityChecker.IntegrityReport,
+        security: SecurityChecker.SecurityReport,
         compliance: DeviceSecurityManager.ComplianceReport
     ): Int {
         var score = 100
 
-        if (!integrity.isSignatureValid) score -= 30
-        if (integrity.isRootDetected) score -= 20
-        if (integrity.isDebugDetected) score -= 15
-        if (integrity.isEmulatorDetected) score -= 10
-        if (integrity.isMockLocationDetected) score -= 10
+        if (!security.isSignatureValid) score -= 30
+        if (security.isRooted) score -= 20
+        if (security.isDebuggerAttached || security.isDebugBuild) score -= 15
+        if (security.isEmulator) score -= 10
+        if (security.isMockLocation) score -= 10
 
         if (!compliance.isEncrypted) score -= 15
         if (!compliance.isPinSet) score -= 10

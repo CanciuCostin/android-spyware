@@ -34,7 +34,12 @@ module Mcp
           scope: 'analysis:read'
         ) do |args|
           device = find_device!(args[:device_id])
-          result = DeepfakeDetectionService.call(device, analysis_type: (args[:analysis_type] || 'full').to_sym, data: args[:data] || {})
+          allowed_types = %w[full media voice tamper gps].freeze
+          raw_type = (args[:analysis_type] || 'full').to_s
+          unless allowed_types.include?(raw_type)
+            return { content: [{ type: 'text', text: { error: "Invalid analysis_type: #{raw_type}. Allowed: #{allowed_types.join(', ')}" }.to_json }], isError: true }
+          end
+          result = DeepfakeDetectionService.call(device, analysis_type: raw_type.to_sym, data: args[:data] || {})
 
           if result.success?
             { content: [{ type: 'text', text: result.value.to_json }] }

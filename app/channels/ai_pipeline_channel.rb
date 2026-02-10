@@ -2,6 +2,11 @@
 
 class AiPipelineChannel < ApplicationCable::Channel
   def subscribed
+    unless current_user_type == :admin
+      reject
+      return
+    end
+
     device_id = params[:device_id]
 
     if device_id.present?

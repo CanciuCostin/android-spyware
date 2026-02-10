@@ -2,20 +2,21 @@
   "name": "androidspyware",
   "private": true,
   "scripts": {
-    "lint:js": "eslint --ext .js,.jsx app/javascript app/assets/javascripts config/webpack",
+    "lint:js": "eslint --ext .js,.jsx app/javascript config/webpack",
     "docs:validate": "npx @redocly/cli lint docs/api/openapi.yaml",
     "docs:serve": "npx @redocly/cli preview-docs docs/api/openapi.yaml",
     "docs:build": "npx @redocly/cli build-docs docs/api/openapi.yaml -o public/api-docs.html"
   },
   "dependencies": {
+    "@hotwired/stimulus": "^3.2.2",
     "@rails/actioncable": "^6.0.0",
     "@rails/activestorage": "^6.0.0",
     "@rails/ujs": "^6.0.0",
     "@rails/webpacker": "4.2.2",
-    "@hotwired/stimulus": "^3.2.2",
     "axios": "^1.6.0",
     "bootstrap": "^4.4.1",
     "jquery": "^3.4.1",
+    "particles.js": "^2.0.0",
     "popper.js": "^1.16.1",
     "postcss-smart-import": "^0.7.6",
     "turbolinks": "^5.2.0",

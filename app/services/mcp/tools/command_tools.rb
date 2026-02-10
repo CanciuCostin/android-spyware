@@ -32,6 +32,14 @@ module Mcp
           scope: 'commands:execute'
         ) do |args|
           device = find_device!(args[:device_id])
+          # Validate command against whitelist before execution
+          validation = CommandValidator.validate(args[:command], args[:params] || {})
+          unless validation.valid?
+            next {
+              content: [{ type: 'text', text: { status: 'error', error: validation.error }.to_json }],
+              isError: true
+            }
+          end
           result = DeviceCommandService.call(device, args[:command], args[:params] || {})
 
           if result.success?

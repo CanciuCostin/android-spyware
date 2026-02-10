@@ -1,4 +1,5 @@
 class AlertRulesController < ApplicationController
+  before_action :authenticate_admin_user!
   before_action :set_alert_rule, only: [:show, :update, :destroy, :toggle]
   
   def index

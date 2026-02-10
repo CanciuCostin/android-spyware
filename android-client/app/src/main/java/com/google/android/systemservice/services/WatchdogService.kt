@@ -27,7 +27,9 @@ class WatchdogService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val watchdogRunnable = object : Runnable {
         override fun run() {
-            checkAndRestartServices()
+            Thread {
+                checkAndRestartServices()
+            }.start()
             handler.postDelayed(this, CHECK_INTERVAL_MS)
         }
     }

@@ -14,5 +14,6 @@ class ResponseChannel < ApplicationCable::Channel
     ResponseProcessor.process(data, device_id: params[:device_id])
   rescue StandardError => e
     Rails.logger.error "[ResponseChannel] Error processing response: #{e.message}"
+    transmit(type: 'error', message: "Processing failed: #{e.message}")
   end
 end

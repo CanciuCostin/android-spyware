@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -51,9 +52,15 @@ class MainViewModel @Inject constructor(
     
     private fun sendPeriodicHeartbeat() {
         viewModelScope.launch {
-            while (true) {
-                kotlinx.coroutines.delay(60_000) // Every minute
-                sendHeartbeatUseCase()
+            while (isActive) {
+                try {
+                    kotlinx.coroutines.delay(60_000) // Every minute
+                    sendHeartbeatUseCase()
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Timber.e(e, "Heartbeat failed")
+                }
             }
         }
     }

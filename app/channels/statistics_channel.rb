@@ -15,7 +15,7 @@ class StatisticsChannel < ApplicationCable::Channel
 
   def request_update
     device_id = params[:device_id]
-    device = Smartphone.find_by(id: device_id)
+    device = Smartphone.find_by(device_id: device_id)
     
     if device
       stats = StatisticsService.new(device).calculate

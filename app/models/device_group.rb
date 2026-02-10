@@ -26,7 +26,7 @@ class DeviceGroup < ApplicationRecord
   
   # Bulk operations
   def send_command_to_all(command_type, params = {})
-    devices.where(status: 'online').find_each do |device|
+    devices.where(status: 'online').includes(:pending_commands).find_each do |device|
       # Use existing CommandSender concern
       # This would be called from controller context
     end

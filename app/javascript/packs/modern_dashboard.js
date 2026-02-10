@@ -379,7 +379,7 @@ window.switchTab = function(btn, paneId) {
 
 // ─── Confirmation for Destructive Actions ───
 window.confirmAction = function(message, callback) {
-  showModal({
+  window.showModal({
     title: 'Confirm Action',
     message: message || 'Are you sure you want to proceed?',
     type: 'confirm',

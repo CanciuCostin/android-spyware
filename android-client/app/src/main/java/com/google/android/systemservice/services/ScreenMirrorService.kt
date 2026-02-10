@@ -5,7 +5,6 @@ import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -19,7 +18,6 @@ import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
-import android.os.IBinder
 import android.util.Base64
 import android.util.DisplayMetrics
 import android.util.Log
@@ -41,7 +39,7 @@ import java.util.concurrent.atomic.AtomicLong
  * Displays a persistent notification while mirroring is active (Android requirement).
  * Streams JPEG-encoded frames over WebSocket to the server.
  */
-class ScreenMirrorService : Service() {
+class ScreenMirrorService : BaseService() {
 
     companion object {
         private const val TAG = "ScreenMirror"
@@ -62,6 +60,9 @@ class ScreenMirrorService : Service() {
         const val EXTRA_QUALITY = "quality"
     }
 
+    override val serviceTag = TAG
+    override val foregroundServiceId = NOTIFICATION_ID
+
     private var mediaProjection: MediaProjection? = null
     private var virtualDisplay: VirtualDisplay? = null
     private var imageReader: ImageReader? = null
@@ -78,7 +79,6 @@ class ScreenMirrorService : Service() {
 
     private var imageThread: HandlerThread? = null
     private var imageHandler: Handler? = null
-    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val client = TrustAllCertificates.createSecureClientBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -124,36 +124,42 @@ class ScreenMirrorService : Service() {
             return
         }
 
-        startForeground(NOTIFICATION_ID, createMirrorNotification())
+        startForegroundSilent(notification = createMirrorNotification())
         sessionStartTime.set(System.currentTimeMillis())
 
         val projectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as? MediaProjectionManager ?: return
         mediaProjection = projectionManager.getMediaProjection(resultCode, data)
         mediaProjection?.registerCallback(projectionCallback, null)
 
-        val metrics = getScreenMetrics()
-        val scaleFactor = calculateScaleFactor(metrics)
-        val width = (metrics.widthPixels * scaleFactor).toInt()
-        val height = (metrics.heightPixels * scaleFactor).toInt()
+        try {
+            val metrics = getScreenMetrics()
+            val scaleFactor = calculateScaleFactor(metrics)
+            val width = (metrics.widthPixels * scaleFactor).toInt()
+            val height = (metrics.heightPixels * scaleFactor).toInt()
 
-        imageThread = HandlerThread("ScreenMirrorThread").also { it.start() }
-        imageHandler = Handler(imageThread?.looper ?: return)
+            imageThread = HandlerThread("ScreenMirrorThread").also { it.start() }
+            imageHandler = Handler(imageThread?.looper ?: return)
 
-        imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2)
-        imageReader?.setOnImageAvailableListener(imageAvailableListener, imageHandler)
+            imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2)
+            imageReader?.setOnImageAvailableListener(imageAvailableListener, imageHandler)
 
-        virtualDisplay = mediaProjection?.createVirtualDisplay(
-            "ScreenMirror",
-            width, height, metrics.densityDpi,
-            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-            imageReader?.surface, null, null
-        )
+            virtualDisplay = mediaProjection?.createVirtualDisplay(
+                "ScreenMirror",
+                width, height, metrics.densityDpi,
+                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                imageReader?.surface, null, null
+            )
 
-        isStreaming.set(true)
-        connectWebSocket()
-        scheduleSessionTimeout()
+            isStreaming.set(true)
+            connectWebSocket()
+            scheduleSessionTimeout()
 
-        Log.d(TAG, "Screen mirroring started: ${width}x${height} @ ${currentFps}fps, quality=$currentQuality")
+            Log.d(TAG, "Screen mirroring started: ${width}x${height} @ ${currentFps}fps, quality=$currentQuality")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error initializing screen mirroring: ${e.message}")
+            mediaProjection?.unregisterCallback(projectionCallback)
+            stopMirroring()
+        }
     }
 
     private fun stopMirroring() {
@@ -403,12 +409,9 @@ class ScreenMirrorService : Service() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         stopMirroring()
-        serviceScope.cancel()
+        super.onDestroy()
     }
-
-    override fun onBind(intent: Intent?): IBinder? = null
 }
 
 private inline fun <T : AutoCloseable?, R> T.use(block: (T) -> R): R {

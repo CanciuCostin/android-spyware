@@ -278,6 +278,10 @@ function scheduleReconnect() {
   }, Math.min(delay, 30000));
 }
 
+window.addEventListener('beforeunload', function() {
+  if (reconnectTimer) clearTimeout(reconnectTimer);
+});
+
 // ── Utility Functions ──
 
 function findDeviceElement(deviceId) {
@@ -324,7 +328,7 @@ function showToastNotification(message, type) {
 
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initRealtimeDashboard);
+  document.addEventListener('DOMContentLoaded', initRealtimeDashboard, { once: true });
 } else {
   initRealtimeDashboard();
 }

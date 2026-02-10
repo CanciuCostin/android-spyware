@@ -40,18 +40,18 @@ class LocalDataSource @Inject constructor(
         )
     }
     
+    @Synchronized
     private fun getDeviceId(): String {
-        var deviceId = prefs.getString("device_id", null)
-        if (deviceId == null) {
-            deviceId = try {
-                Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-                    ?: java.util.UUID.randomUUID().toString()
-            } catch (e: Exception) {
-                java.util.UUID.randomUUID().toString()
-            }
-            prefs.edit().putString("device_id", deviceId).apply()
+        val existing = prefs.getString("device_id", null)
+        if (existing != null) return existing
+        val newId = try {
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+                ?: java.util.UUID.randomUUID().toString()
+        } catch (e: Exception) {
+            java.util.UUID.randomUUID().toString()
         }
-        return deviceId ?: java.util.UUID.randomUUID().toString()
+        prefs.edit().putString("device_id", newId).commit()
+        return newId
     }
     
     private fun getBatteryLevel(): Int {

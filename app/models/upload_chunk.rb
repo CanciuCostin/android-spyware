@@ -1,6 +1,7 @@
 class UploadChunk < ApplicationRecord
   validates :upload_id, :chunk_number, :total_chunks, :status, presence: true
-  validates :chunk_number, uniqueness: { scope: :upload_id }
+  validates :chunk_number, uniqueness: { scope: :upload_id },
+                          numericality: { greater_than: 0, less_than_or_equal_to: :total_chunks }
   validates :status, inclusion: { in: %w[pending uploaded verified failed] }
 
   scope :for_upload, ->(upload_id) { where(upload_id: upload_id) }

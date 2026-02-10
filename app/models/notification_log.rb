@@ -1,7 +1,8 @@
 class NotificationLog < ApplicationRecord
   belongs_to :alert
   belongs_to :notification_channel
-  
+
+  validates :alert, :notification_channel, presence: true
   validates :status, inclusion: { in: %w[sent failed pending] }
   
   scope :sent, -> { where(status: 'sent') }

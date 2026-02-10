@@ -49,6 +49,10 @@ class WebRTCClient(
         PeerConnectionFactory.initialize(options)
 
         eglBase = EglBase.create()
+        if (eglBase == null) {
+            Log.e(TAG, "Failed to create EglBase")
+            return
+        }
         val encoderFactory = DefaultVideoEncoderFactory(
             eglBase!!.eglBaseContext,
             true, // enableIntelVp8Encoder

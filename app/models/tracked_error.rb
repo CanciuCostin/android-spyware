@@ -44,19 +44,21 @@ class TrackedError < ApplicationRecord
   end
 
   def increment_occurrence!(new_backtrace: nil, device_id: nil)
-    attrs = {
-      count: count + 1,
-      last_seen_at: Time.current
-    }
-    attrs[:backtrace] = new_backtrace if new_backtrace.present?
-    attrs[:status] = 'open' if status == 'resolved'
+    with_lock do
+      attrs = {
+        last_seen_at: Time.current
+      }
+      attrs[:backtrace] = new_backtrace if new_backtrace.present?
+      attrs[:status] = 'open' if status == 'resolved'
 
-    if device_id.present?
-      current = device_ids || []
-      attrs[:device_ids] = (current + [device_id]).uniq
+      if device_id.present?
+        current = device_ids || []
+        attrs[:device_ids] = (current + [device_id]).uniq
+      end
+
+      increment!(:count)
+      update!(attrs)
     end
-
-    update!(attrs)
   end
 
   def self.auto_resolve_stale!

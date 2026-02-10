@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import '../stylesheets/application';
 
 $(document).ready(() => {

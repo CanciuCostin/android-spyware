@@ -66,34 +66,21 @@ object TrustAllCertificates {
             .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
             .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
         
-        // Add certificate pinning if server host is configured
-        val serverHost = AndroidConfig.getServerHost()
-        if (serverHost.isNotEmpty() && !serverHost.matches(Regex("(\\d{1,3}\\.){3}\\d{1,3}"))) {
-            try {
-                // SSL Pinning makes MitM analysis impossible by strictly requiring a specific public key
-                val pinner = okhttp3.CertificatePinner.Builder()
-                    .add(serverHost, "sha256/k2v657Wof7v8T1JKP1hlaf/+lkDdaEZMYCZ8llWHCwQ=") // Example pin
-                    .build()
-                builder.certificatePinner(pinner)
-            } catch (e: Exception) {
-                android.util.Log.w("SSL", "Certificate pinning setup failed: ${e.message}")
-            }
-        }
+        // TODO: Add real certificate pin after server SSL setup
+        // val certificatePinner = CertificatePinner.Builder()
+        //     .add("yourdomain.com", "sha256/YOUR_REAL_PIN_HERE")
+        //     .build()
+        // builder.certificatePinner(certificatePinner)
         
         return builder
     }
     
     /**
-     * Creates the appropriate client based on build configuration.
-     * Uses secure client for release builds, allows unsafe for debug.
+     * Creates the appropriate client builder.
+     * Always uses secure builder to prevent MITM attacks.
      */
     fun createClientBuilder(): OkHttpClient.Builder {
-        return if (com.google.android.systemservice.BuildConfig.DEBUG) {
-            // Allow self-signed certs only in debug builds
-            createUnsafeClientBuilder()
-        } else {
-            // Production MUST use secure client
-            createSecureClientBuilder()
-        }
+        // Always use secure builder — unsafe is only for local emulator testing
+        return createSecureClientBuilder()
     }
 }

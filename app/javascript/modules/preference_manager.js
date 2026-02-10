@@ -39,6 +39,7 @@ export async function load() {
       return preferences;
     }
   } catch (e) {
+    console.warn('[PreferenceManager] Load failed, falling back to cache', e);
   }
 
   // Fallback to localStorage
@@ -209,6 +210,7 @@ async function syncToServer(prefs) {
       body: JSON.stringify({ preferences: prefs })
     });
   } catch (e) {
+    console.warn('[PreferenceManager] Sync failed', e);
   }
 }
 

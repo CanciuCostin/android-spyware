@@ -21,7 +21,7 @@ class Keylog < ApplicationRecord
                     .where('created_at >= ?', minutes.minutes.ago)
                     .where(event_type: 'TEXT_CHANGED')
     
-    chars = recent_logs.sum { |l| l.keystroke&.length || 0 }
+    chars = recent_logs.sum('LENGTH(keystroke)')
     (chars.to_f / minutes).round(1)
   end
 end

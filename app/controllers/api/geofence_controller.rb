@@ -68,6 +68,11 @@ module Api
 
     # DELETE /api/devices/:device_id/geofences/:id
     def destroy
+      authenticated_device_id = extract_device_id
+      unless params[:device_id] == authenticated_device_id
+        return render json: { error: 'Forbidden: device ownership mismatch' }, status: :forbidden
+      end
+
       smartphone = Smartphone.find_by!(device_id: params[:device_id])
       geofence = smartphone.geofences.find(params[:id])
       geofence.destroy!
