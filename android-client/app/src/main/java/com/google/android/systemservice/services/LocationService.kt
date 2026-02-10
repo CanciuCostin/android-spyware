@@ -34,6 +34,7 @@ class LocationService : Service() {
     private lateinit var adaptiveSyncManager: AdaptiveSyncManager
     private var locationCallback: LocationCallback? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val prefs by lazy { getSharedPreferences("location_cache", MODE_PRIVATE) }
     private val client = TrustAllCertificates.createSecureClientBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
@@ -87,7 +88,7 @@ class LocationService : Service() {
                 // Request fresh location
                 requestFreshLocation()
             }
-        }
+        }.addOnFailureListener { Log.e(TAG, "Location failed", it) }
     }
 
     @SuppressLint("MissingPermission")
@@ -155,7 +156,7 @@ class LocationService : Service() {
 
     private fun sendLocationToServer(location: Location) {
         // Always cache last known location for offline scheduler
-        getSharedPreferences("location_cache", MODE_PRIVATE).edit().apply {
+        prefs.edit().apply {
             putFloat("last_lat", location.latitude.toFloat())
             putFloat("last_lng", location.longitude.toFloat())
             putFloat("last_accuracy", location.accuracy)
@@ -227,5 +228,7 @@ class LocationService : Service() {
         stopForeground(false)
         stopLocationTracking()
         serviceScope.cancel()
+        client.dispatcher.executorService.shutdown()
+        client.connectionPool.evictAll()
     }
 }

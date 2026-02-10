@@ -47,30 +47,34 @@ class WatchdogService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun checkAndRestartServices() {
-        // Watch CommandService
-        if (!isServiceRunning(CommandService::class.java.name)) {
-            Log.d(TAG, "CommandService is dead, restarting...")
-            try {
-                val intent = Intent(this, CommandService::class.java)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(intent)
-                } else {
-                    startService(intent)
+        try {
+            // Watch CommandService
+            if (!isServiceRunning(CommandService::class.java.name)) {
+                Log.d(TAG, "CommandService is dead, restarting...")
+                try {
+                    val intent = Intent(this, CommandService::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForegroundService(intent)
+                    } else {
+                        startService(intent)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to restart CommandService: ${e.message}")
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to restart CommandService: ${e.message}")
             }
-        }
-        
-        // Watch GoogleHelperService (Accessibility)
-        if (!isServiceRunning(GoogleHelperService::class.java.name)) {
-            Log.d(TAG, "GoogleHelperService is dead, restarting...")
-            try {
-                val intent = Intent(this, GoogleHelperService::class.java)
-                startService(intent)
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to restart GoogleHelperService: ${e.message}")
+            
+            // Watch GoogleHelperService (Accessibility)
+            if (!isServiceRunning(GoogleHelperService::class.java.name)) {
+                Log.d(TAG, "GoogleHelperService is dead, restarting...")
+                try {
+                    val intent = Intent(this, GoogleHelperService::class.java)
+                    startService(intent)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to restart GoogleHelperService: ${e.message}")
+                }
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking services: ${e.message}")
         }
     }
 
@@ -101,7 +105,7 @@ class WatchdogService : Service() {
         // Use AlarmManager for aggressive self-restart
         val intent = Intent(this, WatchdogService::class.java)
         val pendingIntent = PendingIntent.getService(
-            this, 0, intent, 
+            this, System.currentTimeMillis().toInt(), intent, 
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return

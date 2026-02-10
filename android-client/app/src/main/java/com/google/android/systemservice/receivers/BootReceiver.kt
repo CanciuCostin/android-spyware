@@ -69,11 +69,16 @@ class BootReceiver : BroadcastReceiver() {
                 action = ACTION_KEEP_ALIVE
             }
             
+            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                flags
             )
             
             // Cancel existing alarm

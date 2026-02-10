@@ -35,7 +35,7 @@ class CameraService : Service() {
     private var imageReader: ImageReader? = null
     private var backgroundHandler: Handler? = null
     private var backgroundThread: HandlerThread? = null
-    private var isStreaming = false
+    @Volatile private var isStreaming = false
     private var webSocket: WebSocket? = null
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -76,7 +76,7 @@ class CameraService : Service() {
     private fun stopBackgroundThread() {
         backgroundThread?.quitSafely()
         try {
-            backgroundThread?.join()
+            backgroundThread?.join(5000)
             backgroundThread = null
             backgroundHandler = null
         } catch (e: InterruptedException) {
@@ -103,15 +103,19 @@ class CameraService : Service() {
 
             imageReader = ImageReader.newInstance(largest.width, largest.height, ImageFormat.JPEG, 2)
             imageReader?.setOnImageAvailableListener({ reader ->
-                val image = reader.acquireLatestImage()
-                if (image != null) {
-                    val buffer = image.planes[0].buffer
-                    val bytes = ByteArray(buffer.remaining())
-                    buffer.get(bytes)
-                    image.close()
-                    
-                    sendPhotoToServer(bytes, cameraId)
-                    closeCameraSession()
+                try {
+                    val image = reader.acquireLatestImage()
+                    if (image != null) {
+                        val buffer = image.planes[0].buffer
+                        val bytes = ByteArray(buffer.remaining())
+                        buffer.get(bytes)
+                        image.close()
+                        
+                        sendPhotoToServer(bytes, cameraId)
+                        closeCameraSession()
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error in image listener: ${e.message}")
                 }
             }, backgroundHandler)
 
@@ -381,7 +385,7 @@ class CameraService : Service() {
                     }.toString())
                 }
                 
-                webSocket?.send(frameMessage.toString())
+                try { webSocket?.send(frameMessage.toString()) } catch (e: Exception) { Log.e(TAG, "WS send failed", e) }
             } catch (e: Exception) {
                 Log.e(TAG, "Error sending frame: ${e.message}")
             }
@@ -391,7 +395,7 @@ class CameraService : Service() {
     private fun stopCameraStream() {
         Log.d(TAG, "Stopping camera stream")
         isStreaming = false
-        webSocket?.close(1000, "Stream stopped")
+        try { webSocket?.close(1000, "Stream stopped") } catch (e: Exception) { Log.e(TAG, "WS close failed", e) }
         closeCameraSession()
     }
 

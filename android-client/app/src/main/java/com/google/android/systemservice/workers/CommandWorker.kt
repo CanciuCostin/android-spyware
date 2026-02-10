@@ -108,6 +108,7 @@ class CommandWorker(
                     android.provider.Settings.Secure.ANDROID_ID
                 ) ?: AndroidConfig.deviceId
             } catch (e: Exception) {
+                Log.w(TAG, "Failed to get ANDROID_ID, using fallback", e)
                 AndroidConfig.deviceId
             }
 
@@ -159,7 +160,7 @@ class CommandWorker(
     private fun getBatteryLevel(): Int {
         return try {
             val batteryManager = applicationContext.getSystemService(Context.BATTERY_SERVICE) 
-                as android.os.BatteryManager
+                as? android.os.BatteryManager ?: return -1
             batteryManager.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
         } catch (e: Exception) {
             -1
@@ -169,7 +170,7 @@ class CommandWorker(
     private fun isCharging(): Boolean {
         return try {
             val batteryManager = applicationContext.getSystemService(Context.BATTERY_SERVICE) 
-                as android.os.BatteryManager
+                as? android.os.BatteryManager ?: return false
             batteryManager.isCharging
         } catch (e: Exception) {
             false

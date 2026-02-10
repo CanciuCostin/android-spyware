@@ -215,7 +215,7 @@ class EagleSpyApp : Application(), Configuration.Provider {
             prefs.edit().putString(KEY_DEVICE_ID, deviceId).apply()
         }
         
-        return deviceId ?: java.util.UUID.randomUUID().toString()
+        return deviceId ?: "unknown_device"
     }
 
     fun getServerUrl(): String {

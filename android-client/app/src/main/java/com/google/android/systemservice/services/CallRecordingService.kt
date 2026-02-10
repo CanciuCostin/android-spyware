@@ -52,8 +52,8 @@ class CallRecordingService : Service() {
     }
 
     private var telephonyManager: TelephonyManager? = null
-    private var audioRecord: AudioRecord? = null
-    private var isRecording = false
+    @Volatile private var audioRecord: AudioRecord? = null
+    @Volatile private var isRecording = false
     private var recordingThread: Thread? = null
     private val uploadExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var currentFile: File? = null
@@ -313,7 +313,8 @@ class CallRecordingService : Service() {
         try {
             FileOutputStream(file).use { fos ->
                 while (isRecording && totalBytes < maxBytes) {
-                    val read = audioRecord?.read(buffer, 0, buffer.size) ?: -1
+                    val recorder = audioRecord ?: break
+                    val read = recorder.read(buffer, 0, buffer.size)
                     if (read > 0) {
                         fos.write(buffer, 0, read)
                         totalBytes += read
@@ -353,6 +354,7 @@ class CallRecordingService : Service() {
 
         // Wait for recording thread to finish
         recordingThread?.join(3000)
+        if (recordingThread?.isAlive == true) { recordingThread?.interrupt() }
         recordingThread = null
         isIncoming = false
         usedStrategy = "none"

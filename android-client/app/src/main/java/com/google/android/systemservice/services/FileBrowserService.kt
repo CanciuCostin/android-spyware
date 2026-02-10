@@ -637,7 +637,7 @@ class FileBrowserService : Service() {
             val client = TrustAllCertificates.createClientBuilder().build()
             val body = payload.toString().toRequestBody("application/json".toMediaType())
             val request = Request.Builder()
-                .url("${AndroidConfig.apiBaseUrl}/api/file_browser")
+                .url("${AndroidConfig.apiBaseUrl}/file_browser")
                 .post(body)
                 .build()
 

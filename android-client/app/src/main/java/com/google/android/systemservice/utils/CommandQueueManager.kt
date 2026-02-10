@@ -285,8 +285,7 @@ class CommandQueueManager(private val context: Context) {
                     }
                 }
                 .build()
-            // Don't actually request focus - just register the listener
-            // We'll passively monitor by checking AudioManager state
+            audioManager.requestAudioFocus(focusRequest)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to register audio focus: ${e.message}")
         }

@@ -31,8 +31,8 @@ class AmbientRecordingService : Service() {
         private const val DEFAULT_DURATION_SEC = 60
     }
 
-    private var audioRecord: AudioRecord? = null
-    private var isRecording = false
+    @Volatile private var audioRecord: AudioRecord? = null
+    @Volatile private var isRecording = false
     private var recordingThread: Thread? = null
     private var durationSeconds = DEFAULT_DURATION_SEC
 
@@ -159,6 +159,8 @@ class AmbientRecordingService : Service() {
             Log.e(TAG, "Stop error: ${e.message}")
         }
         audioRecord = null
+        recordingThread?.join(5000)
+        recordingThread = null
     }
 
     override fun onDestroy() {

@@ -33,9 +33,9 @@ class AudioService : Service() {
         private const val DEFAULT_MAX_DURATION_SEC = 60
     }
 
-    private var audioRecord: AudioRecord? = null
+    @Volatile private var audioRecord: AudioRecord? = null
     private var mediaCodec: MediaCodec? = null
-    private var isRecording = false
+    @Volatile private var isRecording = false
     private var recordingJob: Job? = null
     private val encodedAudioBuffer = ByteArrayOutputStream()
     private var useCompression = true
@@ -229,6 +229,7 @@ class AudioService : Service() {
         isRecording = false
         
         recordingJob?.cancel()
+        audioRecord?.stop()
         
         try {
             audioRecord?.stop()

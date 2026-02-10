@@ -32,6 +32,8 @@ class WebRTCClient(
     private var localAudioTrack: AudioTrack? = null
     private var localVideoTrack: VideoTrack? = null
     private var videoCapturer: VideoCapturer? = null
+    private var eglBase: EglBase? = null
+    private var surfaceTextureHelper: SurfaceTextureHelper? = null
     
     private val scope = CoroutineScope(Dispatchers.Default)
 
@@ -46,12 +48,13 @@ class WebRTCClient(
             .createInitializationOptions()
         PeerConnectionFactory.initialize(options)
 
+        eglBase = EglBase.create()
         val encoderFactory = DefaultVideoEncoderFactory(
-            EglBase.create().eglBaseContext,
+            eglBase!!.eglBaseContext,
             true, // enableIntelVp8Encoder
             true  // enableH264HighProfile
         )
-        val decoderFactory = DefaultVideoDecoderFactory(EglBase.create().eglBaseContext)
+        val decoderFactory = DefaultVideoDecoderFactory(eglBase!!.eglBaseContext)
 
         peerConnectionFactory = PeerConnectionFactory.builder()
             .setVideoEncoderFactory(encoderFactory)
@@ -119,7 +122,7 @@ class WebRTCClient(
 
     fun addVideoTrack(capturer: VideoCapturer) {
         this.videoCapturer = capturer
-        val surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", EglBase.create().eglBaseContext)
+        surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", eglBase!!.eglBaseContext)
         val videoSource = peerConnectionFactory?.createVideoSource(capturer.isScreencast)
         capturer.initialize(surfaceTextureHelper, context, videoSource?.capturerObserver)
         
@@ -199,7 +202,12 @@ class WebRTCClient(
         localAudioTrack?.dispose()
         peerConnection?.close()
         peerConnection?.dispose()
+        surfaceTextureHelper?.dispose()
+        surfaceTextureHelper = null
         peerConnectionFactory?.dispose()
+        eglBase?.releaseSurface()
+        eglBase?.release()
+        eglBase = null
         Log.d(TAG, "WebRTC client closed")
     }
 }

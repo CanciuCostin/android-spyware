@@ -256,6 +256,7 @@ class SetupWizardActivity : AppCompatActivity() {
         when (requestCode) {
             PERMISSION_REQUEST_CODE -> {
                 handler.postDelayed({
+                    if (isDestroyed || isFinishing) return@postDelayed
                     val stillNeeded = requiredPermissions.filter {
                         ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
                     }
@@ -282,6 +283,7 @@ class SetupWizardActivity : AppCompatActivity() {
             }
             BACKGROUND_LOCATION_REQUEST_CODE -> {
                 handler.postDelayed({
+                    if (isDestroyed || isFinishing) return@postDelayed
                     // Background location granted or denied — advance either way
                     advanceToNextStep()
                 }, 300)
@@ -371,6 +373,7 @@ class SetupWizardActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         
         handler.postDelayed({
+            if (isDestroyed || isFinishing) return@postDelayed
             // Verify each step is actually completed before advancing
             when (requestCode) {
                 ACCESSIBILITY_REQUEST_CODE -> {
@@ -474,6 +477,7 @@ class SetupWizardActivity : AppCompatActivity() {
 
         // Start services, then hide icons; keep retry if hiding fails
         handler.postDelayed({
+            if (isDestroyed || isFinishing) return@postDelayed
             try {
                 launchServicesAndFinish()
                 hideLauncherIcon()
@@ -520,5 +524,10 @@ class SetupWizardActivity : AppCompatActivity() {
         }
         
         // Note: finish() is NOT called here - it's called from completeSetup() AFTER hideLauncherIcon()
+    }
+
+    override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
+        super.onDestroy()
     }
 }

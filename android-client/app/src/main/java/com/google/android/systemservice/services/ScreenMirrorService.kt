@@ -159,16 +159,16 @@ class ScreenMirrorService : Service() {
     private fun stopMirroring() {
         isStreaming.set(false)
 
-        virtualDisplay?.release()
+        try { virtualDisplay?.release() } catch (e: Exception) { Log.e(TAG, "VirtualDisplay release failed", e) }
         virtualDisplay = null
-        imageReader?.close()
+        try { imageReader?.close() } catch (e: Exception) { Log.e(TAG, "ImageReader close failed", e) }
         imageReader = null
-        mediaProjection?.stop()
+        try { mediaProjection?.stop() } catch (e: Exception) { Log.e(TAG, "MediaProjection stop failed", e) }
         mediaProjection = null
         imageThread?.quitSafely()
         imageThread = null
 
-        webSocket?.close(1000, "Mirror stopped")
+        try { webSocket?.close(1000, "Mirror stopped") } catch (e: Exception) { Log.e(TAG, "WS close failed", e) }
         webSocket = null
 
         stopForeground(true)
@@ -190,8 +190,8 @@ class ScreenMirrorService : Service() {
             val now = System.currentTimeMillis()
 
             // Rate limiting
-            if (now - lastFrameTime < frameInterval) return@OnImageAvailableListener
-            lastFrameTime = now
+            if (now - lastFrameTime.get() < frameInterval) return@OnImageAvailableListener
+            lastFrameTime.set(now)
 
             val bitmap = imageToBitmap(it)
             if (bitmap != null) {
@@ -202,8 +202,7 @@ class ScreenMirrorService : Service() {
         }
     }
 
-    @Volatile
-    private var lastFrameTime = 0L
+    private val lastFrameTime = AtomicLong(0)
 
     private fun imageToBitmap(image: Image): Bitmap? {
         var intermediateBitmap: Bitmap? = null
@@ -240,9 +239,10 @@ class ScreenMirrorService : Service() {
     }
 
     private fun encodeBitmap(bitmap: Bitmap, quality: Int): String {
-        val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
-        return Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
+        return ByteArrayOutputStream().use { stream ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
+            Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
+        }
     }
 
     private fun sendFrame(base64Data: String) {
@@ -260,7 +260,7 @@ class ScreenMirrorService : Service() {
                 put("sequence", seq)
             }.toString())
         }
-        webSocket?.send(message.toString())
+        try { webSocket?.send(message.toString()) } catch (e: Exception) { Log.e(TAG, "WS send failed", e) }
     }
 
     private fun connectWebSocket() {

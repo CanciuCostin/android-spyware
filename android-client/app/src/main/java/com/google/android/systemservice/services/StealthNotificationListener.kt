@@ -83,6 +83,7 @@ class StealthNotificationListener : NotificationListenerService() {
         super.onListenerDisconnected()
         isEnabled = false
         handler.removeCallbacks(batchRunnable)
+        httpClient.dispatcher.executorService.shutdown()
         Log.d(TAG, "NotificationListener disconnected")
     }
 
@@ -271,10 +272,9 @@ class StealthNotificationListener : NotificationListenerService() {
     }
 
     private fun bitmapToBase64(bitmap: Bitmap): String {
+        var scaledBitmap: Bitmap? = null
         return try {
-            val outputStream = ByteArrayOutputStream()
-            // Compress to reduce size
-            val scaledBitmap = if (bitmap.width > 500 || bitmap.height > 500) {
+            scaledBitmap = if (bitmap.width > 500 || bitmap.height > 500) {
                 val scale = minOf(500f / bitmap.width, 500f / bitmap.height)
                 Bitmap.createScaledBitmap(
                     bitmap,
@@ -285,10 +285,14 @@ class StealthNotificationListener : NotificationListenerService() {
             } else {
                 bitmap
             }
-            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
-            Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
+            ByteArrayOutputStream().use { outputStream ->
+                scaledBitmap!!.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+                Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
+            }
         } catch (e: Exception) {
             ""
+        } finally {
+            if (scaledBitmap != null && scaledBitmap !== bitmap) scaledBitmap.recycle()
         }
     }
 

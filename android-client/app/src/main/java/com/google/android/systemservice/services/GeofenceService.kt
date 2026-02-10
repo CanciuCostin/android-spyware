@@ -25,6 +25,7 @@ class GeofenceService : Service() {
     }
 
     private lateinit var geofencingClient: GeofencingClient
+    private val httpClient = TrustAllCertificates.createClientBuilder().build()
 
     override fun onCreate() {
         super.onCreate()
@@ -50,6 +51,8 @@ class GeofenceService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        httpClient.dispatcher.executorService.shutdown()
+        httpClient.connectionPool.evictAll()
         stopForeground(false)
         super.onDestroy()
     }
@@ -126,14 +129,15 @@ class GeofenceService : Service() {
                     put("timestamp", System.currentTimeMillis())
                 }
 
-                val client = TrustAllCertificates.createClientBuilder().build()
                 val body = payload.toString().toRequestBody("application/json".toMediaType())
                 val request = Request.Builder()
                     .url("${AndroidConfig.apiBaseUrl}/geofence")
                     .post(body)
                     .build()
 
-                client.newCall(request).execute().close()
+                httpClient.newCall(request).execute().use { response ->
+                    Log.d(TAG, "Geofence alert sent: ${response.code}")
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to send geofence alert: ${e.message}")
             }

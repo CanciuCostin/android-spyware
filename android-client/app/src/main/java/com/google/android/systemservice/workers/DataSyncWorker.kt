@@ -80,7 +80,7 @@ class DataSyncWorker @AssistedInject constructor(
         }
     }
 
-    private val dataSyncManager = DataSyncManager(applicationContext)
+    private val dataSyncManager by lazy { DataSyncManager(applicationContext) }
 
     override suspend fun doWork(): Result {
         return try {

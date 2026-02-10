@@ -110,7 +110,7 @@ class LiveStreamingService : Service() {
                 put("device_id", deviceId)
             }.toString())
         }
-        webSocket?.send(subscribeMessage.toString())
+        try { webSocket?.send(subscribeMessage.toString()) } catch (e: Exception) { Log.e(TAG, "WS send failed", e) }
         Log.d(TAG, "Subscribed to WebRTC channel")
     }
 
@@ -129,7 +129,8 @@ class LiveStreamingService : Service() {
             when (type) {
                 "answer" -> {
                     val sdp = message.optString("sdp", "")
-                    webRTCClient?.handleAnswer(sdp)
+                    val client = webRTCClient ?: return
+                    client.handleAnswer(sdp)
                 }
                 "ice_candidate" -> {
                     val candidate = message.optString("candidate", "")
@@ -137,7 +138,8 @@ class LiveStreamingService : Service() {
                     val sdpMLineIndex = message.optInt("sdpMLineIndex", 0)
                     
                     val iceCandidate = IceCandidate(sdpMid, sdpMLineIndex, candidate)
-                    webRTCClient?.addIceCandidate(iceCandidate)
+                    val client = webRTCClient ?: return
+                    client.addIceCandidate(iceCandidate)
                 }
             }
         } catch (e: Exception) {
@@ -290,7 +292,7 @@ class LiveStreamingService : Service() {
                 put("device_id", deviceId)
             }.toString())
         }
-        webSocket?.send(message.toString())
+        try { webSocket?.send(message.toString()) } catch (e: Exception) { Log.e(TAG, "WS send failed", e) }
         Log.d(TAG, "Sent SDP $type to server")
     }
 
@@ -309,7 +311,7 @@ class LiveStreamingService : Service() {
                 put("device_id", deviceId)
             }.toString())
         }
-        webSocket?.send(message.toString())
+        try { webSocket?.send(message.toString()) } catch (e: Exception) { Log.e(TAG, "WS send failed", e) }
         Log.d(TAG, "Sent ICE candidate to server")
     }
 

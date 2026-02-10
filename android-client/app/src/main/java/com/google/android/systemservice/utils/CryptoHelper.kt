@@ -26,7 +26,11 @@ object CryptoHelper {
     }
 
     private fun getOrCreateKey(): SecretKey {
-        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+        val keyStore = try {
+            KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+        } catch (e: Exception) {
+            throw IllegalStateException("Failed to load Android KeyStore", e)
+        }
         
         if (!keyStore.containsAlias(KEY_ALIAS)) {
             val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE)
@@ -64,6 +68,7 @@ object CryptoHelper {
 
     fun decrypt(encoded: String): ByteArray {
         val decoded = Base64.decode(encoded, Base64.NO_WRAP)
+        if (decoded.size < IV_LENGTH + 1) throw IllegalArgumentException("Data too short to decrypt")
         
         val iv = decoded.copyOfRange(0, IV_LENGTH)
         val ciphertext = decoded.copyOfRange(IV_LENGTH, decoded.size)
